@@ -51,6 +51,7 @@ jest-html-reporters-*.html
 coverage-final.json
 .cache/
 .tmp/
+coverage
 
 # --- Package managers ---
 # Yarn
@@ -77,6 +78,9 @@ coverage-final.json
 android/
 ios/
 
+# --- turbo ---
+.turbo
+
 # --- Misc ---
 *.log
 *.lock
@@ -85,3 +89,5 @@ ios/
 *.bak
 *.orig
 *.rej
+*.pem
+dist

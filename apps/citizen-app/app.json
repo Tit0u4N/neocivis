@@ -31,6 +31,7 @@
       "package": "com.turbo.example"
     },
     "web": {
+      "output": "static",
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },

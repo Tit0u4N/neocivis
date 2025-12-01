@@ -1,0 +1,31 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon",
+    "build": "vite build",
+    "serve": "sam local start-api --template-file local-template.yaml --port 8080",
+    "make:module" : "node scripts/generate-module.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@hono/node-server": "^1.19.6",
+    "archiver": "^7.0.1",
+    "hono": "^4.10.7"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/archiver": "^7.0.0",
+    "@types/node": "^24.10.1",
+    "esbuild": "^0.27.0",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4",
+    "vite-node": "^5.2.0"
+  }
+}

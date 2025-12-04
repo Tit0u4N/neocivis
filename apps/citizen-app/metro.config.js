@@ -1,3 +1,8 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const { withNativewind } = require("nativewind/metro");
 
-module.exports = getDefaultConfig(__dirname);
+/** @type {import('expo/metro-config').MetroConfig} */
+const config = getDefaultConfig(__dirname);
+
+// biome-ignore lint/style/noCommonJs: This is a Metro config file
+module.exports = withNativewind(config);

@@ -8,14 +8,24 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "@expo/html-elements": "latest",
+    "@gluestack-style/react": "latest",
+    "@gluestack-ui/config": "latest",
+    "@gluestack-ui/themed": "latest",
+    "@legendapp/motion": "latest"
+  },
   "devDependencies": {
     "@repo/typescript-config": "*",
-    "@types/react": "^18.2.14",
-    "tsup": "^8.0.1",
-    "typescript": "5.5.4"
+    "@types/react": "^19.2.7",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
   },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-native": "0.76.9"
+  "peerDependencies": {
+    "react": "*",
+    "react-dom": "*",
+    "react-native": "*",
+    "react-native-web": "*",
+    "@gluestack-ui/themed": "*"
   }
 }

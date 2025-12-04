@@ -12,7 +12,6 @@
     "@expo/html-elements": "latest",
     "@gluestack-style/react": "latest",
     "@gluestack-ui/config": "latest",
-    "@gluestack-ui/themed": "latest",
     "@legendapp/motion": "latest"
   },
   "devDependencies": {

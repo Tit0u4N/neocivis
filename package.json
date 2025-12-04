@@ -10,7 +10,6 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "clean": "turbo run clean && rm -rf node_modules",
-
     "lint": "biome lint .",
     "format": "biome check . --write"
   },
@@ -20,6 +19,6 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": ">=24"
+    "node": ">=20.9.0"
   }
 }

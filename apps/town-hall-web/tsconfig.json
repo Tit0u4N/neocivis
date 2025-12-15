@@ -1,23 +1,23 @@
 {
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "types": []
-  },
-  "paths": {
-    "@/*": [
-      "./*"
-    ],
-    "@/utils/*": [
-      "./src/utils/*"
-    ],
-    "@/components/*": [
-      "./src/components/*"
-    ]
+    "types": [],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
     "next-env.d.ts",

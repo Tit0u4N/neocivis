@@ -1,5 +1,5 @@
 {
-  "name": "@repo/ui",
+  "name": "@repo/frontend-core",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -9,22 +9,13 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@expo/html-elements": "latest",
-    "@gluestack-style/react": "latest",
-    "@gluestack-ui/config": "latest",
-    "@legendapp/motion": "latest"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",
-    "@types/react": "^19.2.7",
     "tsup": "^8.5.1",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-dom": "*",
-    "react-native": "*",
-    "react-native-web": "*",
-    "@gluestack-ui/themed": "*"
+
   }
 }

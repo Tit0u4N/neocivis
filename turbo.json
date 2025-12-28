@@ -26,6 +26,13 @@
     },
     "clean": {
       "cache": false
+    },
+    "test": {
+      "dependsOn": ["^build", "@repo/vitest-config#build"]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

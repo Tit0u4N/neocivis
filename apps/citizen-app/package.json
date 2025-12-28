@@ -1,50 +1,69 @@
 {
   "name": "citizen-app",
+  "main": "expo-router/entry",
   "version": "1.0.0",
-  "private": true,
-  "main": "index.js",
   "scripts": {
-    "dev": "expo start --web",
+    "dev": "expo start",
+    "build": "expo export --platform web",
+    "build:web": "expo export --platform web",
     "build:android": "expo export --platform android",
     "build:ios": "expo export --platform ios",
-    "build:web": "expo export --platform web",
-    "build:all": "yarn build:android && yarn build:ios && yarn build:web",
-    "build": "yarn build:web",
-    "eject": "expo eject"
+    "build:all": "expo export --platform all",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "expo lint",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "clean": "rm -rf dist .expo node_modules/.cache"
   },
   "dependencies": {
-    "@gluestack-ui/themed": "^1.1.73",
-    "@repo/ui": "*",
-    "expo": "~54.0.25",
-    "expo-constants": "~18.0.10",
-    "expo-linking": "~8.0.9",
-    "expo-router": "~6.0.15",
-    "expo-status-bar": "~3.0.8",
-    "expo-system-ui": "~6.0.8",
-    "nativewind": "^5.0.0-preview.2",
+    "@repo/frontend-core": "*",
+    "@repo/frontend-services": "*",
+    "@expo/metro-runtime": "~6.1.2",
+    "@expo/vector-icons": "^15.0.3",
+    "@react-navigation/bottom-tabs": "^7.9.0",
+    "@react-navigation/elements": "^2.9.3",
+    "@react-navigation/native": "^7.1.26",
+    "expo": "~54.0.30",
+    "expo-asset": "~12.0.12",
+    "expo-blur": "~15.0.8",
+    "expo-constants": "~18.0.12",
+    "expo-device": "~8.0.10",
+    "expo-font": "~14.0.10",
+    "expo-glass-effect": "~0.1.8",
+    "expo-haptics": "~15.0.8",
+    "expo-image": "~3.0.11",
+    "expo-linking": "~8.0.11",
+    "expo-navigation-bar": "~5.0.10",
+    "expo-router": "~6.0.21",
+    "expo-splash-screen": "~31.0.13",
+    "expo-status-bar": "~3.0.9",
+    "expo-symbols": "~1.0.8",
+    "expo-system-ui": "~6.0.9",
+    "expo-web-browser": "~15.0.10",
+    "lucide-react-native": "^0.553.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
-    "react-native-css": "^3.0.1",
-    "react-native-reanimated": "^4.1.5",
-    "react-native-safe-area-context": "^5.6.2",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-reanimated": "~4.1.6",
+    "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.16.0",
+    "react-native-svg": "^15.15.1",
     "react-native-web": "~0.21.2",
-    "react-native-worklets": "^0.6.1"
+    "react-native-webview": "13.15.0",
+    "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@tailwindcss/postcss": "^4.1.17",
-    "@types/react": "~19.1.10",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17",
-    "typescript": "5.9.3"
+    "@repo/vitest-config": "*",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/react": "~19.1.17",
+    "eslint": "^9.39.2",
+    "eslint-config-expo": "~10.0.0",
+    "jsdom": "^26.1.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.16"
   },
-  "expo": {
-    "doctor": {
-      "reactNativeDirectoryCheck": {
-        "listUnknownPackages": false
-      }
-    }
-  }
+  "private": true
 }

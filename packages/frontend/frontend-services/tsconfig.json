@@ -1,0 +1,11 @@
+{
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"],
+  "compilerOptions": {
+    "strict": true,
+    "types": [],
+    "paths": {
+      "@frontend-core/*": ["./src/*"]
+    }
+  }
+}

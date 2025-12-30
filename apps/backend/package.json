@@ -6,7 +6,9 @@
     "dev": "nodemon",
     "build": "vite build",
     "serve": "sam local start-api --template-file local-template.yaml --port 8080",
-    "make:module" : "node scripts/generate-module.js"
+    "make:module": "node scripts/generate-module.js",
+    "test": "vitest run",
+    "test:watch": "vitest --watch"
   },
   "keywords": [],
   "author": "",
@@ -19,13 +21,15 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "*",
+    "@repo/vitest-config": "*",
     "@types/archiver": "^7.0.0",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.3",
     "esbuild": "^0.27.0",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vite": "^7.2.4",
-    "vite-node": "^5.2.0"
+    "vite-node": "^5.2.0",
+    "vitest": "^4.0.16"
   }
 }

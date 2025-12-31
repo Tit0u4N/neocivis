@@ -45,22 +45,4 @@ yarn turbo run build:ios --filter=citizen-app
 yarn turbo run build:all --filter=citizen-app
 ```
 
-`yarn build` (and therefore `turbo build --filter=citizen-app`) only exports the
-web bundle, which is the safest option for CI/CD because it does not require
-native toolchains. Use the platform-specific scripts when you need APK/IPA
-artifacts locally or in EAS.
-
-## Project structure
-
-- `app/` uses Expo Router; `_layout.tsx` defines the navigation shell.
-- `metro.config.js` extends Expo’s defaults; cache invalidation uses the shared
-  `packages/shared/metro-cache-key` helper.
-- `assets/` holds icons and splash screens reused across platforms.
-
-## Tips
-
-- Keep Metro cache stable by updating `packages/shared/metro-cache-key` whenever
-  you add new config files that affect bundling.
-- When building native binaries on CI, prefer the Expo Application Services
-  workflow defined in `eas.json`.
 

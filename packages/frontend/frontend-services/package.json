@@ -10,8 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest --watch"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@repo/typescript-config": "*",
     "@repo/vitest-config": "*",
@@ -22,6 +21,6 @@
   },
   "peerDependencies": {},
   "exports": {
-    "./report" : "./src/report/report.service.ts"
+    "./report": "./src/report/report.service.ts"
   }
 }

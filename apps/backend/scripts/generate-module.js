@@ -5,36 +5,36 @@ import path from 'path';
 import readline from 'readline';
 
 // Récupérer l'argument module ou demander à l'utilisateur
-const MODULE_NAME = process.argv[2] || await new Promise((resolve) => {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
+const MODULE_NAME =
+ process.argv[2] ||
+ (await new Promise((resolve) => {
+  const rl = readline.createInterface({
+   input: process.stdin,
+   output: process.stdout,
+  });
 
-    rl.question('Nom de module: ', (answer) => {
-        rl.close();
-        if (!answer) {
-            console.error('Erreur: Le nom du module est requis.');
-            process.exit(1);
-        }
-        resolve(answer);
-    });
-});
+  rl.question('Nom de module: ', (answer) => {
+   rl.close();
+   if (!answer) {
+    console.error('Erreur: Le nom du module est requis.');
+    process.exit(1);
+   }
+   resolve(answer);
+  });
+ }));
 
 const TEMPLATE_DIR = path.resolve('templates');
 const MODULE_DIR = path.resolve('src/modules', MODULE_NAME);
 const LAMBDA_DIR = path.resolve('src/lambdas');
 
 function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+ return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function generateFile(templateFile, outputFile) {
-    const template = fs.readFileSync(templateFile, 'utf-8');
-    const content = template
-        .replace(/{{name}}/g, MODULE_NAME)
-        .replace(/{{Name}}/g, capitalize(MODULE_NAME));
-    fs.writeFileSync(outputFile, content, 'utf-8');
+ const template = fs.readFileSync(templateFile, 'utf-8');
+ const content = template.replace(/{{name}}/g, MODULE_NAME).replace(/{{Name}}/g, capitalize(MODULE_NAME));
+ fs.writeFileSync(outputFile, content, 'utf-8');
 }
 
 // Création des dossiers

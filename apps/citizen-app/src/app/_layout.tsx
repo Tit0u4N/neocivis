@@ -14,61 +14,65 @@ import { ThemeProvider } from '@/theme/theme-provider';
 import 'react-native-reanimated';
 
 SplashScreen.setOptions({
- duration: 200,
- fade: true,
+  duration: 200,
+  fade: true,
 });
 
 export default function RootLayout() {
- const colorScheme = useColorScheme() || 'light';
+  const colorScheme = useColorScheme() || 'light';
 
- useEffect(() => {
-  if (Platform.OS === 'android') {
-   NavigationBar.setButtonStyleAsync(colorScheme === 'light' ? 'dark' : 'light');
-  }
- }, [colorScheme]);
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setButtonStyleAsync(colorScheme === 'light' ? 'dark' : 'light');
+    }
+  }, [colorScheme]);
 
- // Keep the root view background color in sync with the current theme
- useEffect(() => {
-  setBackgroundColorAsync(colorScheme === 'dark' ? Colors.dark.background : Colors.light.background);
- }, [colorScheme]);
+  // Keep the root view background color in sync with the current theme
+  useEffect(() => {
+    setBackgroundColorAsync(colorScheme === 'dark' ? Colors.dark.background : Colors.light.background);
+  }, [colorScheme]);
 
- return (
-  <GestureHandlerRootView style={{ flex: 1 }}>
-   <ThemeProvider>
-    <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
 
-    <Stack screenOptions={{ headerShown: false }}>
-     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-     <Stack.Screen
-      name="sheet"
-      options={{
-       headerShown: false,
-       sheetGrabberVisible: true,
-       sheetAllowedDetents: [0.4, 0.7, 1],
-       contentStyle: {
-        backgroundColor: isLiquidGlassAvailable()
-         ? 'transparent'
-         : colorScheme === 'dark'
-           ? Colors.dark.card
-           : Colors.light.card,
-       },
-       headerTransparent: Platform.OS === 'ios',
-       headerLargeTitle: false,
-       title: '',
-       presentation:
-        Platform.OS === 'ios' ? (isLiquidGlassAvailable() && osName !== 'iPadOS' ? 'formSheet' : 'modal') : 'modal',
-       sheetInitialDetentIndex: 0,
-       headerStyle: {
-        backgroundColor:
-         Platform.OS === 'ios' ? 'transparent' : colorScheme === 'dark' ? Colors.dark.card : Colors.light.card,
-       },
-       headerBlurEffect: isLiquidGlassAvailable() ? undefined : colorScheme === 'dark' ? 'dark' : 'light',
-      }}
-     />
-     <Stack.Screen name="+not-found" />
-    </Stack>
-   </ThemeProvider>
-  </GestureHandlerRootView>
- );
+          <Stack.Screen
+            name="sheet"
+            options={{
+              headerShown: false,
+              sheetGrabberVisible: true,
+              sheetAllowedDetents: [0.4, 0.7, 1],
+              contentStyle: {
+                backgroundColor: isLiquidGlassAvailable()
+                  ? 'transparent'
+                  : colorScheme === 'dark'
+                    ? Colors.dark.card
+                    : Colors.light.card,
+              },
+              headerTransparent: Platform.OS === 'ios',
+              headerLargeTitle: false,
+              title: '',
+              presentation:
+                Platform.OS === 'ios'
+                  ? isLiquidGlassAvailable() && osName !== 'iPadOS'
+                    ? 'formSheet'
+                    : 'modal'
+                  : 'modal',
+              sheetInitialDetentIndex: 0,
+              headerStyle: {
+                backgroundColor:
+                  Platform.OS === 'ios' ? 'transparent' : colorScheme === 'dark' ? Colors.dark.card : Colors.light.card,
+              },
+              headerBlurEffect: isLiquidGlassAvailable() ? undefined : colorScheme === 'dark' ? 'dark' : 'light',
+            }}
+          />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </ThemeProvider>
+    </GestureHandlerRootView>
+  );
 }

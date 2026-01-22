@@ -6,6 +6,13 @@
     "useIgnoreFile": true,
     "defaultBranch": "main"
   },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "files": {
     "ignoreUnknown": true,
     "includes": [
@@ -24,7 +31,7 @@
     "enabled": true,
     "formatWithErrors": false,
     "indentStyle": "space",
-    "indentWidth": 1,
+    "indentWidth": 2,
     "lineWidth": 120,
     "lineEnding": "lf",
     "attributePosition": "auto"

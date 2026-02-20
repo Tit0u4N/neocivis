@@ -14,7 +14,8 @@
     "clean": "rimraf dist",
     "clean:node_modules": "npx rimraf node_modules",
     "prestart": "npm run clean && npm run build",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
     "dev": "concurrently \"npm run watch\" \"npm run start\""
   },
   "dependencies": {

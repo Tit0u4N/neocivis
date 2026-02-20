@@ -38,6 +38,9 @@
     "clean": {
       "cache": false
     },
+    "clean:node_modules": {
+      "cache": false
+    },
     "test": {
       "dependsOn": ["^build", "@repo/vitest-config#build"]
     },

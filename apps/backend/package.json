@@ -8,7 +8,9 @@
     "serve": "sam local start-api --template-file local-template.yaml --port 8080",
     "make:module": "node scripts/generate-module.js",
     "test": "vitest run",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "clean": "npx rimraf dist",
+    "clean:node_modules": "npx rimraf node_modules"
   },
   "keywords": [],
   "author": "",

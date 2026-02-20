@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "clean": "rm -rf dist",
+    "clean": "npx rimraf dist",
+    "clean:node_modules": "npx rimraf node_modules",
     "test": "vitest run",
     "test:watch": "vitest --watch"
   },

@@ -91,3 +91,6 @@ ios/
 *.rej
 *.pem
 dist
+
+# --- Azure ---
+local.settings.json

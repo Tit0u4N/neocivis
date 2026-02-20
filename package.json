@@ -12,7 +12,7 @@
     "clean": "turbo run clean && npx rimraf node_modules",
     "clean:node_modules": "turbo run clean:node_modules && npx rimraf node_modules",
     "lint": "biome lint .",
-    "format": "biome format . --write --staged",
+    "format": "biome check . --write --staged",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "prepare": "husky"

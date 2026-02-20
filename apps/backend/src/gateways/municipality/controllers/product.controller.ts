@@ -1,15 +1,15 @@
-import type { Context } from 'node:vm';
+import type { Context } from 'hono';
 import { Hono } from 'hono';
 
-import { ProductService } from './product.service';
+import type { ProductService } from '../../../modules/product/product.service';
 
 export class ProductController {
-  constructor(private service = new ProductService()) {}
+  constructor(private service: ProductService) {}
 
-  routes() {
-    const app = new Hono().basePath('/products');
+  public getRoutes() {
+    const app = new Hono();
 
-    app.get('/', (c: Context) => {
+    app.get('/all', (c: Context) => {
       return c.json(this.service.list());
     });
 
@@ -17,13 +17,14 @@ export class ProductController {
       const request = {
         url: c.req.url,
         method: c.req.method,
-        headers: c.req.headers,
+        headers: c.req.header(),
         query: c.req.query(),
         path: c.req.path,
         params: c.req.param(),
       };
       return c.json(request);
     });
+
     return app;
   }
 }

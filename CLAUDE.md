@@ -56,6 +56,7 @@ apps/
 packages/
 ├── frontend/
 │   ├── frontend-core/      # @repo/frontend-core - shared frontend utilities (tsup build)
+│   ├── frontend-services/  # @repo/frontend-services - shared business logic services (tsup build)
 │   └── ui/                 # Shared UI components (WIP)
 └── shared/
     ├── typescript-config/  # @repo/typescript-config - shared TS configs
@@ -67,7 +68,7 @@ packages/
 | App | Framework | UI Library | Styling |
 |-----|-----------|------------|---------|
 | town-hall-web | Next.js 16, React 19 | shadcn/ui + @base-ui/react | Tailwind CSS v4 |
-| citizen-app | Expo 54, React Native | gluestack-ui | NativeWind + Tailwind CSS v4 |
+| citizen-app | Expo 54, React Native | Custom UI components | React Native StyleSheet + theme system |
 
 Both apps share `@repo/frontend-core` for common utilities.
 
@@ -111,7 +112,7 @@ export function UserProfile({ userId }: Props) {
 
 ## Code Style
 
-- **Formatter/Linter**: Biome (tabs, 120 char lines, double quotes, semicolons)
+- **Formatter/Linter**: Biome (2 spaces, 120 char lines, single quotes, semicolons)
 - **Import organization**: Automatic via Biome
 - **Default exports**: Only for Next.js pages/layouts (use `// biome-ignore lint/style/noDefaultExport`)
 - **Path aliases**: `@/*` maps to `./src/*` in both apps

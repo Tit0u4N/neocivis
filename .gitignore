@@ -81,6 +81,14 @@ ios/
 # --- turbo ---
 .turbo
 
+# --- AI ---
+.agent/
+_bmad/
+.claude/
+.github/agents/
+.github/prompts/
+.github/copilot-instructions.md
+
 # --- Misc ---
 *.log
 *.lock

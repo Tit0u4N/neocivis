@@ -1,0 +1,59 @@
+name: CD Backend to Azure Function
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (dev or main)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - main
+
+env:
+  AZURE_FUNCTIONAPP_NAME: 'neocivis-functions'   
+  AZURE_FUNCTIONAPP_DEV_NAME: 'neocivis-function-dev'   
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'      
+  NODE_VERSION: '22.x'                    
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v4
+
+    - name: 'Setup Node ${{ env.NODE_VERSION }} Environment'
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: 'Resolve Project Dependencies Using Yarn'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        yarn install
+        yarn build 
+        popd
+
+    - name: 'Run Azure Functions Action (DEV)'
+      if: github.ref == 'refs/heads/dev' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev'
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_DEV_NAME }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_DEV_PUBLISH_PROFILE }}
+
+    - name: 'Run Azure Functions Action (PROD)'
+      if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'main'
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PROD_PUBLISH_PROFILE }}

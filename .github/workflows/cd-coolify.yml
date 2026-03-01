@@ -1,10 +1,15 @@
 name: CD Town hall web & Citizen app to Coolify
 
 on:
+  pull_request:
+    branches: ['*']
   workflow_run:
     workflows: ["CI (Build & Test)"] 
     types:
       - completed
+    branches:
+        - main
+        - dev
   workflow_dispatch:
     inputs:
       environment:

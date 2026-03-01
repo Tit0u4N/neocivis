@@ -47,7 +47,7 @@ jobs:
             exit 1
           fi
           echo "Triggering Town hall web webhook..."
-          curl -v -X GET "$WEBHOOK_URL" \
+          curl -v -L "$WEBHOOK_URL" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Accept: application/json" \
             -o response.json
@@ -66,7 +66,7 @@ jobs:
           echo "Deployment UUID: $DEPLOY_UUID"
           
           while true; do
-            STATUS=$(curl -s -X GET "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" -H "Accept: application/json" | jq -r '.status')
+            STATUS=$(curl -s -L "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" -H "Accept: application/json" | jq -r '.status')
             echo "Status: $STATUS"
             if [ "$STATUS" == "finished" ]; then break; fi
             if [ "$STATUS" == "failed" ]; then 
@@ -92,8 +92,12 @@ jobs:
       - name: "Deploy and Wait: Citizen App"
         run: |
           echo "Triggering Citizen App webhook..."
-          RESPONSE=$(curl -s -X GET "$WEBHOOK_URL" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
-          DEPLOY_UUID=$(echo $RESPONSE | jq -r '.deploy_uuid')
+          curl -v -L "$WEBHOOK_URL" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Accept: application/json" \
+            -o response.json
+
+          DEPLOY_UUID=$(cat response.json | jq -r '.deployment_uuid // empty ')
           
           if [ "$DEPLOY_UUID" == "null" ] || [ -z "$DEPLOY_UUID" ]; then
             echo "Error: Failed to retrieve UUID."
@@ -101,7 +105,7 @@ jobs:
           fi
           
           while true; do
-            STATUS=$(curl -s -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" | jq -r '.status')
+            STATUS=$(curl -s -L -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" | jq -r '.status')
             if [ "$STATUS" == "finished" ]; then break; fi
             if [ "$STATUS" == "failed" ]; then exit 1; fi
             sleep 10

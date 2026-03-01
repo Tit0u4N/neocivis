@@ -5,6 +5,11 @@ on:
     branches: 
       - main
       - dev
+# Temporary trigger
+  pull_request:
+    branches:
+      - main
+      - dev
   workflow_dispatch:
     inputs:
       environment:

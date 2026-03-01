@@ -5,6 +5,11 @@ on:
     branches:
       - main
       - dev
+# Temporary trigger
+  pull_request:
+    branches:
+      - main
+      - dev
   workflow_dispatch:
     inputs:
       environment:
@@ -43,7 +48,7 @@ jobs:
         popd
 
     - name: 'Run Azure Functions Action (DEV)'
-      if: github.ref == 'refs/heads/dev' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev'
+      if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment != 'main'
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_DEV_NAME }}

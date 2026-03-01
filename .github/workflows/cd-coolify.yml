@@ -39,7 +39,7 @@ jobs:
       - name: "Deploy and Wait: Town hall web App"
         run: |
           echo "Triggering Town hall web webhook..."
-          RESPONSE=$(curl -s -X GET "$WEBHOOK_URL" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
+          RESPONSE=$(curl --request GET "$WEBHOOK_URL" --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
           echo $RESPONSE
           DEPLOY_UUID=$(echo $RESPONSE | jq -r '.deploy_uuid')
           
@@ -70,7 +70,8 @@ jobs:
       - name: "Deploy and Wait: Citizen App"
         run: |
           echo "Triggering Citizen App webhook..."
-          RESPONSE=$(curl -s -X GET "$WEBHOOK_URL" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
+          RESPONSE=$(curl --request GET "$WEBHOOK_URL" --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
+          echo $RESPONSE
           DEPLOY_UUID=$(echo $RESPONSE | jq -r '.deploy_uuid')
           
           if [ "$DEPLOY_UUID" == "null" ] || [ -z "$DEPLOY_UUID" ]; then

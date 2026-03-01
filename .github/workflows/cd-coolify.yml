@@ -31,27 +31,39 @@ jobs:
       - name: "Configure Town hall web Webhook"
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.environment }}" == "main" ]; then
+            echo "Environment: PROD/MAIN"  
             echo "WEBHOOK_URL=${{ secrets.COOLIFY_WEBHOOK_TOWN_HALL_PROD }}" >> $GITHUB_ENV
           else
+            echo "Environment: DEV"
             echo "WEBHOOK_URL=${{ secrets.COOLIFY_WEBHOOK_TOWN_HALL_DEV }}" >> $GITHUB_ENV
           fi
 
       - name: "Deploy and Wait: Town hall web App"
         run: |
           echo "Triggering Town hall web webhook..."
-          RESPONSE=$(curl -s -X GET "$WEBHOOK_URL" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
-          echo $RESPONSE
-          DEPLOY_UUID=$(echo $RESPONSE | jq -r '.deploy_uuid')
+          RESPONSE=$(curl -s -X GET "$WEBHOOK_URL" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" -H "Accept: application/json")
           
-          if [ "$DEPLOY_UUID" == "null" ] || [ -z "$DEPLOY_UUID" ]; then
-            echo "Error: Failed to retrieve UUID."
+          # Afficher la réponse proprement pour débugger au cas où
+          echo "Raw response: $RESPONSE"
+          
+          # Extraction sécurisée (si vide, retourne une chaîne vide au lieu du texte "null")
+          DEPLOY_UUID=$(echo "$RESPONSE" | jq -r '.deploy_uuid // empty')
+          
+          if [ -z "$DEPLOY_UUID" ]; then
+            echo "Error: Failed to retrieve UUID. Check webhook URL or API token."
             exit 1
           fi
           
+          echo "Deployment UUID: $DEPLOY_UUID"
+          
           while true; do
-            STATUS=$(curl -s -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" | jq -r '.status')
+            STATUS=$(curl -s -X GET "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" -H "Accept: application/json" | jq -r '.status')
+            echo "Status: $STATUS"
             if [ "$STATUS" == "finished" ]; then break; fi
-            if [ "$STATUS" == "failed" ]; then exit 1; fi
+            if [ "$STATUS" == "failed" ]; then 
+              echo "Deployment failed on Coolify side."
+              exit 1
+            fi
             sleep 10
           done
           echo "Town hall web deployment finished successfully!"

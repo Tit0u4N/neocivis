@@ -24,7 +24,7 @@ on:
 env:
   AZURE_FUNCTIONAPP_NAME: 'neocivis-functions'   
   AZURE_FUNCTIONAPP_DEV_NAME: 'neocivis-function-dev'   
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './app/backend'      
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'apps/backend'      
   NODE_VERSION: '22.x'                    
 
 jobs:

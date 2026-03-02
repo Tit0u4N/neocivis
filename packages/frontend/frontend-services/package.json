@@ -1,0 +1,27 @@
+{
+  "name": "@repo/frontend-services",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "npx rimraf dist",
+    "clean:node_modules": "npx rimraf node_modules",
+    "test": "vitest run",
+    "test:watch": "vitest --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/vitest-config": "*",
+    "@repo/frontend-core": "*",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "peerDependencies": {},
+  "exports": {
+    "./report": "./src/report/report.service.ts"
+  }
+}

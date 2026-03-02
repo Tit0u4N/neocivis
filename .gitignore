@@ -27,7 +27,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-bun.lockb
 
 # --- Environment variables ---
 .env
@@ -51,6 +50,7 @@ jest-html-reporters-*.html
 coverage-final.json
 .cache/
 .tmp/
+coverage
 
 # --- Package managers ---
 # Yarn
@@ -77,6 +77,17 @@ coverage-final.json
 android/
 ios/
 
+# --- turbo ---
+.turbo
+
+# --- AI ---
+.agent/
+_bmad/
+.claude/
+.github/agents/
+.github/prompts/
+.github/copilot-instructions.md
+
 # --- Misc ---
 *.log
 *.lock
@@ -85,3 +96,8 @@ ios/
 *.bak
 *.orig
 *.rej
+*.pem
+dist
+
+# --- Azure ---
+local.settings.json

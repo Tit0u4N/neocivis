@@ -1,0 +1,30 @@
+{
+  "name": "@repo/vitest-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./node": "./dist/node.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "npx rimraf dist",
+    "clean:node_modules": "npx rimraf node_modules"
+  },
+  "dependencies": {
+    "vitest": "^4.0.16"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@vitejs/plugin-react": "^4.5.2",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "vitest": "^4.0.16"
+  }
+}

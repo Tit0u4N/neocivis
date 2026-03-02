@@ -1,6 +1,8 @@
 name: CD Backend to Azure Function
 
 on:
+  pull_request:
+    branches: ['*']
   workflow_run:
     workflows: ["CI (Build & Test)"] 
     types:

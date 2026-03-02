@@ -17,7 +17,7 @@ const productController = new ProductController(new ProductService(productReposi
 const app = new Hono().basePath('/api/municipality');
 
 // Register routes from controllers
-app.route('/user/', userController.getRoutes());
-app.route('/product/', productController.getRoutes());
+app.route('/user', userController.getRoutes());
+app.route('/product', productController.getRoutes());
 
 export default app;

@@ -45,37 +45,13 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Accept: application/json" \
             -o response.json
-
           
-          # Extraction sécurisée (si vide, retourne une chaîne vide au lieu du texte "null")
-          DEPLOY_UUID=$(cat response.json | jq -r '.deployments[0].deployment_uuid // empty')
-          
-          if [ -z "$DEPLOY_UUID" ]; then
-            echo "Error: Failed to retrieve UUID. Check webhook URL or API token."
+          IS_ERROR=$(cat response.json | jq -r '.error // empty')
+          if [ -n "$IS_ERROR" ]; then
+            echo "Error: $IS_ERROR"
             exit 1
           fi
-          
-          echo "Deployment UUID: $DEPLOY_UUID"
-          
-          COUNT=0
-          while [ $COUNT -lt 60 ]; do
-            STATUS=$(curl -s -L "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" -H "Accept: application/json" | jq -r '.status')
-            echo "Status: $STATUS"
-            if [ "$STATUS" == "finished" ]; then break; fi
-            if [ "$STATUS" == "failed" ]; then 
-              echo "Deployment failed on Coolify side."
-              exit 1
-            fi
-            sleep 10
-            COUNT=$((COUNT + 1))
-          done
-          if [ $COUNT -ge 60 ]; then
-            echo "Timeout: Deployment did not finish within 10 minutes."
-            echo "Please check the Coolify dashboard for more details."
 
-            exit 1
-          fi
-          echo "Town hall web deployment finished successfully!"
 
   deploy-citizen-app:
     runs-on: ubuntu-latest
@@ -95,29 +71,11 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Accept: application/json" \
             -o response.json
+          
+          IS_ERROR=$(cat response.json | jq -r '.error // empty')
+          if [ -n "$IS_ERROR" ]; then
+            echo "Error: $IS_ERROR"
+            exit 1
+          fi
 
-          DEPLOY_UUID=$(cat response.json | jq -r '.deployments[0].deployment_uuid // empty ')
-          
-          if [ "$DEPLOY_UUID" == "null" ] || [ -z "$DEPLOY_UUID" ]; then
-            echo "Error: Failed to retrieve UUID."
-            exit 1
-          fi
-          
-          COUNT=0
-          while [ $COUNT -lt 60 ]; do
-            STATUS=$(curl -s -L -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "${{ env.COOLIFY_BASE_URL }}/api/v1/deployments/$DEPLOY_UUID" | jq -r '.status')
-            echo "Status: $STATUS"
-            if [ "$STATUS" == "finished" ]; then break; fi
-            if [ "$STATUS" == "failed" ]; then 
-              echo "Deployment failed on Coolify side."
-              exit 1
-            fi
-            sleep 10
-            COUNT=$((COUNT + 1))
-          done
-          if [ $COUNT -ge 60 ]; then
-            echo "Timeout: Deployment did not finish within 10 minutes."
-            echo "Please check the Coolify dashboard for more details."
-            exit 1
-          fi
-          echo "Citizen App deployment finished successfully!"
+          echo "Citizen App deployment triggered successfully!"

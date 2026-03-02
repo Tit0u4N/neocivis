@@ -40,23 +40,15 @@ jobs:
 
       - name: "Deploy and Wait: Town hall web App"
         run: |
-          echo "1. Vérification des variables..."
-          if [ -z "$WEBHOOK_URL" ]; then
-            echo "ERREUR CRITIQUE: L'URL du webhook est vide !"
-            echo "Vérifie que tes secrets GitHub (ex: COOLIFY_WEBHOOK_TOWN_HALL_DEV) sont bien créés."
-            exit 1
-          fi
           echo "Triggering Town hall web webhook..."
           curl -v -L "$WEBHOOK_URL" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Accept: application/json" \
             -o response.json
 
-          # Afficher la réponse proprement pour débugger au cas où
-          cat response.json
           
           # Extraction sécurisée (si vide, retourne une chaîne vide au lieu du texte "null")
-          DEPLOY_UUID=$(cat response.json | jq -r '.deployment_uuid // empty')
+          DEPLOY_UUID=$(cat response.json | jq -r '.deployments[0].deployment_uuid // empty')
           
           if [ -z "$DEPLOY_UUID" ]; then
             echo "Error: Failed to retrieve UUID. Check webhook URL or API token."
@@ -79,7 +71,6 @@ jobs:
 
   deploy-citizen-app:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: "Configure Citizen App Webhook"
         run: |
@@ -97,7 +88,7 @@ jobs:
             -H "Accept: application/json" \
             -o response.json
 
-          DEPLOY_UUID=$(cat response.json | jq -r '.deployment_uuid // empty ')
+          DEPLOY_UUID=$(cat response.json | jq -r '.deployments[0].deployment_uuid // empty ')
           
           if [ "$DEPLOY_UUID" == "null" ] || [ -z "$DEPLOY_UUID" ]; then
             echo "Error: Failed to retrieve UUID."

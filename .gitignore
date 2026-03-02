@@ -27,7 +27,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-bun.lockb
 
 # --- Environment variables ---
 .env
@@ -99,3 +98,6 @@ _bmad/
 *.rej
 *.pem
 dist
+
+# --- Azure ---
+local.settings.json

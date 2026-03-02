@@ -15,7 +15,8 @@
     "lint": "expo lint",
     "test": "vitest run",
     "test:watch": "vitest --watch",
-    "clean": "rm -rf dist .expo node_modules/.cache"
+    "clean": "npx rimraf dist .expo node_modules/.cache",
+    "clean:node_modules": "npx rimraf node_modules"
   },
   "dependencies": {
     "@repo/frontend-core": "*",

@@ -52,6 +52,7 @@ jobs:
     - name: 'Copy Package to Temp Directory and install production dependencies'
       shell: bash
       run: |
+        mkdir -p "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}"
         cp apps/backend/package.json "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/"
         cp apps/backend/host.json "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/"
         cp -r apps/backend/dist "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/dist"

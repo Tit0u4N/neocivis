@@ -9,7 +9,7 @@ export class ProductController {
   public getRoutes() {
     const app = new Hono();
 
-    app.get('/', (c: Context) => {
+    app.get('/all', (c: Context) => {
       return c.json(this.service.list());
     });
 

@@ -77,3 +77,11 @@ You can also export the test results in JUnit format for integration with CI/CD 
 ```bash
 bru run --env local --export-junit
 ```
+
+You can also run the prod and dev environments tests by replacing `local` with `prod` or `dev` in the command:
+```bash
+bru run --env prod
+```
+```bash
+bru run --env dev
+```

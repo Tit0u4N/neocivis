@@ -9,7 +9,7 @@ export class UserController {
   public getRoutes() {
     const app = new Hono();
 
-    app.get('/', (c: Context) => c.json(this.service.getAll()));
+    app.get('/all', (c: Context) => c.json(this.service.getAll()));
     app.get('/:id', (c: Context) => this.getUser(c));
 
     return app;

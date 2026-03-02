@@ -23,8 +23,8 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_NAME: 'neocivis-functions'   
-  AZURE_FUNCTIONAPP_DEV_NAME: 'neocivis-function-dev'   
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'apps/backend'      
+  AZURE_FUNCTIONAPP_DEV_NAME: 'neocivis-function-dev' 
+  AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY: 'deploy_artifact'      
   NODE_VERSION: '22.x'                    
 
 jobs:
@@ -35,25 +35,37 @@ jobs:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v4
 
-    - name: 'Setup Node ${{ env.NODE_VERSION }} Environment'
-      uses: actions/setup-node@v3
+    - name: 'Setup Bun with node ${{ env.NODE_VERSION }} Environment'
+      uses: oven-sh/setup-bun@v1
       with:
+        bun-version: 'latest'
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: 'Resolve Project Dependencies Using Yarn'
+    - name: 'Resolve Project Dependencies Using Bun'
       shell: bash
       run: |
-        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-        yarn install
-        yarn build 
+        pushd './apps/backend'
+        bun install
+        bun run build 
         popd
+
+    - name: 'Copy Package to Temp Directory and install production dependencies'
+      shell: bash
+      run: |
+        cp apps/backend/package.json "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/"
+        cp apps/backend/host.json "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/"
+        cp -r apps/backend/dist "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/dist"
+        cp -r apps/backend/src "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/src"
+
+        cd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}"
+        bun install --production
 
     - name: 'Run Azure Functions Action (DEV)'
       if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment != 'main'
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_DEV_NAME }}
-        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_DEV_PUBLISH_PROFILE }}
 
     - name: 'Run Azure Functions Action (PROD)'
@@ -61,5 +73,5 @@ jobs:
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PROD_PUBLISH_PROFILE }}

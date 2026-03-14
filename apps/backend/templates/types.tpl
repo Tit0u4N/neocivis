@@ -1,8 +1,0 @@
-//////////////////////////////////////
-// Auto-generated file for types.
-// Edit if you need it or delete it.
-//////////////////////////////////////
-
-export interface {{Name}}Type {
-  id: string;
-}

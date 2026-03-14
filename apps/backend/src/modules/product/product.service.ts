@@ -1,8 +1,10 @@
-import { db } from '../../shared/database';
+import type { ProductRepository } from './product.repository';
 import type { Product } from './product.types';
 
 export class ProductService {
+  constructor(private repository: ProductRepository) {}
+
   list(): Product[] {
-    return db.products;
+    return this.repository.list();
   }
 }

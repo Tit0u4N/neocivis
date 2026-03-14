@@ -1,0 +1,79 @@
+name: CD Town hall web & Citizen app to Coolify
+
+on:
+  workflow_run:
+    workflows: ["CI (Build & Test)"] 
+    types:
+      - completed
+    branches:
+        - main
+        - dev
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (dev or main)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - main
+
+env:
+  COOLIFY_BASE_URL: "https://coolify.shiyamii.com"
+
+jobs:
+  deploy-town-hall:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Configure Town hall web Webhook"
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.environment }}" == "main" ]; then
+            echo "Environment: PROD/MAIN"  
+            echo "WEBHOOK_URL=${{ secrets.COOLIFY_WEBHOOK_TOWN_HALL_PROD }}" >> $GITHUB_ENV
+          else
+            echo "Environment: DEV"
+            echo "WEBHOOK_URL=${{ secrets.COOLIFY_WEBHOOK_TOWN_HALL_DEV }}" >> $GITHUB_ENV
+          fi
+
+      - name: "Deploy and Wait: Town hall web App"
+        run: |
+          echo "Triggering Town hall web webhook..."
+          curl -v -L "$WEBHOOK_URL" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Accept: application/json" \
+            -o response.json
+          
+          IS_ERROR=$(cat response.json | jq -r '.error // empty')
+          if [ -n "$IS_ERROR" ]; then
+            echo "Error: $IS_ERROR"
+            exit 1
+          fi
+
+
+  deploy-citizen-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Configure Citizen App Webhook"
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.environment }}" == "main" ]; then
+            echo "WEBHOOK_URL=${{ secrets.COOLIFY_WEBHOOK_CITIZEN_APP_PROD }}" >> $GITHUB_ENV
+          else
+            echo "WEBHOOK_URL=${{ secrets.COOLIFY_WEBHOOK_CITIZEN_APP_DEV }}" >> $GITHUB_ENV
+          fi
+
+      - name: "Deploy and Wait: Citizen App"
+        run: |
+          echo "Triggering Citizen App webhook..."
+          curl -v -L "$WEBHOOK_URL" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Accept: application/json" \
+            -o response.json
+          
+          IS_ERROR=$(cat response.json | jq -r '.error // empty')
+          if [ -n "$IS_ERROR" ]; then
+            echo "Error: $IS_ERROR"
+            exit 1
+          fi
+
+          echo "Citizen App deployment triggered successfully!"

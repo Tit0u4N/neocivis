@@ -12,7 +12,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "clean": "rm -rf dist"
+    "clean": "npx rimraf dist",
+    "clean:node_modules": "npx rimraf node_modules"
   },
   "dependencies": {
     "vitest": "^4.0.16"

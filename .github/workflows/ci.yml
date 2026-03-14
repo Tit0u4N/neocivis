@@ -1,0 +1,37 @@
+name: "CI (Build & Test)"
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Installation des dépendances
+        run: bun install
+
+      - name: Cache Turborepo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          # Le cache est invalidé si le commit change, mais restore-keys permet de récupérer le cache du build précédent
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Build
+        run: bunx turbo run build test
+
+      - name: Test (Tout le monorepo)
+        run: bunx turbo run test

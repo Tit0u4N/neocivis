@@ -1,0 +1,100 @@
+{
+  "realm": "neocivis",
+  "enabled": true,
+  "registrationAllowed": true,
+  "verifyEmail": true,
+  "clients": [
+    {
+      "clientId": "neocivis-app",
+      "secret": "my-secret",
+      "publicClient": false,
+      "redirectUris": ["http://localhost:3000/*", "exp://*"],
+      "directAccessGrantsEnabled": true,
+      "enabled": true,
+      "protocol": "openid-connect"
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Administrateur de la mairie"
+      },
+      {
+        "name": "EMPLOYEE",
+        "description": "Eployé de la mairie"
+      },
+      {
+        "name": "CITIZEN",
+        "description": "Citoyen de la ville"
+      },
+      {
+        "name": "SIGNAL_VIEW_PERMISSION",
+        "description": "Voir les signalements"
+      },
+      {
+        "name": "SIGNAL_CREATE_PERMISSION",
+        "description": "Créer des signalements"
+      },
+      {
+        "name": "SIGNAL_MODIFY_PERMISSION",
+        "description": "Modifier des signalements"
+      },
+      {
+        "name": "FORUM_THREAD_CREATE_PERMISSION",
+        "description": "Créer un thread sur le forum"
+      },
+      {
+        "name": "FORUM_THREAD_DELETE_PERMISSION",
+        "description": "Supprimer un thread sur le forum"
+      },
+      {
+        "name": "FORUM_THREAD_MODIFY_PERMISSION",
+        "description": "Modifier un thread sur le forum"
+      },
+      {
+        "name" : "FORUM_THREAD_DELETE_MESSAGE_PERMISSION",
+        "description": "Supprimer un message dans un thread sur le forum"
+      },
+      {
+        "name": "FORUM_THREAD_BAN_USER_PERMISSION",
+        "description": "Bannir un utilisateur d'un thread sur le forum"
+      },
+      {
+        "name": "FORUM_THREAD_UNBAN_USER_PERMISSION",
+        "description": "Débannir un utilisateur d'un thread sur le forum"
+      },
+      {
+        "name": "PAGE_CITY_HALL_MODIFY_PERMISSION",
+        "description": "Modifier des éléments de la page mairie"
+      },
+      {
+        "name": "PAGE_CITY_HALL_ANNOUNCE_PERMISSION",
+        "description": "Créer des annonces sur la page mairie"
+      },
+      {
+        "name": "NOTIFICATION_SEND_PERMISSION",
+        "description": "Envoyer des notifications aux utilisateurs"
+      },
+      {
+        "name": "WEBHOOK_PERMISSION",
+        "description": "Gestion des webhook"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CITIZEN","SIGNAL_CREATE_PERMISSION","FORUM_THREAD_CREATE_PERMISSION"]
+    }
+  ]
+}

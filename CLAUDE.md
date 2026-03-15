@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Agent Reference Documents
+
+- **Always read before any task**: [`agent/project-context.md`](agent/project-context.md) — complete rules, stack versions, architecture patterns, and critical anti-patterns for the entire project
+- **Read before any frontend task** (`town-hall-web`, `citizen-app`, `keycloak-theme`): [`agent/design-system.md`](agent/design-system.md) — design tokens, brand guidelines, component specs, motion rules, and DO/DON'Ts for both the `citizen` and `town-hall` brands
+
 ## Project Overview
 
 NeoCivis is a monorepo for a municipal services platform (TPI - MIAGE MBDS 2025-2026). It contains:

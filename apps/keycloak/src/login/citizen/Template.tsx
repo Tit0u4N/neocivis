@@ -74,7 +74,7 @@ export function CitizenTemplate(props: TemplateProps<KcContext, I18n>) {
         </div>
 
         <p className="mt-6 text-center text-white/50 text-xs">
-          &copy; {new Date().getFullYear()} NeoCivis — Services Municipaux Numériques
+          &copy; {new Date().getFullYear()} NeoCivis
         </p>
       </div>
     </div>

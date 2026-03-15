@@ -1,6 +1,5 @@
 import { kcSanitize } from 'keycloakify/lib/kcSanitize';
 import type { TemplateProps } from 'keycloakify/login/TemplateProps';
-import { Landmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { I18n } from '../i18n';
 import type { KcContext } from '../KcContext';
@@ -26,9 +25,6 @@ export function TownHallTemplate(props: TemplateProps<KcContext, I18n>) {
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
         {/* Brand */}
         <div className="mb-8 flex w-full max-w-sm items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-secondary bg-primary">
-            <Landmark className="h-5 w-5 text-secondary" />
-          </div>
           <span className="font-bold text-primary text-sm uppercase tracking-widest">NeoCivis</span>
 
           {/* Language switcher */}
@@ -83,7 +79,7 @@ export function TownHallTemplate(props: TemplateProps<KcContext, I18n>) {
       {/* Footer */}
       <div className="border-border border-t px-4 py-3">
         <p className="text-center text-muted-foreground text-xs">
-          &copy; {new Date().getFullYear()} NeoCivis — Portail Municipal Officiel
+          &copy; {new Date().getFullYear()} NeoCivis — Portail NEOCIVIS
         </p>
       </div>
     </div>

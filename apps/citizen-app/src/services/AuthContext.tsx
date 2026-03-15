@@ -31,6 +31,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (response?.type === 'success') {
       const { code } = response.params;
+      console.log("Code d'autorisation reçu:", code);
+      console.log("Request:", request);
+      
+      
 
       if (!code || !request?.codeVerifier) {
         console.error('Auth callback invalide: code ou code verifier manquant.');

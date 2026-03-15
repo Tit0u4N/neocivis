@@ -1,4 +1,5 @@
 import { makeRedirectUri } from 'expo-auth-session';
+import { Platform } from 'react-native-reanimated/lib/typescript/ReanimatedModule/js-reanimated/JSReanimated';
 
 export const discovery = {
   authorizationEndpoint: 'https://auth.neocivis.cloud/realms/neocivis/protocol/openid-connect/auth',
@@ -10,8 +11,8 @@ export const authConfig = {
   // On ajoute 'offline_access' si on veut s'assurer d'avoir un refresh_token pérenne
   scopes: ['openid', 'profile', 'email', 'offline_access'], 
   redirectUri: makeRedirectUri({
-    scheme: 'neocivis-citizen-app',
-    path: 'login'
+    scheme: 'neocivis-citizen-app'
+    
   }),
   usePKCE: true,
 };

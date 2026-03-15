@@ -29,20 +29,6 @@ SplashScreen.setOptions({
   fade: true,
 });
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('error', (event) => {
-    alert("🔴 ERREUR FATALE : " + event.error?.message);
-  });
-  window.addEventListener('unhandledrejection', (event) => {
-    alert("🔴 ERREUR ASYNCHRONE : " + (event.reason?.message || event.reason));
-  });
-  
-  const originalConsoleError = console.error;
-  console.error = (...args) => {
-    alert("🔴 REACT CRASH : " + args[0]);
-    originalConsoleError(...args);
-  };
-}
 
 function GlobalErrorFallback({
   title,

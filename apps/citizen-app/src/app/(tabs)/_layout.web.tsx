@@ -14,7 +14,7 @@ export default function WebTabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(home)"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Icon name={Home} size={24} color={color} />,

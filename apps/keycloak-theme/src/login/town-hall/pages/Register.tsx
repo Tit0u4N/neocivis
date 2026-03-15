@@ -47,11 +47,10 @@ export function TownHallRegister({
           />
 
           <div className="flex gap-4 pt-2">
-            <a
-              href={url.loginUrl}
-              className="inline-flex flex-1 items-center justify-center rounded-lg border border-primary px-6 py-3 font-semibold text-primary text-sm uppercase tracking-widest transition-colors hover:bg-accent"
-            >
-              {msg('doCancel')}
+            <a href={url.loginUrl}>
+              <Button variant={'ghost'} size={'lg'}>
+                {msg('doCancel')}
+              </Button>
             </a>
             <Button type="submit" size="lg" disabled={!isFormSubmittable} className="flex-1">
               {msgStr('doRegister')}

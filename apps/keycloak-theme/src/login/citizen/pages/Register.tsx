@@ -45,13 +45,11 @@ export function CitizenRegister({
             onIsFormSubmittableValueChange={setIsFormSubmittable}
             doMakeUserConfirmPassword={doMakeUserConfirmPassword}
           />
-
-          <div className="flex gap-3 pt-2">
-            <a
-              href={url.loginUrl}
-              className="inline-flex flex-1 items-center justify-center rounded-lg border border-border px-5 py-3 font-semibold text-primary text-sm transition-colors hover:bg-accent"
-            >
-              {msg('doCancel')}
+          <div className="flex gap-4 pt-2">
+            <a href={url.loginUrl}>
+              <Button variant={'ghost'} size={'lg'}>
+                {msg('doCancel')}
+              </Button>
             </a>
             <Button type="submit" size="lg" disabled={!isFormSubmittable} className="flex-1">
               {msgStr('doRegister')}

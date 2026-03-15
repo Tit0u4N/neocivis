@@ -58,8 +58,8 @@
    municipality-customizable (injected at runtime).
    ===================================================== */
 .theme-citizen {
-  --primary: hsl(223.8136 0.0000% 9.0527%);
-  --primary-foreground: hsl(223.8136 0.0004% 98.0256%);
+  --primary: 223.8136 0.0000% 9.0527%;
+  --primary-foreground: 223.8136 0.0004% 98.0256%;
   --radius: 0.625rem;
 }
 

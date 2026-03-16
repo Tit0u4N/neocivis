@@ -5,12 +5,13 @@
   "scripts": {
     "dev": "storybook dev -p 6008",
     "build-storybook": "storybook build",
-    "build-keycloak-theme": "keycloakify build",
+    "build-keycloak-theme": "vite build && keycloakify build",
     "update-kc-gen": "keycloakify update-kc-gen",
     "clean": "rimraf dist storybook-static"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
+    "@fontsource-variable/inter": "^5.2.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "keycloakify": "^11.0.0",

@@ -9,7 +9,8 @@ export const discovery = {
 export const authConfig = {
   clientId: 'neocivis-citizen-app',
   // On ajoute 'offline_access' si on veut s'assurer d'avoir un refresh_token pérenne
-  scopes: ['openid', 'profile', 'email', 'offline_access'], 
+  // TODO : ajouter 'offline_access' pour mobile (mais pas pour web) et gérer le refresh token en conséquence
+  scopes: ['openid', 'profile', 'email'], 
   redirectUri: makeRedirectUri({
     scheme: 'neocivis-citizen-app'
     

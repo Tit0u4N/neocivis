@@ -1,6 +1,6 @@
 import { kcSanitize } from 'keycloakify/lib/kcSanitize';
 import type { TemplateProps } from 'keycloakify/login/TemplateProps';
-import { Building2 } from 'lucide-react';
+import neocivisIconBw from '@/assets/neocivi-icon-bwx300.png';
 import { cn } from '@/lib/utils';
 import type { I18n } from '../i18n';
 import type { KcContext } from '../KcContext';
@@ -16,15 +16,15 @@ export function CitizenTemplate(props: TemplateProps<KcContext, I18n>) {
   const { kcContext, i18n, children, headerNode, infoNode, displayMessage = true, displayInfo = false } = props;
 
   const { message } = kcContext;
-  const { msg, enabledLanguages, currentLanguage } = i18n;
+  const { enabledLanguages, currentLanguage } = i18n;
 
   return (
     <div className="theme-citizen citizen-bg flex min-h-screen items-center justify-center p-4">
       {/* Language switcher */}
       {enabledLanguages.length > 1 && (
-        <div className="absolute top-4 right-4">
+        <div className="fixed top-4 right-4 ml-auto">
           <select
-            className="cursor-pointer rounded-lg border border-white/30 bg-white/20 px-3 py-1.5 text-sm text-white backdrop-blur focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            className="rounded-lg border border-border bg-background px-2 py-1 text-muted-foreground text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             value={currentLanguage.languageTag}
             onChange={(e) => {
               const lang = enabledLanguages.find((l) => l.languageTag === e.target.value);
@@ -34,7 +34,7 @@ export function CitizenTemplate(props: TemplateProps<KcContext, I18n>) {
             }}
           >
             {enabledLanguages.map((lang) => (
-              <option key={lang.languageTag} value={lang.languageTag} className="text-foreground">
+              <option key={lang.languageTag} value={lang.languageTag}>
                 {lang.label}
               </option>
             ))}
@@ -43,17 +43,15 @@ export function CitizenTemplate(props: TemplateProps<KcContext, I18n>) {
       )}
 
       <div className="w-full max-w-sm animate-in-citizen">
-        {/* Brand */}
-        <div className="mb-8 text-center">
-          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur">
-            <Building2 className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="font-bold text-2xl text-white">NeoCivis</h1>
-          <p className="mt-1 text-sm text-white/70">{msg('app-tagline-citizen')}</p>
-        </div>
-
         {/* Card */}
         <div className="rounded-2xl bg-card p-8 shadow-2xl">
+          {/* Brand */}
+          <div className="mb-8 text-center">
+            <div className="inline-flex items-center justify-center rounded-full bg-white/20 backdrop-blur">
+              <img src={neocivisIconBw} alt="NeoCivis" className="size-20 object-contain" />
+            </div>
+            <h1 className="font-bold text-2xl">NeoCivis</h1>
+          </div>
           <h2 className="mb-6 font-semibold text-card-foreground text-xl">{headerNode}</h2>
 
           {displayMessage && message !== undefined && (
@@ -73,9 +71,7 @@ export function CitizenTemplate(props: TemplateProps<KcContext, I18n>) {
           )}
         </div>
 
-        <p className="mt-6 text-center text-white/50 text-xs">
-          &copy; {new Date().getFullYear()} NeoCivis
-        </p>
+        <p className="mt-6 text-center text-white/50 text-xs">&copy; {new Date().getFullYear()} NeoCivis</p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions for Bruno API Client
+# Agent Instructions for Bruno API Client
 
 ## About Bruno
 Bruno is an innovative API client that stores API collections directly in your filesystem using a plain text markup language called "Bru". It's designed as a Git-first, offline-only alternative to Postman, perfect for teams who want to version control their API tests alongside their code.

@@ -1,8 +1,8 @@
 ---
 project: tpi-neocivis
 document: design-system
-version: '2.0'
-date: '2026-03-15'
+version: '2.1'
+date: '2026-03-17'
 status: active
 applies_to: [town-hall-web, citizen-app, keycloak-theme]
 optimized_for_llm: true
@@ -61,9 +61,9 @@ Only `--primary` and `--primary-foreground` are municipality-specific. They are 
 
 | Token | Value | Note |
 |---|---|---|
-| `--primary` | Municipality color | Runtime-injected, default: blue |
+| `--primary` | Municipality color | Runtime-injected, dev fallback: dark grey `hsl(223.8 0% 9.05%)` |
 | `--primary-foreground` | Contrast color against `--primary` | Runtime-injected, typically white |
-| `--radius` | `0.75rem` | Rounded feel — override shadcn default |
+| `--radius` | `0.625rem` | Rounded feel — override shadcn default |
 | All others | shadcn light defaults | Do not override |
 
 > Since only `--primary` changes, any shadcn component using `bg-primary` / `text-primary-foreground` is automatically branded. No extra work needed.
@@ -85,9 +85,9 @@ Never hardcode a primary color in component code — always use `bg-primary` / `
 
 ### Layout
 
-- Full-page background: CSS gradient from `hsl(var(--primary))` to a darker/shifted hue variant
-- Single centered white card, `max-w-sm`, `rounded-2xl shadow-lg` (large radius from `--radius`)
-- Logo placeholder above card: icon in `lucide-react` (`Building2`), app name in white
+- Full-page background: CSS gradient from `hsl(var(--primary))` to a darker/shifted hue variant (utility `.citizen-bg`)
+- Single centered white card, `max-w-sm`, `rounded-2xl shadow-2xl` (large radius from `--radius`)
+- Brand mark **inside the card**, centered: PNG asset `neocivi-icon-bwx300.png` (black & white, `size-20`) in a `bg-white/20 backdrop-blur` circle, app name below
 - No sidebar, no split panel
 
 ### Typography
@@ -117,14 +117,14 @@ Town-hall overrides more tokens than citizen to establish its institutional iden
 
 | Token | Value | Note |
 |---|---|---|
-| `--primary` | Institutional navy | Dark blue, close to `#0F1F3D` |
+| `--primary` | Institutional navy `hsl(212.8 65.2% 22.5%)` | Dark blue |
 | `--primary-foreground` | White | |
-| `--secondary` | Institutional gold | Use only for decorative accents and separators |
-| `--secondary-foreground` | Dark navy | |
-| `--muted` | Light grey | shadcn default range |
-| `--muted-foreground` | Medium grey | shadcn default range |
-| `--radius` | `0.125rem` | Sharp corners — institutional feel |
-| `--font-sans` | `Marianne, system-ui, sans-serif` | Official French government typeface |
+| `--secondary` | Light grey `hsl(220 14.3% 95.9%)` | Use only for decorative accents and separators (top bar) |
+| `--secondary-foreground` | Medium grey | |
+| `--muted` | Near-white `hsl(210 20% 98%)` | |
+| `--muted-foreground` | Medium grey `hsl(220 8.9% 46.1%)` | |
+| `--radius` | `0.375rem` | Slightly rounded — institutional feel |
+| `font-family` | `'Inter Variable', sans-serif` | Applied directly on `.theme-town-hall` |
 
 Dark mode is supported: override surface tokens in `.dark` so navy becomes the page background and white becomes card/field surfaces.
 
@@ -133,12 +133,11 @@ Dark mode is supported: override surface tokens in `.dark` so navy becomes the p
 - Flat layout: centered form on `bg-background`, no split panels
 - shadcn `<Card>` for the form container
 - Responsive and mobile-first — left panel concept from v1 is removed
-- Logo placeholder: `lucide-react` `Landmark` icon, circular border in `secondary`
+- Brand mark in header bar: PNG asset `neocivi-icon-cx300.png` (color, `size-12`) inline with the "NeoCivis" wordmark
 
 ### Typography
 
-- Font: **Marianne** (self-hosted or official source) — required for institutional identity
-  - Fallback: `system-ui, -apple-system, sans-serif`
+- Font: **Inter Variable** (`font-family: 'Inter Variable', sans-serif` on `.theme-town-hall`)
 - Title: `text-2xl font-bold text-primary uppercase tracking-wide`
 - Labels: `text-xs font-bold uppercase tracking-widest text-muted-foreground`
 - Body / help text: `text-sm text-foreground`
@@ -159,9 +158,12 @@ Use shadcn components. Sharp `--radius` and navy `--primary` handle the brand. A
 
 ## Icons
 
-- Web apps: **lucide-react** — no other library
-- Citizen mobile: **lucide-react-native** — no other library
-- Relevant icons: `Building2` (citizen), `Landmark` (town-hall), `Eye` / `EyeOff` (password toggle), `Mail` (reset screens)
+- Web apps: **lucide-react** — no other library for UI icons
+- Citizen mobile: **lucide-react-native** — no other library for UI icons
+- **Brand mark (logo)**: PNG assets in `apps/keycloak/src/assets/` — import via Vite, never use lucide as logo
+  - `neocivi-icon-bwx300.png` — black & white version, used in **citizen** theme (on gradient background)
+  - `neocivi-icon-cx300.png` — color version, used in **town-hall** theme (on light background)
+- UI icons: `Eye` / `EyeOff` (password toggle), `Mail` (reset screens)
 - Icon-only buttons: always add `aria-label`
 
 ---
@@ -226,7 +228,7 @@ Remove all animations including opacity transitions if motion-triggering.
 | Token definition | `@theme inline` in Tailwind v4 CSS | `Colors` object in `@/theme/colors.ts` via `useColor()` hook | CSS custom props in `global.css`, scoped to `.theme-citizen` / `.theme-town-hall` |
 | `--primary` injection (citizen) | `<style>` tag from server/config at render | Config value passed into `Colors.primary` | CSS custom prop override in `global.css` |
 | Font loading | `next/font` or `@font-face` | `useFonts()` from Expo | `@font-face` in `global.css` |
-| Icons | `lucide-react` | `lucide-react-native` | `lucide-react` |
+| Icons | `lucide-react` | `lucide-react-native` | `lucide-react` + PNG brand assets |
 | Animation | Tailwind transitions + CSS keyframes | `react-native-reanimated` (`useSharedValue`, `useAnimatedStyle`) | Tailwind transitions + CSS keyframes |
 | Class merging | `cn()` from `@/lib/utils` | N/A (StyleSheet) | `cn()` from `@/lib/utils` |
 
@@ -239,8 +241,8 @@ Remove all animations including opacity transitions if motion-triggering.
 - Let shadcn components do the work — brand through tokens, not by rewriting components
 - Use `bg-primary text-primary-foreground` for all primary actions in both brands
 - Inject `--primary` / `--primary-foreground` at runtime for citizen — never hardcode
-- Keep citizen corners rounded (`--radius` large), town-hall corners sharp (`--radius` minimal)
-- Use Marianne font for all town-hall surfaces
+- Keep citizen corners rounded (`--radius: 0.625rem`), town-hall corners slightly rounded (`--radius: 0.375rem`)
+- Use Inter Variable font for all town-hall surfaces
 - Guard all animations with `prefers-reduced-motion`
 - Support dark mode for town-hall
 
@@ -260,8 +262,8 @@ Remove all animations including opacity transitions if motion-triggering.
 
 | Decision | Status | Notes |
 |---|---|---|
-| Official logo / brand mark (SVG) | Pending | Using lucide icon placeholders |
+| Official logo / brand mark | Done (PNG) | `neocivi-icon-bwx300.png` (citizen) + `neocivi-icon-cx300.png` (town-hall) in `apps/keycloak/src/assets/` |
 | Municipality / city name | Pending | Currently "NeoCivis" across all apps |
-| Marianne font hosting strategy | To implement | Self-host or official CDN |
-| Town-hall dark mode implementation | To implement | Token overrides defined, UI not wired |
-| Default `--primary` value for citizen preview/dev | Pending | Needs a sensible fallback blue |
+| Inter Variable font hosting | To implement | Currently relies on system/CDN — self-host needed for prod |
+| Town-hall dark mode implementation | To implement | Token overrides defined in `global.css`, UI not wired |
+| Default `--primary` value for citizen preview/dev | Partial | Dev fallback is dark grey — a real blue default is desirable |

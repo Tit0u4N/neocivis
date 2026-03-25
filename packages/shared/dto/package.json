@@ -1,0 +1,20 @@
+{
+  "name": "@repo/dto",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --out-dir dist",
+    "dev": "tsup src/index.ts --format esm --out-dir dist --watch",
+    "clean": "npx rimraf dist",
+    "clean:node_modules": "npx rimraf node_modules"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {}
+}

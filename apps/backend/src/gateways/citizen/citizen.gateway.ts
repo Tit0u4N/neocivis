@@ -5,6 +5,10 @@ import { UserRepository } from '../../modules/users/user.repository';
 import { UserService } from '../../modules/users/user.service';
 import { ProductController } from './controllers/product.controller';
 import { UserController } from './controllers/user.controller';
+import { applyMockApimMiddleware } from '../../middlewares/local-auth.middleware';
+import { applyCorsMiddleware } from '../../middlewares/cors.middleware';
+import { applyUserMiddleware } from '../../middlewares/auth.middleware';
+import { applyRoleMiddleware } from '../../middlewares/role.middleware';
 
 // Import repositories
 const userRepository = new UserRepository();
@@ -14,7 +18,13 @@ const productRepository = new ProductRepository();
 const userController = new UserController(new UserService(userRepository));
 const productController = new ProductController(new ProductService(productRepository));
 
-const app = new Hono().basePath('/api/citizen');
+let app = new Hono().basePath('/api/citizen');
+
+
+app = applyCorsMiddleware(app);
+app = applyMockApimMiddleware(app);
+app = applyUserMiddleware(app);
+app = applyRoleMiddleware(app, ['citizen']);
 
 // Register routes from controllers
 app.route('/user', userController.getRoutes());

@@ -42,6 +42,8 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Auth: JWT via Keycloak
 - Validation: Zod (schemas in `packages/shared`, shared with frontend)
 
+Bruno information -> [api-bruno-instructions.md](api-bruno-instructions.md)
+
 ### Shared Packages
 - @repo/frontend-core: Shared utilities (tsup build, ky 1.14.1 HTTP client)
 - @repo/frontend-services: Business logic services (tsup build)

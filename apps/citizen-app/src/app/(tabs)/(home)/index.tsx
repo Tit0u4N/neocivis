@@ -1,4 +1,5 @@
 import { Terminal } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
@@ -10,6 +11,7 @@ import { useColor } from '@/hooks/useColor';
 export default function HomeScreen() {
   const green = useColor('green');
   const muted = useColor('muted');
+  const { t } = useTranslation();
 
   return (
     <View
@@ -26,7 +28,7 @@ export default function HomeScreen() {
           textAlign: 'center',
         }}
       >
-        Built with ❤️ by BNA
+        {t('home.title')}
       </Text>
 
       <View
@@ -51,7 +53,7 @@ export default function HomeScreen() {
                 fontWeight: '600',
               }}
             >
-              Add Components
+              {t('home.card.title')}
             </Text>
           </View>
           <View
@@ -83,13 +85,13 @@ export default function HomeScreen() {
               opacity: 0.7,
             }}
           >
-            Add components with a single command
+            {t('home.card.description')}
           </Text>
         </Card>
       </View>
 
       <Link asChild={true} href="/sheet">
-        <Button>Open Components Sheet</Button>
+        <Button>{t('home.openSheet')}</Button>
       </Link>
     </View>
   );

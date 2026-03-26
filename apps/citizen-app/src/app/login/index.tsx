@@ -1,9 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useAuth } from '@/services/AuthContext';
 import type { ErrorBoundaryProps } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, View } from 'react-native';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import { useColor } from '@/hooks/useColor';
+import { useAuth } from '@/services/AuthContext';
 
-// Ce composant va attraper le crash silencieux et l'afficher !
 export function ErrorBoundary({ error }: ErrorBoundaryProps) {
   const message = error instanceof Error ? error.message : String(error ?? 'Erreur inconnue');
 
@@ -16,26 +19,31 @@ export function ErrorBoundary({ error }: ErrorBoundaryProps) {
 }
 
 export default function LoginScreen() {
-  const { signIn, isLoading } = useAuth();
+  const { signIn } = useAuth();
+  const _router = useRouter();
+  const { t } = useTranslation();
+
+  const backgroundColor = useColor('background');
+  const foregroundColor = useColor('foreground');
+  const mutedForegroundColor = useColor('mutedForeground');
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Bienvenue</Text>
-        <Text style={styles.subtitle}>Connectez-vous pour accéder à l'application.</Text>
-      </View>
+    <View style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.brandName, { color: foregroundColor }]}>{t('login.brand')}</Text>
 
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#007AFF" />
-      ) : (
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={signIn}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>Se connecter avec Keycloak</Text>
-        </TouchableOpacity>
-      )}
+      <View style={styles.centerBlock}>
+        <Text style={[styles.title, { color: foregroundColor }]}>{t('login.title')}</Text>
+        <Text style={[styles.subtitle, { color: mutedForegroundColor }]}>{t('login.subtitle')}</Text>
+
+        <View style={styles.buttons}>
+          <Button variant="outline" style={styles.button} onPress={signIn}>
+            {t('login.signUp')}
+          </Button>
+          <Button variant="default" style={styles.button} onPress={signIn}>
+            {t('login.signIn')}
+          </Button>
+        </View>
+      </View>
     </View>
   );
 }
@@ -43,39 +51,47 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#ffffff', // À adapter avec votre ThemeProvider si besoin
-  },
-  header: {
-    marginBottom: 48,
     alignItems: 'center',
+    paddingTop: 64,
+    paddingHorizontal: 24,
+  },
+  brandName: {
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  centerBlock: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 48,
+    gap: 16,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#1c1c1e',
+    fontSize: 48,
+    fontWeight: '900',
+    textAlign: 'center',
+    lineHeight: 56,
   },
   subtitle: {
     fontSize: 16,
-    color: '#8e8e93',
     textAlign: 'center',
+    lineHeight: 22,
+  },
+  buttons: {
+    width: '100%',
+    gap: 12,
+    marginTop: 8,
   },
   button: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    borderRadius: 8,
+    height: 56,
   },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+  guestLink: {
+    fontSize: 14,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+    marginTop: 4,
   },
 });

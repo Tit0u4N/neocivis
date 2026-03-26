@@ -24,7 +24,8 @@
       "!!**/node_modules",
       "!!**/.turbo",
       "!!**/.biome",
-      "!!**/.expo"
+      "!!**/.expo",
+      "!!**/next-env.d.ts"
     ]
   },
   "formatter": {

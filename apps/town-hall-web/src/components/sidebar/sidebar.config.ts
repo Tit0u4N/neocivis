@@ -13,7 +13,8 @@ import {
 } from 'lucide-react';
 
 export type SidebarItemConfig = {
-  label: string;
+  /** i18n key from common.json `sidebar.items.*` */
+  labelKey: string;
   icon: LucideIcon;
   href: string;
   permissions?: string[];
@@ -21,37 +22,38 @@ export type SidebarItemConfig = {
 };
 
 export type SidebarSectionConfig = {
-  label: string;
+  /** i18n key from common.json `sidebar.sections.*` */
+  labelKey: string;
   items: SidebarItemConfig[];
 };
 
 export const SIDEBAR_SECTIONS: SidebarSectionConfig[] = [
   {
-    label: 'Town Hall',
+    labelKey: 'sidebar.sections.townHall',
     items: [
-      { label: 'General', icon: FileText, href: '/dashboard/general' },
-      { label: 'App management', icon: Settings2, href: '/dashboard/app-management' },
-      { label: 'Establishment', icon: Store, href: '/dashboard/establishment' },
-      { label: 'Article', icon: Newspaper, href: '/dashboard/article' },
+      { labelKey: 'sidebar.items.general', icon: FileText, href: '/dashboard/general' },
+      { labelKey: 'sidebar.items.appManagement', icon: Settings2, href: '/dashboard/app-management' },
+      { labelKey: 'sidebar.items.establishment', icon: Store, href: '/dashboard/establishment' },
+      { labelKey: 'sidebar.items.article', icon: Newspaper, href: '/dashboard/article' },
     ],
   },
   {
-    label: 'Report',
-    items: [{ label: 'Reports', icon: Flag, href: '/dashboard/reports' }],
+    labelKey: 'sidebar.sections.report',
+    items: [{ labelKey: 'sidebar.items.reports', icon: Flag, href: '/dashboard/reports' }],
   },
   {
-    label: 'Forum',
+    labelKey: 'sidebar.sections.forum',
     items: [
-      { label: 'Threads', icon: MessageSquare, href: '/dashboard/threads' },
-      { label: 'User management', icon: UserCog, href: '/dashboard/forum/users' },
+      { labelKey: 'sidebar.items.threads', icon: MessageSquare, href: '/dashboard/threads' },
+      { labelKey: 'sidebar.items.userManagement', icon: UserCog, href: '/dashboard/forum/users' },
     ],
   },
   {
-    label: 'Administrator',
+    labelKey: 'sidebar.sections.administrator',
     items: [
-      { label: 'User management', icon: Users, href: '/dashboard/admin/users', adminOnly: true },
-      { label: 'Role management', icon: Shield, href: '/dashboard/admin/roles', adminOnly: true },
-      { label: 'Webhook', icon: Webhook, href: '/dashboard/admin/webhooks', adminOnly: true },
+      { labelKey: 'sidebar.items.userManagement', icon: Users, href: '/dashboard/admin/users', adminOnly: true },
+      { labelKey: 'sidebar.items.roleManagement', icon: Shield, href: '/dashboard/admin/roles', adminOnly: true },
+      { labelKey: 'sidebar.items.webhook', icon: Webhook, href: '/dashboard/admin/webhooks', adminOnly: true },
     ],
   },
 ];

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import type { SidebarSectionConfig } from '@/components/sidebar/sidebar.config';
 import {
   SidebarGroup,
@@ -16,19 +17,21 @@ type NavSectionProps = {
 };
 
 export function NavSection({ section, isActive }: NavSectionProps) {
+  const { t } = useTranslation();
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
+      <SidebarGroupLabel>{t(section.labelKey)}</SidebarGroupLabel>
       <SidebarMenu>
         {section.items.map((item) => (
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               render={<Link href={item.href} aria-current={isActive(item.href) ? 'page' : undefined} />}
               isActive={isActive(item.href)}
-              tooltip={item.label}
+              tooltip={t(item.labelKey)}
             >
               <item.icon />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

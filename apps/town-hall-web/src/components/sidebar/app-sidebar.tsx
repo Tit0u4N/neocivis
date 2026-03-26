@@ -1,6 +1,7 @@
 'use client';
 
 import { Building2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { NavSection } from '@/components/sidebar/nav-main';
 import { NavUser } from '@/components/sidebar/nav-user';
 import { useAppSidebar } from '@/components/sidebar/useAppSidebar';
@@ -15,11 +16,6 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 
-const MUNICIPALITY = {
-  name: 'NeoCivis',
-  // Replace with next/image + real asset when available
-};
-
 // Placeholder user — replace with auth context when wired
 const CURRENT_USER = {
   name: 'Admin',
@@ -28,18 +24,20 @@ const CURRENT_USER = {
 };
 
 export function AppSidebar() {
+  const { t } = useTranslation();
   const { visibleSections, isActive } = useAppSidebar();
+  const municipalityName = t('app.shortName');
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" tooltip={MUNICIPALITY.name}>
+            <SidebarMenuButton size="lg" tooltip={municipalityName}>
               <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
                 <Building2 className="size-4" />
               </div>
-              <span className="truncate font-semibold">{MUNICIPALITY.name}</span>
+              <span className="truncate font-semibold">{municipalityName}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -47,7 +45,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         {visibleSections.map((section) => (
-          <NavSection key={section.label} section={section} isActive={isActive} />
+          <NavSection key={section.labelKey} section={section} isActive={isActive} />
         ))}
       </SidebarContent>
 

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import '../global.css';
 import { Building2 } from 'lucide-react';
 import { Figtree, Geist, Geist_Mono } from 'next/font/google';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from 'react-oidc-context';
 import { I18nProvider } from '@/components/I18nProvider';
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
@@ -17,6 +18,7 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 
 function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
   const auth = useAuth();
+  const { t } = useTranslation();
 
   const handleSignIn = async () => {
     await auth.signinRedirect();
@@ -25,7 +27,7 @@ function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
   if (auth.isLoading) {
     return (
       <div className="flex min-h-svh items-center justify-center bg-background">
-        <p className="text-muted-foreground text-sm">Chargement...</p>
+        <p className="text-muted-foreground text-sm">{t('common.loading')}</p>
       </div>
     );
   }
@@ -38,11 +40,11 @@ function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
             <Building2 className="size-8 text-primary-foreground" />
           </div>
           <div className="flex flex-col gap-2">
-            <h1 className="font-bold text-2xl text-primary uppercase tracking-wide">NeoCivis</h1>
-            <p className="text-muted-foreground text-sm">Portail de la mairie — accès réservé aux agents</p>
+            <h1 className="font-bold text-2xl text-primary uppercase tracking-wide">{t('app.shortName')}</h1>
+            <p className="text-muted-foreground text-sm">{t('auth.subtitle')}</p>
           </div>
           <Button className="uppercase tracking-widest" onClick={handleSignIn}>
-            Se connecter
+            {t('nav.login')}
           </Button>
         </div>
       </div>

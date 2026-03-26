@@ -17,8 +17,8 @@ export function PageLayout({ title, children }: PageLayoutProps) {
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
+        <div className="flex items-center gap-1 px-2">
+          <SidebarTrigger size="lg" className="-ml-1 cursor-pointer" />
           <Separator orientation="vertical" className="mr-2 data-vertical:h-4 data-vertical:self-auto" />
           <Breadcrumb>
             <BreadcrumbList>

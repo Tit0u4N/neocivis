@@ -22,6 +22,7 @@
   },
   "peerDependencies": {},
   "exports": {
-    "./report": "./src/report/report.service.ts"
+    "./report": "./src/report/report.service.ts",
+    "./permission": "./src/permission/permission.service.ts"
   }
 }

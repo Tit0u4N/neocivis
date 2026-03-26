@@ -6,6 +6,7 @@ import { Building2 } from 'lucide-react';
 import { Figtree, Geist, Geist_Mono } from 'next/font/google';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from 'react-oidc-context';
+import { AppProvider } from '@/components/AppProvider';
 import { I18nProvider } from '@/components/I18nProvider';
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { Button } from '@/components/ui/button';
@@ -64,9 +65,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     <html lang="fr" className={figtree.variable}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <I18nProvider>
-          <AuthProvider {...oidcConfig}>
-            <AuthGate>{children}</AuthGate>
-          </AuthProvider>
+          <AppProvider>
+            <AuthProvider {...oidcConfig}>
+              <AuthGate>{children}</AuthGate>
+            </AuthProvider>
+          </AppProvider>
         </I18nProvider>
       </body>
     </html>

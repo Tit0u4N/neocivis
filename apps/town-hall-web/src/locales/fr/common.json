@@ -37,6 +37,22 @@
     "description": "Cette page n'existe pas ou a été déplacée.",
     "backToDashboard": "Retour au tableau de bord"
   },
+  "settings": {
+    "appearance": "Apparence",
+    "language": {
+      "label": "Langue",
+      "description": "Choisissez la langue de l'interface",
+      "fr": "Français",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Thème",
+      "description": "Choisissez le thème de l'interface",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    }
+  },
   "sidebar": {
     "sections": {
       "townHall": "Town Hall",

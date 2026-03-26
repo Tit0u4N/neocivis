@@ -1,0 +1,75 @@
+{
+  "app": {
+    "name": "NeoCivis — Town Hall Portal",
+    "shortName": "NeoCivis"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "citizens": "Citizens",
+    "requests": "Requests",
+    "settings": "Settings",
+    "logout": "Log out",
+    "login": "Log in",
+    "account": "My account"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "search": "Search",
+    "noResults": "No results"
+  },
+  "auth": {
+    "welcome": "Welcome",
+    "loginTitle": "Town hall portal login",
+    "subtitle": "Town hall portal — restricted to staff members",
+    "loggedInAs": "Logged in as {{name}}",
+    "sessionExpired": "Your session has expired, please log in again"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This page does not exist or has been moved.",
+    "backToDashboard": "Back to dashboard"
+  },
+  "settings": {
+    "appearance": "Appearance",
+    "language": {
+      "label": "Language",
+      "description": "Choose the interface language",
+      "fr": "French",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Theme",
+      "description": "Choose the interface theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "townHall": "Town Hall",
+      "report": "Reports",
+      "forum": "Forum",
+      "administrator": "Administration"
+    },
+    "items": {
+      "general": "General",
+      "appManagement": "App management",
+      "establishment": "Establishment",
+      "article": "Article",
+      "reports": "Reports",
+      "threads": "Threads",
+      "userManagement": "Users",
+      "roleManagement": "Roles",
+      "webhook": "Webhook"
+    }
+  }
+}

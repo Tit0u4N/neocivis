@@ -1,10 +1,12 @@
 import { Tabs } from 'expo-router';
-import { Home, Search, Settings } from 'lucide-react-native';
+import { CircleUser, Landmark, MessageSquare, TriangleAlert } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Icon } from '@/components/ui/icon';
 import { useColor } from '@/hooks/useColor';
 
 export default function WebTabsLayout() {
   const primary = useColor('primary');
+  const { t } = useTranslation();
 
   return (
     <Tabs
@@ -14,26 +16,34 @@ export default function WebTabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="(home)"
+        name="(city)"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Icon name={Home} size={24} color={color} />,
+          title: t('tabs.city'),
+          tabBarIcon: ({ color }) => <Icon name={Landmark} size={24} color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="settings"
+        name="report"
         options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <Icon name={Settings} size={24} color={color} />,
+          title: t('tabs.report'),
+          tabBarIcon: ({ color }) => <Icon name={TriangleAlert} size={24} color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="search"
+        name="forum"
         options={{
-          title: 'Search',
-          tabBarIcon: ({ color }) => <Icon name={Search} size={24} color={color} />,
+          title: t('tabs.forum'),
+          tabBarIcon: ({ color }) => <Icon name={MessageSquare} size={24} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: t('tabs.account'),
+          tabBarIcon: ({ color }) => <Icon name={CircleUser} size={24} color={color} />,
         }}
       />
     </Tabs>

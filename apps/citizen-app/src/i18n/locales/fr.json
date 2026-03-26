@@ -7,20 +7,34 @@
     "signIn": "Se connecter",
     "continueAsGuest": "Continuer en tant qu'invité"
   },
-  "home": {
-    "title": "Fait avec ❤️ par BNA",
-    "card": {
-      "title": "Ajouter des composants",
-      "description": "Ajoutez des composants en une seule commande"
-    },
-    "openSheet": "Ouvrir la feuille de composants"
+  "tabs": {
+    "city": "Ville",
+    "report": "Signaler",
+    "forum": "Forum",
+    "account": "Compte"
   },
-  "settings": {
-    "title": "Paramètres",
+  "city": {
+    "title": "Ville"
+  },
+  "report": {
+    "title": "Signaler"
+  },
+  "forum": {
+    "title": "Forum"
+  },
+  "account": {
+    "title": "Mon compte",
     "language": {
       "label": "Langue",
       "fr": "Français",
       "en": "English"
-    }
+    },
+    "theme": {
+      "label": "Apparence",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "signOut": "Se déconnecter"
   }
 }

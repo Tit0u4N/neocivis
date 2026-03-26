@@ -7,20 +7,34 @@
     "signIn": "Log In",
     "continueAsGuest": "Continue as guest"
   },
-  "home": {
-    "title": "Built with ❤️ by BNA",
-    "card": {
-      "title": "Add Components",
-      "description": "Add components with a single command"
-    },
-    "openSheet": "Open Components Sheet"
+  "tabs": {
+    "city": "City",
+    "report": "Report",
+    "forum": "Forum",
+    "account": "Account"
   },
-  "settings": {
-    "title": "Settings",
+  "city": {
+    "title": "City"
+  },
+  "report": {
+    "title": "Report"
+  },
+  "forum": {
+    "title": "Forum"
+  },
+  "account": {
+    "title": "My account",
     "language": {
       "label": "Language",
       "fr": "Français",
       "en": "English"
-    }
+    },
+    "theme": {
+      "label": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "signOut": "Sign out"
   }
 }

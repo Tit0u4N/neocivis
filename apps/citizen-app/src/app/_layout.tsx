@@ -76,7 +76,7 @@ function InitialLayout() {
         router.replace('/login');
       } else if (isAuthenticated && isLoginPage) {
         // Si déjà connecté et qu'on est sur la page login -> On redirige vers l'appli
-        router.replace('/(tabs)/(home)');
+        router.replace('/(tabs)/(city)');
       }
     }, 0);
 

@@ -1,14 +1,14 @@
 import { Hono } from 'hono';
-import { ProductRepository } from '../../modules/product/product.repository';
-import { ProductService } from '../../modules/product/product.service';
-import { UserRepository } from '../../modules/users/user.repository';
-import { UserService } from '../../modules/users/user.service';
+import { ProductRepository } from '@/modules/product/product.repository';
+import { ProductService } from '@/modules/product/product.service';
+import { UserRepository } from '@/modules/users/user.repository';
+import { UserService } from '@/modules/users/user.service';
 import { ProductController } from './controllers/product.controller';
 import { UserController } from './controllers/user.controller';
-import { applyMockApimMiddleware } from '../../middlewares/local-auth.middleware';
-import { applyCorsMiddleware } from '../../middlewares/cors.middleware';
-import { applyRoleMiddleware } from '../../middlewares/role.middleware';
-import { applyUserMiddleware } from '../../middlewares/auth.middleware';
+import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
+import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
+import { applyRoleMiddleware } from '@/middlewares/role.middleware';
+import { applyUserMiddleware } from '@/middlewares/auth.middleware';
 
 
 // Import repositories

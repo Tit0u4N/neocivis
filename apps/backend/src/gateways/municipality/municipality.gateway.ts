@@ -25,7 +25,7 @@ const app = new Hono().basePath('/api/municipality');
 applyCorsMiddleware(app);
 applyMockApimMiddleware(app);
 applyUserMiddleware(app);
-applyRoleMiddleware(app, ['municipality']);
+applyRoleMiddleware(app, ['EMPLOYEE']);
 
 // Register routes from controllers
 app.route('/user', userController.getRoutes());

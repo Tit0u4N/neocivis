@@ -34,7 +34,7 @@ export const SIDEBAR_SECTIONS: SidebarSectionConfig[] = [
       { labelKey: 'sidebar.items.general', icon: FileText, href: '/dashboard/general' },
       { labelKey: 'sidebar.items.appManagement', icon: Settings2, href: '/dashboard/app-management' },
       { labelKey: 'sidebar.items.establishment', icon: Store, href: '/dashboard/establishment' },
-      { labelKey: 'sidebar.items.article', icon: Newspaper, href: '/dashboard/article' },
+      { labelKey: 'sidebar.items.article', icon: Newspaper, href: '/dashboard/articles' },
     ],
   },
   {

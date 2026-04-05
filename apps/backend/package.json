@@ -8,21 +8,22 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --out-dir dist",
-    "watch": "tsup src/index.ts --format esm --out-dir dist --watch",
+    "build": "tsup",
+    "watch": "tsup --watch",
     "start": "func start",
     "clean": "rimraf dist",
     "clean:node_modules": "npx rimraf node_modules",
     "prestart": "npm run clean && npm run build",
     "test": "vitest run",
     "test:watch": "vitest --watch",
-    "dev": "concurrently \"npm run watch\" \"npm run start\""
+    "dev": "concurrently \"bun run watch\" \"bun run start\""
   },
   "dependencies": {
+    "@repo/contracts": "*",
     "@azure/functions": "^4.11.0",
-    "@repo/dto": "*",
     "@marplex/hono-azurefunc-adapter": "^1.0.1",
-    "hono": "^4.11.6"
+    "hono": "^4.11.6",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/node": "^25.0.10",

@@ -1,10 +1,10 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import type { Language } from '@/components/settings/useSettings';
-import { useSettings } from '@/components/settings/useSettings';
 import { PageLayout } from '@/components/ui/page-layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { Language } from '@/hooks/useSettings';
+import { useSettings } from '@/hooks/useSettings';
 import type { Theme } from '@/stores/theme.store';
 
 export default function SettingsPage() {

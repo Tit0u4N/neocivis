@@ -11,7 +11,9 @@
     "test": "vitest run",
     "test:watch": "vitest --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@repo/contracts": "*"
+  },
   "devDependencies": {
     "@repo/typescript-config": "*",
     "@repo/vitest-config": "*",
@@ -23,6 +25,7 @@
   "peerDependencies": {},
   "exports": {
     "./report": "./src/report/report.service.ts",
-    "./permission": "./src/permission/permission.service.ts"
+    "./permission": "./src/permission/permission.service.ts",
+    "./article": "./src/article/article.service.ts"
   }
 }

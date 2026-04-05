@@ -1,7 +1,7 @@
 import type { Context } from 'node:vm';
 import { Hono } from 'hono';
 
-import type { UserService } from '../../../modules/users/user.service';
+import type { UserService } from '@/modules/users/user.service';
 
 export class UserController {
   constructor(private service: UserService) {}

@@ -1,7 +1,7 @@
 import type { Context } from 'hono';
 import { Hono } from 'hono';
 
-import type { ProductService } from '../../../modules/product/product.service';
+import type { ProductService } from '@/modules/product/product.service';
 
 export class ProductController {
   constructor(private service: ProductService) {}

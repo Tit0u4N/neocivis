@@ -8,8 +8,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --out-dir dist",
-    "watch": "tsup src/index.ts --format esm --out-dir dist --watch",
+    "build": "tsup",
+    "watch": "tsup --watch",
     "start": "func start",
     "clean": "rimraf dist",
     "clean:node_modules": "npx rimraf node_modules",

@@ -5,6 +5,10 @@
     "moduleResolution": "Node",
     "outDir": "dist",
     "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "sourceMap": true,
     "esModuleInterop": true,
     "strict": false

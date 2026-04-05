@@ -3,6 +3,8 @@
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "types": [],
     "paths": {
       "@frontend-core/*": ["./src/*"]

@@ -1,5 +1,3 @@
-import { osName } from 'expo-device';
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Stack, useRootNavigationState, useRouter, useSegments } from 'expo-router';
 import type { ErrorBoundaryProps } from 'expo-router';
@@ -14,7 +12,8 @@ import { View } from '@/components/ui/view';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/theme/colors';
 import { ThemeProvider } from '@/theme/theme-provider';
-import { AuthProvider, useAuth } from '@/services/AuthContext';
+import { ApiProvider } from '@/providers/ApiProvider';
+import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import 'react-native-reanimated';
 
 type GlobalErrorHandler = (error: unknown, isFatal?: boolean) => void;
@@ -64,7 +63,7 @@ export function ErrorBoundary({ error }: ErrorBoundaryProps) {
 
 function InitialLayout() {
 
-  const colorScheme = useColorScheme() || 'light';
+  useColorScheme() || 'light';
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -72,12 +71,12 @@ function InitialLayout() {
   const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
-    if (!rootNavigationState?.key) return;
+    if (!rootNavigationState?.key) { return; }
 
-    if (isLoading) return;
+    if (isLoading) { return; }
 
     // `segments[0]` helps us determine the current "root" route. 
-    const inTabsGroup = segments[0] === '(tabs)';
+    segments[0] === '(tabs)';
     const isLoginPage = segments[0] === 'login';
     const navigationTimeout = setTimeout(() => {
     if (!isAuthenticated && !isLoginPage) {
@@ -210,8 +209,10 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
         <AuthProvider>
-          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-          <InitialLayout />
+          <ApiProvider>
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+            <InitialLayout />
+          </ApiProvider>
         </AuthProvider>
       </ThemeProvider>
     </GestureHandlerRootView>

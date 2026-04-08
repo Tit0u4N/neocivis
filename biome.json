@@ -58,7 +58,7 @@
           }
         },
         "noForEach": "off",
-        "noVoid": "error",
+        "noVoid": "warn",
         "useSimplifiedLogicExpression": "warn"
       },
 

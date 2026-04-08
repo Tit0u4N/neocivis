@@ -19,7 +19,7 @@ export function ErrorBoundary({ error }: ErrorBoundaryProps) {
 }
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { isLoading, onSignIn } = useLoginScreen();
   const _router = useRouter();
   const { t } = useTranslation();
 
@@ -31,19 +31,23 @@ export default function LoginScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       <Text style={[styles.brandName, { color: foregroundColor }]}>{t('login.brand')}</Text>
 
+      {isLoading ? (
+          <Spinner size="lg" />
+        ) : (
       <View style={styles.centerBlock}>
         <Text style={[styles.title, { color: foregroundColor }]}>{t('login.title')}</Text>
         <Text style={[styles.subtitle, { color: mutedForegroundColor }]}>{t('login.subtitle')}</Text>
 
         <View style={styles.buttons}>
-          <Button variant="outline" style={styles.button} onPress={signIn}>
+          <Button variant="outline" style={styles.button} onPress={onSignIn}>
             {t('login.signUp')}
           </Button>
-          <Button variant="default" style={styles.button} onPress={signIn}>
+          <Button variant="default" style={styles.button} onPress={onSignIn}>
             {t('login.signIn')}
           </Button>
         </View>
       </View>
+        )
     </View>
   );
 }

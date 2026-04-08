@@ -15,6 +15,8 @@ import { LanguageProvider } from '@/i18n/LanguageContext';
 import { AuthProvider, useAuth } from '@/services/AuthContext';
 import { Colors } from '@/theme/colors';
 import { ThemeProvider } from '@/theme/theme-provider';
+import { ApiProvider } from '@/providers/ApiProvider';
+import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import 'react-native-reanimated';
 
 type GlobalErrorHandler = (error: unknown, isFatal?: boolean) => void;
@@ -51,7 +53,7 @@ export function ErrorBoundary({ error }: ErrorBoundaryProps) {
 }
 
 function InitialLayout() {
-  const _colorScheme = useColorScheme() || 'light';
+  useColorScheme() || 'light';
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();

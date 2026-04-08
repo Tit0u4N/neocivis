@@ -12,7 +12,7 @@ type ApiContextValue = {
 
 const ApiContext = createContext<ApiContextValue | undefined>(undefined);
 
-export function ApiProvider({ children }: { children: ReactNode }) {
+export function ApiProvider({children}: { children: ReactNode }) {
   const auth = useAuth();
 
   // Keep a stable ref so the api client is created once and always reads
@@ -33,7 +33,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       }),
     [],
   );
-
   return <ApiContext.Provider value={{ api }}>{children}</ApiContext.Provider>;
 }
 

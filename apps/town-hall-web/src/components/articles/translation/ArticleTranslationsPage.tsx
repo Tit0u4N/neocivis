@@ -103,12 +103,13 @@ export function ArticleTranslationsPage(props: Props) {
                       </Button>
                       {translation.locale === 'fr' ? (
                         <Tooltip>
-                          <TooltipTrigger asChild>
+                          <TooltipTrigger render={() => (
                             <span>
                               <Button variant="ghost" size="sm" disabled className="text-muted-foreground">
                                 <Trash2 className="size-4" />
                               </Button>
                             </span>
+                          )}>
                           </TooltipTrigger>
                           <TooltipContent>La traduction française ne peut pas être supprimée</TooltipContent>
                         </Tooltip>

@@ -5,8 +5,7 @@ import { CreateArticleInput } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-
-const articleService = new ArticleService();
+import {useApi} from "@/providers/ApiProvider";
 
 type FormState = {
   title: string;
@@ -28,6 +27,7 @@ type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export function useArticleFormPage(id?: string) {
   const router = useRouter();
+  const articleService = new ArticleService(useApi());
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);

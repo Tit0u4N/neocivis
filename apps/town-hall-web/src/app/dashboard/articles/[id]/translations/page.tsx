@@ -2,8 +2,8 @@
 'use client';
 
 import { use } from 'react';
-import { ArticleTranslationsPage } from '@/components/articles/ArticleTranslationsPage';
-import { useArticleTranslationsPage } from '@/components/articles/useArticleTranslationsPage';
+import { ArticleTranslationsPage } from '@/components/articles/translation/ArticleTranslationsPage';
+import { useArticleTranslationsPage } from '@/components/articles/translation/useArticleTranslationsPage';
 
 type Props = {
   params: Promise<{ id: string }>;

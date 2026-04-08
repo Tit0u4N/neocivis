@@ -6,6 +6,8 @@ import { UserService } from '@/modules/users/user.service';
 import { ProductController } from './controllers/product.controller';
 import { UserController } from './controllers/user.controller';
 import { ArticleController } from './controllers/article.controller';
+import {ArticleRepository} from "@/modules/article/article.repository";
+import {ArticleService} from "@/modules/article/article.service";
 import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';

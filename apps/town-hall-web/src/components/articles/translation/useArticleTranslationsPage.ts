@@ -1,11 +1,11 @@
 'use client';
 
+import { useApi } from "@/providers/ApiProvider";
 import type { AddTranslationInput, Article, ArticleLocale } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-const articleService = new ArticleService();
 
 const ALL_LOCALES: ArticleLocale[] = ['fr', 'en', 'de', 'it'];
 
@@ -24,6 +24,7 @@ const DEFAULT_TRANSLATION_FORM: Omit<TranslationFormState, 'locale'> = {
 
 export function useArticleTranslationsPage(id: string) {
   const router = useRouter();
+  const articleService = new ArticleService(useApi());
   const [article, setArticle] = useState<Article | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

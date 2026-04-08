@@ -35,13 +35,13 @@ function ArticleRow({
   onTranslations,
   onToggleStatus,
   onDeleteRequest,
-}: {
+}: Readonly<{
   article: Article;
   onEdit: () => void;
   onTranslations: () => void;
   onToggleStatus: () => void;
   onDeleteRequest: () => void;
-}) {
+}>) {
   const frTranslation = article.translations.find((t) => t.locale === 'fr');
 
   return (
@@ -80,11 +80,14 @@ function ArticleRow({
       </td>
       <td className="px-4 py-3">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MoreHorizontal className="size-4" />
-              <span className="sr-only">Actions</span>
-            </Button>
+          <DropdownMenuTrigger
+            render={(props) => (
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" {...props}>
+                <MoreHorizontal className="size-4" />
+                <span className="sr-only">Actions</span>
+              </Button>
+            )}
+          >
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onEdit}>Modifier</DropdownMenuItem>

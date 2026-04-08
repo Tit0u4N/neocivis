@@ -2,6 +2,7 @@
 
 import type { ArticleLocale } from '@repo/contracts/article';
 import { ArrowLeft, Loader2, Plus, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PlateEditor } from '@/components/plate-editor/PlateEditor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ const LOCALE_LABELS: Record<ArticleLocale, string> = {
 };
 
 export function ArticleTranslationsPage(props: Props) {
+  const { t } = useTranslation();
   const {
     article,
     isLoading,
@@ -50,15 +52,15 @@ export function ArticleTranslationsPage(props: Props) {
     navigateToEdit,
   } = props;
 
-  const frTitle = article?.translations.find((t) => t.locale === 'fr')?.title ?? 'Article';
+  const frTitle = article?.translations.find((translation) => translation.locale === 'fr')?.title ?? 'Article';
 
   return (
-    <PageLayout title={`Traductions — ${frTitle}`}>
+    <PageLayout title={t('articles.translations.pageTitle', { articleTitle: frTitle })}>
       <div className="max-w-3xl space-y-6">
         {/* Back link */}
         <Button variant="ghost" size="sm" onClick={navigateToEdit} className="-ml-2">
           <ArrowLeft className="mr-1.5 size-4" />
-          Retour à l&apos;édition
+          {t('articles.translations.backToEdit')}
         </Button>
 
         {error && (
@@ -89,7 +91,7 @@ export function ArticleTranslationsPage(props: Props) {
                       <span className="font-medium text-sm">{LOCALE_LABELS[translation.locale as ArticleLocale]}</span>
                       {translation.locale === 'fr' && (
                         <Badge variant="secondary" className="text-xs">
-                          Langue par défaut
+                          {t('articles.translations.defaultLanguage')}
                         </Badge>
                       )}
                     </div>
@@ -99,7 +101,7 @@ export function ArticleTranslationsPage(props: Props) {
                         size="sm"
                         onClick={() => handleOpenEdit(translation.locale as ArticleLocale)}
                       >
-                        Modifier
+                        {t('common.edit')}
                       </Button>
                       {translation.locale === 'fr' ? (
                         <Tooltip>
@@ -111,7 +113,7 @@ export function ArticleTranslationsPage(props: Props) {
                             </span>
                           )}>
                           </TooltipTrigger>
-                          <TooltipContent>La traduction française ne peut pas être supprimée</TooltipContent>
+                          <TooltipContent>{t('articles.translations.cannotDeleteFr')}</TooltipContent>
                         </Tooltip>
                       ) : (
                         <Button
@@ -143,15 +145,15 @@ export function ArticleTranslationsPage(props: Props) {
                   {editingLocale === translation.locale && (
                     <div className="space-y-4 border-t bg-muted/10 px-4 py-4">
                       <div className="space-y-1.5">
-                        <Label>Titre *</Label>
+                        <Label>{t('articles.translations.fields.title')}</Label>
                         <Input
                           value={editForm.title}
                           onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                          placeholder="Titre"
+                          placeholder={t('articles.translations.fields.titlePlaceholder')}
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Description (optionnel)</Label>
+                        <Label>{t('articles.translations.fields.description')}</Label>
                         <Textarea
                           value={editForm.description}
                           onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -159,7 +161,7 @@ export function ArticleTranslationsPage(props: Props) {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Contenu</Label>
+                        <Label>{t('articles.translations.fields.content')}</Label>
                         <PlateEditor
                           value={editForm.content}
                           onChange={(v) => setEditForm({ ...editForm, content: v })}
@@ -168,7 +170,7 @@ export function ArticleTranslationsPage(props: Props) {
                       <div className="flex items-center gap-2">
                         <Button size="sm" onClick={() => void handleSaveEdit()} disabled={isSavingEdit}>
                           {isSavingEdit && <Loader2 className="mr-1.5 size-3.5 animate-spin" />}
-                          Enregistrer
+                          {t('common.save')}
                         </Button>
                         <Button
                           size="sm"
@@ -176,7 +178,7 @@ export function ArticleTranslationsPage(props: Props) {
                           onClick={() => setEditingLocale(null)}
                           disabled={isSavingEdit}
                         >
-                          Annuler
+                          {t('common.cancel')}
                         </Button>
                       </div>
                     </div>
@@ -189,16 +191,16 @@ export function ArticleTranslationsPage(props: Props) {
             {availableLocalesToAdd.length > 0 && !isAddDialogOpen && (
               <Button variant="outline" onClick={handleOpenAddDialog}>
                 <Plus className="mr-2 size-4" />
-                Ajouter une traduction
+                {t('articles.translations.addTranslation')}
               </Button>
             )}
 
             {isAddDialogOpen && (
               <div className="space-y-4 rounded-lg border p-4">
-                <h3 className="font-semibold">Nouvelle traduction</h3>
+                <h3 className="font-semibold">{t('articles.translations.newTranslation')}</h3>
 
                 <div className="space-y-1.5">
-                  <Label>Langue</Label>
+                  <Label>{t('articles.translations.fields.language')}</Label>
                   <Select value={addLocale} onValueChange={(v) => setAddLocale(v as ArticleLocale)}>
                     <SelectTrigger className="w-48">
                       <SelectValue />
@@ -214,16 +216,16 @@ export function ArticleTranslationsPage(props: Props) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Titre *</Label>
+                  <Label>{t('articles.translations.fields.title')}</Label>
                   <Input
                     value={addForm.title}
                     onChange={(e) => setAddForm({ ...addForm, title: e.target.value })}
-                    placeholder="Titre dans cette langue"
+                    placeholder={t('articles.translations.fields.titlePlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Description (optionnel)</Label>
+                  <Label>{t('articles.translations.fields.description')}</Label>
                   <Textarea
                     value={addForm.description}
                     onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
@@ -232,24 +234,24 @@ export function ArticleTranslationsPage(props: Props) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Contenu</Label>
+                  <Label>{t('articles.translations.fields.content')}</Label>
                   <PlateEditor value={addForm.content} onChange={(v) => setAddForm({ ...addForm, content: v })} />
                 </div>
 
                 <div className="flex items-center gap-2">
                   <Button onClick={() => void handleAddTranslation()} disabled={isAdding}>
                     {isAdding && <Loader2 className="mr-1.5 size-4 animate-spin" />}
-                    Ajouter
+                    {t('articles.translations.addTranslation')}
                   </Button>
                   <Button variant="ghost" onClick={() => setIsAddDialogOpen(false)} disabled={isAdding}>
-                    Annuler
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </div>
             )}
 
             {availableLocalesToAdd.length === 0 && (
-              <p className="text-muted-foreground text-sm">Toutes les langues disponibles ont déjà été ajoutées.</p>
+              <p className="text-muted-foreground text-sm">{t('articles.translations.allLanguagesAdded')}</p>
             )}
           </>
         )}

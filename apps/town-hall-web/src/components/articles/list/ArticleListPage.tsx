@@ -2,6 +2,7 @@
 
 import type { Article } from '@repo/contracts/article';
 import { MoreHorizontal, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +43,7 @@ function ArticleRow({
   onToggleStatus: () => void;
   onDeleteRequest: () => void;
 }>) {
+  const { t } = useTranslation();
   const frTranslation = article.translations.find((t) => t.locale === 'fr');
 
   return (
@@ -54,7 +56,7 @@ function ArticleRow({
       </td>
       <td className="px-4 py-3">
         <Badge variant={article.status === 'published' ? 'default' : 'secondary'}>
-          {article.status === 'published' ? 'Publié' : 'Brouillon'}
+          {article.status === 'published' ? t('articles.list.status.published') : t('articles.list.status.draft')}
         </Badge>
       </td>
       <td className="px-4 py-3 text-muted-foreground text-sm">
@@ -71,9 +73,9 @@ function ArticleRow({
       </td>
       <td className="px-4 py-3">
         <div className="flex flex-wrap gap-1">
-          {article.translations.map((t) => (
-            <Badge key={t.locale} variant="outline" className="text-xs uppercase">
-              {t.locale}
+          {article.translations.map((translation) => (
+            <Badge key={translation.locale} variant="outline" className="text-xs uppercase">
+              {translation.locale}
             </Badge>
           ))}
         </div>
@@ -84,20 +86,20 @@ function ArticleRow({
             render={(props) => (
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0" {...props}>
                 <MoreHorizontal className="size-4" />
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">{t('articles.list.actions.label')}</span>
               </Button>
             )}
           >
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onEdit}>Modifier</DropdownMenuItem>
-            <DropdownMenuItem onClick={onTranslations}>Gérer les traductions</DropdownMenuItem>
+            <DropdownMenuItem onClick={onEdit}>{t('common.edit')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={onTranslations}>{t('articles.list.actions.manageTranslations')}</DropdownMenuItem>
             <DropdownMenuItem onClick={onToggleStatus}>
-              {article.status === 'published' ? 'Dépublier' : 'Publier'}
+              {article.status === 'published' ? t('articles.list.actions.unpublish') : t('articles.list.actions.publish')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDeleteRequest} className="text-destructive">
-              Supprimer
+              {t('common.delete')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -107,6 +109,7 @@ function ArticleRow({
 }
 
 export function ArticleListPage(props: Props) {
+  const { t } = useTranslation();
   const {
     articles,
     isLoading,
@@ -125,13 +128,13 @@ export function ArticleListPage(props: Props) {
   } = props;
 
   return (
-    <PageLayout title="Articles">
+    <PageLayout title={t('articles.list.title')}>
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{articles.length} article(s)</p>
+        <p className="text-muted-foreground text-sm">{t('articles.list.count', { count: articles.length })}</p>
         <Button onClick={navigateToCreate}>
           <Plus className="mr-2 size-4" />
-          Nouvel article
+          {t('articles.list.newArticle')}
         </Button>
       </div>
 
@@ -139,16 +142,16 @@ export function ArticleListPage(props: Props) {
       <div className="flex flex-wrap items-center gap-3">
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Tous les statuts" />
+            <SelectValue placeholder={t('articles.list.filters.allStatuses')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous les statuts</SelectItem>
-            <SelectItem value="published">Publiés</SelectItem>
-            <SelectItem value="draft">Brouillons</SelectItem>
+            <SelectItem value="all">{t('articles.list.filters.allStatuses')}</SelectItem>
+            <SelectItem value="published">{t('articles.list.filters.published')}</SelectItem>
+            <SelectItem value="draft">{t('articles.list.filters.drafts')}</SelectItem>
           </SelectContent>
         </Select>
         <Input
-          placeholder="Rechercher…"
+          placeholder={t('articles.list.filters.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-xs"
@@ -166,11 +169,11 @@ export function ArticleListPage(props: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Titre</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Statut</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Publication</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Modification</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Langues</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.title')}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.status')}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.publishedAt')}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.updatedAt')}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.languages')}</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground" />
             </tr>
           </thead>
@@ -188,9 +191,9 @@ export function ArticleListPage(props: Props) {
             {!isLoading && articles.length === 0 && (
               <tr>
                 <td className="px-4 py-10 text-center text-muted-foreground" colSpan={6}>
-                  <p className="font-medium">Aucun article</p>
+                  <p className="font-medium">{t('articles.list.empty.title')}</p>
                   <Button variant="link" className="mt-1" onClick={navigateToCreate}>
-                    Créer votre premier article
+                    {t('articles.list.empty.createFirst')}
                   </Button>
                 </td>
               </tr>
@@ -215,18 +218,16 @@ export function ArticleListPage(props: Props) {
       <AlertDialog open={confirmDeleteId !== null} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cet article ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. L&apos;article et toutes ses traductions seront définitivement supprimés.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t('articles.list.deleteDialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('articles.list.deleteDialog.description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => confirmDeleteId && void handleDelete(confirmDeleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Supprimer
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

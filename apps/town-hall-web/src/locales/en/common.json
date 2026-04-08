@@ -53,6 +53,79 @@
       "system": "System"
     }
   },
+  "articles": {
+    "list": {
+      "title": "Articles",
+      "newArticle": "New article",
+      "count": "{{count}} article(s)",
+      "filters": {
+        "allStatuses": "All statuses",
+        "published": "Published",
+        "drafts": "Drafts",
+        "searchPlaceholder": "Search…"
+      },
+      "table": {
+        "title": "Title",
+        "status": "Status",
+        "publishedAt": "Published",
+        "updatedAt": "Modified",
+        "languages": "Languages"
+      },
+      "status": {
+        "published": "Published",
+        "draft": "Draft"
+      },
+      "actions": {
+        "label": "Actions",
+        "manageTranslations": "Manage translations",
+        "unpublish": "Unpublish",
+        "publish": "Publish"
+      },
+      "empty": {
+        "title": "No articles",
+        "createFirst": "Create your first article"
+      },
+      "deleteDialog": {
+        "title": "Delete this article?",
+        "description": "This action is irreversible. The article and all its translations will be permanently deleted."
+      }
+    },
+    "form": {
+      "titleCreate": "New article",
+      "titleEdit": "Edit article",
+      "fields": {
+        "title": "Title *",
+        "titlePlaceholder": "Article title",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Summary or subtitle",
+        "coverImage": "Cover image (URL, optional)",
+        "coverImageAlt": "Cover preview",
+        "status": "Status",
+        "content": "Content",
+        "contentPlaceholder": "Start writing your article…"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published"
+      }
+    },
+    "translations": {
+      "pageTitle": "Translations — {{articleTitle}}",
+      "backToEdit": "Back to editing",
+      "defaultLanguage": "Default language",
+      "cannotDeleteFr": "The French translation cannot be deleted",
+      "addTranslation": "Add a translation",
+      "newTranslation": "New translation",
+      "allLanguagesAdded": "All available languages have already been added.",
+      "fields": {
+        "language": "Language",
+        "title": "Title *",
+        "titlePlaceholder": "Title in this language",
+        "description": "Description (optional)",
+        "content": "Content"
+      }
+    }
+  },
   "sidebar": {
     "sections": {
       "townHall": "Town Hall",

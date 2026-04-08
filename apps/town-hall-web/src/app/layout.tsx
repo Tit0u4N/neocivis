@@ -2,6 +2,8 @@ import type React from 'react';
 import '../global.css';
 import { Figtree, Geist, Geist_Mono } from 'next/font/google';
 import { I18nProvider } from '@/components/I18nProvider';
+import { ApiProvider } from '@/providers/ApiProvider';
+import { AuthProvider } from '@/providers/AuthProvider';
 
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -23,7 +25,11 @@ export default function RootLayout({
   return (
     <html lang="fr" className={figtree.variable}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <I18nProvider>{children}</I18nProvider>
+        <I18nProvider>
+          <AuthProvider>
+            <ApiProvider>{children}</ApiProvider>
+          </AuthProvider>
+        </I18nProvider>
       </body>
     </html>
   );

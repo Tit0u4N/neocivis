@@ -1,26 +1,13 @@
-import type { ErrorBoundaryProps } from 'expo-router';
-import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useColor } from '@/hooks/useColor';
-import { useAuth } from '@/services/AuthContext';
-
-export function ErrorBoundary({ error }: ErrorBoundaryProps) {
-  const message = error instanceof Error ? error.message : String(error ?? 'Erreur inconnue');
-
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: 'red' }}>
-      <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>ERREUR FATALE TROUVÉE :</Text>
-      <Text style={{ fontSize: 16, color: 'white', marginTop: 10 }}>{message}</Text>
-    </View>
-  );
-}
+import {Spinner} from "@/components/ui/spinner";
+import {useLoginScreen} from "@/app/login/useLoginScreen";
 
 export default function LoginScreen() {
   const { isLoading, onSignIn } = useLoginScreen();
-  const _router = useRouter();
   const { t } = useTranslation();
 
   const backgroundColor = useColor('background');
@@ -47,7 +34,7 @@ export default function LoginScreen() {
           </Button>
         </View>
       </View>
-        )
+      )}
     </View>
   );
 }

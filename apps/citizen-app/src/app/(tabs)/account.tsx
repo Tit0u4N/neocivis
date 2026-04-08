@@ -5,15 +5,14 @@ import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { useModeToggle } from '@/hooks/useModeToggle';
 import { useSettings } from '@/hooks/useSettings';
-import { useAuth } from '@/services/AuthContext';
-
+import { useAuth } from '@/providers/AuthProvider';
 type ThemeMode = 'light' | 'dark' | 'system';
 
 export default function AccountScreen() {
   const { t } = useTranslation();
+  const { logout } = useAuth();
   const { language, availableLanguages, setLanguage } = useSettings();
   const { mode, setMode } = useModeToggle();
-  const { signOut } = useAuth();
 
   const themeModes: ThemeMode[] = ['light', 'dark', 'system'];
 
@@ -59,7 +58,7 @@ export default function AccountScreen() {
         </View>
       </View>
 
-      <Button variant="destructive" onPress={signOut} style={styles.signOut}>
+      <Button variant="destructive" onPress={logout} style={styles.signOut}>
         {t('account.signOut')}
       </Button>
     </View>

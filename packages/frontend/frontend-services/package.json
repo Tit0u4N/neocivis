@@ -25,6 +25,7 @@
   "peerDependencies": {},
   "exports": {
     "./report": "./src/report/report.service.ts",
+    "./auth": "./src/auth/auth.service.ts",
     "./permission": "./src/permission/permission.service.ts",
     "./article": "./src/article/article.service.ts"
   }

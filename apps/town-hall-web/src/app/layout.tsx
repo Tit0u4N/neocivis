@@ -1,17 +1,18 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import '../global.css';
+import type { ReactNode } from 'react';
 import { Building2 } from 'lucide-react';
 import { Figtree, Geist, Geist_Mono } from 'next/font/google';
 import { useTranslation } from 'react-i18next';
-import { AuthProvider, useAuth } from 'react-oidc-context';
 import { AppProvider } from '@/components/AppProvider';
 import { I18nProvider } from '@/components/I18nProvider';
+import { ApiProvider } from '@/providers/ApiProvider';
+import { AuthProvider } from '@/providers/AuthProvider';
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { Button } from '@/components/ui/button';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { oidcConfig } from '@/lib/oidc';
+import { useAuth } from "react-oidc-context";
 
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-sans' });
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -66,8 +67,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <I18nProvider>
           <AppProvider>
-            <AuthProvider {...oidcConfig}>
-              <AuthGate>{children}</AuthGate>
+            <AuthProvider>
+              <AuthGate>
+                  <ApiProvider>{children}</ApiProvider>
+              </AuthGate>
             </AuthProvider>
           </AppProvider>
         </I18nProvider>

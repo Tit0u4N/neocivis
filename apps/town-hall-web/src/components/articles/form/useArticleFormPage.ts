@@ -5,12 +5,12 @@ import { CreateArticleInput } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import {useApi} from "@/providers/ApiProvider";
+import { useApi } from '@/providers/ApiProvider';
 
 type FormState = {
   title: string;
   description: string;
-  content: Record<string, unknown>;
+  content: unknown;
   coverImageUrl: string;
   status: ArticleStatus;
 };
@@ -18,7 +18,7 @@ type FormState = {
 const DEFAULT_FORM: FormState = {
   title: '',
   description: '',
-  content: {},
+  content: [],
   coverImageUrl: '',
   status: 'draft',
 };
@@ -48,7 +48,7 @@ export function useArticleFormPage(id?: string) {
         setForm({
           title: frTranslation?.title ?? '',
           description: frTranslation?.description ?? '',
-          content: (frTranslation?.content as Record<string, unknown>) ?? {},
+          content: (frTranslation?.content as unknown as unknown[]) ?? [],
           coverImageUrl: article.coverImageUrl ?? '',
           status: article.status,
         });
@@ -105,7 +105,7 @@ export function useArticleFormPage(id?: string) {
           locale: 'fr' as const,
           title: form.title,
           description: form.description || undefined,
-          content: form.content,
+          content: form.content as unknown[],
         },
         coverImageUrl: form.coverImageUrl || undefined,
         status: form.status,

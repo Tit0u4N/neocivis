@@ -1,18 +1,18 @@
 'use client';
 
 import '../global.css';
-import type { ReactNode } from 'react';
 import { Building2 } from 'lucide-react';
 import { Figtree, Geist, Geist_Mono } from 'next/font/google';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { AppProvider } from '@/components/AppProvider';
 import { I18nProvider } from '@/components/I18nProvider';
-import { ApiProvider } from '@/providers/ApiProvider';
-import { AuthProvider } from '@/providers/AuthProvider';
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { Button } from '@/components/ui/button';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { useAuth } from "react-oidc-context";
+import { ApiProvider } from '@/providers/ApiProvider';
+import { AuthProvider } from '@/providers/AuthProvider';
 
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-sans' });
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -23,6 +23,7 @@ function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
   const { t } = useTranslation();
 
   const handleSignIn = async () => {
+    console.log('Initiating sign-in process...');
     await auth.signinRedirect();
   };
 
@@ -69,7 +70,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           <AppProvider>
             <AuthProvider>
               <AuthGate>
-                  <ApiProvider>{children}</ApiProvider>
+                <ApiProvider>{children}</ApiProvider>
               </AuthGate>
             </AuthProvider>
           </AppProvider>

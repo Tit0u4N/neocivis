@@ -10,7 +10,7 @@ export const ArticleTranslation = z.object({
   locale: ArticleLocale,
   title: z.string().min(1).max(200),
   description: z.string().optional(),
-  content: z.record(z.string(), z.unknown()).optional(),
+  content: z.array(z.unknown()).optional(),
 });
 export type ArticleTranslation = z.infer<typeof ArticleTranslation>;
 
@@ -40,7 +40,7 @@ export const AddTranslationInput = z.object({
   locale: ArticleLocale,
   title: z.string().min(1).max(200),
   description: z.string().optional(),
-  content: z.record(z.string(), z.unknown()).optional(),
+  content: z.array(z.unknown()).optional(),
 });
 export type AddTranslationInput = z.infer<typeof AddTranslationInput>;
 

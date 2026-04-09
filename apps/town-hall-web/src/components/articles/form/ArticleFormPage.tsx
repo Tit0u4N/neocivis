@@ -77,7 +77,11 @@ export function ArticleFormPage(props: Props) {
           {form.coverImageUrl && (
             <div className="mt-2 overflow-hidden rounded-md border">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={form.coverImageUrl} alt={t('articles.form.fields.coverImageAlt')} className="h-48 w-full object-cover" />
+              <img
+                src={form.coverImageUrl}
+                alt={t('articles.form.fields.coverImageAlt')}
+                className="h-48 w-full object-cover"
+              />
             </div>
           )}
         </div>
@@ -100,7 +104,7 @@ export function ArticleFormPage(props: Props) {
         <div className="space-y-1.5">
           <Label>{t('articles.form.fields.content')}</Label>
           <PlateEditor
-            value={form.content}
+            value={form.content as unknown[] | undefined}
             onChange={(v) => setField('content', v)}
             placeholder={t('articles.form.fields.contentPlaceholder')}
           />

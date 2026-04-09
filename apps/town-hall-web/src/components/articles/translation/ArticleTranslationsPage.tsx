@@ -105,14 +105,15 @@ export function ArticleTranslationsPage(props: Props) {
                       </Button>
                       {translation.locale === 'fr' ? (
                         <Tooltip>
-                          <TooltipTrigger render={() => (
-                            <span>
-                              <Button variant="ghost" size="sm" disabled className="text-muted-foreground">
-                                <Trash2 className="size-4" />
-                              </Button>
-                            </span>
-                          )}>
-                          </TooltipTrigger>
+                          <TooltipTrigger
+                            render={() => (
+                              <span>
+                                <Button variant="ghost" size="sm" disabled className="text-muted-foreground">
+                                  <Trash2 className="size-4" />
+                                </Button>
+                              </span>
+                            )}
+                          />
                           <TooltipContent>{t('articles.translations.cannotDeleteFr')}</TooltipContent>
                         </Tooltip>
                       ) : (
@@ -163,7 +164,7 @@ export function ArticleTranslationsPage(props: Props) {
                       <div className="space-y-1.5">
                         <Label>{t('articles.translations.fields.content')}</Label>
                         <PlateEditor
-                          value={editForm.content}
+                          value={editForm.content as unknown[] | undefined}
                           onChange={(v) => setEditForm({ ...editForm, content: v })}
                         />
                       </div>
@@ -235,7 +236,10 @@ export function ArticleTranslationsPage(props: Props) {
 
                 <div className="space-y-1.5">
                   <Label>{t('articles.translations.fields.content')}</Label>
-                  <PlateEditor value={addForm.content} onChange={(v) => setAddForm({ ...addForm, content: v })} />
+                  <PlateEditor
+                    value={addForm.content as unknown[] | undefined}
+                    onChange={(v) => setAddForm({ ...addForm, content: v })}
+                  />
                 </div>
 
                 <div className="flex items-center gap-2">

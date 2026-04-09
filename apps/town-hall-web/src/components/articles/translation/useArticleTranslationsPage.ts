@@ -1,11 +1,10 @@
 'use client';
 
-import { useApi } from "@/providers/ApiProvider";
 import type { AddTranslationInput, Article, ArticleLocale } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-
+import { useApi } from '@/providers/ApiProvider';
 
 const ALL_LOCALES: ArticleLocale[] = ['fr', 'en', 'de', 'it'];
 
@@ -13,13 +12,13 @@ type TranslationFormState = {
   locale: ArticleLocale;
   title: string;
   description: string;
-  content: Record<string, unknown>;
+  content: unknown;
 };
 
 const DEFAULT_TRANSLATION_FORM: Omit<TranslationFormState, 'locale'> = {
   title: '',
   description: '',
-  content: {},
+  content: [],
 };
 
 export function useArticleTranslationsPage(id: string) {
@@ -81,7 +80,7 @@ export function useArticleTranslationsPage(id: string) {
         locale: addLocale,
         title: addForm.title,
         description: addForm.description || undefined,
-        content: addForm.content,
+        content: addForm.content as unknown[],
       };
       await articleService.addTranslation(id, input);
       await fetchArticle();
@@ -107,7 +106,7 @@ export function useArticleTranslationsPage(id: string) {
       setEditForm({
         title: translation.title,
         description: translation.description ?? '',
-        content: (translation.content as Record<string, unknown>) ?? {},
+        content: (translation.content as unknown as unknown[]) ?? [],
       });
     },
     [article],
@@ -123,7 +122,7 @@ export function useArticleTranslationsPage(id: string) {
       await articleService.updateTranslation(id, editingLocale, {
         title: editForm.title,
         description: editForm.description || undefined,
-        content: editForm.content,
+        content: editForm.content as unknown[],
       });
       await fetchArticle();
       setEditingLocale(null);

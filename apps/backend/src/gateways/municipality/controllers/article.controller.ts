@@ -46,6 +46,7 @@ export class ArticleController {
         return c.json({ error: parsed.error.message }, 400);
       }
       try {
+        console.log(parsed.data)
         const article = this.service.updateArticle(c.req.param('id'), parsed.data);
         return c.json(article);
       } catch {

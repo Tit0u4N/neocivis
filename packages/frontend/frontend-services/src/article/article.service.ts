@@ -28,6 +28,7 @@ export class ArticleService extends AbstractService {
     }
 
     async update(id: string, input: UpdateArticleInput): Promise<Article> {
+        console.log(`Updating article ${id} with data:`, input);
         return await this.http.put(`articles/${id}`, {json: input}).json<Article>();
     }
 

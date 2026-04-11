@@ -28,6 +28,7 @@
     "./auth": "./src/auth/auth.service.ts",
     "./permission": "./src/permission/permission.service.ts",
     "./article": "./src/article/article.service.ts",
-    "./upload": "./src/upload/upload.service.ts"
+    "./upload": "./src/upload/upload.service.ts",
+    "./testing": "./src/testing.ts"
   }
 }

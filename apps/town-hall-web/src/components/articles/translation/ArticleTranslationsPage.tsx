@@ -1,9 +1,10 @@
 'use client';
 
 import type { ArticleLocale } from '@repo/contracts/article';
-import { ArrowLeft, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PlateEditor } from '@/components/plate-editor/PlateEditor';
+import { BackButton } from '@/components/ui/back-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,11 +58,7 @@ export function ArticleTranslationsPage(props: Props) {
   return (
     <PageLayout title={t('articles.translations.pageTitle', { articleTitle: frTitle })}>
       <div className="max-w-3xl space-y-6">
-        {/* Back link */}
-        <Button variant="ghost" size="sm" onClick={navigateToEdit} className="-ml-2">
-          <ArrowLeft className="mr-1.5 size-4" />
-          {t('articles.translations.backToEdit')}
-        </Button>
+        <BackButton onClick={navigateToEdit}>{t('articles.translations.backToEdit')}</BackButton>
 
         {error && (
           <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm">
@@ -157,7 +154,12 @@ export function ArticleTranslationsPage(props: Props) {
                         <Label>{t('articles.translations.fields.description')}</Label>
                         <Textarea
                           value={editForm.description}
-                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              description: e.target.value,
+                            })
+                          }
                           rows={2}
                         />
                       </div>

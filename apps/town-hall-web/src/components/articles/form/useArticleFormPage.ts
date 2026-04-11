@@ -38,6 +38,8 @@ export function useArticleFormPage(id?: string) {
   const [isLoading, setIsLoading] = useState(isEditing);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
 
   useEffect(() => {
     if (!isEditing) {
@@ -67,6 +69,7 @@ export function useArticleFormPage(id?: string) {
   const setField = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
+    setIsDirty(true);
   }, []);
 
   const validate = useCallback((): boolean => {
@@ -119,19 +122,45 @@ export function useArticleFormPage(id?: string) {
       } else {
         await articleService.create(payload);
       }
+      setIsDirty(false);
       router.push('/dashboard/articles');
     } catch {
       setApiError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSubmitting(false);
     }
-  }, [form, id, isEditing, router, validate, articleService.create]);
+  }, [form, id, isEditing, router, validate, articleService.create, articleService.update]);
 
-  const handleUploadImage = useCallback((file: File) => uploadService.uploadImage(file), []);
+  const handleUploadImage = useCallback((file: File) => uploadService.uploadImage(file), [uploadService.uploadImage]);
 
-  const handleCancel = useCallback(() => {
+  const navigateAway = useCallback(() => {
     router.push('/dashboard/articles');
   }, [router]);
+
+  const handleCancel = useCallback(() => {
+    if (isDirty) {
+      setShowDiscardDialog(true);
+    } else {
+      navigateAway();
+    }
+  }, [isDirty, navigateAway]);
+
+  const handleBack = useCallback(() => {
+    if (isDirty) {
+      setShowDiscardDialog(true);
+    } else {
+      navigateAway();
+    }
+  }, [isDirty, navigateAway]);
+
+  const confirmDiscard = useCallback(() => {
+    setShowDiscardDialog(false);
+    navigateAway();
+  }, [navigateAway]);
+
+  const closeDiscardDialog = useCallback(() => {
+    setShowDiscardDialog(false);
+  }, []);
 
   return {
     isEditing,
@@ -140,9 +169,14 @@ export function useArticleFormPage(id?: string) {
     isLoading,
     isSubmitting,
     apiError,
+    isDirty,
+    showDiscardDialog,
     setField,
     handleUploadImage,
     handleSubmit,
     handleCancel,
+    handleBack,
+    confirmDiscard,
+    closeDiscardDialog,
   };
 }

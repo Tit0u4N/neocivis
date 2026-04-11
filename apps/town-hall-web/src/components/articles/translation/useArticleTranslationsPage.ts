@@ -53,7 +53,7 @@ export function useArticleTranslationsPage(id: string) {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, articleService.getById]);
 
   useEffect(() => {
     void fetchArticle();
@@ -91,7 +91,7 @@ export function useArticleTranslationsPage(id: string) {
     } finally {
       setIsAdding(false);
     }
-  }, [id, addLocale, addForm, fetchArticle]);
+  }, [id, addLocale, addForm, fetchArticle, articleService.addTranslation]);
 
   const handleOpenEdit = useCallback(
     (locale: ArticleLocale) => {
@@ -131,7 +131,7 @@ export function useArticleTranslationsPage(id: string) {
     } finally {
       setIsSavingEdit(false);
     }
-  }, [id, editingLocale, editForm, fetchArticle]);
+  }, [id, editingLocale, editForm, fetchArticle, articleService.updateTranslation]);
 
   const handleDeleteTranslation = useCallback(
     async (locale: ArticleLocale) => {
@@ -147,7 +147,7 @@ export function useArticleTranslationsPage(id: string) {
         setDeletingLocale(null);
       }
     },
-    [id, fetchArticle],
+    [id, fetchArticle, articleService.deleteTranslation],
   );
 
   const navigateToEdit = useCallback(() => {

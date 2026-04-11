@@ -3,6 +3,17 @@
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PlateEditor } from '@/components/plate-editor/PlateEditor';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
@@ -23,12 +34,31 @@ export function ArticleFormPage(props: Props) {
     isLoading,
     isSubmitting,
     apiError,
+    showDiscardDialog,
     setField,
     handleUploadImage,
     handleSubmit,
     handleCancel,
+    handleBack,
+    confirmDiscard,
+    closeDiscardDialog,
   } = props;
   const { t } = useTranslation();
+
+  const discardDialog = (
+    <AlertDialog open={showDiscardDialog} onOpenChange={(open) => !open && closeDiscardDialog()}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('articles.form.discardDialog.title')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('articles.form.discardDialog.description')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={closeDiscardDialog}>{t('articles.form.discardDialog.cancel')}</AlertDialogCancel>
+          <AlertDialogAction onClick={confirmDiscard}>{t('articles.form.discardDialog.confirm')}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 
   if (isLoading) {
     return (
@@ -44,7 +74,9 @@ export function ArticleFormPage(props: Props) {
 
   return (
     <PageLayout title={isEditing ? t('articles.form.titleEdit') : t('articles.form.titleCreate')}>
+      {discardDialog}
       <div className="max-w-3xl space-y-6">
+        <BackButton onClick={handleBack}>{t('common.back')}</BackButton>
         {apiError && (
           <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm">
             {apiError}

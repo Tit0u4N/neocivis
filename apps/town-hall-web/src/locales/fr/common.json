@@ -107,6 +107,12 @@
       "status": {
         "draft": "Brouillon",
         "published": "Publié"
+      },
+      "discardDialog": {
+        "title": "Modifications non sauvegardées",
+        "description": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter sans enregistrer ?",
+        "cancel": "Continuer l'édition",
+        "confirm": "Quitter sans enregistrer"
       }
     },
     "translations": {

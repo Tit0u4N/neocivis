@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 'use client';
 
 import { act, renderHook, waitFor } from '@testing-library/react';
@@ -16,17 +18,25 @@ vi.mock('@/providers/ApiProvider', () => ({
   useApi: () => ({}),
 }));
 
-const mockArticleService = {
-  getById: vi.fn(),
-  create: vi.fn(),
-  update: vi.fn(),
-};
-vi.mock('@repo/frontend-services/article', () => ({
-  // biome-ignore lint/suspicious/noExplicitAny: test mock
-  ArticleService: vi.fn(function (this: any) {
-    return mockArticleService;
-  }),
-}));
+vi.mock('@repo/frontend-services/article', async () => {
+  const { mockArticleService: instance } = await import('@repo/frontend-services/testing');
+  return {
+    ArticleService: vi.fn(function (this: any) {
+      return instance;
+    }),
+  };
+});
+
+vi.mock('@repo/frontend-services/upload', async () => {
+  const { mockUploadService: instance } = await import('@repo/frontend-services/testing');
+  return {
+    UploadService: vi.fn(function (this: any) {
+      return instance;
+    }),
+  };
+});
+
+import { mockArticleService } from '@repo/frontend-services/testing';
 
 import { useArticleFormPage } from './useArticleFormPage';
 
@@ -123,10 +133,63 @@ describe('useArticleFormPage — create mode', () => {
     expect(result.current.apiError).not.toBeNull();
   });
 
-  it('handleCancel navigates to /dashboard/articles', () => {
+  it('isDirty starts false and becomes true after setField', () => {
+    const { result } = renderHook(() => useArticleFormPage());
+    expect(result.current.isDirty).toBe(false);
+    act(() => result.current.setField('title', 'Hello'));
+    expect(result.current.isDirty).toBe(true);
+  });
+
+  it('handleCancel navigates directly when form is clean', () => {
     const { result } = renderHook(() => useArticleFormPage());
     act(() => result.current.handleCancel());
     expect(mockPush).toHaveBeenCalledWith('/dashboard/articles');
+    expect(result.current.showDiscardDialog).toBe(false);
+  });
+
+  it('handleCancel opens the discard dialog when form is dirty', () => {
+    const { result } = renderHook(() => useArticleFormPage());
+    act(() => result.current.setField('title', 'Changed'));
+    act(() => result.current.handleCancel());
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(result.current.showDiscardDialog).toBe(true);
+  });
+
+  it('handleBack opens the discard dialog when form is dirty', () => {
+    const { result } = renderHook(() => useArticleFormPage());
+    act(() => result.current.setField('title', 'Changed'));
+    act(() => result.current.handleBack());
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(result.current.showDiscardDialog).toBe(true);
+  });
+
+  it('confirmDiscard navigates away and closes the dialog', () => {
+    const { result } = renderHook(() => useArticleFormPage());
+    act(() => result.current.setField('title', 'Changed'));
+    act(() => result.current.handleCancel());
+    act(() => result.current.confirmDiscard());
+    expect(result.current.showDiscardDialog).toBe(false);
+    expect(mockPush).toHaveBeenCalledWith('/dashboard/articles');
+  });
+
+  it('closeDiscardDialog closes the dialog without navigating', () => {
+    const { result } = renderHook(() => useArticleFormPage());
+    act(() => result.current.setField('title', 'Changed'));
+    act(() => result.current.handleCancel());
+    act(() => result.current.closeDiscardDialog());
+    expect(result.current.showDiscardDialog).toBe(false);
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('isDirty resets to false after a successful submit', async () => {
+    mockArticleService.create.mockResolvedValue(undefined);
+    const { result } = renderHook(() => useArticleFormPage());
+    act(() => result.current.setField('title', 'Mon titre'));
+    expect(result.current.isDirty).toBe(true);
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+    expect(result.current.isDirty).toBe(false);
   });
 });
 

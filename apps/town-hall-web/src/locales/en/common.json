@@ -107,6 +107,12 @@
       "status": {
         "draft": "Draft",
         "published": "Published"
+      },
+      "discardDialog": {
+        "title": "Unsaved changes",
+        "description": "You have unsaved changes. Are you sure you want to leave without saving?",
+        "cancel": "Continue editing",
+        "confirm": "Leave without saving"
       }
     },
     "translations": {

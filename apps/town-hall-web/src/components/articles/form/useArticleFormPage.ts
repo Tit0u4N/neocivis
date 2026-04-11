@@ -3,6 +3,7 @@
 import type { ArticleStatus } from '@repo/contracts/article';
 import { CreateArticleInput } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
+import { UploadService } from '@repo/frontend-services/upload';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useApi } from '@/providers/ApiProvider';
@@ -27,7 +28,9 @@ type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export function useArticleFormPage(id?: string) {
   const router = useRouter();
-  const articleService = new ArticleService(useApi());
+  const api = useApi();
+  const articleService = new ArticleService(api);
+  const uploadService = new UploadService(api);
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
@@ -59,7 +62,7 @@ export function useArticleFormPage(id?: string) {
       }
     };
     void load();
-  }, [id, isEditing]);
+  }, [id, isEditing, articleService.getById]);
 
   const setField = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -122,7 +125,9 @@ export function useArticleFormPage(id?: string) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [form, id, isEditing, router, validate]);
+  }, [form, id, isEditing, router, validate, articleService.create]);
+
+  const handleUploadImage = useCallback((file: File) => uploadService.uploadImage(file), []);
 
   const handleCancel = useCallback(() => {
     router.push('/dashboard/articles');
@@ -136,6 +141,7 @@ export function useArticleFormPage(id?: string) {
     isSubmitting,
     apiError,
     setField,
+    handleUploadImage,
     handleSubmit,
     handleCancel,
   };

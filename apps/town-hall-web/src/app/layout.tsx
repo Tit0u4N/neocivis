@@ -23,7 +23,6 @@ function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
   const { t } = useTranslation();
 
   const handleSignIn = async () => {
-    console.log('Initiating sign-in process...');
     await auth.signinRedirect();
   };
 
@@ -46,7 +45,7 @@ function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
             <h1 className="font-bold text-2xl text-primary uppercase tracking-wide">{t('app.shortName')}</h1>
             <p className="text-muted-foreground text-sm">{t('auth.subtitle')}</p>
           </div>
-          <Button className="uppercase tracking-widest" onClick={handleSignIn}>
+          <Button className="uppercase tracking-widest" size={'lg'} onClick={handleSignIn}>
             {t('nav.login')}
           </Button>
         </div>

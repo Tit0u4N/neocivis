@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import { KEYS } from 'platejs';
 import { Plate, PlateElement, type PlateElementProps, usePlateEditor } from 'platejs/react';
+import { useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -138,9 +139,20 @@ type PlateEditorProps = {
   readOnly?: boolean;
   placeholder?: string;
   className?: string;
+  onUploadImage?: (file: File) => Promise<string>;
 };
 
-export function PlateEditor({ value, onChange, readOnly = false, placeholder, className }: PlateEditorProps) {
+export function PlateEditor({
+  value,
+  onChange,
+  readOnly = false,
+  placeholder,
+  className,
+  onUploadImage,
+}: PlateEditorProps) {
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const imageUploadCallbackRef = useRef<((file: File) => Promise<void>) | null>(null);
+
   const editor = usePlateEditor({
     plugins: [
       // Marks
@@ -184,6 +196,21 @@ export function PlateEditor({ value, onChange, readOnly = false, placeholder, cl
 
   return (
     <RadixTooltip.Provider>
+      {onUploadImage && (
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file && imageUploadCallbackRef.current) {
+              void imageUploadCallbackRef.current(file);
+            }
+            e.target.value = '';
+          }}
+        />
+      )}
       <Plate editor={editor} onChange={({ value: v }) => onChange?.(v as unknown[])} readOnly={readOnly}>
         <div className={cn('overflow-hidden rounded-md border bg-background', className)}>
           {!readOnly && (
@@ -272,9 +299,17 @@ export function PlateEditor({ value, onChange, readOnly = false, placeholder, cl
                   tooltip="Insérer une image"
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    const url = window.prompt("URL de l'image :");
-                    if (url) {
-                      editor.tf.insertNodes({ type: ImagePlugin.key, url, children: [{ text: '' }] });
+                    if (onUploadImage) {
+                      imageUploadCallbackRef.current = async (file: File) => {
+                        const url = await onUploadImage(file);
+                        editor.tf.insertNodes({ type: ImagePlugin.key, url, children: [{ text: '' }] });
+                      };
+                      imageInputRef.current?.click();
+                    } else {
+                      const url = window.prompt("URL de l'image :");
+                      if (url) {
+                        editor.tf.insertNodes({ type: ImagePlugin.key, url, children: [{ text: '' }] });
+                      }
                     }
                   }}
                 >

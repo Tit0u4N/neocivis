@@ -1,18 +1,19 @@
 import { Hono } from 'hono';
+import { applyUserMiddleware } from '@/middlewares/auth.middleware';
+import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
+import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
+import { applyRoleMiddleware } from '@/middlewares/role.middleware';
+import { ArticleRepository } from '@/modules/article/article.repository';
+import { ArticleService } from '@/modules/article/article.service';
 import { ProductRepository } from '@/modules/product/product.repository';
 import { ProductService } from '@/modules/product/product.service';
+import { StubUploadService } from '@/modules/upload/upload.service';
 import { UserRepository } from '@/modules/users/user.repository';
 import { UserService } from '@/modules/users/user.service';
-import { ProductController } from './controllers/product.controller';
-import { UserController } from './controllers/user.controller';
 import { ArticleController } from './controllers/article.controller';
-import {ArticleRepository} from "@/modules/article/article.repository";
-import {ArticleService} from "@/modules/article/article.service";
-import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
-import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
-import { applyRoleMiddleware } from '@/middlewares/role.middleware';
-import { applyUserMiddleware } from '@/middlewares/auth.middleware';
-
+import { ProductController } from './controllers/product.controller';
+import { UploadController } from './controllers/upload.controller';
+import { UserController } from './controllers/user.controller';
 
 // Import repositories
 const userRepository = new UserRepository();
@@ -23,6 +24,7 @@ const articleRepository = new ArticleRepository();
 const userController = new UserController(new UserService(userRepository));
 const productController = new ProductController(new ProductService(productRepository));
 const articleController = new ArticleController(new ArticleService(articleRepository));
+const uploadController = new UploadController(new StubUploadService());
 
 const app = new Hono().basePath('/api/municipality');
 
@@ -35,5 +37,6 @@ applyRoleMiddleware(app, ['EMPLOYEE']);
 app.route('/user', userController.getRoutes());
 app.route('/product', productController.getRoutes());
 app.route('/articles', articleController.getRoutes());
+app.route('/uploads', uploadController.getRoutes());
 
 export default app;

@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PlateEditor } from '@/components/plate-editor/PlateEditor';
 import { Button } from '@/components/ui/button';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
@@ -15,7 +16,18 @@ import type { useArticleFormPage } from './useArticleFormPage';
 type Props = ReturnType<typeof useArticleFormPage>;
 
 export function ArticleFormPage(props: Props) {
-  const { isEditing, form, errors, isLoading, isSubmitting, apiError, setField, handleSubmit, handleCancel } = props;
+  const {
+    isEditing,
+    form,
+    errors,
+    isLoading,
+    isSubmitting,
+    apiError,
+    setField,
+    handleUploadImage,
+    handleSubmit,
+    handleCancel,
+  } = props;
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -66,24 +78,14 @@ export function ArticleFormPage(props: Props) {
 
         {/* Image de couverture */}
         <div className="space-y-1.5">
-          <Label htmlFor="coverImageUrl">{t('articles.form.fields.coverImage')}</Label>
-          <Input
-            id="coverImageUrl"
-            type="url"
-            value={form.coverImageUrl}
-            onChange={(e) => setField('coverImageUrl', e.target.value)}
-            placeholder="https://example.com/image.jpg"
+          <Label>{t('articles.form.fields.coverImage')}</Label>
+          <ImageUpload
+            value={form.coverImageUrl || undefined}
+            onChange={(url) => setField('coverImageUrl', url ?? '')}
+            onUpload={handleUploadImage}
+            alt={t('articles.form.fields.coverImageAlt')}
+            error={errors.coverImageUrl}
           />
-          {form.coverImageUrl && (
-            <div className="mt-2 overflow-hidden rounded-md border">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={form.coverImageUrl}
-                alt={t('articles.form.fields.coverImageAlt')}
-                className="h-48 w-full object-cover"
-              />
-            </div>
-          )}
         </div>
 
         {/* Statut */}
@@ -107,6 +109,7 @@ export function ArticleFormPage(props: Props) {
             value={form.content as unknown[] | undefined}
             onChange={(v) => setField('content', v)}
             placeholder={t('articles.form.fields.contentPlaceholder')}
+            onUploadImage={handleUploadImage}
           />
         </div>
 

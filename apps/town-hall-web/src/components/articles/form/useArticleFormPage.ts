@@ -103,7 +103,6 @@ export function useArticleFormPage(id?: string) {
     if (!validate()) {
       return;
     }
-
     setIsSubmitting(true);
     try {
       const payload = {

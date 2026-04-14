@@ -12,10 +12,12 @@ import {
 } from '@platejs/basic-nodes/react';
 import { DndPlugin } from '@platejs/dnd';
 import { LinkPlugin } from '@platejs/link/react';
+import { toggleBulletedList, toggleNumberedList } from '@platejs/list-classic';
 import {
   BulletedListPlugin,
   ListItemContentPlugin,
   ListItemPlugin,
+  ListPlugin,
   NumberedListPlugin,
 } from '@platejs/list-classic/react';
 import { ImagePlugin } from '@platejs/media/react';
@@ -48,7 +50,7 @@ import { FixedToolbar } from '@/components/ui/fixed-toolbar';
 import { MarkToolbarButton } from '@/components/ui/mark-toolbar-button';
 import { ToolbarButton, ToolbarGroup } from '@/components/ui/toolbar';
 import { cn } from '@/lib/utils';
-
+import { autoformatPlugin } from './autoformat-plugin';
 import { BlockContextMenu } from './BlockContextMenu';
 import { BlockDraggable } from './BlockDraggable';
 
@@ -165,7 +167,8 @@ export function PlateEditor({
       H2Plugin.withComponent(H2Element),
       H3Plugin.withComponent(H3Element),
       BlockquotePlugin.withComponent(BlockquoteElement),
-      // Lists
+      // Lists (ListPlugin fournit les comportements : Enter, Backspace, normalisation)
+      ListPlugin,
       BulletedListPlugin.withComponent(BulletedListElement),
       NumberedListPlugin.withComponent(NumberedListElement),
       ListItemPlugin.withComponent(ListItemElement),
@@ -181,6 +184,8 @@ export function PlateEditor({
       TableCellHeaderPlugin.withComponent(TableCellHeaderElement),
       // Block selection (needed for DnD + context menu)
       BlockSelectionPlugin,
+      // Autoformat (raccourcis Markdown)
+      autoformatPlugin,
       // Drag & Drop
       DndPlugin.configure({
         options: { enableScroller: true },
@@ -264,14 +269,14 @@ export function PlateEditor({
               <ToolbarGroup>
                 <ToolbarButton
                   tooltip="Liste à puces"
-                  onClick={() => editor.tf.toggleBlock(KEYS.ul)}
+                  onClick={() => toggleBulletedList(editor)}
                   pressed={editor.api.some({ match: { type: KEYS.ul } })}
                 >
                   <List />
                 </ToolbarButton>
                 <ToolbarButton
                   tooltip="Liste numérotée"
-                  onClick={() => editor.tf.toggleBlock(KEYS.ol)}
+                  onClick={() => toggleNumberedList(editor)}
                   pressed={editor.api.some({ match: { type: KEYS.ol } })}
                 >
                   <ListOrdered />

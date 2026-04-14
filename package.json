@@ -28,6 +28,7 @@
     "node": ">=20.9.0"
   },
   "dependencies": {
+    "@platejs/autoformat": "^52.3.10",
     "keycloak-connect": "^26.1.1"
   }
 }

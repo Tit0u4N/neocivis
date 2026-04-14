@@ -10,19 +10,13 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Bienvenue dans notre ville',
           description: 'Découvrez les dernières actualités de notre commune.',
-          content: {
-            type: 'doc',
-            content: articleMockContent,
-          },
+          content: articleMockContent,
         },
         {
           locale: 'en',
           title: 'Welcome to our city',
           description: 'Discover the latest news from our municipality.',
-          content: {
-            type: 'doc',
-            content: articleMockContent
-          },
+          content: articleMockContent,
         },
       ],
       coverImageUrl: 'https://picsum.photos/seed/city/800/400',
@@ -39,10 +33,7 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Travaux de voirie — Rue du Moulin',
           description: 'Informations sur les travaux en cours.',
-          content: {
-            type: 'doc',
-            content: articleMockContent
-          },
+          content: articleMockContent,
         },
       ],
       coverImageUrl: 'https://picsum.photos/seed/road/800/400',
@@ -59,10 +50,7 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Conseil municipal — Compte-rendu de janvier',
           description: 'Résumé des décisions prises lors du conseil du 25 janvier.',
-          content: {
-            type: 'doc',
-            content: articleMockContent
-          },
+          content: articleMockContent,
         },
         {
           locale: 'de',
@@ -94,10 +82,7 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Fête de la musique 2026 — Appel à candidature',
           description: 'Vous êtes musicien·ne ? Rejoignez la fête !',
-          content: {
-            type: 'doc',
-            content: articleMockContent,
-          },
+          content: articleMockContent,
         },
       ],
       status: 'draft',

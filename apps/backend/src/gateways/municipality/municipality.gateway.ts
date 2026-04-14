@@ -3,7 +3,7 @@ import { applyUserMiddleware } from '@/middlewares/auth.middleware';
 import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';
-import { ArticleRepository } from '@/modules/article/article.repository';
+import { CosmosArticleRepository, InMemoryArticleRepository, isCosmosConfigured } from '@/modules/article/article.repository';
 import { ArticleService } from '@/modules/article/article.service';
 import { ProductRepository } from '@/modules/product/product.repository';
 import { ProductService } from '@/modules/product/product.service';
@@ -19,7 +19,7 @@ import { UserController } from './controllers/user.controller';
 // Import repositories
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
-const articleRepository = new ArticleRepository();
+const articleRepository = isCosmosConfigured() ? new CosmosArticleRepository() : new InMemoryArticleRepository();
 
 // Import controllers
 const userController = new UserController(new UserService(userRepository));

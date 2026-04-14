@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { ArticleRepository } from './article.repository';
+import { InMemoryArticleRepository } from './article.repository';
 import { ArticleService } from './article.service';
 
 describe('ArticleService', () => {
   const makeService = () => {
-    const repository = new ArticleRepository();
+    const repository = new InMemoryArticleRepository();
     const service = new ArticleService(repository);
     return { repository, service };
   };

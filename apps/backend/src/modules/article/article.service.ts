@@ -7,10 +7,10 @@ import type {
   UpdateArticleInput,
   UpdateStatusInput,
 } from '@repo/contracts/article';
-import type { ArticleRepository } from './article.repository';
+import type { IArticleRepository } from './article.repository';
 
 export class ArticleService {
-  constructor(private repository: ArticleRepository) {}
+  constructor(private repository: IArticleRepository) {}
 
   getAllArticles(): Promise<Article[]> {
     return this.repository.findAll();

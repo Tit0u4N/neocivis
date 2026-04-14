@@ -2,9 +2,29 @@ import type { Container } from '@azure/cosmos';
 import type { Article, ArticleLocale, ArticleTranslation, CreateArticleInput } from '@repo/contracts/article';
 import { getCosmosClient } from '@/infrastructure/azure/cosmos.client';
 import { optionalEnv } from '@/infrastructure/env';
-import { getMockArticles } from './article.mockdata.repository';
+import { getMockArticles } from './article.mock';
 
-export class ArticleRepository {
+export interface IArticleRepository {
+  findAll(): Promise<Article[]>;
+  findAllPublished(): Promise<Article[]>;
+  findById(id: string): Promise<Article | undefined>;
+  create(input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string }): Promise<Article>;
+  update(id: string, input: Partial<Article>): Promise<Article | undefined>;
+  delete(id: string): Promise<boolean>;
+  addTranslation(id: string, translation: ArticleTranslation): Promise<Article | undefined>;
+  updateTranslation(
+    id: string,
+    locale: ArticleLocale,
+    translation: Partial<ArticleTranslation>,
+  ): Promise<Article | undefined>;
+  deleteTranslation(id: string, locale: ArticleLocale): Promise<Article | undefined>;
+}
+
+export function isCosmosConfigured(): boolean {
+  return Boolean(optionalEnv('COSMOS_ENDPOINT') && optionalEnv('COSMOS_KEY'));
+}
+
+export class CosmosArticleRepository implements IArticleRepository {
   private cosmosContainer: Container | null = null;
   private seedPromise: Promise<void> | null = null;
 
@@ -114,6 +134,107 @@ export class ArticleRepository {
     } catch {
       return false;
     }
+  }
+
+  async addTranslation(id: string, translation: ArticleTranslation): Promise<Article | undefined> {
+    const article = await this.findById(id);
+    if (!article) {
+      return undefined;
+    }
+    article.translations.push(translation);
+    return this.update(id, article);
+  }
+
+  async updateTranslation(
+    id: string,
+    locale: ArticleLocale,
+    translation: Partial<ArticleTranslation>,
+  ): Promise<Article | undefined> {
+    const article = await this.findById(id);
+    if (!article) {
+      return undefined;
+    }
+    const tIndex = article.translations.findIndex((t) => t.locale === locale);
+    if (tIndex === -1) {
+      return undefined;
+    }
+    article.translations[tIndex] = { ...article.translations[tIndex], ...translation } as ArticleTranslation;
+    return this.update(id, article);
+  }
+
+  async deleteTranslation(id: string, locale: ArticleLocale): Promise<Article | undefined> {
+    const article = await this.findById(id);
+    if (!article) {
+      return undefined;
+    }
+    article.translations = article.translations.filter((t) => t.locale !== locale);
+    return this.update(id, article);
+  }
+}
+
+export class InMemoryArticleRepository implements IArticleRepository {
+  private seeded = false;
+  private articles: Article[] = [];
+
+  private ensureSeeded(): void {
+    if (this.seeded) {
+      return;
+    }
+    this.articles = getMockArticles();
+    this.seeded = true;
+  }
+
+  findAll(): Promise<Article[]> {
+    this.ensureSeeded();
+    return Promise.resolve(this.articles);
+  }
+
+  findAllPublished(): Promise<Article[]> {
+    this.ensureSeeded();
+    return Promise.resolve(this.articles.filter((a) => a.status === 'published'));
+  }
+
+  findById(id: string): Promise<Article | undefined> {
+    this.ensureSeeded();
+    return Promise.resolve(this.articles.find((a) => a.id === id));
+  }
+
+  create(
+    input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
+  ): Promise<Article> {
+    this.ensureSeeded();
+    const article: Article = {
+      id: input.id,
+      translations: [input.translation],
+      coverImageUrl: input.coverImageUrl,
+      status: input.status ?? 'draft',
+      createdAt: input.createdAt,
+      updatedAt: input.updatedAt,
+      authorId: input.authorId,
+    };
+    this.articles.push(article);
+    return article;
+  }
+
+  update(id: string, input: Partial<Article>): Promise<Article | undefined> {
+    this.ensureSeeded();
+    const index = this.articles.findIndex((a) => a.id === id);
+    if (index === -1) {
+      return undefined;
+    }
+    const updated = { ...this.articles[index], ...input, id } as Article;
+    this.articles[index] = updated;
+    return updated;
+  }
+
+  delete(id: string): Promise<boolean> {
+    this.ensureSeeded();
+    const index = this.articles.findIndex((a) => a.id === id);
+    if (index === -1) {
+      return Promise.resolve(false);
+    }
+    this.articles.splice(index, 1);
+    return Promise.resolve(true);
   }
 
   async addTranslation(id: string, translation: ArticleTranslation): Promise<Article | undefined> {

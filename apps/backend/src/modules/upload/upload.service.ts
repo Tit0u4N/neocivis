@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { getBaseUrl, getBlobServiceClient, getUploadsContainerName } from '@/infrastructure/azure/blob.client';
+import { getBlobServiceClient, getUploadsContainerName } from '@/infrastructure/azure/blob.client';
 import { ContainerName } from '@/infrastructure/containers';
 
 export interface IUploadService {
@@ -11,7 +11,10 @@ export class AzureBlobUploadService implements IUploadService {
     const service = getBlobServiceClient(ContainerName.ARTICLES);
     const containerName = getUploadsContainerName(ContainerName.ARTICLES);
     const container = service.getContainerClient(containerName);
-    await container.createIfNotExists();
+    await container.createIfNotExists({
+      access: 'blob'
+    });
+    await container.setAccessPolicy('blob');
 
     const ext = filename.includes('.') ? filename.slice(filename.lastIndexOf('.')) : '';
     const blobName = `${randomUUID()}${ext}`;
@@ -20,12 +23,6 @@ export class AzureBlobUploadService implements IUploadService {
     await blockBlob.uploadData(Buffer.from(buffer), {
       blobHTTPHeaders: { blobContentType: mimeType },
     });
-
-    const baseUrl = getBaseUrl(ContainerName.ARTICLES);
-    if (baseUrl) {
-      return `${baseUrl.replace(/\/$/, '')}/${blobName}`;
-    }
-
     return blockBlob.url;
   }
 }

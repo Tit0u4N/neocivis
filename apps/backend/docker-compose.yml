@@ -18,7 +18,7 @@ services:
       - "10000:10000" # Blob service
       - "10001:10001" # Queue service
       - "10002:10002" # Table service
-    command: "azurite-blob --blobHost 0.0.0.0"
+    command: "azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck"
 
   # 3. CosmosDB Emulator (Attention: gourmand en ressources)
   cosmos-db:

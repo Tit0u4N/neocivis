@@ -1,4 +1,5 @@
 import type { Article } from '@repo/contracts/article';
+import { articleMockContent } from './article.mock';
 
 export function getMockArticles(): Article[] {
   return [
@@ -11,12 +12,7 @@ export function getMockArticles(): Article[] {
           description: 'Découvrez les dernières actualités de notre commune.',
           content: {
             type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                children: [{ text: 'Notre ville est heureuse de vous accueillir sur ce nouveau portail citoyen.' }],
-              },
-            ],
+            content: articleMockContent,
           },
         },
         {
@@ -25,12 +21,7 @@ export function getMockArticles(): Article[] {
           description: 'Discover the latest news from our municipality.',
           content: {
             type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                children: [{ text: 'Our city is pleased to welcome you to this new citizen portal.' }],
-              },
-            ],
+            content: articleMockContent
           },
         },
       ],
@@ -50,16 +41,7 @@ export function getMockArticles(): Article[] {
           description: 'Informations sur les travaux en cours.',
           content: {
             type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                children: [
-                  {
-                    text: 'Des travaux de rénovation débutent le 1er février 2026 rue du Moulin. Circulation alternée.',
-                  },
-                ],
-              },
-            ],
+            content: articleMockContent
           },
         },
       ],
@@ -79,14 +61,7 @@ export function getMockArticles(): Article[] {
           description: 'Résumé des décisions prises lors du conseil du 25 janvier.',
           content: {
             type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                children: [
-                  { text: "Le conseil municipal s'est réuni le 25 janvier 2026 et a voté le budget primitif 2026." },
-                ],
-              },
-            ],
+            content: articleMockContent
           },
         },
         {
@@ -121,12 +96,7 @@ export function getMockArticles(): Article[] {
           description: 'Vous êtes musicien·ne ? Rejoignez la fête !',
           content: {
             type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                children: [{ text: 'Inscrivez-vous avant le 30 avril pour participer à la Fête de la musique 2026.' }],
-              },
-            ],
+            content: articleMockContent,
           },
         },
       ],

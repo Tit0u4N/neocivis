@@ -1,13 +1,33 @@
-// Interface to implement when Azure Blob Storage is configured:
-//
-//   import { BlobServiceClient } from '@azure/storage-blob';
-//   const client = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
-//   const container = client.getContainerClient(process.env.AZURE_STORAGE_CONTAINER);
-//   await container.uploadBlockBlob(filename, buffer, buffer.length, { blobHTTPHeaders: { blobContentType: mimeType } });
-//   return `${process.env.AZURE_STORAGE_BASE_URL}/${container.containerName}/${filename}`;
+import { randomUUID } from 'node:crypto';
+import { getBaseUrl, getBlobServiceClient, getUploadsContainerName } from '@/infrastructure/azure/blob.client';
+import { ContainerName } from '@/infrastructure/containers';
 
 export interface IUploadService {
   uploadImage(buffer: ArrayBuffer, filename: string, mimeType: string): Promise<string>;
+}
+
+export class AzureBlobUploadService implements IUploadService {
+  async uploadImage(buffer: ArrayBuffer, filename: string, mimeType: string): Promise<string> {
+    const service = getBlobServiceClient(ContainerName.ARTICLES);
+    const containerName = getUploadsContainerName(ContainerName.ARTICLES);
+    const container = service.getContainerClient(containerName);
+    await container.createIfNotExists();
+
+    const ext = filename.includes('.') ? filename.slice(filename.lastIndexOf('.')) : '';
+    const blobName = `${randomUUID()}${ext}`;
+
+    const blockBlob = container.getBlockBlobClient(blobName);
+    await blockBlob.uploadData(Buffer.from(buffer), {
+      blobHTTPHeaders: { blobContentType: mimeType },
+    });
+
+    const baseUrl = getBaseUrl(ContainerName.ARTICLES);
+    if (baseUrl) {
+      return `${baseUrl.replace(/\/$/, '')}/${blobName}`;
+    }
+
+    return blockBlob.url;
+  }
 }
 
 export class StubUploadService implements IUploadService {

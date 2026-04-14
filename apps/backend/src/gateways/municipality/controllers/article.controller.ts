@@ -15,13 +15,13 @@ export class ArticleController {
   public getRoutes() {
     const app = new Hono();
 
-    app.get('/', (c: Context) => {
-      return c.json(this.service.getAllArticles());
+    app.get('/', async (c: Context) => {
+      return c.json(await this.service.getAllArticles());
     });
 
-    app.get('/:id', (c: Context) => {
+    app.get('/:id', async (c: Context) => {
       try {
-        const article = this.service.getArticleById(c.req.param('id'));
+        const article = await this.service.getArticleById(c.req.param('id'));
         return c.json(article);
       } catch {
         return c.json({ error: 'Article not found' }, 404);
@@ -35,7 +35,7 @@ export class ArticleController {
         return c.json({ error: parsed.error.message }, 400);
       }
       const authorId = (c.get('userId') as string) ?? 'unknown';
-      const article = this.service.createArticle(parsed.data, authorId);
+      const article = await this.service.createArticle(parsed.data, authorId);
       return c.json(article, 201);
     });
 
@@ -46,17 +46,16 @@ export class ArticleController {
         return c.json({ error: parsed.error.message }, 400);
       }
       try {
-        console.log(parsed.data)
-        const article = this.service.updateArticle(c.req.param('id'), parsed.data);
+        const article = await this.service.updateArticle(c.req.param('id'), parsed.data);
         return c.json(article);
       } catch {
         return c.json({ error: 'Article not found' }, 404);
       }
     });
 
-    app.delete('/:id', (c: Context) => {
+    app.delete('/:id', async (c: Context) => {
       try {
-        this.service.deleteArticle(c.req.param('id'));
+        await this.service.deleteArticle(c.req.param('id'));
         return c.json({ success: true });
       } catch {
         return c.json({ error: 'Article not found' }, 404);
@@ -70,7 +69,7 @@ export class ArticleController {
         return c.json({ error: parsed.error.message }, 400);
       }
       try {
-        const article = this.service.updateStatus(c.req.param('id'), parsed.data);
+        const article = await this.service.updateStatus(c.req.param('id'), parsed.data);
         return c.json(article);
       } catch {
         return c.json({ error: 'Article not found' }, 404);
@@ -84,7 +83,7 @@ export class ArticleController {
         return c.json({ error: parsed.error.message }, 400);
       }
       try {
-        const article = this.service.addTranslation(c.req.param('id'), parsed.data);
+        const article = await this.service.addTranslation(c.req.param('id'), parsed.data);
         return c.json(article, 201);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
@@ -106,20 +105,20 @@ export class ArticleController {
         return c.json({ error: parsed.error.message }, 400);
       }
       try {
-        const article = this.service.updateTranslation(c.req.param('id'), localeParsed.data, parsed.data);
+        const article = await this.service.updateTranslation(c.req.param('id'), localeParsed.data, parsed.data);
         return c.json(article);
       } catch {
         return c.json({ error: 'Translation not found' }, 404);
       }
     });
 
-    app.delete('/:id/translations/:locale', (c: Context) => {
+    app.delete('/:id/translations/:locale', async (c: Context) => {
       const localeParsed = ArticleLocale.safeParse(c.req.param('locale'));
       if (!localeParsed.success) {
         return c.json({ error: 'Invalid locale' }, 400);
       }
       try {
-        const article = this.service.deleteTranslation(c.req.param('id'), localeParsed.data);
+        const article = await this.service.deleteTranslation(c.req.param('id'), localeParsed.data);
         return c.json(article);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';

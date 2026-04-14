@@ -1,0 +1,32 @@
+services:
+  # 1. PostgreSQL
+  db-sql:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: neocivis-data
+    ports:
+      - "5432:5432"
+
+  # 2. Azure Blob Storage (via Azurite)
+  azure-storage:
+    image: mcr.microsoft.com/azure-storage/azurite
+    restart: always
+    ports:
+      - "10000:10000" # Blob service
+      - "10001:10001" # Queue service
+      - "10002:10002" # Table service
+    command: "azurite-blob --blobHost 0.0.0.0"
+
+  # 3. CosmosDB Emulator (Attention: gourmand en ressources)
+  cosmos-db:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    restart: always
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_EXPLORER=true
+    ports:
+      - "8082:8081"   # Data Explorer
+      - "10250:10250" # MongoDB/SQL API

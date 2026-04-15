@@ -8,13 +8,13 @@ export class ArticleController {
   public getRoutes() {
     const app = new Hono();
 
-    app.get('/', (c: Context) => {
-      return c.json(this.service.getPublishedArticles());
+    app.get('/', async (c: Context) => {
+      return c.json(await this.service.getPublishedArticles());
     });
 
-    app.get('/:id', (c: Context) => {
+    app.get('/:id', async (c: Context) => {
       try {
-        const article = this.service.getArticleById(c.req.param('id'));
+        const article = await this.service.getArticleById(c.req.param('id'));
         if (article.status !== 'published') {
           return c.json({ error: 'Article not found' }, 404);
         }

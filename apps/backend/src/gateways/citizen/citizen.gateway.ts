@@ -6,8 +6,8 @@ import { UserService } from '@/modules/users/user.service';
 import { ProductController } from './controllers/product.controller';
 import { UserController } from './controllers/user.controller';
 import { ArticleController } from './controllers/article.controller';
-import {ArticleRepository} from "@/modules/article/article.repository";
-import {ArticleService} from "@/modules/article/article.service";
+import { CosmosArticleRepository, InMemoryArticleRepository, isCosmosConfigured } from '@/modules/article/article.repository';
+import { ArticleService } from '@/modules/article/article.service';
 import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
@@ -16,7 +16,7 @@ import { applyRoleMiddleware } from '@/middlewares/role.middleware';
 // Import repositories
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
-const articleRepository = new ArticleRepository();
+const articleRepository = isCosmosConfigured() ? new CosmosArticleRepository() : new InMemoryArticleRepository();
 
 // Import controllers
 const userController = new UserController(new UserService(userRepository));

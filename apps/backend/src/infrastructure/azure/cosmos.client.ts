@@ -11,7 +11,13 @@ export function getCosmosClient(): CosmosClient {
   const endpoint = requiredEnv('COSMOS_ENDPOINT');
   const key = requiredEnv('COSMOS_KEY');
 
-  singleton = new CosmosClient({ endpoint, key });
+  singleton = new CosmosClient({
+    endpoint,
+    key,
+    // TODO : Enable endpoint discovery when in prod
+    connectionPolicy: {
+      enableEndpointDiscovery: false,
+    },
+  });
   return singleton;
 }
-

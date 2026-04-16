@@ -22,11 +22,13 @@ services:
 
   # 3. CosmosDB Emulator (Attention: gourmand en ressources)
   cosmos-db:
-    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
     restart: always
     environment:
       - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10
       - AZURE_COSMOS_EMULATOR_ENABLE_DATA_EXPLORER=true
+      - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1:8082
     ports:
       - "8082:8081"   # Data Explorer
       - "10250:10250" # MongoDB/SQL API
+      - "1234:1234"

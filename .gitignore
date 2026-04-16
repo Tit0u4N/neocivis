@@ -87,6 +87,9 @@ _bmad/
 .github/agents/
 .github/prompts/
 .github/copilot-instructions.md
+graphify-out/
+CLAUDE.md
+.mcp.json
 
 # --- Misc ---
 *.log
@@ -98,6 +101,7 @@ _bmad/
 *.rej
 *.pem
 dist
+next-env.d.ts
 
 # --- Azure ---
 local.settings.json

@@ -27,7 +27,7 @@ To run the backend locally, follow these steps:
 1. Navigate to the `apps/backend` directory.
 2. Install the dependencies (if you haven't already during the setup of the glbal project):
 ```bash
-yarn install
+bun install
 ```
 3. Start the Azure Functions host:
 ```bash

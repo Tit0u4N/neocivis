@@ -8,7 +8,9 @@ export interface IArticleRepository {
   findAll(): Promise<Article[]>;
   findAllPublished(): Promise<Article[]>;
   findById(id: string): Promise<Article | undefined>;
-  create(input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string }): Promise<Article>;
+  create(
+    input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
+  ): Promise<Article>;
   update(id: string, input: Partial<Article>): Promise<Article | undefined>;
   delete(id: string): Promise<boolean>;
   addTranslation(id: string, translation: ArticleTranslation): Promise<Article | undefined>;
@@ -79,7 +81,10 @@ export class CosmosArticleRepository implements IArticleRepository {
     await this.ensureSeeded();
     const container = await this.getContainer();
     const { resources } = await container.items
-      .query<Article>({ query: 'SELECT * FROM c WHERE c.status = @status', parameters: [{ name: '@status', value: 'published' }] })
+      .query<Article>({
+        query: 'SELECT * FROM c WHERE c.status = @status',
+        parameters: [{ name: '@status', value: 'published' }],
+      })
       .fetchAll();
     return resources;
   }

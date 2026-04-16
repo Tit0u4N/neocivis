@@ -5,14 +5,14 @@
     "FUNCTIONS_EXTENSION_VERSION": "~4",
     "WEBSITE_NODE_DEFAULT_VERSION": "22",
     "ENV_MODE": "development",
-    "NODE_TLS_REJECT_UNAUTHORIZED":0,
+    "NODE_TLS_REJECT_UNAUTHORIZED": 0,
 
     "DATABASE_URL": "postgresql://user:password@localhost:5432/neocivis-data",
 
     "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;",
     "AZURE_ARTICLES_STORAGE_CONTAINER": "articles",
     "AZURE_STORAGE_BASE_URL": "http://127.0.0.1:10000/devstoreaccount1",
-    
+
     "COSMOS_ENDPOINT": "http://localhost:8082",
     "COSMOS_KEY": "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
   },

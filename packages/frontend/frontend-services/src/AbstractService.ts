@@ -5,7 +5,7 @@ export default abstract class AbstractService {
 
   protected constructor(kyInstance: KyInstance, prefixUrl: string = '') {
     this.http = kyInstance.extend((parentOptions) => ({
-      prefixUrl: parentOptions.prefixUrl + prefixUrl
+      prefixUrl: parentOptions.prefixUrl + prefixUrl,
     }));
   }
 }

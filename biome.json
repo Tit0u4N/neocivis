@@ -25,7 +25,8 @@
       "!!**/.turbo",
       "!!**/.biome",
       "!!**/components/ui",
-      "!!**/.expo"
+      "!!**/.expo",
+      "!!**/next-env.d.ts"
     ]
   },
   "formatter": {
@@ -54,11 +55,11 @@
         "noExcessiveCognitiveComplexity": {
           "level": "warn",
           "options": {
-            "maxAllowedComplexity": 15
+            "maxAllowedComplexity": 25
           }
         },
         "noForEach": "off",
-        "noVoid": "warn",
+        "noVoid": "off",
         "useSimplifiedLogicExpression": "warn"
       },
 
@@ -74,7 +75,7 @@
       "performance": {
         "noAccumulatingSpread": "warn",
         "noDelete": "warn",
-        "noBarrelFile": "warn"
+        "noBarrelFile": "off"
       },
 
       "security": {

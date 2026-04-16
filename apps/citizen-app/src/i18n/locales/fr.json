@@ -1,0 +1,40 @@
+{
+  "login": {
+    "brand": "NeoCivis",
+    "title": "Bienvenue sur\nNeoCivis",
+    "subtitle": "Rejoins-nous si tu veux être au courant des actualités de ta ville",
+    "signUp": "S'inscrire",
+    "signIn": "Se connecter",
+    "continueAsGuest": "Continuer en tant qu'invité"
+  },
+  "tabs": {
+    "city": "Ville",
+    "report": "Signaler",
+    "forum": "Forum",
+    "account": "Compte"
+  },
+  "city": {
+    "title": "Ville"
+  },
+  "report": {
+    "title": "Signaler"
+  },
+  "forum": {
+    "title": "Forum"
+  },
+  "account": {
+    "title": "Mon compte",
+    "language": {
+      "label": "Langue",
+      "fr": "Français",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Apparence",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "signOut": "Se déconnecter"
+  }
+}

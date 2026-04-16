@@ -1,17 +1,16 @@
 import { BlobServiceClient } from '@azure/storage-blob';
-import { optionalEnv, requiredEnv } from '../env';
 import { ContainerName } from '../containers';
-
+import { optionalEnv, requiredEnv } from '../env';
 
 export type ContainerClient = {
   name: ContainerName;
   client: BlobServiceClient;
-}
+};
 
 const singletons: ContainerClient[] = [];
 
 export function getBlobServiceClient(name: ContainerName): BlobServiceClient {
-  const singleton = singletons.find(s => s.name === name);
+  const singleton = singletons.find((s) => s.name === name);
   if (singleton) {
     return singleton.client;
   }
@@ -32,5 +31,5 @@ export function getUploadsContainerName(name: ContainerName): string {
 }
 
 export function getBaseUrl(name: ContainerName): string {
-  return`${optionalEnv('AZURE_STORAGE_BASE_URL')}/${getUploadsContainerName(name)}`;
+  return `${optionalEnv('AZURE_STORAGE_BASE_URL')}/${getUploadsContainerName(name)}`;
 }

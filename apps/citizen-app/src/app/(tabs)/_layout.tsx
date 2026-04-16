@@ -1,13 +1,13 @@
 import MaterialIcons from '@expo/vector-icons/Feather';
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
-import { Badge, Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
+import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
+import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 import { useColor } from '@/hooks/useColor';
 
 export default function TabsLayout() {
-  const red = useColor('red');
   const primary = useColor('primary');
   const foreground = useColor('foreground');
+  const { t } = useTranslation();
 
   return (
     <NativeTabs
@@ -20,33 +20,39 @@ export default function TabsLayout() {
         default: primary,
         selected: foreground,
       }}
-      badgeBackgroundColor={red}
       labelVisibilityMode="labeled"
       disableTransparentOnScrollEdge={true}
     >
-      <NativeTabs.Trigger name="(home)">
+      <NativeTabs.Trigger name="(city)">
         {Platform.select({
-          ios: <Icon sf="house.fill" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="home" />} />,
+          ios: <Icon sf="building.2.fill" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="map-pin" />} />,
         })}
-        <Label>Home</Label>
+        <Label>{t('tabs.city')}</Label>
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="settings">
+      <NativeTabs.Trigger name="report">
         {Platform.select({
-          ios: <Icon sf="gear" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="settings" />} />,
+          ios: <Icon sf="exclamationmark.triangle.fill" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="alert-triangle" />} />,
         })}
-        <Label>Settings</Label>
-        <Badge>1</Badge>
+        <Label>{t('tabs.report')}</Label>
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="search" role={isLiquidGlassAvailable() ? 'search' : undefined}>
+      <NativeTabs.Trigger name="forum">
         {Platform.select({
-          ios: <Icon sf="magnifyingglass" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="search" />} />,
+          ios: <Icon sf="bubble.left.and.bubble.right.fill" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="message-square" />} />,
         })}
-        <Label>Search</Label>
+        <Label>{t('tabs.forum')}</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="account">
+        {Platform.select({
+          ios: <Icon sf="person.fill" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="user" />} />,
+        })}
+        <Label>{t('tabs.account')}</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

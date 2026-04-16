@@ -30,7 +30,6 @@ export default function SettingsPage() {
               <Select
                 value={currentLanguage}
                 onValueChange={(value) => {
-                  // biome-ignore lint/complexity/noVoid: This is a simple callback and the void operator is not necessary here.
                   void changeLanguage(value as Language);
                 }}
               >

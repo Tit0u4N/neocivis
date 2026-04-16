@@ -1,4 +1,3 @@
-// biome-ignore lint/style/noDefaultExport: Next.js page
 'use client';
 
 import { ArticleFormPage } from '@/components/articles/form/ArticleFormPage';

@@ -1,6 +1,7 @@
+import '@/i18n';
 import * as NavigationBar from 'expo-navigation-bar';
-import { Stack, useRootNavigationState, useRouter, useSegments } from 'expo-router';
 import type { ErrorBoundaryProps } from 'expo-router';
+import { Stack, useRootNavigationState, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
@@ -10,10 +11,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/theme/colors';
-import { ThemeProvider } from '@/theme/theme-provider';
+import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ApiProvider } from '@/providers/ApiProvider';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
+import { Colors } from '@/theme/colors';
+import { ThemeProvider } from '@/theme/theme-provider';
 import 'react-native-reanimated';
 
 type GlobalErrorHandler = (error: unknown, isFatal?: boolean) => void;
@@ -28,14 +30,7 @@ SplashScreen.setOptions({
   fade: true,
 });
 
-
-function GlobalErrorFallback({
-  title,
-  message,
-}: {
-  title: string;
-  message: string;
-}) {
+function GlobalErrorFallback({ title, message }: { title: string; message: string }) {
   return (
     <View
       style={{
@@ -53,51 +48,55 @@ function GlobalErrorFallback({
 }
 
 export function ErrorBoundary({ error }: ErrorBoundaryProps) {
-  return (
-    <GlobalErrorFallback
-      title="Une erreur est survenue"
-      message={error?.message ?? 'Erreur inconnue.'}
-    />
-  );
+  return <GlobalErrorFallback title="Une erreur est survenue" message={error?.message ?? 'Erreur inconnue.'} />;
 }
 
 function InitialLayout() {
-
   useColorScheme() || 'light';
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-  
+
   const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
-    if (!rootNavigationState?.key) { return; }
+    if (!rootNavigationState?.key) {
+      return;
+    }
 
-    if (isLoading) { return; }
+    if (isLoading) {
+      return;
+    }
 
-    // `segments[0]` helps us determine the current "root" route. 
-    segments[0] === '(tabs)';
+    // `segments[0]` helps us determine the current "root" route.
+    const _inTabsGroup = segments[0] === '(tabs)';
     const isLoginPage = segments[0] === 'login';
     const navigationTimeout = setTimeout(() => {
-    if (!isAuthenticated && !isLoginPage) {
-      // Si non connecté et qu'on n'est pas sur la page login -> On force le login
-      router.replace('/login');
-    } else if (isAuthenticated && isLoginPage) {
-      // Si déjà connecté et qu'on est sur la page login -> On redirige vers l'appli
-      router.replace('/(tabs)/(home)');
-    }}, 0);
+      if (!(isAuthenticated || isLoginPage)) {
+        // Si non connecté et qu'on n'est pas sur la page login -> On force le login
+        router.replace('/login');
+      } else if (isAuthenticated && isLoginPage) {
+        // Si déjà connecté et qu'on est sur la page login -> On redirige vers l'appli
+        router.replace('/(tabs)/(city)');
+      }
+    }, 0);
 
     return () => clearTimeout(navigationTimeout);
-  }, [isAuthenticated, isLoading, segments]);
+  }, [
+    isAuthenticated,
+    isLoading,
+    segments,
+    rootNavigationState?.key, // Si déjà connecté et qu'on est sur la page login -> On redirige vers l'appli
+    router.replace,
+  ]);
 
   return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="login/index" options={{ headerShown: false }} />
 
-            <Stack.Screen name="login/index" options={{ headerShown: false }} />
-
-            {/* <Stack.Screen
+      {/* <Stack.Screen
               name="sheet"
               options={{
                 headerShown: false,
@@ -127,11 +126,10 @@ function InitialLayout() {
                 headerBlurEffect: isLiquidGlassAvailable() ? undefined : colorScheme === 'dark' ? 'dark' : 'light',
               }}
             /> */}
-            <Stack.Screen name="+not-found" />
-          </Stack>
-  )
+      <Stack.Screen name="+not-found" />
+    </Stack>
+  );
 }
-
 
 export default function RootLayout() {
   const colorScheme = useColorScheme() || 'light';
@@ -196,10 +194,7 @@ export default function RootLayout() {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ThemeProvider>
-          <GlobalErrorFallback
-            title="Erreur fatale interceptée"
-            message={fatalError.message}
-          />
+          <GlobalErrorFallback title="Erreur fatale interceptée" message={fatalError.message} />
         </ThemeProvider>
       </GestureHandlerRootView>
     );
@@ -207,14 +202,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider>
-        <AuthProvider>
-          <ApiProvider>
-            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-            <InitialLayout />
-          </ApiProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <ApiProvider>
+              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+              <InitialLayout />
+            </ApiProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </LanguageProvider>
     </GestureHandlerRootView>
   );
 }

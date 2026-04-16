@@ -2,8 +2,8 @@
 
 import { createApiClient } from '@repo/frontend-core/api';
 import type { KyInstance } from 'ky';
-import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from 'react-oidc-context';
 
 type ApiContextValue = {
@@ -12,7 +12,7 @@ type ApiContextValue = {
 
 const ApiContext = createContext<ApiContextValue | undefined>(undefined);
 
-export function ApiProvider({children}: { children: ReactNode }) {
+export function ApiProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();
 
   // Keep a stable ref so the api client is created once and always reads

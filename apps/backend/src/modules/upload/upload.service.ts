@@ -12,7 +12,7 @@ export class AzureBlobUploadService implements IUploadService {
     const containerName = getUploadsContainerName(ContainerName.ARTICLES);
     const container = service.getContainerClient(containerName);
     await container.createIfNotExists({
-      access: 'blob'
+      access: 'blob',
     });
     await container.setAccessPolicy('blob');
 

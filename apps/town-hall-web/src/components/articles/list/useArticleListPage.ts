@@ -4,8 +4,7 @@ import type { Article, ArticleStatus } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {useApi} from "@/providers/ApiProvider";
-
+import { useApi } from '@/providers/ApiProvider';
 
 type StatusFilter = ArticleStatus | 'all';
 
@@ -31,7 +30,7 @@ export function useArticleListPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [articleService.getAll]);
 
   useEffect(() => {
     void fetchArticles();
@@ -59,7 +58,7 @@ export function useArticleListPage() {
         setConfirmDeleteId(null);
       }
     },
-    [fetchArticles],
+    [fetchArticles, articleService.delete],
   );
 
   const handleToggleStatus = useCallback(
@@ -72,7 +71,7 @@ export function useArticleListPage() {
         setError('Impossible de modifier le statut.');
       }
     },
-    [fetchArticles],
+    [fetchArticles, articleService.updateStatus],
   );
 
   const navigateToCreate = useCallback(() => {

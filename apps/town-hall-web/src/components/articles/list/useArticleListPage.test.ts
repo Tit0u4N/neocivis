@@ -22,7 +22,6 @@ const mockArticleService = {
   updateStatus: vi.fn(),
 };
 vi.mock('@repo/frontend-services/article', () => ({
-  // biome-ignore lint/suspicious/noExplicitAny: test mock
   ArticleService: vi.fn(function (this: any) {
     return mockArticleService;
   }),

@@ -15,5 +15,4 @@ export function requiredEnv(name: string): string {
   return value;
 }
 
-
 //todo: add a fonction to detect if all required env variables are set, depending on the env mode

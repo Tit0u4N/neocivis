@@ -8,7 +8,7 @@
       "clientId": "neocivis-citizen-app",
       "publicClient": true,
       "redirectUris": [
-        "http://localhost:8081/*", 
+        "http://localhost:8081/*",
         "neocivis-citizen-app://*",
         "https://citizen-app-dev.neocivis.cloud/*",
         "https://citizen-app.neocivis.cloud/*"
@@ -26,26 +26,14 @@
       "attributes": {
         "pkce.code.challenge.method": "S256"
       },
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "profile",
-        "roles",
-        "api-hono",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
+      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "api-hono", "email"],
+      "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
     },
     {
       "clientId": "neocivis-townhall-app",
       "publicClient": true,
       "redirectUris": [
-        "http://localhost:3000/*", 
+        "http://localhost:3000/*",
         "https://townhall-dev.neocivis.cloud/",
         "https://townhall.neocivis.cloud/"
       ],
@@ -61,20 +49,8 @@
       "attributes": {
         "pkce.code.challenge.method": "S256"
       },
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "profile",
-        "roles",
-        "api-hono",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
+      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "api-hono", "email"],
+      "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
     }
   ],
   "roles": {
@@ -116,7 +92,7 @@
         "description": "Modifier un thread sur le forum"
       },
       {
-        "name" : "FORUM_THREAD_DELETE_MESSAGE_PERMISSION",
+        "name": "FORUM_THREAD_DELETE_MESSAGE_PERMISSION",
         "description": "Supprimer un message dans un thread sur le forum"
       },
       {

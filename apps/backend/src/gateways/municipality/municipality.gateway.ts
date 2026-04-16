@@ -1,13 +1,17 @@
 import { Hono } from 'hono';
+import { optionalEnv } from '@/infrastructure/env';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
 import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';
-import { CosmosArticleRepository, InMemoryArticleRepository, isCosmosConfigured } from '@/modules/article/article.repository';
+import {
+  CosmosArticleRepository,
+  InMemoryArticleRepository,
+  isCosmosConfigured,
+} from '@/modules/article/article.repository';
 import { ArticleService } from '@/modules/article/article.service';
 import { ProductRepository } from '@/modules/product/product.repository';
 import { ProductService } from '@/modules/product/product.service';
-import { optionalEnv } from '@/infrastructure/env';
 import { AzureBlobUploadService, StubUploadService } from '@/modules/upload/upload.service';
 import { UserRepository } from '@/modules/users/user.repository';
 import { UserService } from '@/modules/users/user.service';
@@ -25,7 +29,9 @@ const articleRepository = isCosmosConfigured() ? new CosmosArticleRepository() :
 const userController = new UserController(new UserService(userRepository));
 const productController = new ProductController(new ProductService(productRepository));
 const articleController = new ArticleController(new ArticleService(articleRepository));
-const uploadService = optionalEnv('AZURE_STORAGE_CONNECTION_STRING') ? new AzureBlobUploadService() : new StubUploadService();
+const uploadService = optionalEnv('AZURE_STORAGE_CONNECTION_STRING')
+  ? new AzureBlobUploadService()
+  : new StubUploadService();
 const uploadController = new UploadController(uploadService);
 
 const app = new Hono().basePath('/api/municipality');

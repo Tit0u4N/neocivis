@@ -44,6 +44,7 @@ function ArticleRow({
   onDeleteRequest: () => void;
 }>) {
   const { t } = useTranslation();
+  // biome-ignore lint/nursery/noShadow:Let him cook
   const frTranslation = article.translations.find((t) => t.locale === 'fr');
 
   return (
@@ -89,13 +90,16 @@ function ArticleRow({
                 <span className="sr-only">{t('articles.list.actions.label')}</span>
               </Button>
             )}
-          >
-          </DropdownMenuTrigger>
+          />
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onEdit}>{t('common.edit')}</DropdownMenuItem>
-            <DropdownMenuItem onClick={onTranslations}>{t('articles.list.actions.manageTranslations')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={onTranslations}>
+              {t('articles.list.actions.manageTranslations')}
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={onToggleStatus}>
-              {article.status === 'published' ? t('articles.list.actions.unpublish') : t('articles.list.actions.publish')}
+              {article.status === 'published'
+                ? t('articles.list.actions.unpublish')
+                : t('articles.list.actions.publish')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDeleteRequest} className="text-destructive">
@@ -169,18 +173,27 @@ export function ArticleListPage(props: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.title')}</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.status')}</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.publishedAt')}</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.updatedAt')}</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('articles.list.table.languages')}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                {t('articles.list.table.title')}
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                {t('articles.list.table.status')}
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                {t('articles.list.table.publishedAt')}
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                {t('articles.list.table.updatedAt')}
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                {t('articles.list.table.languages')}
+              </th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground" />
             </tr>
           </thead>
           <tbody>
             {isLoading &&
               Array.from({ length: 4 }).map((_, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                 <tr key={i} className="border-b">
                   <td className="px-4 py-3" colSpan={6}>
                     <Skeleton className="h-8 w-full" />

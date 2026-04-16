@@ -1,4 +1,3 @@
-// biome-ignore lint/style/noDefaultExport: Next.js page
 'use client';
 
 import { ArticleListPage } from '@/components/articles/list/ArticleListPage';

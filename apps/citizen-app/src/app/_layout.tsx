@@ -12,9 +12,10 @@ import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { LanguageProvider } from '@/i18n/LanguageContext';
+import { ApiProvider } from '@/providers/ApiProvider';
+import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { Colors } from '@/theme/colors';
 import { ThemeProvider } from '@/theme/theme-provider';
-import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import 'react-native-reanimated';
 
 type GlobalErrorHandler = (error: unknown, isFatal?: boolean) => void;
@@ -204,8 +205,10 @@ export default function RootLayout() {
       <LanguageProvider>
         <ThemeProvider>
           <AuthProvider>
-            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-            <InitialLayout />
+            <ApiProvider>
+              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+              <InitialLayout />
+            </ApiProvider>
           </AuthProvider>
         </ThemeProvider>
       </LanguageProvider>

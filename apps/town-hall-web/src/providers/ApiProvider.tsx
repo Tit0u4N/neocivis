@@ -2,8 +2,8 @@
 
 import { createApiClient } from '@repo/frontend-core/api';
 import type { KyInstance } from 'ky';
-import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from 'react-oidc-context';
 
 type ApiContextValue = {
@@ -33,7 +33,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       }),
     [],
   );
-
   return <ApiContext.Provider value={{ api }}>{children}</ApiContext.Provider>;
 }
 

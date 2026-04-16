@@ -24,6 +24,7 @@
       "!!**/node_modules",
       "!!**/.turbo",
       "!!**/.biome",
+      "!!**/components/ui",
       "!!**/.expo",
       "!!**/next-env.d.ts"
     ]
@@ -58,7 +59,7 @@
           }
         },
         "noForEach": "off",
-        "noVoid": "warn",
+        "noVoid": "off",
         "useSimplifiedLogicExpression": "warn"
       },
 
@@ -74,7 +75,7 @@
       "performance": {
         "noAccumulatingSpread": "warn",
         "noDelete": "warn",
-        "noBarrelFile": "warn"
+        "noBarrelFile": "off"
       },
 
       "security": {

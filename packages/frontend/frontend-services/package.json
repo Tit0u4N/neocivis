@@ -24,11 +24,11 @@
   },
   "peerDependencies": {},
   "exports": {
-    "./report": "./src/report/report.service.ts",
-    "./auth": "./src/auth/auth.service.ts",
-    "./permission": "./src/permission/permission.service.ts",
-    "./article": "./src/article/article.service.ts",
-    "./upload": "./src/upload/upload.service.ts",
-    "./testing": "./src/testing.ts"
+    "./report": "./dist/report.js",
+    "./auth": "./dist/auth.js",
+    "./permission": "./dist/permission.js",
+    "./article": "./dist/article.js",
+    "./upload": "./dist/upload.js",
+    "./testing": "./dist/testing.js"
   }
 }

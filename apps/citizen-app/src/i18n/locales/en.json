@@ -16,6 +16,16 @@
   "city": {
     "title": "City"
   },
+  "articles": {
+    "title": "Articles",
+    "latest": "Latest news",
+    "seeAll": "See all articles",
+    "loading": "Loading...",
+    "loadMore": "Load more",
+    "error": "Unable to load articles",
+    "empty": "No articles available",
+    "notFound": "Article not found"
+  },
   "report": {
     "title": "Report"
   },

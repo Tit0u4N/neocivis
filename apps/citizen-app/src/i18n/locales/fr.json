@@ -16,6 +16,16 @@
   "city": {
     "title": "Ville"
   },
+  "articles": {
+    "title": "Articles",
+    "latest": "Dernières actualités",
+    "seeAll": "Voir tous les articles",
+    "loading": "Chargement...",
+    "loadMore": "Charger plus",
+    "error": "Impossible de charger les articles",
+    "empty": "Aucun article disponible",
+    "notFound": "Article introuvable"
+  },
   "report": {
     "title": "Signaler"
   },

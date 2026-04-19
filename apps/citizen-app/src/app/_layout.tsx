@@ -190,9 +190,11 @@ export default function RootLayout() {
     setBackgroundColorAsync(colorScheme === 'dark' ? Colors.dark.background : Colors.light.background);
   }, [colorScheme]);
 
+  const bgColor = colorScheme === 'dark' ? Colors.dark.background : Colors.light.background;
+
   if (fatalError) {
     return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: bgColor }}>
         <ThemeProvider>
           <GlobalErrorFallback title="Erreur fatale interceptée" message={fatalError.message} />
         </ThemeProvider>
@@ -201,7 +203,7 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: bgColor }}>
       <LanguageProvider>
         <ThemeProvider>
           <AuthProvider>

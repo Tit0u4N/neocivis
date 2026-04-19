@@ -6,6 +6,7 @@ import { useColor } from '@/hooks/useColor';
 type Colors = {
   text: string;
   muted: string;
+  mutedBg: string;
   border: string;
   card: string;
   blue: string;
@@ -65,7 +66,7 @@ function renderTextLeaf(node: TextLeaf, key: string, colors: Colors): ReactEleme
     style.push({ textDecorationLine: 'underline' });
   }
   if (node.code) {
-    style.push({ fontFamily: 'monospace', backgroundColor: colors.card, paddingHorizontal: 4, borderRadius: 3 });
+    style.push({ fontFamily: 'monospace', backgroundColor: colors.mutedBg, paddingHorizontal: 4, borderRadius: 3 });
   }
   return (
     <RNText key={key} style={style}>
@@ -295,11 +296,19 @@ function renderBlock(node: PlateNode, key: string, colors: Colors): ReactElement
 export function PlateRenderer({ content }: { content: unknown }) {
   const textColor = useColor('text');
   const mutedColor = useColor('textMuted');
+  const mutedBgColor = useColor('muted');
   const borderColor = useColor('border');
   const cardColor = useColor('card');
   const blueColor = useColor('blue');
 
-  const colors: Colors = { text: textColor, muted: mutedColor, border: borderColor, card: cardColor, blue: blueColor };
+  const colors: Colors = {
+    text: textColor,
+    muted: mutedColor,
+    mutedBg: mutedBgColor,
+    border: borderColor,
+    card: cardColor,
+    blue: blueColor,
+  };
   const nodes = normalizeContent(content);
 
   return <View style={{ gap: 0 }}>{nodes.map((node, i) => renderBlock(node, String(i), colors))}</View>;

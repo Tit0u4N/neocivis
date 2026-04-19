@@ -1,8 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { Appearance, type ColorSchemeName, Platform } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { schemeStore } from '@/theme/schemeStore';
 
 type Mode = 'light' | 'dark' | 'system';
+
+const STORAGE_KEY = 'theme-mode';
 
 interface UseModeToggleReturn {
   isDark: boolean;
@@ -12,71 +16,49 @@ interface UseModeToggleReturn {
   toggleMode: () => void;
 }
 
+function applyMode(newMode: Mode) {
+  if (Platform.OS === 'web') {
+    schemeStore.set(newMode === 'system' ? null : newMode);
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement;
+      root.classList.remove('light', 'dark');
+      if (newMode !== 'system') {
+        root.classList.add(newMode);
+        root.setAttribute('data-theme', newMode);
+      } else {
+        root.removeAttribute('data-theme');
+      }
+    }
+  } else {
+    Appearance.setColorScheme(newMode === 'system' ? null : newMode);
+  }
+}
+
 export function useModeToggle(): UseModeToggleReturn {
   const [mode, setModeState] = useState<Mode>('system');
-  const colorScheme = useColorScheme(); // Uses your existing hook
+  const colorScheme = useColorScheme();
 
-  // Calculate isDark based on mode and system preference
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY).then((saved) => {
+      if (saved === 'light' || saved === 'dark' || saved === 'system') {
+        setModeState(saved);
+        applyMode(saved);
+      }
+    });
+  }, []);
+
   const isDark = mode === 'system' ? colorScheme === 'dark' : mode === 'dark';
-
-  const toggleMode = () => {
-    switch (mode) {
-      case 'light':
-        setMode('dark');
-        break;
-      case 'dark':
-        setMode('system');
-        break;
-      case 'system':
-        setMode('light');
-        break;
-    }
-  };
 
   const setMode = (newMode: Mode) => {
     setModeState(newMode);
-
-    // Only use Appearance.setColorScheme on native platforms
-    if (Platform.OS !== 'web') {
-      if (newMode === 'system') {
-        Appearance.setColorScheme(null);
-      } else {
-        Appearance.setColorScheme(newMode);
-      }
-    } else {
-      // For web, update the root HTML element
-      if (typeof document !== 'undefined') {
-        const root = document.documentElement;
-
-        if (newMode === 'system') {
-          // Remove override and let CSS media query handle it
-          root.classList.remove('light', 'dark');
-          root.removeAttribute('data-theme');
-        } else {
-          // Set explicit theme
-          root.classList.remove('light', 'dark');
-          root.classList.add(newMode);
-          root.setAttribute('data-theme', newMode);
-        }
-      }
-    }
+    applyMode(newMode);
+    AsyncStorage.setItem(STORAGE_KEY, newMode);
   };
 
-  // Sync web theme with mode changes
-  useEffect(() => {
-    if (Platform.OS === 'web' && typeof document !== 'undefined') {
-      const root = document.documentElement;
-
-      if (mode === 'system') {
-        root.classList.remove('light', 'dark');
-        root.removeAttribute('data-theme');
-      } else {
-        root.classList.remove('light', 'dark');
-        root.classList.add(mode);
-        root.setAttribute('data-theme', mode);
-      }
-    }
-  }, [mode]); // Re-run when mode or system preference changes
+  const toggleMode = () => {
+    const next: Mode = mode === 'light' ? 'dark' : mode === 'dark' ? 'system' : 'light';
+    setMode(next);
+  };
 
   return {
     isDark,

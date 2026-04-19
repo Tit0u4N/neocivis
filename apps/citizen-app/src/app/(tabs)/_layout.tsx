@@ -5,20 +5,20 @@ import { Platform } from 'react-native';
 import { useColor } from '@/hooks/useColor';
 
 export default function TabsLayout() {
-  const primary = useColor('primary');
-  const foreground = useColor('foreground');
+  const iconDefault = useColor('icon');
+  const iconSelected = useColor('tabIconSelected');
   const { t } = useTranslation();
 
   return (
     <NativeTabs
       minimizeBehavior="onScrollDown"
       labelStyle={{
-        default: { color: primary },
-        selected: { color: foreground },
+        default: { color: iconDefault },
+        selected: { color: iconSelected },
       }}
       iconColor={{
-        default: primary,
-        selected: foreground,
+        default: iconDefault,
+        selected: iconSelected,
       }}
       labelVisibilityMode="labeled"
       disableTransparentOnScrollEdge={true}

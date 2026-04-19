@@ -21,10 +21,10 @@ export const ThemeProvider = ({ children }: Props) => {
       border: Colors.light.border,
       notification: Colors.light.red,
 
-      tint: Colors.light.background,
-      icon: '#9BA1A6',
-      tabIconDefault: '#9BA1A6',
-      tabIconSelected: Colors.light.background,
+      tint: Colors.light.tint,
+      icon: Colors.light.icon,
+      tabIconDefault: Colors.light.tabIconDefault,
+      tabIconSelected: Colors.light.tabIconSelected,
     },
   };
 
@@ -38,10 +38,10 @@ export const ThemeProvider = ({ children }: Props) => {
       text: Colors.dark.text,
       border: Colors.dark.border,
       notification: Colors.dark.red,
-      tint: Colors.dark.background,
-      tabIconSelected: Colors.dark.background,
-      icon: '#9BA1A6',
-      tabIconDefault: '#9BA1A6',
+      tint: Colors.dark.tint,
+      icon: Colors.dark.icon,
+      tabIconDefault: Colors.dark.tabIconDefault,
+      tabIconSelected: Colors.dark.tabIconSelected,
     },
   };
 

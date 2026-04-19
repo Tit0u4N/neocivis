@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useColorScheme as useRnColorScheme } from 'react-native';
+import { schemeStore } from '@/theme/schemeStore';
 
-/**
- * To support static rendering, this value needs to be re-calculated on the client side for web
- */
 export function useColorScheme() {
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [override, setOverride] = useState(schemeStore.get());
+  const colorScheme = useRnColorScheme();
 
   useEffect(() => {
     setHasHydrated(true);
+    return schemeStore.subscribe(setOverride);
   }, []);
 
-  const colorScheme = useRnColorScheme();
-
-  if (hasHydrated) {
-    return colorScheme;
+  if (!hasHydrated) {
+    return 'light';
   }
-
-  return 'light';
+  if (override !== null) {
+    return override;
+  }
+  return colorScheme;
 }

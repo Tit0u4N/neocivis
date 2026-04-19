@@ -65,6 +65,7 @@ export const Button = forwardRef<View, ButtonProps>(
     const secondaryForegroundColor = useColor('secondaryForeground');
     const destructiveColor = useColor('red');
     const destructiveForegroundColor = useColor('destructiveForeground');
+    const successForegroundColor = useColor('successForeground');
     const greenColor = useColor('green');
     const borderColor = useColor('border');
 
@@ -138,7 +139,7 @@ export const Button = forwardRef<View, ButtonProps>(
         case 'destructive':
           return { ...baseTextStyle, color: destructiveForegroundColor };
         case 'success':
-          return { ...baseTextStyle, color: destructiveForegroundColor };
+          return { ...baseTextStyle, color: successForegroundColor };
         case 'outline':
           return { ...baseTextStyle, color: primaryColor };
         case 'secondary':
@@ -161,7 +162,7 @@ export const Button = forwardRef<View, ButtonProps>(
         case 'destructive':
           return destructiveForegroundColor;
         case 'success':
-          return destructiveForegroundColor;
+          return successForegroundColor;
         case 'outline':
           return primaryColor;
         case 'secondary':

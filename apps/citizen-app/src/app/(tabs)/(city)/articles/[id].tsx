@@ -56,7 +56,7 @@ export default function ArticleDetailScreen() {
   if (loading) {
     return (
       <>
-        <Stack.Screen options={{ headerTransparent: true, title: '', headerTintColor: '#fff' }} />
+        <Stack.Screen options={{ title: '' }} />
         <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scroll}>
           <SkeletonBlock height={300} style={{ borderRadius: 0 }} />
           <View style={styles.skeletonContent}>
@@ -94,13 +94,7 @@ export default function ArticleDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={
-          hasCover
-            ? { headerTransparent: true, title: '', headerTintColor: '#fff' }
-            : { title: article.translation.title }
-        }
-      />
+      <Stack.Screen options={{ title: article.translation.title }} />
       <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scroll}>
         {hasCover ? (
           <View style={styles.coverContainer}>

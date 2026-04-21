@@ -69,15 +69,13 @@ export function ArticleCard({ article, onPress }: ArticleCardProps) {
             <View style={[styles.localeBadgeDark, { backgroundColor: primaryColor }]}>
               <Text style={[styles.localeBadgeDarkText, { color: primaryFgColor }]}>{locale.toUpperCase()}</Text>
             </View>
-            <Text variant="caption" style={{ color: mutedColor }}>
-              {formatDate(date, locale)}
-            </Text>
+            <Text style={[styles.dateCard, { color: mutedColor }]}>{formatDate(date, locale)}</Text>
           </View>
-          <Text variant="subtitle" numberOfLines={2} style={styles.cardTitle}>
+          <Text numberOfLines={2} style={styles.cardTitle}>
             {article.translation.title}
           </Text>
           {article.translation.description ? (
-            <Text variant="caption" numberOfLines={3}>
+            <Text numberOfLines={2} style={[styles.cardDescription, { color: mutedColor }]}>
               {article.translation.description}
             </Text>
           ) : null}
@@ -171,5 +169,15 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     marginTop: 2,
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 24,
+  },
+  cardDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  dateCard: {
+    fontSize: 13,
   },
 });

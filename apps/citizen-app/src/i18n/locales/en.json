@@ -14,7 +14,9 @@
     "account": "Account"
   },
   "city": {
-    "title": "City"
+    "title": "City",
+    "welcomeTitle": "Welcome to NeoCivis",
+    "welcomeSubtitle": "Find the latest news from your city here. Stay informed and engaged."
   },
   "articles": {
     "title": "Articles",

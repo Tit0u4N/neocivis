@@ -5,15 +5,25 @@ import { ArticleCard } from '@/components/article/ArticleCard';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
+import { useColor } from '@/hooks/useColor';
 import { useHomeScreen } from '@/screens/city/useHomeScreen';
 
 export default function CityScreen() {
   const { t } = useTranslation();
   const { articles, loading, error } = useHomeScreen();
+  const mutedColor = useColor('textMuted');
+  const primaryColor = useColor('primary');
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scroll}>
       <View style={styles.container}>
+        <View style={[styles.welcome, { backgroundColor: `${primaryColor}10` }]}>
+          <Text variant="title">{t('city.welcomeTitle')}</Text>
+          <Text variant="caption" style={{ color: mutedColor }}>
+            {t('city.welcomeSubtitle')}
+          </Text>
+        </View>
+
         <Text variant="subtitle">{t('articles.latest')}</Text>
 
         {loading ? (
@@ -53,5 +63,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     gap: 12,
+  },
+  welcome: {
+    padding: 16,
+    borderRadius: 12,
+    gap: 6,
+    marginBottom: 4,
   },
 });

@@ -52,17 +52,18 @@ function normalizeContent(content: unknown): PlateNode[] {
 }
 
 function renderTextLeaf(node: TextLeaf, key: string, colors: Colors): ReactElement {
-  const style: TextStyle[] = [{ fontSize: 16, lineHeight: 26, color: colors.text }];
+  const style: TextStyle[] = [{ color: colors.text }];
   if (node.bold) {
     style.push({ fontWeight: '700' });
   }
   if (node.italic) {
     style.push({ fontStyle: 'italic' });
   }
-  if (node.strikethrough) {
+  if (node.strikethrough && node.underline) {
+    style.push({ textDecorationLine: 'underline line-through' });
+  } else if (node.strikethrough) {
     style.push({ textDecorationLine: 'line-through' });
-  }
-  if (node.underline) {
+  } else if (node.underline) {
     style.push({ textDecorationLine: 'underline' });
   }
   if (node.code) {
@@ -139,9 +140,9 @@ function renderParagraph(node: PlateElement, key: string, colors: Colors): React
 
 function renderHeading(node: PlateElement, key: string, level: 1 | 2 | 3, colors: Colors): ReactElement {
   const headingStyles: Record<number, TextStyle> = {
-    1: { fontSize: 26, fontWeight: '800', color: colors.text, marginTop: 16, marginBottom: 8 },
-    2: { fontSize: 22, fontWeight: '700', color: colors.text, marginTop: 12, marginBottom: 6 },
-    3: { fontSize: 18, fontWeight: '600', color: colors.text, marginTop: 8, marginBottom: 4 },
+    1: { fontSize: 28, fontWeight: '800', color: colors.text, marginTop: 18, marginBottom: 12 },
+    2: { fontSize: 22, fontWeight: '700', color: colors.text, marginTop: 14, marginBottom: 8 },
+    3: { fontSize: 18, fontWeight: '600', color: colors.text, marginTop: 10, marginBottom: 6 },
   };
   return (
     <RNText key={key} style={headingStyles[level]}>

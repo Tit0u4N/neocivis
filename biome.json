@@ -26,7 +26,8 @@
       "!!**/.biome",
       "!!**/components/ui",
       "!!**/.expo",
-      "!!**/next-env.d.ts"
+      "!!**/next-env.d.ts",
+      "!!**/bun.lock"
     ]
   },
   "formatter": {

@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Always read before any task**: [`agent/project-context.md`](agent/project-context.md) — complete rules, stack versions, architecture patterns, and critical anti-patterns for the entire project
 - **Read before any frontend task** (`town-hall-web`, `citizen-app`, `keycloak-theme`): [`agent/design-system.md`](agent/design-system.md) — design tokens, brand guidelines, component specs, motion rules, and DO/DON'Ts for both the `citizen` and `town-hall` brands
+- **Read before any api test task**: [`agent/api-bruno-instructions.md`](agent/api-bruno-instructions.md) — instructions for using Bruno API client to test the backend API endpoints
 
 ## Project Overview
 

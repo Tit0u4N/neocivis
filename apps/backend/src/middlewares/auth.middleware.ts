@@ -1,20 +1,92 @@
-// This middleware checks if the user is in the headers and places the user info in req.user for downstream middlewares and route handlers.
+import type { Hono } from 'hono';
+import { createMiddleware } from 'hono/factory';
+import type { BaseUserRole } from '@/modules/users/user.types';
+import { KeycloakIAMService } from '@/infrastructure/iam/keycloak-iam.service';
+import { UserService } from '@/modules/users/user.service';
+import { isInMemoryMode } from '@/core/runtime-config';
 
-import { Hono } from 'hono'
-
-const userMiddleware = (c, next) => {
-    const userId = c.req.raw.headers.get('X-User-Id')
-    const userRolesStr = c.req.raw.headers.get('X-User-Roles') || ''
-    const userRoles = userRolesStr.split(',').filter(Boolean)
-    console.log('User Middleware: Extracted user info from headers - ID:', userId, 'Roles:', userRoles.join(', '))
-    if (userId) {
-        c.user = { id: userId, roles: userRoles }
-    }
-    return next()
+function normalizeRoles(rolesHeaderValue: string): string[] {
+  return rolesHeaderValue
+    .split(',')
+    .map((r) => r.trim())
+    .filter(Boolean)
+    .map((r) => r.toUpperCase());
 }
 
-export function applyUserMiddleware(app: Hono) {
-    app.use('*', userMiddleware)
-    return app
+function getBaseRole(roles: string[]): BaseUserRole {
+  if (roles.includes('ADMIN')) {
+    return 'ADMIN';
+  }
+  if (roles.includes('EMPLOYEE')) {
+    return 'EMPLOYEE';
+  }
+  return 'CITIZEN';
 }
-    
+
+/**
+ * Extract `X-User-Id` / `X-User-Roles` and exposes them through `c.var.user`.
+ * Also upserts the user in SQL (Drizzle) when DB is configured.
+ */
+export function applyUserMiddleware(app: Hono, userService: UserService, iamService: KeycloakIAMService) {
+
+  app.use(
+    '*',
+    createMiddleware(async (c, next) => {
+      const keycloakId = c.req.header('X-User-Id');
+      const roles = normalizeRoles(c.req.header('X-User-Roles') ?? '');
+      const username = c.req.header('X-User-Username') ?? undefined;
+      const email = c.req.header('X-User-Email') ?? undefined;
+      const firstName = c.req.header('X-User-First-Name') ?? undefined;
+      const lastName = c.req.header('X-User-Last-Name') ?? undefined;
+
+      if (keycloakId) {
+        const baseRole = getBaseRole(roles);
+
+        let resolvedUsername = username;
+        let resolvedEmail = email;
+        let resolvedFirstName = firstName;
+        let resolvedLastName = lastName;
+
+        if (
+          c.var.db &&
+          (resolvedUsername === undefined ||
+            resolvedEmail === undefined ||
+            resolvedFirstName === undefined ||
+            resolvedLastName === undefined)
+        ) {
+          const profile = await iamService.getUserProfileById(keycloakId);
+          resolvedUsername ??= profile?.username;
+          resolvedEmail ??= profile?.email;
+          resolvedFirstName ??= profile?.firstName;
+          resolvedLastName ??= profile?.lastName;
+        }
+
+        c.set('user', {
+          keycloakId,
+          roles,
+          baseRole,
+          username: resolvedUsername,
+          email: resolvedEmail,
+          firstName: resolvedFirstName,
+          lastName: resolvedLastName,
+        });
+
+        // Sync si DB branchée, ou si on est en mode in-memory (repository in-memory).
+        if (c.var.db || isInMemoryMode()) {
+          await userService.syncFromHeaders({
+            keycloakId,
+            role: baseRole,
+            username: resolvedUsername,
+            email: resolvedEmail,
+            firstName: resolvedFirstName,
+            lastName: resolvedLastName,
+          });
+        }
+      }
+
+      await next();
+    }),
+  );
+
+  return app;
+}

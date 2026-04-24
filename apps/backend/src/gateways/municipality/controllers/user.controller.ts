@@ -1,6 +1,6 @@
-import type { Context } from 'node:vm';
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 
+import { toUserPublicDto } from '@/modules/users/user.dto';
 import type { UserService } from '@/modules/users/user.service';
 
 export class UserController {
@@ -9,14 +9,38 @@ export class UserController {
   public getRoutes() {
     const app = new Hono();
 
-    app.get('/all', (c: Context) => c.json(this.service.getAll()));
-    app.get('/:id', (c: Context) => this.getUser(c));
+    app.get('/me', async (c) => this.getMe(c));
+    app.get('/by-ids', async (c) => this.getUsersByIds(c));
 
     return app;
   }
 
-  private getUser(c: Context) {
-    const user = this.service.getById(c.req.param('id'));
+  private async getUsersByIds(c: Context) {
+    const idsParam = c.req.query('ids');
+    if (!idsParam) {
+      return c.json({ error: 'Missing ids query param' }, 400);
+    }
+
+    const ids = idsParam
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((s) => Number(s));
+
+    if (ids.length === 0 || !ids.every(Number.isFinite)) {
+      return c.json({ error: 'Invalid ids' }, 400);
+    }
+
+    const users = await this.service.getByIds(ids);
+    return c.json(users.map(toUserPublicDto));
+  }
+
+  private async getMe(c: Context) {
+    const keycloakId = c.req.header('X-User-Id');
+    if (!keycloakId) {
+      return c.json({ error: 'No user information found in headers' }, 400);
+    }
+    const user = await this.service.getByKeycloakId(keycloakId);
     return user ? c.json(user) : c.json({ error: 'User not found' }, 404);
   }
 }

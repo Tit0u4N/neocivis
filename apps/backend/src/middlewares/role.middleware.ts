@@ -3,11 +3,11 @@ import { createInsufficientRoleError, type InsufficientRoleErrorMessage } from '
 const checkRoleGateway = (requiredRoles: string[]) => {
   // biome-ignore lint/suspicious/useAwait: On s'en fou c'est du test
   return async (c: any, next: any) => {
-    const user = c.user;
+    const user = c.var.user;
     if (!user) {
       return c.json({ error: 'Unauthorized: No user information found' }, 401);
     }
-    const hasRole = requiredRoles.some((role) => user.roles.includes(role));
+    const hasRole = requiredRoles.some((role) => user.roles.includes(role.toUpperCase()));
     if (!hasRole) {
       const error = createInsufficientRoleError(requiredRoles, user.roles) as InsufficientRoleErrorMessage;
       return c.json(error, 403);

@@ -1,0 +1,24 @@
+CREATE TYPE "public"."user_role" AS ENUM('ADMIN', 'EMPLOYEE', 'CITIZEN');--> statement-breakpoint
+CREATE TABLE "application_metadata" (
+	"key" text PRIMARY KEY NOT NULL,
+	"value" text NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "users" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "users_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"seed_id" integer,
+	"keycloak_id" text NOT NULL,
+	"username" text DEFAULT '' NOT NULL,
+	"email" text DEFAULT '' NOT NULL,
+	"first_name" text DEFAULT '' NOT NULL,
+	"last_name" text DEFAULT '' NOT NULL,
+	"role" "user_role" NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE INDEX "users_keycloak_id_idx" ON "users" USING btree ("keycloak_id");--> statement-breakpoint
+CREATE INDEX "users_username_idx" ON "users" USING btree ("username");--> statement-breakpoint
+CREATE INDEX "users_username_keycloak_id_idx" ON "users" USING btree ("username","keycloak_id");--> statement-breakpoint
+CREATE INDEX "users_seed_id_idx" ON "users" USING btree ("seed_id");

@@ -27,6 +27,7 @@
     "@react-navigation/native": "^7.1.26",
     "@repo/frontend-core": "*",
     "@repo/frontend-services": "*",
+    "@repo/contracts": "*",
     "expo": "~54.0.30",
     "expo-asset": "~12.0.12",
     "expo-auth-session": "^55.0.8",

@@ -45,6 +45,7 @@
         "@react-navigation/bottom-tabs": "^7.9.0",
         "@react-navigation/elements": "^2.9.3",
         "@react-navigation/native": "^7.1.26",
+        "@repo/contracts": "*",
         "@repo/frontend-core": "*",
         "@repo/frontend-services": "*",
         "expo": "~54.0.30",
@@ -182,6 +183,7 @@
       "name": "@repo/frontend-core",
       "version": "0.0.0",
       "dependencies": {
+        "@repo/contracts": "*",
         "ky": "^1.14.1",
       },
       "devDependencies": {
@@ -197,8 +199,10 @@
       "version": "0.0.0",
       "dependencies": {
         "@repo/contracts": "*",
+        "ky": "^1.14.1",
       },
       "devDependencies": {
+        "@repo/contracts": "*",
         "@repo/frontend-core": "*",
         "@repo/typescript-config": "*",
         "@repo/vitest-config": "*",

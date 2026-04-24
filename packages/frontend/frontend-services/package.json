@@ -12,9 +12,11 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
-    "@repo/contracts": "*"
+    "@repo/contracts": "*",
+    "ky": "^1.14.1"
   },
   "devDependencies": {
+    "@repo/contracts": "*",
     "@repo/typescript-config": "*",
     "@repo/vitest-config": "*",
     "@repo/frontend-core": "*",

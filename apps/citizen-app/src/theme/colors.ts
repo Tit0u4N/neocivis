@@ -26,46 +26,49 @@ export const Fonts = Platform.select({
 });
 
 export const lightColors = {
-  // Base colors
+  // Base colors — aligned with .theme-citizen in global.css
   background: '#FFFFFF',
-  foreground: '#000000',
+  foreground: '#0A0A0A',
 
   // Card colors
-  card: '#F2F2F7',
-  cardForeground: '#000000',
+  card: '#FFFFFF',
+  cardForeground: '#0A0A0A',
 
   // Popover colors
-  popover: '#F2F2F7',
-  popoverForeground: '#000000',
+  popover: '#FFFFFF',
+  popoverForeground: '#0A0A0A',
 
-  // Primary colors
-  primary: '#18181b',
-  primaryForeground: '#FFFFFF',
+  // Primary colors — hsl(0 0% 9.05%)
+  primary: '#171717',
+  primaryForeground: '#FAFAFA',
 
-  // Secondary colors
-  secondary: '#F2F2F7',
-  secondaryForeground: '#18181b',
+  // Secondary colors — hsl(0 0% 96.06%)
+  secondary: '#F5F5F5',
+  secondaryForeground: '#171717',
 
-  // Muted colors
-  muted: '#78788033',
-  mutedForeground: '#71717a',
+  // Muted colors — hsl(0 0% 96.06%) / hsl(0 0% 45.15%)
+  muted: '#F5F5F5',
+  mutedForeground: '#737373',
 
   // Accent colors
-  accent: '#F2F2F7',
-  accentForeground: '#18181b',
+  accent: '#F5F5F5',
+  accentForeground: '#171717',
 
   // Destructive colors
   destructive: '#ef4444',
   destructiveForeground: '#FFFFFF',
 
-  // Border and input
-  border: '#C6C6C8',
-  input: '#e4e4e7',
-  ring: '#a1a1aa',
+  // Success colors
+  successForeground: '#FFFFFF',
+
+  // Border and input — hsl(0 0% 89.82%)
+  border: '#E5E5E5',
+  input: '#E5E5E5',
+  ring: '#A1A1A1',
 
   // Text colors
-  text: '#000000',
-  textMuted: '#71717a',
+  text: '#0A0A0A',
+  textMuted: '#737373',
 
   // Legacy support for existing components
   tint: '#18181b',
@@ -102,46 +105,49 @@ export const lightColors = {
 };
 
 export const darkColors = {
-  // Base colors
-  background: '#000000',
-  foreground: '#FFFFFF',
+  // Base colors — aligned with .theme-citizen.dark in global.css
+  background: '#0A0A0A',
+  foreground: '#FAFAFA',
 
-  // Card colors
-  card: '#1C1C1E',
-  cardForeground: '#FFFFFF',
+  // Card colors — hsl(0 0% 9.05%)
+  card: '#171717',
+  cardForeground: '#FAFAFA',
 
-  // Popover colors
-  popover: '#18181b',
-  popoverForeground: '#FFFFFF',
+  // Popover colors — hsl(0 0% 14.94%)
+  popover: '#262626',
+  popoverForeground: '#FAFAFA',
 
-  // Primary colors
-  primary: '#e4e4e7',
-  primaryForeground: '#18181b',
+  // Primary colors — hsl(0 0% 89.82%)
+  primary: '#E5E5E5',
+  primaryForeground: '#171717',
 
-  // Secondary colors
-  secondary: '#1C1C1E',
-  secondaryForeground: '#FFFFFF',
+  // Secondary colors — hsl(0 0% 14.94%)
+  secondary: '#262626',
+  secondaryForeground: '#FAFAFA',
 
-  // Muted colors
-  muted: '#78788033',
-  mutedForeground: '#a1a1aa',
+  // Muted colors — hsl(0 0% 14.94%) / hsl(0 0% 63.02%)
+  muted: '#262626',
+  mutedForeground: '#A1A1A1',
 
-  // Accent colors
-  accent: '#1C1C1E',
-  accentForeground: '#FFFFFF',
+  // Accent colors — hsl(0 0% 25.05%)
+  accent: '#404040',
+  accentForeground: '#FAFAFA',
 
-  // Destructive colors
-  destructive: '#dc2626',
-  destructiveForeground: '#FFFFFF',
+  // Destructive colors — hsl(359 100% 70%)
+  destructive: '#fc8181',
+  destructiveForeground: '#FAFAFA',
 
-  // Border and input - using alpha values for better blending
-  border: '#38383A',
-  input: 'rgba(255, 255, 255, 0.15)',
-  ring: '#71717a',
+  // Success colors
+  successForeground: '#FFFFFF',
+
+  // Border and input — hsl(0 0% 15.51%) / hsl(0 0% 20.39%)
+  border: '#272727',
+  input: '#343434',
+  ring: '#737373',
 
   // Text colors
-  text: '#FFFFFF',
-  textMuted: '#a1a1aa',
+  text: '#FAFAFA',
+  textMuted: '#A1A1A1',
 
   // Legacy support for existing components
   tint: '#FFFFFF',

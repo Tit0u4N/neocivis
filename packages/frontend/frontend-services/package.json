@@ -11,8 +11,12 @@
     "test": "vitest run",
     "test:watch": "vitest --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@repo/contracts": "*",
+    "ky": "^1.14.1"
+  },
   "devDependencies": {
+    "@repo/contracts": "*",
     "@repo/typescript-config": "*",
     "@repo/vitest-config": "*",
     "@repo/frontend-core": "*",
@@ -22,6 +26,11 @@
   },
   "peerDependencies": {},
   "exports": {
-    "./report": "./src/report/report.service.ts"
+    "./report": "./dist/report.js",
+    "./auth": "./dist/auth.js",
+    "./permission": "./dist/permission.js",
+    "./article": "./dist/article.js",
+    "./upload": "./dist/upload.js",
+    "./testing": "./dist/testing.js"
   }
 }

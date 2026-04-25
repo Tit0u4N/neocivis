@@ -1,0 +1,52 @@
+{
+  "login": {
+    "brand": "NeoCivis",
+    "title": "Welcome to\nNeoCivis",
+    "subtitle": "Join us to stay up to date with your city's news",
+    "signUp": "Sign Up",
+    "signIn": "Log In",
+    "continueAsGuest": "Continue as guest"
+  },
+  "tabs": {
+    "city": "City",
+    "report": "Report",
+    "forum": "Forum",
+    "account": "Account"
+  },
+  "city": {
+    "title": "City",
+    "welcomeTitle": "Welcome to NeoCivis",
+    "welcomeSubtitle": "Find the latest news from your city here. Stay informed and engaged."
+  },
+  "articles": {
+    "title": "Articles",
+    "latest": "Latest news",
+    "seeAll": "See all articles",
+    "loading": "Loading...",
+    "loadMore": "Load more",
+    "error": "Unable to load articles",
+    "empty": "No articles available",
+    "notFound": "Article not found"
+  },
+  "report": {
+    "title": "Report"
+  },
+  "forum": {
+    "title": "Forum"
+  },
+  "account": {
+    "title": "My account",
+    "language": {
+      "label": "Language",
+      "fr": "Français",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "signOut": "Sign out"
+  }
+}

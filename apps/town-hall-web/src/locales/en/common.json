@@ -1,0 +1,154 @@
+{
+  "app": {
+    "name": "NeoCivis — Town Hall Portal",
+    "shortName": "NeoCivis"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "citizens": "Citizens",
+    "requests": "Requests",
+    "settings": "Settings",
+    "logout": "Log out",
+    "login": "Log in",
+    "account": "My account"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "search": "Search",
+    "noResults": "No results"
+  },
+  "auth": {
+    "welcome": "Welcome",
+    "loginTitle": "Town hall portal login",
+    "subtitle": "Town hall portal — restricted to staff members",
+    "loggedInAs": "Logged in as {{name}}",
+    "sessionExpired": "Your session has expired, please log in again"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This page does not exist or has been moved.",
+    "backToDashboard": "Back to dashboard"
+  },
+  "settings": {
+    "appearance": "Appearance",
+    "language": {
+      "label": "Language",
+      "description": "Choose the interface language",
+      "fr": "French",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Theme",
+      "description": "Choose the interface theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "articles": {
+    "list": {
+      "title": "Articles",
+      "newArticle": "New article",
+      "count": "{{count}} article(s)",
+      "filters": {
+        "allStatuses": "All statuses",
+        "published": "Published",
+        "drafts": "Drafts",
+        "searchPlaceholder": "Search…"
+      },
+      "table": {
+        "title": "Title",
+        "status": "Status",
+        "publishedAt": "Published",
+        "updatedAt": "Modified",
+        "languages": "Languages"
+      },
+      "status": {
+        "published": "Published",
+        "draft": "Draft"
+      },
+      "actions": {
+        "label": "Actions",
+        "manageTranslations": "Manage translations",
+        "unpublish": "Unpublish",
+        "publish": "Publish"
+      },
+      "empty": {
+        "title": "No articles",
+        "createFirst": "Create your first article"
+      },
+      "deleteDialog": {
+        "title": "Delete this article?",
+        "description": "This action is irreversible. The article and all its translations will be permanently deleted."
+      }
+    },
+    "form": {
+      "titleCreate": "New article",
+      "titleEdit": "Edit article",
+      "fields": {
+        "title": "Title *",
+        "titlePlaceholder": "Article title",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Summary or subtitle",
+        "coverImage": "Cover image (URL, optional)",
+        "coverImageAlt": "Cover preview",
+        "status": "Status",
+        "content": "Content",
+        "contentPlaceholder": "Start writing your article…"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published"
+      },
+      "discardDialog": {
+        "title": "Unsaved changes",
+        "description": "You have unsaved changes. Are you sure you want to leave without saving?",
+        "cancel": "Continue editing",
+        "confirm": "Leave without saving"
+      }
+    },
+    "translations": {
+      "pageTitle": "Translations — {{articleTitle}}",
+      "backToEdit": "Back to editing",
+      "defaultLanguage": "Default language",
+      "cannotDeleteFr": "The French translation cannot be deleted",
+      "addTranslation": "Add a translation",
+      "newTranslation": "New translation",
+      "allLanguagesAdded": "All available languages have already been added.",
+      "fields": {
+        "language": "Language",
+        "title": "Title *",
+        "titlePlaceholder": "Title in this language",
+        "description": "Description (optional)",
+        "content": "Content"
+      }
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "townHall": "Town Hall",
+      "report": "Reports",
+      "forum": "Forum",
+      "administrator": "Administration"
+    },
+    "items": {
+      "general": "General",
+      "appManagement": "App management",
+      "establishment": "Establishment",
+      "article": "Article",
+      "reports": "Reports",
+      "threads": "Threads",
+      "userManagement": "Users",
+      "roleManagement": "Roles",
+      "webhook": "Webhook"
+    }
+  }
+}

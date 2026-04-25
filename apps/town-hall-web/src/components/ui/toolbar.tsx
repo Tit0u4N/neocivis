@@ -1,0 +1,170 @@
+'use client';
+
+import * as React from 'react';
+
+import * as ToolbarPrimitive from '@radix-ui/react-toolbar';
+import * as RadixTooltip from '@radix-ui/react-tooltip';
+import { type VariantProps, cva } from 'class-variance-authority';
+import { ChevronDown } from 'lucide-react';
+
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+
+export function Toolbar({ className, ...props }: React.ComponentProps<typeof ToolbarPrimitive.Root>) {
+  return (
+    <ToolbarPrimitive.Root className={cn('relative flex select-none items-center', className)} {...props} />
+  );
+}
+
+export function ToolbarToggleGroup({
+  className,
+  ...props
+}: React.ComponentProps<typeof ToolbarPrimitive.ToolbarToggleGroup>) {
+  return <ToolbarPrimitive.ToolbarToggleGroup className={cn('flex items-center', className)} {...props} />;
+}
+
+export function ToolbarLink({ className, ...props }: React.ComponentProps<typeof ToolbarPrimitive.Link>) {
+  return (
+    <ToolbarPrimitive.Link
+      className={cn('font-medium underline underline-offset-4', className)}
+      {...props}
+    />
+  );
+}
+
+export function ToolbarSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof ToolbarPrimitive.Separator>) {
+  return <ToolbarPrimitive.Separator className={cn('mx-2 my-1 w-px shrink-0 bg-border', className)} {...props} />;
+}
+
+const toolbarButtonVariants = cva(
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium text-sm outline-none transition-[color,box-shadow] hover:bg-muted hover:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-checked:bg-accent aria-checked:text-accent-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  {
+    defaultVariants: {
+      size: 'default',
+      variant: 'default',
+    },
+    variants: {
+      size: {
+        default: 'h-9 min-w-9 px-2',
+        lg: 'h-10 min-w-10 px-2.5',
+        sm: 'h-8 min-w-8 px-1.5',
+      },
+      variant: {
+        default: 'bg-transparent',
+        outline: 'border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground',
+      },
+    },
+  },
+);
+
+export function ToolbarToggleItem({
+  className,
+  size = 'sm',
+  variant,
+  ...props
+}: React.ComponentProps<typeof ToolbarPrimitive.ToggleItem> & VariantProps<typeof toolbarButtonVariants>) {
+  return (
+    <ToolbarPrimitive.ToggleItem
+      className={cn(toolbarButtonVariants({ size, variant }), className)}
+      {...props}
+    />
+  );
+}
+
+export function ToolbarGroup({ children, className }: React.ComponentProps<'div'>) {
+  return (
+    <div className={cn('group/toolbar-group', 'relative hidden has-[button]:flex', className)}>
+      <div className="flex items-center">{children}</div>
+      <div className="group-last/toolbar-group:hidden! mx-1.5 py-0.5">
+        <Separator orientation="vertical" />
+      </div>
+    </div>
+  );
+}
+
+type TooltipProps<T extends React.ElementType> = {
+  tooltip?: React.ReactNode;
+  tooltipContentProps?: Omit<React.ComponentPropsWithoutRef<typeof RadixTooltip.Content>, 'children'>;
+  tooltipProps?: Omit<React.ComponentPropsWithoutRef<typeof RadixTooltip.Root>, 'children'>;
+} & React.ComponentProps<T>;
+
+function withTooltip<T extends React.ElementType>(Component: T) {
+  return function ExtendComponent({ tooltip, tooltipContentProps, tooltipProps, ...props }: TooltipProps<T>) {
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+      setMounted(true);
+    }, []);
+
+    const component = <Component {...(props as React.ComponentProps<T>)} />;
+
+    if (tooltip && mounted) {
+      return (
+        <RadixTooltip.Root {...tooltipProps}>
+          <RadixTooltip.Trigger asChild>{component}</RadixTooltip.Trigger>
+          <RadixTooltip.Portal>
+            <RadixTooltip.Content
+              sideOffset={4}
+              className={cn(
+                'z-50 rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground',
+                tooltipContentProps?.className,
+              )}
+              {...tooltipContentProps}
+            >
+              {tooltip}
+            </RadixTooltip.Content>
+          </RadixTooltip.Portal>
+        </RadixTooltip.Root>
+      );
+    }
+
+    return component;
+  };
+}
+
+type ToolbarButtonProps = {
+  isDropdown?: boolean;
+  pressed?: boolean;
+} & Omit<React.ComponentPropsWithoutRef<typeof ToolbarToggleItem>, 'asChild' | 'value'> &
+  VariantProps<typeof toolbarButtonVariants>;
+
+export const ToolbarButton = withTooltip(function ToolbarButton({
+  children,
+  className,
+  isDropdown,
+  pressed,
+  size = 'sm',
+  variant,
+  ...props
+}: ToolbarButtonProps) {
+  return typeof pressed === 'boolean' ? (
+    <ToolbarToggleGroup disabled={props.disabled} value="single" type="single">
+      <ToolbarToggleItem
+        className={cn(toolbarButtonVariants({ size, variant }), isDropdown && 'justify-between gap-1 pr-1', className)}
+        value={pressed ? 'single' : ''}
+        {...props}
+      >
+        {isDropdown ? (
+          <>
+            <div className="flex flex-1 items-center gap-2 whitespace-nowrap">{children}</div>
+            <div>
+              <ChevronDown className="size-3.5 text-muted-foreground" data-icon />
+            </div>
+          </>
+        ) : (
+          children
+        )}
+      </ToolbarToggleItem>
+    </ToolbarToggleGroup>
+  ) : (
+    <ToolbarPrimitive.Button
+      className={cn(toolbarButtonVariants({ size, variant }), isDropdown && 'pr-1', className)}
+      {...props}
+    >
+      {children}
+    </ToolbarPrimitive.Button>
+  );
+});

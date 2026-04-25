@@ -1,0 +1,154 @@
+{
+  "app": {
+    "name": "NeoCivis — Espace Mairie",
+    "shortName": "NeoCivis"
+  },
+  "nav": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "citizens": "Citoyens",
+    "requests": "Demandes",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter",
+    "login": "Se connecter",
+    "account": "Mon compte"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "search": "Rechercher",
+    "noResults": "Aucun résultat"
+  },
+  "auth": {
+    "welcome": "Bienvenue",
+    "loginTitle": "Connexion à l'espace mairie",
+    "subtitle": "Portail de la mairie — accès réservé aux agents",
+    "loggedInAs": "Connecté en tant que {{name}}",
+    "sessionExpired": "Votre session a expiré, veuillez vous reconnecter"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "Cette page n'existe pas ou a été déplacée.",
+    "backToDashboard": "Retour au tableau de bord"
+  },
+  "settings": {
+    "appearance": "Apparence",
+    "language": {
+      "label": "Langue",
+      "description": "Choisissez la langue de l'interface",
+      "fr": "Français",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Thème",
+      "description": "Choisissez le thème de l'interface",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    }
+  },
+  "articles": {
+    "list": {
+      "title": "Articles",
+      "newArticle": "Nouvel article",
+      "count": "{{count}} article(s)",
+      "filters": {
+        "allStatuses": "Tous les statuts",
+        "published": "Publiés",
+        "drafts": "Brouillons",
+        "searchPlaceholder": "Rechercher…"
+      },
+      "table": {
+        "title": "Titre",
+        "status": "Statut",
+        "publishedAt": "Publication",
+        "updatedAt": "Modification",
+        "languages": "Langues"
+      },
+      "status": {
+        "published": "Publié",
+        "draft": "Brouillon"
+      },
+      "actions": {
+        "label": "Actions",
+        "manageTranslations": "Gérer les traductions",
+        "unpublish": "Dépublier",
+        "publish": "Publier"
+      },
+      "empty": {
+        "title": "Aucun article",
+        "createFirst": "Créer votre premier article"
+      },
+      "deleteDialog": {
+        "title": "Supprimer cet article ?",
+        "description": "Cette action est irréversible. L'article et toutes ses traductions seront définitivement supprimés."
+      }
+    },
+    "form": {
+      "titleCreate": "Nouvel article",
+      "titleEdit": "Modifier l'article",
+      "fields": {
+        "title": "Titre *",
+        "titlePlaceholder": "Titre de l'article",
+        "description": "Description (optionnel)",
+        "descriptionPlaceholder": "Résumé ou sous-titre",
+        "coverImage": "Image de couverture (URL, optionnel)",
+        "coverImageAlt": "Aperçu de la couverture",
+        "status": "Statut",
+        "content": "Contenu",
+        "contentPlaceholder": "Commencez à rédiger votre article…"
+      },
+      "status": {
+        "draft": "Brouillon",
+        "published": "Publié"
+      },
+      "discardDialog": {
+        "title": "Modifications non sauvegardées",
+        "description": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter sans enregistrer ?",
+        "cancel": "Continuer l'édition",
+        "confirm": "Quitter sans enregistrer"
+      }
+    },
+    "translations": {
+      "pageTitle": "Traductions — {{articleTitle}}",
+      "backToEdit": "Retour à l'édition",
+      "defaultLanguage": "Langue par défaut",
+      "cannotDeleteFr": "La traduction française ne peut pas être supprimée",
+      "addTranslation": "Ajouter une traduction",
+      "newTranslation": "Nouvelle traduction",
+      "allLanguagesAdded": "Toutes les langues disponibles ont déjà été ajoutées.",
+      "fields": {
+        "language": "Langue",
+        "title": "Titre *",
+        "titlePlaceholder": "Titre dans cette langue",
+        "description": "Description (optionnel)",
+        "content": "Contenu"
+      }
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "townHall": "Town Hall",
+      "report": "Signalements",
+      "forum": "Forum",
+      "administrator": "Administration"
+    },
+    "items": {
+      "general": "Général",
+      "appManagement": "Gestion de l'application",
+      "establishment": "Établissement",
+      "article": "Article",
+      "reports": "Signalements",
+      "threads": "Fils de discussion",
+      "userManagement": "Utilisateurs",
+      "roleManagement": "Rôles",
+      "webhook": "Webhook"
+    }
+  }
+}

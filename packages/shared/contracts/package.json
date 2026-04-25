@@ -1,0 +1,27 @@
+{
+  "name": "@repo/contracts",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "npx rimraf dist",
+    "clean:node_modules": "npx rimraf node_modules"
+  },
+  "dependencies": {
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./article": "./src/article/article.schema.ts",
+    "./dto": "./src/dto/index.ts",
+    "./error-messages": "./src/error-messages/index.ts"
+  }
+}

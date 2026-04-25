@@ -1,10 +1,10 @@
 ---
 project_name: 'tpi-neocivis'
 user_name: 'Titouan'
-date: '2026-02-20'
-sections_completed: ['technology_stack', 'language_specific_rules', 'framework_specific_rules', 'testing_rules', 'code_quality_style', 'workflow_rules', 'critical_dont_miss']
+date: '2026-03-05'
+sections_completed: ['technology_stack', 'language_specific_rules', 'framework_specific_rules', 'backend_rules', 'testing_rules', 'code_quality_style', 'workflow_rules', 'critical_dont_miss']
 status: 'complete'
-rule_count: 95
+rule_count: 115
 optimized_for_llm: true
 ---
 
@@ -17,10 +17,10 @@ _This file contains critical rules and patterns that AI agents must follow when 
 ## Technology Stack & Versions
 
 ### Monorepo
-- **Package Manager**: Yarn 1.22.19 (Classic) — DO NOT use npm or pnpm
+- **Package Manager**: bun — DO NOT use npm, pnpm, or yarn
 - **Orchestrator**: Turborepo 2.6.1
 - **Node**: >=20.9.0
-- **Language**: TypeScript ~5.9.3 (strict mode in citizen-app)
+- **Language**: TypeScript ~5.9.3 (strict mode enabled everywhere)
 
 ### town-hall-web (Municipal Portal)
 - Next.js 16.0.10 (App Router) + React 19.2.1
@@ -35,11 +35,21 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Custom UI components with React Native StyleSheet + theme system
 - react-native-reanimated 4.1.6 for animations
 
+### backend (API)
+- Hono v4 on Azure Functions v4 (Node.js model v4)
+- @marplex/hono-azurefunc-adapter: Bridges Hono with Azure Functions runtime
+- Build: tsup (ESM output to dist/)
+- Auth: JWT via Keycloak
+- Validation: Zod (schemas in `packages/shared`, shared with frontend)
+
+Bruno information -> [api-bruno-instructions.md](api-bruno-instructions.md)
+
 ### Shared Packages
 - @repo/frontend-core: Shared utilities (tsup build, ky 1.14.1 HTTP client)
 - @repo/frontend-services: Business logic services (tsup build)
 - @repo/typescript-config: Shared TypeScript configurations
 - @repo/vitest-config: Shared Vitest configurations
+- @repo/shared _(to be created)_: Zod schemas + shared types (used by backend AND frontend)
 
 ### Dev Tools
 - Biome 2.3.8 (linting + formatting — replaces ESLint/Prettier for most rules)
@@ -123,8 +133,97 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Import in apps: `import { ReportService } from '@repo/frontend-services/report'`
 
 **Shared Utilities (@repo/frontend-core):**
-- After ANY change: run `yarn turbo build --filter=@repo/frontend-core` before testing in apps
-- Same for @repo/frontend-services: `yarn turbo build --filter=@repo/frontend-services`
+- After ANY change: run `bun turbo build --filter=@repo/frontend-core` before testing in apps
+- Same for @repo/frontend-services: `bun turbo build --filter=@repo/frontend-services`
+
+### Backend Rules (apps/backend)
+
+**Architecture — 4 Layers (strict):**
+```
+src/
+├── index.ts                  # Azure Functions entry point — 2 HTTP triggers only
+├── gateways/
+│   ├── citizen/              # Citizen gateway (Azure Function)
+│   │   ├── citizen.gateway.ts
+│   │   └── controllers/      # Route handlers, no business logic
+│   └── municipality/         # Municipality gateway (Azure Function)
+│       ├── municipality.gateway.ts
+│       └── controllers/
+├── modules/                  # Business logic layer
+│   └── {feature}/
+│       ├── {feature}.service.ts      # Business logic
+│       ├── {feature}.repository.ts   # Data access (in-memory for now)
+│       └── {feature}.types.ts        # Types for this module
+└── middleware/               # Hono middleware (auth, errors, logging, etc.)
+```
+
+**Gateway Rules:**
+- EXACTLY 2 gateways: `citizen` and `municipality` — NEVER create a 3rd
+- Each gateway is a separate Azure Function with its own Hono instance
+- Gateway base paths: `/api/citizen` and `/api/municipality`
+- Gateway instantiates repositories → services → controllers in order
+- Gateway calls `app.route('/feature', controller.getRoutes())`
+
+**Controller Rules:**
+- Controllers are classes receiving service via constructor injection
+- ALWAYS expose routes via `getRoutes(): Hono` method
+- Route handlers: `(c: Context) => c.json(...)` — no business logic inline
+- Error responses: `c.json({ error: string }, statusCode)`
+- File naming: `{feature}.controller.ts` in the appropriate gateway's `controllers/`
+
+**Service Rules:**
+- All business logic lives in services — NEVER in controllers or repositories
+- Services receive repository via constructor injection
+- File naming: `{feature}.service.ts` in `src/modules/{feature}/`
+
+**Repository Rules:**
+- Repositories are the ONLY data access layer — services NEVER touch data directly
+- Currently in-memory (hardcoded arrays) — ORM/ODM will be added later
+- File naming: `{feature}.repository.ts` in `src/modules/{feature}/`
+- Do NOT add an ORM without explicit instruction — data layer will evolve
+
+**Types Rules:**
+- Module-local types: `src/modules/{feature}/{feature}.types.ts`
+- Shared types (frontend + backend): `packages/shared` — import from `@repo/shared`
+- Zod schemas: ALWAYS defined in `packages/shared`, NOT in the backend app directly
+- Import Zod-inferred types: `import type { MyType } from '@repo/shared/my-schema'`
+
+**Authentication (JWT / Keycloak):**
+- Auth is handled via JWT Bearer tokens issued by Keycloak
+- Auth middleware lives in `src/middleware/` — applied at gateway level
+- Extract and validate JWT in middleware, attach user context to Hono context
+- NEVER trust client-sent user identity — always derive from validated JWT
+- Azure Functions `authLevel: 'function'` is infrastructure-level only, NOT application auth
+
+**Middleware (`src/middleware/`):**
+- Place ALL Hono middleware here (auth guard, error handler, logger, CORS, etc.)
+- Apply middleware at gateway level (in `*.gateway.ts`) using `app.use()`
+- Error handling middleware MUST catch all thrown errors and return structured JSON
+- Error response format (to be standardized): `{ error: string, code?: string, details?: unknown }`
+
+**Validation (Zod):**
+- Request body/params MUST be validated with Zod before processing
+- Schemas defined in `packages/shared` — used by both backend and frontend
+- Use `schema.safeParse()` in controllers — return 400 on validation failure
+- NEVER trust unvalidated input from the request
+
+**Backend Commands (from `apps/backend/`):**
+- Dev: `bun run dev` (watch + func start)
+- Build: `bun run build`
+- Test (unit): `bun run test`
+- Test (watch): `bun run test:watch`
+- API tests: `bru run --env local` (Bruno collection in `api-tests/`)
+
+**Backend Commands (from monorepo root):**
+- Dev: `bun turbo dev --filter=backend`
+- Build: `bun turbo build --filter=backend`
+- Test: `bun turbo test --filter=backend`
+
+**Testing (backend):**
+- Unit tests: co-located with source as `{feature}.service.test.ts`
+- API tests: Bruno collection in `api-tests/` — organized by module and resource
+- Bruno environments: `local`, `dev`, `prod` (in `api-tests/environments/`)
+- Run API tests: `bru run --env local` from `apps/backend/`
 
 ### Testing Rules
 
@@ -153,9 +252,9 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - `noExportsInTest: error` — NEVER export from test files
 
 **Running Tests:**
-- All tests: `yarn turbo test`
-- Single app: `yarn turbo test --filter=town-hall-web`
-- Watch mode: `yarn turbo test:watch`
+- All tests: `bun turbo test`
+- Single app: `bun turbo test --filter=town-hall-web`
+- Watch mode: `bun turbo test:watch`
 - Tests depend on package builds: Turbo handles `dependsOn: ["^build"]`
 
 ### Code Quality & Style Rules
@@ -216,17 +315,17 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Require 2 reviewers
 
 **Monorepo Commands (from root):**
-- Dev all: `yarn turbo dev`
-- Dev single: `yarn turbo dev --filter=town-hall-web`
-- Build: `yarn turbo build --filter=<app>`
-- Lint: `yarn lint` (Biome) or `yarn turbo lint --filter=town-hall-web` (ESLint)
-- Format: `yarn format`
-- Test: `yarn turbo test`
-- Clean: `yarn clean`
+- Dev all: `bun turbo dev`
+- Dev single: `bun turbo dev --filter=town-hall-web`
+- Build: `bun turbo build --filter=<app>`
+- Lint: `bun lint` (Biome) or `bun turbo lint --filter=town-hall-web` (ESLint)
+- Format: `bun format`
+- Test: `bun turbo test`
+- Clean: `bun clean`
 
 **Adding Shared Functionality:**
-1. Add code to `@repo/frontend-core` or `@repo/frontend-services`
-2. Build the package: `yarn turbo build --filter=@repo/frontend-core`
+1. Add code to `@repo/frontend-core`, `@repo/frontend-services`, or `@repo/shared`
+2. Build the package: `bun turbo build --filter=@repo/frontend-core`
 3. Import in apps from the package name
 4. Turbo handles build ordering via `dependsOn: ["^build"]`
 
@@ -234,17 +333,23 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 **Anti-Patterns to Avoid:**
 - NEVER install Prettier or ESLint plugins that conflict with Biome — Biome handles ALL formatting
-- NEVER use `npm` or `pnpm` commands — this project uses Yarn Classic exclusively
+- NEVER use `npm`, `pnpm`, or `yarn` commands — this project uses bun exclusively
 - NEVER import from `react-native` in town-hall-web or from `react-dom` in citizen-app
 - NEVER use `lucide-react` in citizen-app — use `lucide-react-native`
 - NEVER use `lucide-react-native` in town-hall-web — use `lucide-react`
 - NEVER hardcode colors in citizen-app — always use `useColor()` hook or `Colors` theme object
 - NEVER use arbitrary Tailwind values in town-hall-web — use CSS custom properties
 - NEVER create a `pages/` directory in town-hall-web — App Router only
-- NEVER add `package-lock.json` or `pnpm-lock.yaml` — only `yarn.lock`
+- NEVER add `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock` — only `bun.lock`
+- NEVER create a 3rd Azure Function gateway — only `citizen` and `municipality`
+- NEVER write business logic in controllers — it belongs in services
+- NEVER access data directly from services — always go through repositories
+- NEVER define Zod schemas in the backend app — put them in `packages/shared`
+- NEVER trust unvalidated request input — always validate with Zod before processing
+- NEVER derive user identity from the request body — always from the validated JWT
 
 **Monorepo Gotchas:**
-- Shared packages (`@repo/*`) must be BUILT before apps can use changes — `yarn turbo build --filter=@repo/package-name`
+- Shared packages (`@repo/*`) must be BUILT before apps can use changes — `bun turbo build --filter=@repo/package-name`
 - Turbopack in Next.js uses `root: '../..'` — path resolution is relative to monorepo root
 - Dependencies shared between apps should go in shared packages, NOT duplicated
 
@@ -281,4 +386,4 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Review quarterly for outdated rules
 - Remove rules that become obvious over time
 
-Last Updated: 2026-02-20
+Last Updated: 2026-03-05

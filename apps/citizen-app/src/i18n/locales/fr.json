@@ -14,7 +14,19 @@
     "account": "Compte"
   },
   "city": {
-    "title": "Ville"
+    "title": "Ville",
+    "welcomeTitle": "Bienvenue sur NeoCivis",
+    "welcomeSubtitle": "Retrouve ici les dernières actualités de ta ville, reste informé et engagé."
+  },
+  "articles": {
+    "title": "Articles",
+    "latest": "Dernières actualités",
+    "seeAll": "Voir plus",
+    "loading": "Chargement...",
+    "loadMore": "Charger plus",
+    "error": "Impossible de charger les articles",
+    "empty": "Aucun article disponible",
+    "notFound": "Article introuvable"
   },
   "report": {
     "title": "Signaler"

@@ -43,6 +43,7 @@ export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
 export const Button = forwardRef<View, ButtonProps>(
   (
     {
+      label,
       children,
       icon,
       onPress,
@@ -65,6 +66,7 @@ export const Button = forwardRef<View, ButtonProps>(
     const secondaryForegroundColor = useColor('secondaryForeground');
     const destructiveColor = useColor('red');
     const destructiveForegroundColor = useColor('destructiveForeground');
+    const successForegroundColor = useColor('successForeground');
     const greenColor = useColor('green');
     const borderColor = useColor('border');
 
@@ -109,8 +111,8 @@ export const Button = forwardRef<View, ButtonProps>(
           return {
             ...baseStyle,
             backgroundColor: 'transparent',
-            borderWidth: 1,
-            borderColor,
+            borderWidth: 1.5,
+            borderColor: primaryColor,
           };
         case 'secondary':
           return { ...baseStyle, backgroundColor: secondaryColor };
@@ -138,7 +140,7 @@ export const Button = forwardRef<View, ButtonProps>(
         case 'destructive':
           return { ...baseTextStyle, color: destructiveForegroundColor };
         case 'success':
-          return { ...baseTextStyle, color: destructiveForegroundColor };
+          return { ...baseTextStyle, color: successForegroundColor };
         case 'outline':
           return { ...baseTextStyle, color: primaryColor };
         case 'secondary':
@@ -161,7 +163,7 @@ export const Button = forwardRef<View, ButtonProps>(
         case 'destructive':
           return destructiveForegroundColor;
         case 'success':
-          return destructiveForegroundColor;
+          return successForegroundColor;
         case 'outline':
           return primaryColor;
         case 'secondary':
@@ -307,6 +309,8 @@ export const Button = forwardRef<View, ButtonProps>(
       });
     };
 
+    const content = children ?? label;
+
     const buttonStyle = getButtonStyle();
     const finalTextStyle = getButtonTextStyle();
     const contentColor = getColor();
@@ -326,15 +330,15 @@ export const Button = forwardRef<View, ButtonProps>(
         <Animated.View style={[animatedStyle, buttonStyle, styleWithoutFlex]}>
           {loading ? (
             <ButtonSpinner size={size} variant={loadingVariant} color={contentColor} />
-          ) : typeof children === 'string' ? (
+          ) : typeof content === 'string' ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
-              <Text style={[finalTextStyle, textStyle]}>{children}</Text>
+              <Text style={[finalTextStyle, textStyle]}>{content}</Text>
             </View>
           ) : (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
-              {children}
+              {content}
             </View>
           )}
         </Animated.View>
@@ -350,13 +354,13 @@ export const Button = forwardRef<View, ButtonProps>(
       >
         {loading ? (
           <ButtonSpinner size={size} variant={loadingVariant} color={contentColor} />
-        ) : typeof children === 'string' ? (
+        ) : typeof content === 'string' ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
-            <Text style={[finalTextStyle, textStyle]}>{children}</Text>
+            <Text style={[finalTextStyle, textStyle]}>{content}</Text>
           </View>
         ) : (
-          children
+          content
         )}
       </TouchableOpacity>
     );

@@ -3,7 +3,10 @@ import type {
   AddTranslationInput,
   Article,
   ArticleLocale,
+  ArticleTranslation,
+  ArticleWithResolvedTranslation,
   CreateArticleInput,
+  PaginatedArticlesResponse,
   UpdateArticleInput,
   UpdateStatusInput,
 } from '@repo/contracts/article';
@@ -109,5 +112,49 @@ export class ArticleService {
       throw new Error(`Translation for locale '${locale}' not found on article '${id}'`);
     }
     return updated;
+  }
+
+  private resolveTranslation(translations: ArticleTranslation[], preferredLocale: ArticleLocale): ArticleTranslation {
+    const byPreferred = translations.find((t) => t.locale === preferredLocale);
+    if (byPreferred) {
+      return byPreferred;
+    }
+    const byDefault = translations.find((t) => t.locale === 'fr');
+    if (byDefault) {
+      return byDefault;
+    }
+    const first = translations[0];
+    if (!first) {
+      throw new Error('Article has no translations');
+    }
+    return first;
+  }
+
+  private resolveArticle(article: Article, preferredLocale: ArticleLocale): ArticleWithResolvedTranslation {
+    const { translations, ...rest } = article;
+    return { ...rest, translation: this.resolveTranslation(translations, preferredLocale) };
+  }
+
+  async getPublishedArticlesPaginated(
+    page: number,
+    limit: number,
+    preferredLocale: ArticleLocale,
+  ): Promise<PaginatedArticlesResponse> {
+    const all = await this.repository.findAllPublished();
+    const sorted = [...all].sort((a, b) => {
+      const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+      const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+      return dateB - dateA;
+    });
+    const total = sorted.length;
+    const totalPages = Math.ceil(total / limit);
+    const offset = (page - 1) * limit;
+    const data = sorted.slice(offset, offset + limit).map((a) => this.resolveArticle(a, preferredLocale));
+    return { data, total, page, limit, totalPages };
+  }
+
+  async getArticleByIdResolved(id: string, preferredLocale: ArticleLocale): Promise<ArticleWithResolvedTranslation> {
+    const article = await this.getArticleById(id);
+    return this.resolveArticle(article, preferredLocale);
   }
 }

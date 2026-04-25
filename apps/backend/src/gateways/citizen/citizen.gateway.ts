@@ -32,7 +32,7 @@ let app = new Hono().basePath('/api/citizen');
 app = applyCorsMiddleware(app);
 app = applyMockApimMiddleware(app);
 app = applyUserMiddleware(app);
-app = applyRoleMiddleware(app, ['citizen']);
+app = applyRoleMiddleware(app, ['CITIZEN', 'ADMIN', 'EMPLOYEE']);
 
 // Register routes from controllers
 app.route('/user', userController.getRoutes());

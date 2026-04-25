@@ -69,14 +69,14 @@ function InitialLayout() {
     }
 
     // `segments[0]` helps us determine the current "root" route.
-    const _inTabsGroup = segments[0] === '(tabs)';
+    const InTabsGroup = segments[0] === '(tabs)';
     const isLoginPage = segments[0] === 'login';
     const navigationTimeout = setTimeout(() => {
       if (!(isAuthenticated || isLoginPage)) {
         // Si non connecté et qu'on n'est pas sur la page login -> On force le login
         router.replace('/login');
-      } else if (isAuthenticated && isLoginPage) {
-        // Si déjà connecté et qu'on est sur la page login -> On redirige vers l'appli
+      } else if (isAuthenticated && !InTabsGroup) {
+        // Si déjà connecté et qu'on n'est pas dans les tabs -> On redirige vers l'appli
         router.replace('/(tabs)/(city)');
       }
     }, 0);
@@ -190,9 +190,11 @@ export default function RootLayout() {
     setBackgroundColorAsync(colorScheme === 'dark' ? Colors.dark.background : Colors.light.background);
   }, [colorScheme]);
 
+  const bgColor = colorScheme === 'dark' ? Colors.dark.background : Colors.light.background;
+
   if (fatalError) {
     return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: bgColor }}>
         <ThemeProvider>
           <GlobalErrorFallback title="Erreur fatale interceptée" message={fatalError.message} />
         </ThemeProvider>
@@ -201,7 +203,7 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: bgColor }}>
       <LanguageProvider>
         <ThemeProvider>
           <AuthProvider>

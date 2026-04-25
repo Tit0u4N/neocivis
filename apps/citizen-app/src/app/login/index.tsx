@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
 import { useColor } from '@/hooks/useColor';
-import {Spinner} from "@/components/ui/spinner";
-import {useLoginScreen} from "@/app/login/useLoginScreen";
+import { useLoginScreen } from '@/screens/login/useLoginScreen';
 
 export default function LoginScreen() {
   const { isLoading, onSignIn } = useLoginScreen();
@@ -19,21 +19,21 @@ export default function LoginScreen() {
       <Text style={[styles.brandName, { color: foregroundColor }]}>{t('login.brand')}</Text>
 
       {isLoading ? (
-          <Spinner size="lg" />
-        ) : (
-      <View style={styles.centerBlock}>
-        <Text style={[styles.title, { color: foregroundColor }]}>{t('login.title')}</Text>
-        <Text style={[styles.subtitle, { color: mutedForegroundColor }]}>{t('login.subtitle')}</Text>
+        <Spinner size="lg" />
+      ) : (
+        <View style={styles.centerBlock}>
+          <Text style={[styles.title, { color: foregroundColor }]}>{t('login.title')}</Text>
+          <Text style={[styles.subtitle, { color: mutedForegroundColor }]}>{t('login.subtitle')}</Text>
 
-        <View style={styles.buttons}>
-          <Button variant="outline" style={styles.button} onPress={onSignIn}>
-            {t('login.signUp')}
-          </Button>
-          <Button variant="default" style={styles.button} onPress={onSignIn}>
-            {t('login.signIn')}
-          </Button>
+          <View style={styles.buttons}>
+            <Button variant="outline" style={styles.button} onPress={onSignIn}>
+              {t('login.signUp')}
+            </Button>
+            <Button variant="default" style={styles.button} onPress={onSignIn}>
+              {t('login.signIn')}
+            </Button>
+          </View>
         </View>
-      </View>
       )}
     </View>
   );

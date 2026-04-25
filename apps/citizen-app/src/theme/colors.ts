@@ -58,6 +58,9 @@ export const lightColors = {
   destructive: '#ef4444',
   destructiveForeground: '#FFFFFF',
 
+  // Success colors
+  successForeground: '#FFFFFF',
+
   // Border and input — hsl(0 0% 89.82%)
   border: '#E5E5E5',
   input: '#E5E5E5',
@@ -133,6 +136,9 @@ export const darkColors = {
   // Destructive colors — hsl(359 100% 70%)
   destructive: '#fc8181',
   destructiveForeground: '#FAFAFA',
+
+  // Success colors
+  successForeground: '#FFFFFF',
 
   // Border and input — hsl(0 0% 15.51%) / hsl(0 0% 20.39%)
   border: '#272727',

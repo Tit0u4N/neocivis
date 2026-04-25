@@ -1,9 +1,11 @@
 'use client';
 
+import type { ArticleLocale } from '@repo/contracts/article';
 import {
   BarChart3,
   Battery,
   Building,
+  Languages,
   MessageCircle,
   Monitor,
   Pencil,
@@ -17,8 +19,16 @@ import { BackButton } from '@/components/ui/back-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/ui/page-layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { useArticlePreview } from './useArticlePreview';
+
+const LOCALE_LABELS: Record<ArticleLocale, string> = {
+  fr: 'Français',
+  en: 'English',
+  de: 'Deutsch',
+  it: 'Italiano',
+};
 
 type Props = ReturnType<typeof useArticlePreview> & {
   onBack: () => void;
@@ -137,6 +147,9 @@ export function ArticlePreview({
   status,
   viewMode,
   setViewMode,
+  locale,
+  setLocale,
+  availableLocales,
   onBack,
   onEdit,
 }: Props) {
@@ -148,10 +161,25 @@ export function ArticlePreview({
       {/* Barre d'actions */}
       <div className="flex items-center justify-between">
         <BackButton onClick={onBack}>Retour</BackButton>
-        <Button onClick={onEdit}>
-          <Pencil className="mr-2 size-4" />
-          Modifier
-        </Button>
+        <div className="flex items-center gap-2">
+          <Select value={locale} onValueChange={(v) => setLocale(v as ArticleLocale)}>
+            <SelectTrigger className="!h-8 w-44 !px-2.5 !py-0">
+              <Languages className="mr-2 size-4" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {availableLocales.map((loc) => (
+                <SelectItem key={loc} value={loc}>
+                  {LOCALE_LABELS[loc]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button onClick={onEdit}>
+            <Pencil className="mr-2 size-4" />
+            Modifier
+          </Button>
+        </div>
       </div>
 
       {/* Toggle vue */}

@@ -3,6 +3,7 @@
 import type { Article } from '@repo/contracts/article';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ArticlePreview } from '@/components/articles/preview/ArticlePreview';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,12 +33,14 @@ type Props = ReturnType<typeof useArticleListPage>;
 
 function ArticleRow({
   article,
+  onSelect,
   onEdit,
   onTranslations,
   onToggleStatus,
   onDeleteRequest,
 }: Readonly<{
   article: Article;
+  onSelect: () => void;
   onEdit: () => void;
   onTranslations: () => void;
   onToggleStatus: () => void;
@@ -50,7 +53,9 @@ function ArticleRow({
   return (
     <tr className="border-b transition-colors hover:bg-muted/50">
       <td className="px-4 py-3">
-        <p className="font-medium text-sm">{frTranslation?.title ?? '—'}</p>
+        <p className="cursor-pointer font-medium text-sm hover:underline" onClick={onSelect}>
+          {frTranslation?.title ?? '—'}
+        </p>
         {frTranslation?.description && (
           <p className="mt-0.5 line-clamp-1 text-muted-foreground text-xs">{frTranslation.description}</p>
         )}
@@ -92,6 +97,7 @@ function ArticleRow({
             )}
           />
           <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onSelect}>Consulter</DropdownMenuItem>
             <DropdownMenuItem onClick={onEdit}>{t('common.edit')}</DropdownMenuItem>
             <DropdownMenuItem onClick={onTranslations}>
               {t('articles.list.actions.manageTranslations')}
@@ -129,7 +135,22 @@ export function ArticleListPage(props: Props) {
     navigateToCreate,
     navigateToEdit,
     navigateToTranslations,
+    selectedArticle,
+    handleSelectArticle,
+    handleClosePreview,
+    preview,
   } = props;
+
+  if (selectedArticle) {
+    return (
+      <ArticlePreview
+        key={selectedArticle.id}
+        {...preview}
+        onBack={handleClosePreview}
+        onEdit={() => navigateToEdit(selectedArticle.id)}
+      />
+    );
+  }
 
   return (
     <PageLayout title={t('articles.list.title')}>
@@ -217,6 +238,7 @@ export function ArticleListPage(props: Props) {
                 <ArticleRow
                   key={article.id}
                   article={article}
+                  onSelect={() => handleSelectArticle(article)}
                   onEdit={() => navigateToEdit(article.id)}
                   onTranslations={() => navigateToTranslations(article.id)}
                   onToggleStatus={() => void handleToggleStatus(article)}

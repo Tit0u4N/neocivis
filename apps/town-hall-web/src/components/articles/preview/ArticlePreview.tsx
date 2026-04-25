@@ -57,6 +57,7 @@ function WebView({
       </div>
 
       {coverImageUrl && (
+        // biome-ignore lint/performance/noImgElement: l'app utilise <img> natif partout
         <img src={coverImageUrl} alt={title} className="w-full rounded-lg object-cover" style={{ maxHeight: 220 }} />
       )}
 
@@ -102,6 +103,7 @@ function MobileView({
           <div className="overflow-y-auto bg-background p-4" style={{ height: 700 }}>
             <div className="space-y-3">
               {coverImageUrl && (
+                // biome-ignore lint/performance/noImgElement: l'app utilise <img> natif partout
                 <img
                   src={coverImageUrl}
                   alt={title}
@@ -163,7 +165,7 @@ export function ArticlePreview({
         <BackButton onClick={onBack}>Retour</BackButton>
         <div className="flex items-center gap-2">
           <Select value={locale} onValueChange={(v) => setLocale(v as ArticleLocale)}>
-            <SelectTrigger className="!h-8 w-44 !px-2.5 !py-0">
+            <SelectTrigger className="!h-8 !px-2.5 !py-0 w-44">
               <Languages className="mr-2 size-4" />
               <SelectValue />
             </SelectTrigger>

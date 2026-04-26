@@ -1,0 +1,37 @@
+meta {
+  name: Get me
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{url}}/api/citizen/user/me
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("Status is 200 or 404", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+  
+  if (res.getStatus() === 200) {
+    test("Body is a user", function() {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      expect(body).to.have.property('id');
+      expect(body).to.have.property('firstName');
+      expect(body).to.have.property('lastName');
+      expect(body).to.have.property('role');
+    });
+    test("User is a citizen", function(){ 
+      const body = res.getBody();
+      expect(body.role).to.be.equal('CITIZEN');
+    })
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

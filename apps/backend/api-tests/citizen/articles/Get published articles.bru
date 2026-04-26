@@ -1,11 +1,11 @@
 meta {
-  name: Get all users
+  name: Get published articles
   type: http
   seq: 1
 }
 
 get {
-  url: {{url}}/api/citizen/user/all
+  url: {{url}}/api/citizen/articles
   body: none
   auth: inherit
 }
@@ -15,15 +15,14 @@ script:post-response {
     expect(res.getStatus()).to.equal(200);
   });
   
-  test("Is body list of users", function() {
+  test("Body is list", function() {
     const body = res.getBody();
     expect(body).to.be.an('array');
-    body.forEach(user => {
-      expect(user).to.have.property('id');
-      expect(user).to.have.property('name');
-    });
-   }
-  );
+    // Optionnel: garder un id pour la requête suivante si possible
+    if (body.length > 0 && body[0] && body[0].id) {
+      bru.setVar('citizenArticleId', body[0].id);
+    }
+  });
 }
 
 settings {

@@ -1,0 +1,40 @@
+meta {
+  name: 04 - Update article
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{url}}/api/municipality/articles/{{articleId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "translation": {
+      "locale": "fr",
+      "title": "Bruno test article (updated)",
+      "description": "Updated by Bruno scenario",
+      "content": []
+    }
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('articleId')) {
+    throw new Error('Missing articleId. Run "01 - Create article" first.');
+  }
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

@@ -17,7 +17,7 @@ script:pre-request {
   
   // Petite sécurité : si on oublie de sélectionner un environnement, on arrête
   if (!tokenUrl || !clientId || !username || !password) {
-    console.log("⚠️ Variables d'environnement manquantes. As-tu sélectionné 'Local' ou 'Dev' ?");
+    console.log("⚠️ Variables d'environnement manquantes");
     return; 
   }
   

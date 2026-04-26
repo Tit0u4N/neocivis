@@ -37,18 +37,18 @@ export class ReportController {
         return c.json({ error: 'Invalid fields', details: fields.error.flatten() }, 400);
       }
 
-      let photoUrl: string | undefined;
       const photo = formData.get('photo');
-      if (photo instanceof File) {
-        if (!ALLOWED_TYPES.includes(photo.type)) {
-          return c.json({ error: 'Format non supporté. Utilisez JPG, PNG ou WebP.' }, 400);
-        }
-        if (photo.size > MAX_SIZE_BYTES) {
-          return c.json({ error: 'Fichier trop volumineux. Maximum 5 Mo.' }, 400);
-        }
-        const buf = await photo.arrayBuffer();
-        photoUrl = await this.uploads.uploadImage(buf, photo.name, photo.type);
+      if (!(photo instanceof File)) {
+        return c.json({ error: 'Une photo est obligatoire.' }, 400);
       }
+      if (!ALLOWED_TYPES.includes(photo.type)) {
+        return c.json({ error: 'Format non supporté. Utilisez JPG, PNG ou WebP.' }, 400);
+      }
+      if (photo.size > MAX_SIZE_BYTES) {
+        return c.json({ error: 'Fichier trop volumineux. Maximum 5 Mo.' }, 400);
+      }
+      const buf = await photo.arrayBuffer();
+      const photoUrl = await this.uploads.uploadImage(buf, photo.name, photo.type);
 
       const { latitude, longitude } = fields.data;
       const location = latitude !== undefined && longitude !== undefined ? { latitude, longitude } : undefined;

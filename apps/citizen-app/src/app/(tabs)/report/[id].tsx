@@ -1,4 +1,4 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { AlertTriangle, MapPin } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, View as RnView, ScrollView, StyleSheet } from 'react-native';
@@ -26,12 +26,9 @@ export default function ReportDetailScreen() {
 
   if (!report) {
     return (
-      <>
-        <Stack.Screen options={{ title: t('report.detail.headerTitle') }} />
-        <View style={styles.notFound}>
-          <Text variant="caption">{t('report.notFound')}</Text>
-        </View>
-      </>
+      <View style={styles.notFound}>
+        <Text variant="caption">{t('report.notFound')}</Text>
+      </View>
     );
   }
 
@@ -39,27 +36,18 @@ export default function ReportDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: t('report.detail.headerTitle') }} />
       <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scroll}>
         <View style={styles.container}>
           <Text variant="heading" style={{ lineHeight: 34 }}>
             {report.title}
           </Text>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <StatusBadge status={report.status} />
-            <Text style={{ fontSize: 12, color: mutedColor }}>· #{report.id}</Text>
-          </View>
+          <StatusBadge status={report.status} />
 
           <Card>
             <View style={styles.infoItem}>
               <Text style={[styles.metaLabel, { color: mutedColor }]}>{t('report.detail.date')}</Text>
               <Text style={styles.metaValue}>{formatReportDate(report.createdAt)}</Text>
-            </View>
-            <View style={[styles.divider, { borderColor }]} />
-            <View style={styles.infoItem}>
-              <Text style={[styles.metaLabel, { color: mutedColor }]}>{t('report.detail.type')}</Text>
-              <Text style={styles.metaValue}>{report.type}</Text>
             </View>
             <View style={[styles.divider, { borderColor }]} />
             <View style={styles.infoItem}>

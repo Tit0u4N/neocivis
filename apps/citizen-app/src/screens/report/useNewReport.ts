@@ -105,10 +105,10 @@ export function useNewReport() {
     setPhoto({ status: 'none' });
   };
 
-  const valid = desc.trim().length > 5;
+  const valid = desc.trim().length > 5 && photo.status === 'picked';
 
   const submit = async () => {
-    if (!valid || submitting) {
+    if (!valid || submitting || photo.status !== 'picked') {
       return;
     }
     setSubmitting(true);
@@ -117,10 +117,7 @@ export function useNewReport() {
         desc: desc.trim(),
         latitude: location.status === 'ready' ? location.coords.latitude : undefined,
         longitude: location.status === 'ready' ? location.coords.longitude : undefined,
-        photo:
-          photo.status === 'picked'
-            ? { uri: photo.uri, fileName: photo.fileName, mimeType: photo.mimeType }
-            : undefined,
+        photo: { uri: photo.uri, fileName: photo.fileName, mimeType: photo.mimeType },
       });
       router.back();
     } catch {

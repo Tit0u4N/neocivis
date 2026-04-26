@@ -12,7 +12,11 @@ describe('ReportService', () => {
   describe('createReport', () => {
     it('génère un id et des timestamps', async () => {
       const { service } = makeService();
-      const report = await service.createReport({ desc: 'Trottoir dégradé', authorId: 'user-1' });
+      const report = await service.createReport({
+        desc: 'Trottoir dégradé',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       expect(report.id).toBeDefined();
       expect(report.authorId).toBe('user-1');
       expect(report.createdAt).toBeDefined();
@@ -23,14 +27,22 @@ describe('ReportService', () => {
 
     it('dérive le titre depuis la description courte', async () => {
       const { service } = makeService();
-      const report = await service.createReport({ desc: 'Nid de poule', authorId: 'user-1' });
+      const report = await service.createReport({
+        desc: 'Nid de poule',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       expect(report.title).toBe('Nid de poule');
     });
 
     it('tronque le titre à 60 caractères sur un espace', async () => {
       const { service } = makeService();
       const desc = 'Un trottoir très dégradé avec des nids de poule dangereux qui nécessitent une intervention urgente';
-      const report = await service.createReport({ desc, authorId: 'user-1' });
+      const report = await service.createReport({
+        desc,
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       expect(report.title.length).toBeLessThanOrEqual(61); // 60 + ellipsis char
       expect(report.title.endsWith('…')).toBe(true);
     });
@@ -51,8 +63,16 @@ describe('ReportService', () => {
   describe('getMyReports', () => {
     it("retourne uniquement les signalements de l'auteur", async () => {
       const { service } = makeService();
-      await service.createReport({ desc: 'Problème voirie', authorId: 'user-A' });
-      await service.createReport({ desc: 'Éclairage défaillant', authorId: 'user-B' });
+      await service.createReport({
+        desc: 'Problème voirie',
+        authorId: 'user-A',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
+      await service.createReport({
+        desc: 'Éclairage défaillant',
+        authorId: 'user-B',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
 
       const result = await service.getMyReports('user-A', 1, 10);
       expect(result.data.every((r) => r.authorId === 'user-A')).toBe(true);
@@ -61,7 +81,11 @@ describe('ReportService', () => {
     it('calcule correctement totalPages', async () => {
       const { service } = makeService();
       for (let i = 0; i < 5; i++) {
-        await service.createReport({ desc: `Signalement ${i} suffisamment long`, authorId: 'user-paginate' });
+        await service.createReport({
+          desc: `Signalement ${i} suffisamment long`,
+          authorId: 'user-paginate',
+          photoUrl: 'https://example.com/photo.jpg',
+        });
       }
       const result = await service.getMyReports('user-paginate', 1, 2);
       expect(result.total).toBe(5);
@@ -81,7 +105,11 @@ describe('ReportService', () => {
   describe('getReportByIdForUser', () => {
     it("retourne le signalement si l'auteur correspond", async () => {
       const { service } = makeService();
-      const created = await service.createReport({ desc: 'Mobilier cassé', authorId: 'user-1' });
+      const created = await service.createReport({
+        desc: 'Mobilier cassé',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       const found = await service.getReportByIdForUser(created.id, 'user-1');
       expect(found.id).toBe(created.id);
     });
@@ -93,7 +121,11 @@ describe('ReportService', () => {
 
     it("lève une erreur si l'auteur ne correspond pas", async () => {
       const { service } = makeService();
-      const created = await service.createReport({ desc: 'Dégradation', authorId: 'user-1' });
+      const created = await service.createReport({
+        desc: 'Dégradation',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       await expect(service.getReportByIdForUser(created.id, 'user-autre')).rejects.toThrow('Report not found');
     });
   });
@@ -101,14 +133,22 @@ describe('ReportService', () => {
   describe('cancelReport', () => {
     it('passe le statut à cancelled', async () => {
       const { service } = makeService();
-      const created = await service.createReport({ desc: 'Bruit excessif nocturne', authorId: 'user-1' });
+      const created = await service.createReport({
+        desc: 'Bruit excessif nocturne',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       const cancelled = await service.cancelReport(created.id, 'user-1');
       expect(cancelled.status).toBe('cancelled');
     });
 
     it('met à jour updatedAt', async () => {
       const { service, repo } = makeService();
-      const created = await service.createReport({ desc: 'Stationnement gênant', authorId: 'user-1' });
+      const created = await service.createReport({
+        desc: 'Stationnement gênant',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       // Force une date passée pour garantir un updatedAt différent après cancel
       await repo.update(created.id, { updatedAt: '2020-01-01T00:00:00.000Z' });
       const cancelled = await service.cancelReport(created.id, 'user-1');
@@ -117,7 +157,11 @@ describe('ReportService', () => {
 
     it("refuse l'annulation d'un signalement déjà résolu", async () => {
       const { service, repo } = makeService();
-      const created = await service.createReport({ desc: 'Problème résolu', authorId: 'user-1' });
+      const created = await service.createReport({
+        desc: 'Problème résolu',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       await repo.update(created.id, { status: 'resolved' });
       await expect(service.cancelReport(created.id, 'user-1')).rejects.toThrow(
         'Cannot cancel a report that is resolved or already cancelled',
@@ -126,7 +170,11 @@ describe('ReportService', () => {
 
     it("refuse l'annulation d'un signalement déjà annulé", async () => {
       const { service } = makeService();
-      const created = await service.createReport({ desc: 'Déjà annulé', authorId: 'user-1' });
+      const created = await service.createReport({
+        desc: 'Déjà annulé',
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       await service.cancelReport(created.id, 'user-1');
       await expect(service.cancelReport(created.id, 'user-1')).rejects.toThrow(
         'Cannot cancel a report that is resolved or already cancelled',
@@ -135,7 +183,11 @@ describe('ReportService', () => {
 
     it("lève une erreur si l'auteur ne correspond pas", async () => {
       const { service } = makeService();
-      const created = await service.createReport({ desc: "Signalement d'un autre", authorId: 'user-1' });
+      const created = await service.createReport({
+        desc: "Signalement d'un autre",
+        authorId: 'user-1',
+        photoUrl: 'https://example.com/photo.jpg',
+      });
       await expect(service.cancelReport(created.id, 'user-autre')).rejects.toThrow('Report not found');
     });
   });

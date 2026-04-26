@@ -15,7 +15,7 @@ function deriveTitle(desc: string, maxLen = 60): string {
 export class ReportService {
   constructor(private repo: IReportRepository) {}
 
-  createReport(input: { desc: string; authorId: string; location?: GpsLocation; photoUrl?: string }): Promise<Report> {
+  createReport(input: { desc: string; authorId: string; location?: GpsLocation; photoUrl: string }): Promise<Report> {
     const now = new Date().toISOString();
     return this.repo.create({
       id: randomUUID(),

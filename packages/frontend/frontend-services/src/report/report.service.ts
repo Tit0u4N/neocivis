@@ -6,7 +6,7 @@ export interface CreateReportPayload {
   desc: string;
   latitude?: number;
   longitude?: number;
-  photo?: { uri: string; fileName: string; mimeType?: string };
+  photo: { uri: string; fileName: string; mimeType?: string };
 }
 
 export class ReportService extends AbstractService {
@@ -23,14 +23,12 @@ export class ReportService extends AbstractService {
     if (payload.longitude !== undefined) {
       formData.append('longitude', String(payload.longitude));
     }
-    if (payload.photo) {
-      // Expo RN accepts { uri, name, type } as a File-compatible value in FormData
-      formData.append('photo', {
-        uri: payload.photo.uri,
-        name: payload.photo.fileName,
-        type: payload.photo.mimeType ?? 'image/jpeg',
-      } as unknown as Blob);
-    }
+    // Expo RN accepts { uri, name, type } as a File-compatible value in FormData
+    formData.append('photo', {
+      uri: payload.photo.uri,
+      name: payload.photo.fileName,
+      type: payload.photo.mimeType ?? 'image/jpeg',
+    } as unknown as Blob);
     return await this.http
       .extend({ headers: { 'Content-Type': undefined } })
       .post('reports', { body: formData })

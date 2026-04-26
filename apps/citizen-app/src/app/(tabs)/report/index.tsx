@@ -62,47 +62,30 @@ export default function ReportListScreen() {
           {t('report.myReports')}
         </Text>
 
-        <View style={[styles.list, { borderColor, backgroundColor: cardColor }]}>
-          <View style={[styles.listHeader, { borderBottomColor: borderColor }]}>
-            <Text style={[styles.colLabel, { color: mutedColor, flex: 1 }]}>{t('report.columns.subject')}</Text>
-            <Text style={[styles.colLabel, { color: mutedColor, width: 60, textAlign: 'center' }]}>
-              {t('report.columns.date')}
-            </Text>
-            <Text style={[styles.colLabel, { color: mutedColor, width: 90, textAlign: 'right' }]}>
-              {t('report.columns.status')}
-            </Text>
+        {filtered.length === 0 ? (
+          <View style={[styles.empty, { backgroundColor: cardColor, borderColor }]}>
+            <Text variant="caption">{t('report.noReports')}</Text>
           </View>
-
-          {filtered.length === 0 ? (
-            <View style={styles.empty}>
-              <Text variant="caption">{t('report.noReports')}</Text>
-            </View>
-          ) : (
-            filtered.map((report, idx) => (
+        ) : (
+          <View style={styles.cardList}>
+            {filtered.map((report) => (
               <TouchableOpacity
                 key={report.id}
                 onPress={() => navigateToDetail(report.id)}
                 activeOpacity={0.7}
-                style={[styles.row, { borderBottomColor: borderColor }, idx === filtered.length - 1 && styles.rowLast]}
+                style={[styles.card, { backgroundColor: cardColor, borderColor }]}
               >
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={{ fontWeight: '600', color: textColor, fontSize: 15 }} numberOfLines={1}>
+                <View style={styles.cardTop}>
+                  <Text style={{ fontWeight: '600', color: textColor, fontSize: 15, flex: 1 }} numberOfLines={1}>
                     {report.title}
                   </Text>
-                  <Text style={{ fontSize: 11, color: mutedColor }}>
-                    {report.type} · #{report.id}
-                  </Text>
-                </View>
-                <Text style={{ fontSize: 13, color: mutedColor, width: 60, textAlign: 'center' }}>
-                  {formatReportDate(report.createdAt)}
-                </Text>
-                <View style={{ width: 90, alignItems: 'flex-end' }}>
                   <StatusBadge status={report.status} />
                 </View>
+                <Text style={{ fontSize: 12, color: mutedColor }}>{formatReportDate(report.createdAt)}</Text>
               </TouchableOpacity>
-            ))
-          )}
-        </View>
+            ))}
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -119,32 +102,22 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
   },
-  list: {
-    borderRadius: 16,
+  cardList: { gap: 10 },
+  card: {
+    borderRadius: 14,
     borderWidth: 1,
-    overflow: 'hidden',
-  },
-  listHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  colLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    padding: 14,
     gap: 8,
   },
-  rowLast: { borderBottomWidth: 0 },
-  empty: { padding: 24, alignItems: 'center' },
+  cardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  empty: {
+    padding: 24,
+    alignItems: 'center',
+    borderRadius: 14,
+    borderWidth: 1,
+  },
 });

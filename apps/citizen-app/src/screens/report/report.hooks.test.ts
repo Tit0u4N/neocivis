@@ -69,6 +69,7 @@ const makeReport = (overrides: Partial<Report> = {}): Report => ({
   type: 'Éclairage public',
   status: 'pending',
   desc: 'Le lampadaire clignote.',
+  photoUrl: 'https://example.com/photo.jpg',
   createdAt: '2026-04-12T10:00:00.000Z',
   updatedAt: '2026-04-12T10:00:00.000Z',
   ...overrides,
@@ -287,11 +288,27 @@ describe('useNewReport', () => {
     expect(result.current.valid).toBe(false);
   });
 
-  it('valid est true si desc > 5 caractères', async () => {
+  it('valid est false si photo absente même avec desc valide', async () => {
     const { useNewReport } = await import('./useNewReport');
     const { result } = renderHook(() => useNewReport());
 
     act(() => result.current.setDesc('Trottoir abîmé'));
+    expect(result.current.valid).toBe(false);
+  });
+
+  it('valid est true si desc > 5 caractères et photo sélectionnée', async () => {
+    const { useNewReport } = await import('./useNewReport');
+    mockImagePickerModule.requestMediaLibraryPermissionsAsync.mockResolvedValue({ status: 'granted' });
+    mockImagePickerModule.launchImageLibraryAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file://photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' }],
+    });
+
+    const { result } = renderHook(() => useNewReport());
+    act(() => result.current.setDesc('Trottoir abîmé'));
+    await act(async () => {
+      await result.current.pickFromGallery();
+    });
     expect(result.current.valid).toBe(true);
   });
 
@@ -328,11 +345,19 @@ describe('useNewReport', () => {
   it('submit crée le signalement et navigue en arrière', async () => {
     const { useNewReport } = await import('./useNewReport');
     mockCreate.mockResolvedValue(makeReport());
+    mockImagePickerModule.requestMediaLibraryPermissionsAsync.mockResolvedValue({ status: 'granted' });
+    mockImagePickerModule.launchImageLibraryAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file://photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' }],
+    });
 
     const { result } = renderHook(() => useNewReport());
     await waitFor(() => expect(result.current.location.status).toBe('ready'));
 
     act(() => result.current.setDesc('Nid de poule dangereux'));
+    await act(async () => {
+      await result.current.pickFromGallery();
+    });
     await act(async () => {
       await result.current.submit();
     });

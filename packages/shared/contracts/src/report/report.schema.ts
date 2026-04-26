@@ -30,7 +30,7 @@ export const Report = z.object({
   type: ReportType,
   status: ReportStatus,
   desc: z.string().min(6),
-  photoUrl: z.string().url().optional(),
+  photoUrl: z.string().url(),
   location: GpsLocation.optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

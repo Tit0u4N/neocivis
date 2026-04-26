@@ -29,7 +29,62 @@
     "notFound": "Article introuvable"
   },
   "report": {
-    "title": "Signaler"
+    "title": "Signalements",
+    "subtitle": "Aide ta ville à résoudre les problèmes.",
+    "newReport": "Nouveau signalement",
+    "myReports": "Mes signalements",
+    "noReports": "Aucun signalement.",
+    "notFound": "Signalement introuvable",
+    "filters": {
+      "all": "Tous",
+      "pending": "En attente",
+      "progress": "En cours",
+      "resolved": "Résolus"
+    },
+    "new": {
+      "headerTitle": "Nouveau signalement",
+      "title": "Signaler un problème",
+      "date": "Date",
+      "type": "Type de problème",
+      "description": "Description",
+      "descriptionPlaceholder": "Décris le problème en détail...",
+      "photo": "Photo (optionnel)",
+      "photoCamera": "Prendre une photo",
+      "photoGallery": "Galerie",
+      "location": "Localisation GPS",
+      "locationLoading": "Récupération de la position...",
+      "locationDenied": "Accès à la localisation refusé",
+      "locationRetry": "Réessayer",
+      "locationRefresh": "Actualiser",
+      "cancel": "Annuler",
+      "submit": "Envoyer",
+      "chars": "caractères"
+    },
+    "detail": {
+      "headerTitle": "Détails",
+      "date": "DATE",
+      "type": "TYPE",
+      "description": "DESCRIPTION",
+      "tracking": "SUIVI",
+      "received": "Reçu",
+      "takenCare": "Pris en charge par les services",
+      "takenCareAgo": "il y a 2 jours",
+      "resolved": "Résolu",
+      "resolvedAgo": "il y a 1 jour",
+      "back": "Retour",
+      "cancelReport": "Annuler le signalement"
+    },
+    "cancel": {
+      "title": "Annuler ce signalement ?",
+      "subtitle": "Cette action est définitive. Tu pourras créer un nouveau signalement si nécessaire.",
+      "keep": "Garder",
+      "confirm": "Confirmer"
+    },
+    "columns": {
+      "subject": "Sujet",
+      "date": "Date",
+      "status": "Statut"
+    }
   },
   "forum": {
     "title": "Forum"

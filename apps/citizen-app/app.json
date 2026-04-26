@@ -28,6 +28,20 @@
       "expo-web-browser",
       "expo-secure-store",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "NeoCivis accède à ta galerie pour joindre une photo à ton signalement.",
+          "cameraPermission": "NeoCivis accède à ta caméra pour prendre une photo de ton signalement."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "NeoCivis a besoin de ta position pour associer ton signalement à une localisation GPS.",
+          "locationAlwaysAndWhenInUsePermission": "NeoCivis a besoin de ta position pour associer ton signalement à une localisation GPS."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./src/assets/images/icon.png",

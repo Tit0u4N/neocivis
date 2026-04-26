@@ -1,0 +1,141 @@
+{
+  "time": 1776805030122,
+  "realmId": "49e571be-df07-44d9-b440-4526b3fd7947",
+  "uid": "d52933cd-1140-453a-b316-fce7207b1a09",
+  "authDetails": {
+    "realmId": "neocivis",
+    "clientId": "neocivis-townhall-app",
+    "userId": "f68272ff-e7b6-4e9f-a114-89b1b1d34c6a",
+    "ipAddress": "159.26.112.45",
+    "username": "test",
+    "sessionId": "08dbb8ce-1928-447b-beaa-1d8362448d03"
+  },
+  "type": "access.REGISTER",
+  "details": {
+    "auth_method": "openid-connect",
+    "auth_type": "code",
+    "register_method": "form",
+    "last_name": "test",
+    "redirect_uri": "http://localhost:3000",
+    "first_name": "TEst",
+    "code_id": "08dbb8ce-1928-447b-beaa-1d8362448d03",
+    "email": "neocivis.reprimand669@passmail.net",
+    "username": "test"
+  }
+}
+
+{
+  "time": 1776805030429,
+  "realmId": "49e571be-df07-44d9-b440-4526b3fd7947",
+  "uid": "f2821fa4-b067-4092-8dff-2892d1505b09",
+  "authDetails": {
+    "realmId": "neocivis",
+    "clientId": "neocivis-townhall-app",
+    "userId": "f68272ff-e7b6-4e9f-a114-89b1b1d34c6a",
+    "ipAddress": "159.26.112.45",
+    "username": "test",
+    "sessionId": "08dbb8ce-1928-447b-beaa-1d8362448d03"
+  },
+  "type": "access.LOGIN",
+  "details": {
+    "auth_method": "openid-connect",
+    "auth_type": "code",
+    "response_type": "code",
+    "redirect_uri": "http://localhost:3000",
+    "consent": "no_consent_required",
+    "code_id": "08dbb8ce-1928-447b-beaa-1d8362448d03",
+    "username": "test",
+    "response_mode": "query"
+  }
+}
+
+{
+  "time": 1776805030957,
+  "realmId": "49e571be-df07-44d9-b440-4526b3fd7947",
+  "uid": "9f16327c-905b-419b-a0d9-c4faf99a4eaa",
+  "authDetails": {
+    "realmId": "neocivis",
+    "clientId": "neocivis-townhall-app",
+    "userId": "f68272ff-e7b6-4e9f-a114-89b1b1d34c6a",
+    "ipAddress": "159.26.112.45",
+    "username": "test",
+    "sessionId": "08dbb8ce-1928-447b-beaa-1d8362448d03"
+  },
+  "type": "access.CODE_TO_TOKEN",
+  "details": {
+    "token_id": "31a9b497-4fa2-4e73-801f-b103b4d9d851",
+    "grant_type": "authorization_code",
+    "refresh_token_type": "Refresh",
+    "scope": "openid profile email",
+    "refresh_token_id": "55f45a43-9754-41c6-8103-64c1a783d4f7",
+    "code_id": "08dbb8ce-1928-447b-beaa-1d8362448d03",
+    "client_auth_method": "client-secret"
+  }
+}
+
+{
+  "time": 1776871037446,
+  "realmId": "neocivis-dev",
+  "operationType": "CREATE",
+  "resourcePath": "users/beda346f-f675-4fbf-be74-dfd40ba4c45d",
+  "representation": "{\"username\":\"Test\",\"firstName\":\"tes\",\"lastName\":\"tes\",\"email\":\"tes@tes.tes\",\"emailVerified\":true,\"attributes\":{\"locale\":[\"\"]},\"enabled\":true,\"requiredActions\":[],\"groups\":[]}",
+  "uid": "ab1e96ef-396e-4777-84c8-9e9e37551705",
+  "authDetails": {
+    "realmId": "neocivis-dev",
+    "clientId": "fd2da41b-15b4-4cf0-b8eb-a94865cf1efb",
+    "userId": "1d9f3628-5f8f-4607-a20e-cada882a9a93",
+    "ipAddress": "159.26.112.13",
+    "username": "neocivis-admin"
+  },
+  "type": "admin.USER-CREATE",
+  "details": {
+    "userId": "beda346f-f675-4fbf-be74-dfd40ba4c45d",
+    "username": "test"
+  },
+  "resourceType": "USER"
+}
+{
+  "time": 1776871259232,
+  "realmId": "neocivis-dev",
+  "operationType": "DELETE",
+  "resourcePath": "users/beda346f-f675-4fbf-be74-dfd40ba4c45d",
+  "uid": "e012fbae-b4b0-48de-8e6c-9a07c1e5e7a6",
+  "authDetails": {
+    "realmId": "neocivis-dev",
+    "clientId": "fd2da41b-15b4-4cf0-b8eb-a94865cf1efb",
+    "userId": "1d9f3628-5f8f-4607-a20e-cada882a9a93",
+    "ipAddress": "159.26.112.13",
+    "username": "neocivis-admin"
+  },
+  "type": "admin.USER-DELETE",
+  "details": {
+    "userId": "beda346f-f675-4fbf-be74-dfd40ba4c45d"
+  },
+  "resourceType": "USER"
+}
+
+{
+  "time": 1776871464338,
+  "realmId": "d1fa75a9-d5a9-4328-a45f-70915a73acee",
+  "uid": "145ade29-c80b-410d-914d-e046d4369336",
+  "authDetails": {
+    "realmId": "neocivis-dev",
+    "clientId": "neocivis-townhall-app",
+    "userId": "abd02149-cfdf-4a46-a274-90cdfc583215",
+    "ipAddress": "159.26.112.13",
+    "username": "test",
+    "sessionId": "d75c39ab-ade3-4d87-b0bd-5364eab38d08"
+  },
+  "type": "access.REGISTER",
+  "details": {
+    "auth_method": "openid-connect",
+    "auth_type": "code",
+    "register_method": "form",
+    "last_name": "test",
+    "redirect_uri": "http://localhost:3000",
+    "first_name": "test",
+    "code_id": "d75c39ab-ade3-4d87-b0bd-5364eab38d08",
+    "email": "tamas.palotas@pm.me",
+    "username": "test"
+  }
+}

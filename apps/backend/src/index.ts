@@ -5,7 +5,7 @@ import municipalityGateway from './gateways/municipality/municipality.gateway';
 
 // --- Fonction 1 : Module Citizen ---
 app.http('citizenModule', {
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   authLevel: 'function',
   route: 'citizen/{*proxy}',
   handler: azureHonoHandler(citizenGateway.fetch),

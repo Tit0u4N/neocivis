@@ -1,33 +1,10 @@
-import { describe, expect, it } from 'vitest';
-import { AdminReportService, ReportService } from './report.service';
+import { describe, expect, it, vi } from 'vitest';
+import { ReportService } from './report.service';
 
 describe('ReportService', () => {
-  it('should create an instance', () => {
-    const service = new ReportService();
+  it('should instantiate with a ky instance', () => {
+    const fakeKy = { extend: vi.fn().mockReturnValue({}) } as any;
+    const service = new ReportService(fakeKy);
     expect(service).toBeInstanceOf(ReportService);
-  });
-
-  it('should have getReportByUser method', () => {
-    const service = new ReportService();
-    expect(service.getReportByUser).toBeDefined();
-    expect(typeof service.getReportByUser).toBe('function');
-  });
-});
-
-describe('AdminReportService', () => {
-  it('should create an instance', () => {
-    const service = new AdminReportService();
-    expect(service).toBeInstanceOf(AdminReportService);
-  });
-
-  it('should extend ReportService', () => {
-    const service = new AdminReportService();
-    expect(service).toBeInstanceOf(ReportService);
-  });
-
-  it('should have getAllReports method', () => {
-    const service = new AdminReportService();
-    expect(service.getAllReports).toBeDefined();
-    expect(typeof service.getAllReports).toBe('function');
   });
 });

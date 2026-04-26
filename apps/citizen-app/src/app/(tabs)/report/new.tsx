@@ -29,6 +29,7 @@ export default function NewReportScreen() {
     location,
     retryLocation,
     valid,
+    submitting,
     submit,
     cancel,
   } = useNewReport();
@@ -153,7 +154,12 @@ export default function NewReportScreen() {
           {/* Actions */}
           <View style={styles.actions}>
             <Button variant="secondary" label={t('report.new.cancel')} onPress={cancel} style={{ flex: 1 }} />
-            <Button label={t('report.new.submit')} onPress={submit} disabled={!valid} style={{ flex: 2 }} />
+            <Button
+              label={t('report.new.submit')}
+              onPress={submit}
+              disabled={!valid || submitting}
+              style={{ flex: 2 }}
+            />
           </View>
         </View>
       </ScrollView>

@@ -71,6 +71,7 @@
       "takenCareAgo": "il y a 2 jours",
       "resolved": "Résolu",
       "resolvedAgo": "il y a 1 jour",
+      "noLocation": "Localisation non disponible",
       "back": "Retour",
       "cancelReport": "Annuler le signalement"
     },

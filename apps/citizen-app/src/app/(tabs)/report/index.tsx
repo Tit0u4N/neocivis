@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { useColor } from '@/hooks/useColor';
+import { formatReportDate } from '@/screens/report/report.types';
 import { FILTER_OPTIONS, useReportsList } from '@/screens/report/useReportsList';
 
 export default function ReportListScreen() {
@@ -92,7 +93,9 @@ export default function ReportListScreen() {
                     {report.type} · #{report.id}
                   </Text>
                 </View>
-                <Text style={{ fontSize: 13, color: mutedColor, width: 60, textAlign: 'center' }}>{report.date}</Text>
+                <Text style={{ fontSize: 13, color: mutedColor, width: 60, textAlign: 'center' }}>
+                  {formatReportDate(report.createdAt)}
+                </Text>
                 <View style={{ width: 90, alignItems: 'flex-end' }}>
                   <StatusBadge status={report.status} />
                 </View>

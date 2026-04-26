@@ -1,10 +1,34 @@
+import type { Report } from '@repo/contracts/report';
+import { ReportService } from '@repo/frontend-services/report';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { type Report, SEED_REPORTS } from './report.types';
+import { useEffect, useMemo, useState } from 'react';
+import { useApi } from '@/providers/ApiProvider';
 
 export function useReportDetails(id: string) {
+  const api = useApi();
+  const reportService = useMemo(() => new ReportService(api), [api]);
+
+  const [report, setReport] = useState<Report | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const report: Report | null = SEED_REPORTS.find((r) => r.id === id) ?? null;
+  const [cancelling, setCancelling] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    void reportService
+      .getById(id)
+      .then((r) => {
+        setReport(r);
+      })
+      .catch(() => {
+        setError('error');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [id, reportService]);
 
   const openCancelDialog = () => {
     setShowCancelDialog(true);
@@ -14,10 +38,30 @@ export function useReportDetails(id: string) {
     setShowCancelDialog(false);
   };
 
-  const confirmCancel = () => {
-    setShowCancelDialog(false);
-    router.back();
+  const confirmCancel = async () => {
+    if (cancelling) {
+      return;
+    }
+    setCancelling(true);
+    try {
+      const updated = await reportService.cancel(id);
+      setReport(updated);
+      setShowCancelDialog(false);
+      router.back();
+    } catch {
+      setCancelling(false);
+      setShowCancelDialog(false);
+    }
   };
 
-  return { report, showCancelDialog, openCancelDialog, closeCancelDialog, confirmCancel };
+  return {
+    report,
+    loading,
+    error,
+    showCancelDialog,
+    openCancelDialog,
+    closeCancelDialog,
+    confirmCancel,
+    cancelling,
+  };
 }

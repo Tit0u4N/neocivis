@@ -22,6 +22,7 @@
     ".": "./src/index.ts",
     "./article": "./src/article/article.schema.ts",
     "./dto": "./src/dto/index.ts",
-    "./error-messages": "./src/error-messages/index.ts"
+    "./error-messages": "./src/error-messages/index.ts",
+    "./report": "./src/report/report.schema.ts"
   }
 }

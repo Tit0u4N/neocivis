@@ -71,6 +71,7 @@
       "takenCareAgo": "2 days ago",
       "resolved": "Resolved",
       "resolvedAgo": "1 day ago",
+      "noLocation": "Location not available",
       "back": "Back",
       "cancelReport": "Cancel report"
     },

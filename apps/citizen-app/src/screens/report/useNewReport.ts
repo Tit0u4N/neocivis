@@ -1,7 +1,9 @@
+import { ReportService } from '@repo/frontend-services/report';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useApi } from '@/providers/ApiProvider';
 
 export interface GpsCoords {
   latitude: number;
@@ -10,12 +12,16 @@ export interface GpsCoords {
 
 export type LocationState = { status: 'loading' } | { status: 'denied' } | { status: 'ready'; coords: GpsCoords };
 
-export type PhotoState = { status: 'none' } | { status: 'picked'; uri: string; fileName: string };
+export type PhotoState = { status: 'none' } | { status: 'picked'; uri: string; fileName: string; mimeType?: string };
 
 export function useNewReport() {
+  const api = useApi();
+  const reportService = useMemo(() => new ReportService(api), [api]);
+
   const [desc, setDesc] = useState('');
   const [photo, setPhoto] = useState<PhotoState>({ status: 'none' });
   const [location, setLocation] = useState<LocationState>({ status: 'loading' });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,7 +81,7 @@ export function useNewReport() {
     if (!result.canceled && result.assets.length > 0) {
       const asset = result.assets[0];
       const fileName = asset.fileName ?? `photo_${Date.now()}.jpg`;
-      setPhoto({ status: 'picked', uri: asset.uri, fileName });
+      setPhoto({ status: 'picked', uri: asset.uri, fileName, mimeType: asset.mimeType ?? undefined });
     }
   };
 
@@ -91,7 +97,7 @@ export function useNewReport() {
     if (!result.canceled && result.assets.length > 0) {
       const asset = result.assets[0];
       const fileName = asset.fileName ?? `photo_${Date.now()}.jpg`;
-      setPhoto({ status: 'picked', uri: asset.uri, fileName });
+      setPhoto({ status: 'picked', uri: asset.uri, fileName, mimeType: asset.mimeType ?? undefined });
     }
   };
 
@@ -101,11 +107,25 @@ export function useNewReport() {
 
   const valid = desc.trim().length > 5;
 
-  const submit = () => {
-    if (!valid) {
+  const submit = async () => {
+    if (!valid || submitting) {
       return;
     }
-    router.back();
+    setSubmitting(true);
+    try {
+      await reportService.create({
+        desc: desc.trim(),
+        latitude: location.status === 'ready' ? location.coords.latitude : undefined,
+        longitude: location.status === 'ready' ? location.coords.longitude : undefined,
+        photo:
+          photo.status === 'picked'
+            ? { uri: photo.uri, fileName: photo.fileName, mimeType: photo.mimeType }
+            : undefined,
+      });
+      router.back();
+    } catch {
+      setSubmitting(false);
+    }
   };
 
   const cancel = () => {
@@ -122,6 +142,7 @@ export function useNewReport() {
     location,
     retryLocation,
     valid,
+    submitting,
     submit,
     cancel,
   };

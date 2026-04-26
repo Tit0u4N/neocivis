@@ -8,13 +8,15 @@ import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { useColor } from '@/hooks/useColor';
+import { formatReportDate } from '@/screens/report/report.types';
 import { useReportDetails } from '@/screens/report/useReportDetails';
 import { BORDER_RADIUS } from '@/theme/globals';
 
 export default function ReportDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation();
-  const { report, showCancelDialog, openCancelDialog, closeCancelDialog, confirmCancel } = useReportDetails(id);
+  const { report, showCancelDialog, openCancelDialog, closeCancelDialog, confirmCancel, cancelling } =
+    useReportDetails(id);
   const mutedColor = useColor('textMuted');
   const borderColor = useColor('border');
   const cardColor = useColor('card');
@@ -52,7 +54,7 @@ export default function ReportDetailScreen() {
           <Card>
             <View style={styles.infoItem}>
               <Text style={[styles.metaLabel, { color: mutedColor }]}>{t('report.detail.date')}</Text>
-              <Text style={styles.metaValue}>{report.date}</Text>
+              <Text style={styles.metaValue}>{formatReportDate(report.createdAt)}</Text>
             </View>
             <View style={[styles.divider, { borderColor }]} />
             <View style={styles.infoItem}>
@@ -68,7 +70,13 @@ export default function ReportDetailScreen() {
 
           <View style={[styles.locationCard, { backgroundColor: cardColor, borderColor }]}>
             <MapPin size={24} color={primaryColor} />
-            <Text style={{ fontSize: 12, color: mutedColor, fontWeight: '600' }}>12 rue Pasteur, 13001 Marseille</Text>
+            {report.location ? (
+              <Text style={{ fontSize: 12, color: mutedColor, fontWeight: '600' }}>
+                {report.location.latitude.toFixed(6)}, {report.location.longitude.toFixed(6)}
+              </Text>
+            ) : (
+              <Text style={{ fontSize: 12, color: mutedColor }}>{t('report.detail.noLocation')}</Text>
+            )}
           </View>
 
           <Card style={{ backgroundColor: bgMuted }}>
@@ -80,7 +88,7 @@ export default function ReportDetailScreen() {
                 <View style={[styles.timelineDot, { backgroundColor: greenColor }]} />
                 <View>
                   <Text style={{ fontWeight: '600', fontSize: 13 }}>{t('report.detail.received')}</Text>
-                  <Text style={{ fontSize: 11, color: mutedColor }}>{report.date} · 14:32</Text>
+                  <Text style={{ fontSize: 11, color: mutedColor }}>{formatReportDate(report.createdAt)}</Text>
                 </View>
               </View>
               {report.status !== 'pending' && (
@@ -142,6 +150,7 @@ export default function ReportDetailScreen() {
                 variant="destructive"
                 label={t('report.cancel.confirm')}
                 onPress={confirmCancel}
+                disabled={cancelling}
                 style={{ flex: 1 }}
               />
             </View>

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Linking, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { ArticlePreviewCard } from '@/components/home/ArticlePreviewCard';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { type CarouselItem, HeroCarousel } from '@/components/home/HeroCarousel';
@@ -11,22 +11,20 @@ import { useHomeScreen } from '@/screens/city/useHomeScreen';
 
 export default function CityScreen() {
   const { t } = useTranslation();
-  const { heroArticles, previewArticles, loading, error, categories, user } = useHomeScreen();
+  const { carouselItems, previewArticles, articlesLoading, carouselLoading, error, categories, user } = useHomeScreen();
   const primaryColor = useColor('primary');
   const mutedColor = useColor('textMuted');
   const secondaryBg = useColor('secondary');
 
   const greeting = user?.given_name ? t('city.greetingNamed', { name: user.given_name }) : t('city.greeting');
 
-  const heroItems: CarouselItem[] = heroArticles.map((article) => ({
-    id: article.id,
-    imageUrl: article.coverImageUrl,
-    tag: 'Actualités',
-    title: article.translation.title,
-    description: article.translation.description,
-    onPress: () => {
-      router.push({ pathname: '/(tabs)/(city)/articles/[id]', params: { id: article.id } });
-    },
+  const heroItems: CarouselItem[] = carouselItems.map((item) => ({
+    id: item.id,
+    imageUrl: item.imageUrl,
+    tag: item.tag,
+    title: item.title,
+    description: item.description,
+    onPress: item.linkUrl ? () => void Linking.openURL(item.linkUrl!) : undefined,
   }));
 
   return (
@@ -36,7 +34,7 @@ export default function CityScreen() {
         <Text style={[styles.greeting, { color: mutedColor }]}>{greeting}</Text>
 
         {/* Hero carousel */}
-        {loading ? (
+        {carouselLoading ? (
           <View style={[styles.heroPlaceholder, { backgroundColor: secondaryBg }]}>
             <ActivityIndicator color={primaryColor} />
           </View>
@@ -65,7 +63,7 @@ export default function CityScreen() {
             </TouchableOpacity>
           </View>
 
-          {loading ? (
+          {articlesLoading ? (
             <ActivityIndicator color={primaryColor} style={styles.listLoader} />
           ) : error ? (
             <Text variant="caption">{t('articles.error')}</Text>

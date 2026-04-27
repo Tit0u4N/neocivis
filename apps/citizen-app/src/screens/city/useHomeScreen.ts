@@ -1,11 +1,12 @@
 import type { ArticleWithResolvedTranslation } from '@repo/contracts/article';
+import type { CarouselItemResolved } from '@repo/contracts/config';
 import { ArticleService } from '@repo/frontend-services/article';
+import { ConfigService } from '@repo/frontend-services/config';
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useApi } from '@/providers/ApiProvider';
 import { useAuth } from '@/providers/AuthProvider';
 
-const HOME_HERO_LIMIT = 5;
 const HOME_PREVIEW_LIMIT = 3;
 
 export type Category = {
@@ -19,31 +20,26 @@ export type Category = {
   rowSpan?: 1 | 2 | 3;
 };
 
-// Placeholder — replace with GET /api/citizen/categories once backend endpoint is ready
-const PLACEHOLDER_CATEGORIES: Category[] = [
-  { id: 'alaune', name: 'À la Une', icon: 'Star', color: '#F42500', row: 0, col: 0, colSpan: 2 },
-  { id: 'pratique', name: 'Pratique', icon: 'Info', color: '#0C8CE9', row: 0, col: 2 },
-  { id: 'urgence', name: 'Urgence', icon: 'TriangleAlert', color: '#D97706', row: 1, col: 0 },
-  { id: 'travaux', name: 'Travaux', icon: 'Wrench', color: '#64748B', row: 1, col: 1, colSpan: 2 },
-  { id: 'sondage', name: 'Sondage', icon: 'BarChart2', color: '#16A34A', row: 2, col: 0 },
-  { id: 'divers', name: 'Divers', icon: 'Globe', color: '#7C3AED', row: 2, col: 1 },
-];
-
 export function useHomeScreen() {
   const api = useApi();
   const { language } = useLanguage();
   const { user } = useAuth();
+
   const [articles, setArticles] = useState<ArticleWithResolvedTranslation[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [carouselItems, setCarouselItems] = useState<CarouselItemResolved[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [articlesLoading, setArticlesLoading] = useState(false);
+  const [carouselLoading, setCarouselLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const articleService = useMemo(() => new ArticleService(api), [api]);
+  const configService = useMemo(() => new ConfigService(api), [api]);
 
   useEffect(() => {
-    setLoading(true);
+    setArticlesLoading(true);
     setError(null);
     void articleService
-      .getPublished({ preferredLocale: language, page: 1, limit: HOME_HERO_LIMIT + HOME_PREVIEW_LIMIT })
+      .getPublished({ preferredLocale: language, page: 1, limit: HOME_PREVIEW_LIMIT })
       .then((result) => {
         setArticles(result.data);
       })
@@ -51,15 +47,24 @@ export function useHomeScreen() {
         setError('error');
       })
       .finally(() => {
-        setLoading(false);
+        setArticlesLoading(false);
       });
   }, [language, articleService]);
 
-  const heroArticles = useMemo(() => articles.slice(0, HOME_HERO_LIMIT), [articles]);
+  useEffect(() => {
+    setCarouselLoading(true);
+    void configService
+      .getConfig(language)
+      .then((config) => {
+        setCarouselItems(config.carousel);
+        setCategories(config.categories);
+      })
+      .finally(() => {
+        setCarouselLoading(false);
+      });
+  }, [language, configService]);
+
   const previewArticles = useMemo(() => articles.slice(0, HOME_PREVIEW_LIMIT), [articles]);
 
-  // TODO: fetch from GET /api/citizen/categories
-  const categories = PLACEHOLDER_CATEGORIES;
-
-  return { heroArticles, previewArticles, loading, error, categories, user };
+  return { carouselItems, previewArticles, articlesLoading, carouselLoading, error, categories, user };
 }

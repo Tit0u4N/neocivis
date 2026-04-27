@@ -1,6 +1,4 @@
-import type { ArticleWithResolvedTranslation } from '@repo/contracts/article';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Text } from '@/components/ui/text';
@@ -8,75 +6,101 @@ import { View } from '@/components/ui/view';
 import { useColor } from '@/hooks/useColor';
 import { useHeroCarousel } from './useHeroCarousel';
 
-interface HeroCarouselProps {
-  articles: ArticleWithResolvedTranslation[];
+export interface CarouselItem {
+  id: string;
+  imageUrl?: string;
+  onPress?: () => void;
+  tag?: string;
+  title?: string;
+  description?: string;
 }
 
-export function HeroCarousel({ articles }: HeroCarouselProps) {
-  const { activeIndex, goTo } = useHeroCarousel(articles.length);
+interface HeroCarouselProps {
+  items: CarouselItem[];
+}
+
+export function HeroCarousel({ items }: HeroCarouselProps) {
+  const { activeIndex, goTo } = useHeroCarousel(items.length);
   const primaryColor = useColor('primary');
   const primaryFgColor = useColor('primaryForeground');
   const textColor = useColor('text');
 
-  if (articles.length === 0) {
+  if (items.length === 0) {
     return null;
   }
 
-  const article = articles[activeIndex] ?? articles[0];
+  const item = items[activeIndex] ?? items[0];
+  const hasText = !!(item.tag || item.title || item.description);
 
-  const handlePress = () => {
-    router.push({ pathname: '/(tabs)/(city)/articles/[id]', params: { id: article.id } });
-  };
+  const inner = (
+    <>
+      {item.tag ? (
+        <View style={styles.tagPill}>
+          <Text style={styles.tagText}>{item.tag}</Text>
+        </View>
+      ) : null}
+      {item.title ? (
+        <Text style={styles.title} numberOfLines={2}>
+          {item.title}
+        </Text>
+      ) : null}
+      {item.description ? (
+        <Text style={styles.desc} numberOfLines={2}>
+          {item.description}
+        </Text>
+      ) : null}
+    </>
+  );
+
+  const card = (
+    <Animated.View key={activeIndex} entering={FadeIn.duration(300)} style={styles.hero}>
+      {item.imageUrl ? (
+        <ImageBackground source={{ uri: item.imageUrl }} style={styles.image} imageStyle={styles.imageStyle}>
+          {hasText ? (
+            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.75)']} style={styles.gradient}>
+              <View style={styles.content}>{inner}</View>
+            </LinearGradient>
+          ) : null}
+        </ImageBackground>
+      ) : (
+        <View style={[styles.image, { backgroundColor: primaryColor }]}>
+          {hasText ? (
+            <View style={styles.content}>
+              {item.tag ? (
+                <View style={styles.tagPill}>
+                  <Text style={[styles.tagText, { color: primaryColor }]}>{item.tag}</Text>
+                </View>
+              ) : null}
+              {item.title ? (
+                <Text style={[styles.title, { color: primaryFgColor }]} numberOfLines={2}>
+                  {item.title}
+                </Text>
+              ) : null}
+              {item.description ? (
+                <Text style={[styles.desc, { color: `${primaryFgColor}CC` }]} numberOfLines={2}>
+                  {item.description}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
+        </View>
+      )}
+    </Animated.View>
+  );
 
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity activeOpacity={0.92} onPress={handlePress}>
-        <Animated.View key={activeIndex} entering={FadeIn.duration(300)} style={styles.hero}>
-          {article.coverImageUrl ? (
-            <ImageBackground
-              source={{ uri: article.coverImageUrl }}
-              style={styles.image}
-              imageStyle={styles.imageStyle}
-            >
-              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.75)']} style={styles.gradient}>
-                <View style={styles.content}>
-                  <View style={styles.tagPill}>
-                    <Text style={styles.tagText}>Actualités</Text>
-                  </View>
-                  <Text style={styles.title} numberOfLines={1}>
-                    {article.translation.title}
-                  </Text>
-                  {article.translation.description ? (
-                    <Text style={styles.desc} numberOfLines={2}>
-                      {article.translation.description}
-                    </Text>
-                  ) : null}
-                </View>
-              </LinearGradient>
-            </ImageBackground>
-          ) : (
-            <View style={[styles.image, { backgroundColor: primaryColor }]}>
-              <View style={styles.content}>
-                <View style={styles.tagPill}>
-                  <Text style={[styles.tagText, { color: primaryColor }]}>Actualités</Text>
-                </View>
-                <Text style={[styles.title, { color: primaryFgColor }]} numberOfLines={2}>
-                  {article.translation.title}
-                </Text>
-                {article.translation.description ? (
-                  <Text style={[styles.desc, { color: `${primaryFgColor}CC` }]} numberOfLines={2}>
-                    {article.translation.description}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-          )}
-        </Animated.View>
-      </TouchableOpacity>
+      {item.onPress ? (
+        <TouchableOpacity activeOpacity={0.92} onPress={item.onPress}>
+          {card}
+        </TouchableOpacity>
+      ) : (
+        card
+      )}
 
-      {articles.length > 1 ? (
+      {items.length > 1 ? (
         <View style={styles.dotsRow}>
-          {articles.map((_, i) => (
+          {items.map((_, i) => (
             <TouchableOpacity
               key={`dot-${i}`}
               onPress={() => {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { ArticlePreviewCard } from '@/components/home/ArticlePreviewCard';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
-import { HeroCarousel } from '@/components/home/HeroCarousel';
+import { type CarouselItem, HeroCarousel } from '@/components/home/HeroCarousel';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { useColor } from '@/hooks/useColor';
@@ -18,6 +18,17 @@ export default function CityScreen() {
 
   const greeting = user?.given_name ? t('city.greetingNamed', { name: user.given_name }) : t('city.greeting');
 
+  const heroItems: CarouselItem[] = heroArticles.map((article) => ({
+    id: article.id,
+    imageUrl: article.coverImageUrl,
+    tag: 'Actualités',
+    title: article.translation.title,
+    description: article.translation.description,
+    onPress: () => {
+      router.push({ pathname: '/(tabs)/(city)/articles/[id]', params: { id: article.id } });
+    },
+  }));
+
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scroll} showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
@@ -30,7 +41,7 @@ export default function CityScreen() {
             <ActivityIndicator color={primaryColor} />
           </View>
         ) : (
-          <HeroCarousel articles={heroArticles} />
+          <HeroCarousel items={heroItems} />
         )}
 
         {/* Categories */}

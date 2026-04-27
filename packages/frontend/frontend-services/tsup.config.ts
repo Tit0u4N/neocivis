@@ -5,6 +5,7 @@ export default defineConfig((options: Options) => ({
     index: 'src/index.ts',
     article: 'src/article/article.service.ts',
     auth: 'src/auth/auth.service.ts',
+    config: 'src/config/config.service.ts',
     permission: 'src/permission/permission.service.ts',
     report: 'src/report/report.service.ts',
     upload: 'src/upload/upload.service.ts',

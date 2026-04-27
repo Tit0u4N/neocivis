@@ -16,7 +16,12 @@
   "city": {
     "title": "Ville",
     "welcomeTitle": "Bienvenue sur NeoCivis",
-    "welcomeSubtitle": "Retrouve ici les dernières actualités de ta ville, reste informé et engagé."
+    "welcomeSubtitle": "Retrouve ici les dernières actualités de ta ville, reste informé et engagé.",
+    "greeting": "Bonjour 👋",
+    "greetingNamed": "Bonjour {{name}} 👋",
+    "categories": "Catégories",
+    "news": "Actualités",
+    "seeAll": "Tout voir"
   },
   "articles": {
     "title": "Articles",
@@ -27,6 +32,14 @@
     "error": "Impossible de charger les articles",
     "empty": "Aucun article disponible",
     "notFound": "Article introuvable"
+  },
+  "common": {
+    "relativeDate": {
+      "justNow": "à l'instant",
+      "hoursAgo": "il y a {{count}}h",
+      "yesterday": "hier",
+      "daysAgo": "il y a {{count}}j"
+    }
   },
   "report": {
     "title": "Signaler"

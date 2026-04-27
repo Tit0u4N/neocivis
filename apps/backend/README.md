@@ -58,7 +58,7 @@ Bruno is a tool for testing APIs. Here it's used to test the backend API endpoin
 
 If you haven't already, make sure to install Bruno globally:
 ```bash
-npm install -g @bruno/cli
+npm install -g @usebruno/cli
 ```
 
 To run the tests, navigate to the `api-tests` directory and execute the following command:

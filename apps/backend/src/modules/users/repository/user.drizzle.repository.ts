@@ -1,8 +1,8 @@
 import { eq, inArray, sql } from 'drizzle-orm';
 import { getDb } from '@/infrastructure/db/client';
-import { users } from './user.table';
+import { users } from '../user.table';
+import type { User } from '../user.types';
 import type { IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
-import type { User } from './user.types';
 
 function mapRowToUser(r: typeof users.$inferSelect): User {
   return {
@@ -80,4 +80,3 @@ export class DrizzleUserRepository implements IUserRepository {
       .where(eq(users.keycloakId, keycloakId));
   }
 }
-

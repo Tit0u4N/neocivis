@@ -1,6 +1,7 @@
-// biome-ignore-all lint/suspicious/useAwait: mock file 
+// biome-ignore-all lint/suspicious/useAwait: mock file
+
+import type { User } from '../user.types';
 import type { IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
-import type { User } from './user.types';
 
 export class InMemoryUserRepository implements IUserRepository {
   private autoId = 1;
@@ -58,4 +59,3 @@ export class InMemoryUserRepository implements IUserRepository {
     existing.updatedAt = new Date();
   }
 }
-

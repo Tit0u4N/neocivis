@@ -1,4 +1,4 @@
-import type { BaseUserRole, User } from './user.types';
+import type { BaseUserRole, User } from '../user.types';
 
 export type UpsertUserFromHeadersInput = {
   seedId?: number;
@@ -18,4 +18,3 @@ export interface IUserRepository {
   insertFromHeaders(input: UpsertUserFromHeadersInput): Promise<void>;
   updateFromHeaders(input: UpsertUserFromHeadersInput): Promise<void>;
 }
-

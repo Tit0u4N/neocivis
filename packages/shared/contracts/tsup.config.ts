@@ -6,6 +6,7 @@ export default defineConfig((options: Options) => ({
     article: 'src/article/article.schema.ts',
     dto: 'src/dto/index.ts',
     'error-messages': 'src/error-messages/index.ts',
+    report: 'src/report/report.schema.ts',
   },
   clean: true,
   format: ['cjs', 'esm'],

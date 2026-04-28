@@ -47,14 +47,17 @@ vi.mock('@/providers/ApiProvider', () => {
   return { useApi: () => stableApi };
 });
 
-vi.mock('@repo/frontend-services/report', () => ({
-  // biome-ignore lint/style/useNamingConvention: mock constructor must be regular function
-  ReportService: vi.fn(() => ({
+function createReportServiceMock() {
+  return {
     getMine: mockGetMine,
     getById: mockGetById,
     cancel: mockCancel,
     create: mockCreate,
-  })),
+  };
+}
+
+vi.mock('@repo/frontend-services/report', () => ({
+  ReportService: vi.fn(createReportServiceMock),
 }));
 
 vi.mock('expo-location', () => mockLocationModule);

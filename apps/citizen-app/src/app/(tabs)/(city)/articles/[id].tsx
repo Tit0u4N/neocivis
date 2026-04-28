@@ -21,8 +21,8 @@ function SkeletonBlock({ height, width, style }: { height: number; width?: numbe
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.75, duration: 750, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.35, duration: 750, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.75, duration: 750, useNativeDriver: false }),
+        Animated.timing(opacity, { toValue: 0.35, duration: 750, useNativeDriver: false }),
       ]),
     ).start();
   }, [opacity]);

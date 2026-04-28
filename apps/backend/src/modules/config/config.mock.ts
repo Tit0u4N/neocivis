@@ -4,6 +4,7 @@ export function getMockCategories(): Category[] {
   return [
     {
       id: 'alaune',
+      attachedPageId: 'page-1',
       icon: 'Star',
       color: '#F42500',
       row: 0,
@@ -18,6 +19,7 @@ export function getMockCategories(): Category[] {
     },
     {
       id: 'pratique',
+      attachedPageId: 'page-2',
       icon: 'Info',
       color: '#0C8CE9',
       row: 0,
@@ -31,6 +33,7 @@ export function getMockCategories(): Category[] {
     },
     {
       id: 'urgence',
+      attachedPageId: 'page-3',
       icon: 'TriangleAlert',
       color: '#D97706',
       row: 1,

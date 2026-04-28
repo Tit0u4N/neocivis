@@ -1,28 +1,17 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import type { LucideProps } from 'lucide-react-native';
-import * as LucideIcons from 'lucide-react-native';
-import type { ComponentType } from 'react';
 import { StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import type { Category } from '@/screens/city/useHomeScreen';
+import { hexToGradient } from '@/utils/color.util';
+import { resolveIcon } from '@/utils/icon.util';
 import { useCategoryLayout } from './useCategoryLayout';
 
 const GRID_GAP = 10;
 const GRID_COLS = 3;
 const SIDE_PADDING = 32; // 16px each side
 const CELL_HEIGHT = 110;
-
-const Icons = LucideIcons as unknown as Record<string, ComponentType<LucideProps>>;
-
-function resolveIcon(name: string): ComponentType<LucideProps> {
-  return Icons[name] ?? Icons.Newspaper;
-}
-
-function hexToGradient(hex: string): [string, string] {
-  return [`${hex}26`, `${hex}14`]; // 15% → 8% opacity
-}
 
 interface CategoryTileProps {
   category: Category;
@@ -38,13 +27,12 @@ function CategoryTile({ category }: CategoryTileProps) {
       style={styles.tileTouchable}
       onPress={
         category.attachedPageId
-          ? () =>
-              router.push({ pathname: '/(tabs)/(city)/categories/[id]', params: { id: `${category.attachedPageId}` } })
+          ? () => router.push({ pathname: '/(tabs)/(city)/page/[id]', params: { id: `${category.attachedPageId}` } })
           : undefined
       }
     >
       <LinearGradient colors={[gradStart, gradEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.tile}>
-        <View style={[styles.iconWrapper, { backgroundColor: `${category.color}30` }]}>
+        <View style={[styles.iconWrapper, { backgroundColor: 'rgba(255,255,255,0.7)' }]}>
           <IconComponent color={category.color} size={20} strokeWidth={1.8} />
         </View>
         <Text style={[styles.tileName, { color: category.color }]} numberOfLines={2}>
@@ -97,7 +85,9 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 18,
     padding: 14,
+    flexDirection: 'column',
     justifyContent: 'space-between',
+    gap: 10,
     overflow: 'hidden',
   },
   iconWrapper: {

@@ -11,6 +11,7 @@ const HOME_PREVIEW_LIMIT = 3;
 
 export type Category = {
   id: string;
+  attachedPageId?: string;
   name: string;
   icon: string; // PascalCase Lucide icon name, e.g. 'Star', 'TriangleAlert'
   color: string;

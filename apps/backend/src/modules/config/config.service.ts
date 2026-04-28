@@ -41,6 +41,7 @@ export class ConfigService {
     const t = cat.translations.find((tr) => tr.locale === locale) ?? cat.translations.find((tr) => tr.locale === 'fr')!;
     return {
       id: cat.id,
+      attachedPageId: cat.attachedPageId,
       icon: cat.icon,
       color: cat.color,
       row: cat.row,

@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import type { LucideProps } from 'lucide-react-native';
 import * as LucideIcons from 'lucide-react-native';
 import type { ComponentType } from 'react';
@@ -32,7 +33,16 @@ function CategoryTile({ category }: CategoryTileProps) {
   const [gradStart, gradEnd] = hexToGradient(category.color);
 
   return (
-    <TouchableOpacity activeOpacity={0.8} style={styles.tileTouchable}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      style={styles.tileTouchable}
+      onPress={
+        category.attachedPageId
+          ? () =>
+              router.push({ pathname: '/(tabs)/(city)/categories/[id]', params: { id: `${category.attachedPageId}` } })
+          : undefined
+      }
+    >
       <LinearGradient colors={[gradStart, gradEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.tile}>
         <View style={[styles.iconWrapper, { backgroundColor: `${category.color}30` }]}>
           <IconComponent color={category.color} size={20} strokeWidth={1.8} />

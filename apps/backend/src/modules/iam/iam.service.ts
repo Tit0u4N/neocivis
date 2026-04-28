@@ -23,4 +23,3 @@ export interface IAMService {
    */
   getUserByUsername(username: string): Promise<IamUser | null>;
 }
-

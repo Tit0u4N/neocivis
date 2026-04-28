@@ -1,7 +1,16 @@
 import type { BaseUserRole, User } from '../user.types';
 
 export type UpsertUserFromHeadersInput = {
-  seedId?: number;
+  keycloakId: string;
+  role: BaseUserRole;
+  username?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+};
+
+export type InsertSeededUserInput = {
+  id: number;
   keycloakId: string;
   role: BaseUserRole;
   username?: string;
@@ -17,4 +26,7 @@ export interface IUserRepository {
   getByKeycloakId(keycloakId: string): Promise<User | undefined>;
   insertFromHeaders(input: UpsertUserFromHeadersInput): Promise<void>;
   updateFromHeaders(input: UpsertUserFromHeadersInput): Promise<void>;
+  insertSeeded(input: InsertSeededUserInput): Promise<void>;
+  deleteAll(): Promise<void>;
+  setNextId(nextId: number): Promise<void>;
 }

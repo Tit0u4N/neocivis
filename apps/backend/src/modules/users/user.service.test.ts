@@ -6,7 +6,6 @@ describe('UserService', () => {
   const seededUsers = [
     {
       id: 1,
-      seedId: null,
       keycloakId: 'kc_1',
       username: 'user1',
       email: 'user1@example.com',
@@ -18,7 +17,6 @@ describe('UserService', () => {
     },
     {
       id: 2,
-      seedId: null,
       keycloakId: 'kc_2',
       username: 'user2',
       email: 'user2@example.com',

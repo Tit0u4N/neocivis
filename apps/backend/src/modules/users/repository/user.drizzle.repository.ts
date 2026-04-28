@@ -1,13 +1,12 @@
 import { eq, inArray, sql } from 'drizzle-orm';
 import { getDb } from '@/infrastructure/db/client';
-import { users } from '../user.table';
 import type { User } from '../user.types';
-import type { IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
+import type { InsertSeededUserInput, IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
+import { users } from './user.table';
 
 function mapRowToUser(r: typeof users.$inferSelect): User {
   return {
     id: r.id,
-    seedId: r.seedId,
     keycloakId: r.keycloakId,
     username: r.username,
     email: r.email,
@@ -51,9 +50,8 @@ export class DrizzleUserRepository implements IUserRepository {
 
   async insertFromHeaders(input: UpsertUserFromHeadersInput): Promise<void> {
     const db = getDb();
-    const { seedId, keycloakId, role, username, email, firstName, lastName } = input;
+    const { keycloakId, role, username, email, firstName, lastName } = input;
     await db.insert(users).values({
-      seedId: seedId ?? null,
       keycloakId,
       role,
       username: username ?? '',
@@ -65,12 +63,11 @@ export class DrizzleUserRepository implements IUserRepository {
 
   async updateFromHeaders(input: UpsertUserFromHeadersInput): Promise<void> {
     const db = getDb();
-    const { seedId, keycloakId, role, username, email, firstName, lastName } = input;
+    const { keycloakId, role, username, email, firstName, lastName } = input;
     await db
       .update(users)
       .set({
         role,
-        seedId: seedId ?? null,
         username: username ?? '',
         email: email ?? '',
         firstName: firstName ?? '',
@@ -78,5 +75,30 @@ export class DrizzleUserRepository implements IUserRepository {
         updatedAt: sql`now()`,
       })
       .where(eq(users.keycloakId, keycloakId));
+  }
+
+  async insertSeeded(input: InsertSeededUserInput): Promise<void> {
+    const db = getDb();
+    const { id, keycloakId, role, username, email, firstName, lastName } = input;
+    await db.insert(users).values({
+      id,
+      keycloakId,
+      role,
+      username: username ?? '',
+      email: email ?? '',
+      firstName: firstName ?? '',
+      lastName: lastName ?? '',
+    });
+  }
+
+  async deleteAll(): Promise<void> {
+    const db = getDb();
+    await db.delete(users);
+  }
+
+  async setNextId(nextId: number): Promise<void> {
+    const db = getDb();
+    const safeNextId = Math.max(1, Math.floor(nextId));
+    await db.execute(sql`SELECT setval(pg_get_serial_sequence('users', 'id'), ${safeNextId}, false)`);
   }
 }

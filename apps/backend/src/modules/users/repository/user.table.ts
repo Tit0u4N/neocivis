@@ -5,8 +5,9 @@ export const userRole = pgEnum('user_role', ['ADMIN', 'EMPLOYEE', 'CITIZEN']);
 export const users = pgTable(
   'users',
   {
-    id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-    seedId: integer('seed_id'),
+    // "BY DEFAULT" permet d'insérer un id fixe pendant le seeding,
+    // tout en gardant l'auto-increment pour les insertions normales.
+    id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
     keycloakId: text('keycloak_id').notNull(),
     username: text('username').notNull().default(''),
     email: text('email').notNull().default(''),
@@ -20,7 +21,5 @@ export const users = pgTable(
     keycloakIdIndex: index('users_keycloak_id_idx').on(t.keycloakId),
     usernameIndex: index('users_username_idx').on(t.username),
     usernameKeycloakIdIndex: index('users_username_keycloak_id_idx').on(t.username, t.keycloakId),
-    seedIdIndex: index('users_seed_id_idx').on(t.seedId),
   }),
 );
-

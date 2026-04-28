@@ -1,9 +1,8 @@
 import type { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
-import type { BaseUserRole } from '@/modules/users/user.types';
-import { KeycloakIAMService } from '@/infrastructure/iam/keycloak-iam.service';
-import { UserService } from '@/modules/users/user.service';
 import { isInMemoryMode } from '@/core/runtime-config';
+import type { UserService } from '@/modules/users/user.service';
+import type { BaseUserRole } from '@/modules/users/user.types';
 
 function normalizeRoles(rolesHeaderValue: string): string[] {
   return rolesHeaderValue
@@ -27,8 +26,7 @@ function getBaseRole(roles: string[]): BaseUserRole {
  * Extract `X-User-Id` / `X-User-Roles` and exposes them through `c.var.user`.
  * Also upserts the user in SQL (Drizzle) when DB is configured.
  */
-export function applyUserMiddleware(app: Hono, userService: UserService, iamService: KeycloakIAMService) {
-
+export function applyUserMiddleware(app: Hono, userService: UserService) {
   app.use(
     '*',
     createMiddleware(async (c, next) => {
@@ -54,7 +52,7 @@ export function applyUserMiddleware(app: Hono, userService: UserService, iamServ
             resolvedFirstName === undefined ||
             resolvedLastName === undefined)
         ) {
-          const profile = await iamService.getUserProfileById(keycloakId);
+          const profile = await userService.getIamProfileByKeycloakId(keycloakId);
           resolvedUsername ??= profile?.username;
           resolvedEmail ??= profile?.email;
           resolvedFirstName ??= profile?.firstName;

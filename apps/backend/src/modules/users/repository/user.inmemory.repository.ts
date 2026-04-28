@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/useAwait: mock file
 
 import type { User } from '../user.types';
-import type { IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
+import type { InsertSeededUserInput, IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
 
 export class InMemoryUserRepository implements IUserRepository {
   private autoId = 1;
@@ -31,7 +31,6 @@ export class InMemoryUserRepository implements IUserRepository {
     const now = new Date();
     const user: User = {
       id: this.autoId++,
-      seedId: input.seedId ?? null,
       keycloakId: input.keycloakId,
       username: input.username ?? '',
       email: input.email ?? '',
@@ -51,11 +50,36 @@ export class InMemoryUserRepository implements IUserRepository {
     }
 
     existing.role = input.role;
-    existing.seedId = input.seedId ?? null;
     existing.username = input.username ?? '';
     existing.email = input.email ?? '';
     existing.firstName = input.firstName ?? '';
     existing.lastName = input.lastName ?? '';
     existing.updatedAt = new Date();
+  }
+
+  async insertSeeded(input: InsertSeededUserInput): Promise<void> {
+    const now = new Date();
+    const user: User = {
+      id: input.id,
+      keycloakId: input.keycloakId,
+      username: input.username ?? '',
+      email: input.email ?? '',
+      firstName: input.firstName ?? '',
+      lastName: input.lastName ?? '',
+      createdAt: now,
+      updatedAt: now,
+      role: input.role,
+    };
+    this.users.push(user);
+    this.autoId = Math.max(this.autoId, input.id + 1);
+  }
+
+  async deleteAll(): Promise<void> {
+    this.users = [];
+    this.autoId = 1;
+  }
+
+  async setNextId(nextId: number): Promise<void> {
+    this.autoId = Math.max(1, nextId);
   }
 }

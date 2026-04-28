@@ -1,13 +1,14 @@
 import { Hono } from 'hono';
+import { startAutoSeedOnStartup } from '@/core/auto-seed';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
-import { KeycloakIAMService } from '@/infrastructure/iam/keycloak-iam.service';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
 import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';
 import { CosmosArticleRepository, InMemoryArticleRepository } from '@/modules/article/article.repository';
 import { ArticleService } from '@/modules/article/article.service';
+import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/user.service';
@@ -19,11 +20,13 @@ const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new Dri
 const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : new CosmosArticleRepository();
 
 // Import services
-const userService = new UserService(userRepository);
 const iamService = new KeycloakIAMService();
+const userService = new UserService(userRepository, iamService);
+
+startAutoSeedOnStartup({ userService });
 
 // Import controllers
-const userController = new UserController(new UserService(userRepository));
+const userController = new UserController(userService);
 const articleController = new ArticleController(new ArticleService(articleRepository));
 
 let app = new Hono().basePath('/api/citizen');
@@ -31,7 +34,7 @@ let app = new Hono().basePath('/api/citizen');
 app = applyCorsMiddleware(app);
 app = applyDbMiddleware(app);
 app = applyMockApimMiddleware(app);
-app = applyUserMiddleware(app, userService, iamService);
+app = applyUserMiddleware(app, userService);
 app = applyRoleMiddleware(app, ['CITIZEN']);
 
 // Register routes from controllers

@@ -19,12 +19,7 @@ function loadKeycloakEnv(): KeycloakEnv | null {
   const clientId = optionalEnv('KEYCLOAK_CLIENT_ID');
   const clientSecret = optionalEnv('KEYCLOAK_CLIENT_SECRET');
 
-  if (
-    baseUrl === undefined ||
-    realm === undefined ||
-    clientId === undefined ||
-    clientSecret === undefined
-  ) {
+  if (baseUrl === undefined || realm === undefined || clientId === undefined || clientSecret === undefined) {
     return null;
   }
 
@@ -42,7 +37,7 @@ type TokenCache = {
 };
 
 async function fetchAdminAccessToken(env: KeycloakEnv): Promise<TokenCache> {
-  const url = `${env.baseUrl}realms/master/protocol/openid-connect/token`;
+  const url = `${env.baseUrl}realms/${env.realm}/protocol/openid-connect/token`;
 
   const body = new URLSearchParams();
   body.set('grant_type', 'client_credentials');
@@ -61,8 +56,8 @@ async function fetchAdminAccessToken(env: KeycloakEnv): Promise<TokenCache> {
   }
 
   const json = (await res.json()) as Record<string, unknown>;
-  const token = typeof json['access_token'] === 'string' ? json['access_token'] : '';
-  const expiresIn = typeof json['expires_in'] === 'number' ? json['expires_in'] : 0;
+  const token = typeof json.access_token === 'string' ? json.access_token : '';
+  const expiresIn = typeof json.expires_in === 'number' ? json.expires_in : 0;
   if (!token) {
     throw new Error('Keycloak token response missing access_token');
   }
@@ -117,10 +112,10 @@ export class KeycloakIAMService implements IAMService {
     }
 
     const json = (await res.json()) as Record<string, unknown>;
-    const username = typeof json['username'] === 'string' ? json['username'] : undefined;
-    const email = typeof json['email'] === 'string' ? json['email'] : undefined;
-    const firstName = typeof json['firstName'] === 'string' ? json['firstName'] : undefined;
-    const lastName = typeof json['lastName'] === 'string' ? json['lastName'] : undefined;
+    const username = typeof json.username === 'string' ? json.username : undefined;
+    const email = typeof json.email === 'string' ? json.email : undefined;
+    const firstName = typeof json.firstName === 'string' ? json.firstName : undefined;
+    const lastName = typeof json.lastName === 'string' ? json.lastName : undefined;
 
     return { username, email, firstName, lastName };
   }
@@ -157,17 +152,16 @@ export class KeycloakIAMService implements IAMService {
     }
 
     const record = json[0] as Record<string, unknown>;
-    const id = typeof record['id'] === 'string' ? record['id'] : '';
+    const id = typeof record.id === 'string' ? record.id : '';
     if (!id) {
       throw new Error('Keycloak user search response missing id');
     }
 
-    const resolvedUsername = typeof record['username'] === 'string' ? record['username'] : undefined;
-    const email = typeof record['email'] === 'string' ? record['email'] : undefined;
-    const firstName = typeof record['firstName'] === 'string' ? record['firstName'] : undefined;
-    const lastName = typeof record['lastName'] === 'string' ? record['lastName'] : undefined;
+    const resolvedUsername = typeof record.username === 'string' ? record.username : undefined;
+    const email = typeof record.email === 'string' ? record.email : undefined;
+    const firstName = typeof record.firstName === 'string' ? record.firstName : undefined;
+    const lastName = typeof record.lastName === 'string' ? record.lastName : undefined;
 
     return { id, username: resolvedUsername, email, firstName, lastName };
   }
 }
-

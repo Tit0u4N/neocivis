@@ -6,6 +6,12 @@
     "ENV_MODE": "development",
     "IN_MEMORY": "false",
     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+    "AUTO_SEED": "INSERT_ONLY",
+
+    "KEYCLOAK_BASE_URL": "https://auth.neocivis.cloud/",
+    "KEYCLOAK_REALM": "neocivis-dev",
+    "KEYCLOAK_CLIENT_ID": "hono-backend",
+    "KEYCLOAK_CLIENT_SECRET": "replace-me",
 
     "DATABASE_URL": "postgresql://user:password@localhost:5432/neocivis-data",
 

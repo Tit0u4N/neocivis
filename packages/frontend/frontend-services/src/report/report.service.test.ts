@@ -10,6 +10,7 @@ const mockReport: Report = {
   type: 'Éclairage public',
   status: 'pending',
   desc: 'Le lampadaire au coin de la rue clignote.',
+  photoUrl: 'https://example.com/photo.jpg',
   createdAt: '2026-04-12T10:00:00.000Z',
   updatedAt: '2026-04-12T10:00:00.000Z',
 };
@@ -101,7 +102,10 @@ describe('ReportService (frontend)', () => {
       const extendedKy = { post: postMock };
       (ky.extend as ReturnType<typeof vi.fn>).mockReturnValue(extendedKy);
 
-      const result = await service.create({ desc: 'Le lampadaire au coin de la rue clignote.' });
+      const result = await service.create({
+        desc: 'Le lampadaire au coin de la rue clignote.',
+        photo: { uri: 'file:///photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' },
+      });
 
       expect(ky.extend).toHaveBeenCalledWith({ headers: { 'Content-Type': undefined } });
       expect(postMock).toHaveBeenCalledWith('reports', expect.objectContaining({ body: expect.any(FormData) }));
@@ -113,7 +117,12 @@ describe('ReportService (frontend)', () => {
       const postMock = vi.fn().mockReturnValue({ json });
       (ky.extend as ReturnType<typeof vi.fn>).mockReturnValue({ post: postMock });
 
-      await service.create({ desc: 'Voirie abîmée', latitude: 43.2965, longitude: 5.3698 });
+      await service.create({
+        desc: 'Voirie abîmée',
+        latitude: 43.2965,
+        longitude: 5.3698,
+        photo: { uri: 'file:///photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' },
+      });
 
       const formData: FormData = postMock.mock.calls[0][1].body;
       expect(formData.get('latitude')).toBe('43.2965');
@@ -125,7 +134,10 @@ describe('ReportService (frontend)', () => {
       const postMock = vi.fn().mockReturnValue({ json });
       (ky.extend as ReturnType<typeof vi.fn>).mockReturnValue({ post: postMock });
 
-      await service.create({ desc: 'Tag sur mur' });
+      await service.create({
+        desc: 'Tag sur mur',
+        photo: { uri: 'file:///photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' },
+      });
 
       const formData: FormData = postMock.mock.calls[0][1].body;
       expect(formData.get('latitude')).toBeNull();

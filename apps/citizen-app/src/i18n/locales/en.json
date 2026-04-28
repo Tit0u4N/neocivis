@@ -42,7 +42,63 @@
     }
   },
   "report": {
-    "title": "Report"
+    "title": "Reports",
+    "subtitle": "Help your city solve problems.",
+    "newReport": "New report",
+    "myReports": "My reports",
+    "noReports": "No reports.",
+    "notFound": "Report not found",
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "progress": "In progress",
+      "resolved": "Resolved"
+    },
+    "new": {
+      "headerTitle": "New report",
+      "title": "Report a problem",
+      "date": "Date",
+      "type": "Problem type",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the problem in detail...",
+      "photo": "Photo (optional)",
+      "photoCamera": "Take a photo",
+      "photoGallery": "Gallery",
+      "location": "GPS Location",
+      "locationLoading": "Getting your location...",
+      "locationDenied": "Location access denied",
+      "locationRetry": "Retry",
+      "locationRefresh": "Refresh",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "chars": "characters"
+    },
+    "detail": {
+      "headerTitle": "Details",
+      "date": "DATE",
+      "type": "TYPE",
+      "description": "DESCRIPTION",
+      "tracking": "TRACKING",
+      "received": "Received",
+      "takenCare": "Handled by services",
+      "takenCareAgo": "2 days ago",
+      "resolved": "Resolved",
+      "resolvedAgo": "1 day ago",
+      "noLocation": "Location not available",
+      "back": "Back",
+      "cancelReport": "Cancel report"
+    },
+    "cancel": {
+      "title": "Cancel this report?",
+      "subtitle": "This action is permanent. You can create a new report if needed.",
+      "keep": "Keep",
+      "confirm": "Confirm"
+    },
+    "columns": {
+      "subject": "Subject",
+      "date": "Date",
+      "status": "Status"
+    }
   },
   "forum": {
     "title": "Forum"

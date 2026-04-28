@@ -1,4 +1,6 @@
 import { Stack } from 'expo-router';
+import { View } from 'react-native';
+import { AppTopBar } from '@/components/ui/app-top-bar';
 import { useColor } from '@/hooks/useColor';
 
 export default function CityLayout() {
@@ -6,18 +8,21 @@ export default function CityLayout() {
   const background = useColor('background');
 
   return (
-    <Stack
-      screenOptions={{
-        headerLargeTitle: true,
-        headerLargeTitleShadowVisible: false,
-        headerTransparent: false,
-        headerTintColor: text,
-        headerStyle: {
-          backgroundColor: background,
-        },
-      }}
-    >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-    </Stack>
+    <View style={{ flex: 1 }}>
+      <AppTopBar />
+      <Stack
+        screenOptions={{
+          headerLargeTitle: true,
+          headerLargeTitleShadowVisible: false,
+          headerTransparent: false,
+          headerTintColor: text,
+          headerStyle: {
+            backgroundColor: background,
+          },
+        }}
+      >
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+    </View>
   );
 }

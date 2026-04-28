@@ -9,11 +9,14 @@ import {
   isCosmosConfigured,
 } from '@/modules/article/article.repository';
 import { ArticleService } from '@/modules/article/article.service';
+import { InMemoryConfigRepository } from '@/modules/config/config.repository';
+import { ConfigService } from '@/modules/config/config.service';
 import { ProductRepository } from '@/modules/product/product.repository';
 import { ProductService } from '@/modules/product/product.service';
 import { UserRepository } from '@/modules/users/user.repository';
 import { UserService } from '@/modules/users/user.service';
 import { ArticleController } from './controllers/article.controller';
+import { ConfigController } from './controllers/config.controller';
 import { ProductController } from './controllers/product.controller';
 import { UserController } from './controllers/user.controller';
 
@@ -21,11 +24,13 @@ import { UserController } from './controllers/user.controller';
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
 const articleRepository = isCosmosConfigured() ? new CosmosArticleRepository() : new InMemoryArticleRepository();
+const configRepository = new InMemoryConfigRepository();
 
 // Import controllers
 const userController = new UserController(new UserService(userRepository));
 const productController = new ProductController(new ProductService(productRepository));
 const articleController = new ArticleController(new ArticleService(articleRepository));
+const configController = new ConfigController(new ConfigService(configRepository));
 
 let app = new Hono().basePath('/api/citizen');
 
@@ -38,5 +43,6 @@ app = applyRoleMiddleware(app, ['CITIZEN', 'ADMIN', 'EMPLOYEE']);
 app.route('/user', userController.getRoutes());
 app.route('/product', productController.getRoutes());
 app.route('/articles', articleController.getRoutes());
+app.route('/config', configController.getRoutes());
 
 export default app;

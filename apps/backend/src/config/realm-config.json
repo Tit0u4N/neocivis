@@ -147,6 +147,16 @@
       ]
     }
   ],
+  "smtpServer": {
+    "replyToDisplayName": "",
+    "starttls": "false",
+    "auth": "false",
+    "ssl": "false",
+    "port": "1025",
+    "host": "mailpit.neocivis.cloud",
+    "from": "iam@neocivis.cloud",
+    "fromDisplayName": "IAM Neocivis"
+  },
   "users": [
     {
       "username": "citizen1",
@@ -159,6 +169,9 @@
           "temporary": false
         }
       ],
+      "email": "cit1@example.com",
+      "last_name": "One",
+      "first_name": "Citizen",
       "realmRoles": ["CITIZEN"]
     },
     {
@@ -172,6 +185,9 @@
           "temporary": false
         }
       ],
+      "email": "emp1@neocivis.cloud",
+      "last_name": "Employee1",
+      "first_name": "Municipal",
       "realmRoles": ["EMPLOYEE", "SIGNAL_VIEW_PERMISSION", "SIGNAL_CREATE_PERMISSION", "SIGNAL_MODIFY_PERMISSION"]
     },
     {
@@ -185,6 +201,9 @@
           "temporary": false
         }
       ],
+      "email": "admin@example.com",
+      "last_name": "Min",
+      "first_name": "Ad",
       "realmRoles": ["ADMIN", "EMPLOYEE"]
     }
   ]

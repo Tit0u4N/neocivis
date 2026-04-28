@@ -1,5 +1,9 @@
 import { vi } from 'vitest';
 
-export const mockPermissionService = {
+export interface IMockPermissionService {
+  fetchPermissions: ReturnType<typeof vi.fn>;
+}
+
+export const mockPermissionService: IMockPermissionService = {
   fetchPermissions: vi.fn(),
 };

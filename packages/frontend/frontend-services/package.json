@@ -12,19 +12,21 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
-    "@repo/contracts": "*",
-    "ky": "^1.14.1"
+    "@repo/contracts": "*"
   },
   "devDependencies": {
     "@repo/contracts": "*",
     "@repo/typescript-config": "*",
     "@repo/vitest-config": "*",
     "@repo/frontend-core": "*",
+    "ky": "^1.14.1",
     "tsup": "^8.5.1",
     "typescript": "5.9.3",
     "vitest": "^4.0.16"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "ky": "^1.14.1"
+  },
   "exports": {
     "./report": "./dist/report.js",
     "./auth": "./dist/auth.js",

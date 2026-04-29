@@ -2,6 +2,7 @@
   "login": {
     "brand": "NeoCivis",
     "title": "Welcome to\nNeoCivis",
+    "welcomeTo": "Welcome to",
     "subtitle": "Join us to stay up to date with your city's news",
     "signUp": "Sign Up",
     "signIn": "Log In",

@@ -10,6 +10,7 @@
   },
   "tabs": {
     "city": "Ville",
+    "news": "Actualités",
     "report": "Signaler",
     "forum": "Forum",
     "account": "Compte"
@@ -103,6 +104,9 @@
   },
   "forum": {
     "title": "Forum"
+  },
+  "news": {
+    "title": "Actualités"
   },
   "account": {
     "title": "Mon compte",

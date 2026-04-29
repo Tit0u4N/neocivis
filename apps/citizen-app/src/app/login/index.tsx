@@ -53,23 +53,24 @@ export default function LoginScreen() {
 
   return (
     <View style={[styles.splash, { backgroundColor: primaryColor }]}>
-      <View style={styles.hero}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: primaryColor }]} />
-        <LinearGradient
-          colors={['rgba(255,255,255,0.30)', 'rgba(255,255,255,0)']}
-          locations={[0, 0.6]}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0.15, y: 0.9 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <LinearGradient
-          colors={['rgba(0,0,0,0.50)', 'rgba(0,0,0,0)']}
-          locations={[0, 0.55]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0.85, y: 0.1 }}
-          style={StyleSheet.absoluteFill}
-        />
+      <LinearGradient
+        colors={['rgba(255,255,255,0.30)', 'rgba(255,255,255,0)']}
+        locations={[0, 0.2]}
+        start={{ x: 1, y: 0 }}
+        end={{ x: 0.15, y: 0.9 }}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <LinearGradient
+        colors={['rgba(0,0,0,0.70)', 'rgba(0,0,0,0)']}
+        locations={[0, 0.55]}
+        start={{ x: 0, y: 1 }}
+        end={{ x: 0.85, y: 0.1 }}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
 
+      <View style={styles.hero}>
         <View style={styles.ringLg} pointerEvents="none" />
         <View style={styles.ringSm} pointerEvents="none" />
 

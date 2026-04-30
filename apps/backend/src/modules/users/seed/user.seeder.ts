@@ -1,26 +1,9 @@
-import type { AutoSeedMode } from '@/core/runtime-config';
 import type { ISeeder } from '@/core/seeder.interface';
-import type { UserService } from '../user.service';
+import type { UserService } from '../service/user.service';
 import { loadSeededUsersFromRealmConfigDev } from './user.seed';
 
 export class UserSeeder implements ISeeder {
   constructor(private userService: UserService) {}
-
-  async autoSeed(mode: AutoSeedMode): Promise<void> {
-    const seeded = loadSeededUsersFromRealmConfigDev();
-    if (seeded.length === 0) {
-      return;
-    }
-
-    if (mode === 'RESET_DATA') {
-      await this.deleteAll();
-    }
-    await this.seed();
-
-    // Après insert d'IDs explicites, on positionne la séquence au bon next id.
-    const nextId = Math.max(...seeded.map((u) => u.seedId)) + 1;
-    await this.userService.setNextId(nextId);
-  }
 
   async deleteAll(): Promise<void> {
     await this.userService.deleteAll();
@@ -43,5 +26,7 @@ export class UserSeeder implements ISeeder {
         lastName: kcUser?.lastName ?? seeded.lastName,
       });
     }
+    const nextId = Math.max(...seededUsers.map((u) => u.seedId)) + 1;
+    await this.userService.setNextId(nextId);
   }
 }

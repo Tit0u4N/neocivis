@@ -7,7 +7,7 @@ import {
 } from '@repo/contracts/article';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
-import type { ArticleService } from '../../../modules/article/article.service';
+import type { ArticleService } from '../../../modules/article/service/article.service';
 
 export class ArticleController {
   constructor(private service: ArticleService) {}

@@ -1,8 +1,8 @@
-import { getAutoSeedMode } from '@/core/runtime-config';
-import type { IArticleRepository } from '@/modules/article/article.repository';
+import { getAutoSeedMode, isInMemoryMode } from '@/core/runtime-config';
+import type { IArticleRepository } from '@/modules/article/repository/article.repository.interface';
 import { ArticleSeeder } from '@/modules/article/seed/article.seeder';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
-import type { UserService } from '@/modules/users/user.service';
+import type { UserService } from '@/modules/users/service/user.service';
 import type { ISeeder } from './seeder.interface';
 
 type AutoSeedDeps = {
@@ -20,26 +20,28 @@ function markStarted(): void {
   (globalThis as Record<string, unknown>)[AUTO_SEED_GLOBAL_KEY] = true;
 }
 
-export function startAutoSeedOnStartup(deps: AutoSeedDeps): void {
+export async function startAutoSeedOnStartup(deps: AutoSeedDeps): Promise<void> {
   const mode = getAutoSeedMode();
   if (!mode) {
     return;
   }
-  if (hasStarted()) {
+  // If the auto-seed has already started and we are not in in-memory mode, we don't need to start it again.
+  // In in-memory mode, we can start the seed again since it's only in memory and won't be present in both function.
+  if (hasStarted() && !isInMemoryMode()) {
     return;
   }
   markStarted();
 
   const seederList: ISeeder[] = [new UserSeeder(deps.userService), new ArticleSeeder(deps.articleRepository)];
 
-  (async () => {
-    for (const seeder of seederList) {
+  await Promise.all(
+    seederList.map(async (seeder) => {
       if (mode === 'RESET_DATA') {
         await seeder.deleteAll();
       }
       await seeder.seed();
-    }
-  })().catch((err: unknown) => {
+    }),
+  ).catch((err: unknown) => {
     // biome-ignore lint/suspicious/noConsole: startup seeding diagnostics
     console.error('[auto-seed] failed', err);
   });

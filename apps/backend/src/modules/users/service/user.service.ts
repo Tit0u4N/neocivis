@@ -3,8 +3,8 @@ import type {
   InsertSeededUserInput,
   IUserRepository,
   UpsertUserFromHeadersInput,
-} from './repository/user.repository.interface';
-import type { User } from './user.types';
+} from '../repository/user.repository.interface';
+import type { User } from '../user.types';
 
 export class UserService {
   constructor(

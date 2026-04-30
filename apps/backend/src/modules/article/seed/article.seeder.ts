@@ -1,24 +1,10 @@
 import type { ArticleTranslation } from '@repo/contracts';
-import type { AutoSeedMode } from '@/core/runtime-config';
 import type { ISeeder } from '@/core/seeder.interface';
-import { getMockArticles } from '../article.mock';
-import type { IArticleRepository } from '../article.repository';
+import type { IArticleRepository } from '../repository/article.repository.interface';
+import { loadSeededArticlesDev } from './article.seed';
 
 export class ArticleSeeder implements ISeeder {
   constructor(private articleRepository: IArticleRepository) {}
-
-  async autoSeed(mode: AutoSeedMode): Promise<void> {
-    const seeded = getMockArticles();
-    if (seeded.length === 0) {
-      return;
-    }
-
-    if (mode === 'RESET_DATA') {
-      await this.deleteAll();
-    }
-
-    await this.seed();
-  }
 
   async deleteAll(): Promise<void> {
     const existing = await this.articleRepository.findAll();
@@ -28,7 +14,10 @@ export class ArticleSeeder implements ISeeder {
   }
 
   async seed(): Promise<void> {
-    const articles = getMockArticles();
+    const articles = loadSeededArticlesDev();
+    if (articles.length === 0) {
+      return;
+    }
     for (const article of articles) {
       const existing = await this.articleRepository.findById(article.id);
       if (existing) {

@@ -71,7 +71,7 @@ apps/
         │   └── municipality/
         │       ├── municipality.gateway.ts
         │       └── controllers/
-        ├── modules/        # Business logic: {feature}.service.ts / .repository.ts / .types.ts
+        ├── modules/        # Business logic par module (voir structure ci-dessous)
         └── middleware/     # Hono middleware (auth, errors, logging, CORS)
 
 packages/
@@ -155,8 +155,37 @@ The backend follows a strict 4-layer architecture:
 |-------|----------|----------------|
 | **Gateway** | `src/gateways/{module}/` | Azure Function entry, Hono routing, DI wiring |
 | **Controller** | `src/gateways/{module}/controllers/` | Route handlers, request validation, no business logic |
-| **Service** | `src/modules/{feature}/` | All business logic |
-| **Repository** | `src/modules/{feature}/` | Data access only (in-memory now, ORM later) |
+| **Service** | `src/modules/{module}/service/` | All business logic |
+| **Repository** | `src/modules/{module}/repository/` | Data access only (in-memory now, ORM later) |
+
+### Structure d'un module (référence: `users`)
+
+Les “modules” backend sont organisés **par domaine** (ex: `users`, `article`, `upload`) et contiennent la logique métier, la persistance, et (optionnellement) le seed.
+
+Structure typique:
+
+```
+apps/backend/src/modules/
+└── users/
+    ├── repository/
+    │   ├── user.repository.interface.ts   # contrat du repository (port)
+    │   ├── user.inmemory.repository.ts    # impl in-memory (dev/tests)
+    │   ├── user.{DB impl}.repository.ts   # impl DB (drizzle ou cosmos)
+    │   └── user.table.ts                  # mapping/table/schema DB (optionel)
+    ├── service/
+    │   ├── user.service.ts                # logique métier (use-cases)
+    │   └── user.service.test.ts           # tests de service
+    ├── seed/
+    │   ├── user.seed.ts                   # source des données de seed (dev)
+    │   └── user.seeder.ts                 # orchestrateur de seed (impl `ISeeder`)
+    └── user.types.ts                      # types domaine (ex: `User`, `BaseUserRole`)
+```
+
+Guidelines:
+- **Controllers**: validation/format d'entrée + mapping DTO → service. Zéro logique métier.
+- **Services**: logique métier pure (use-cases), dépend de `repository` et éventuellement d'autres services (ex: `IAMService`).
+- **Repositories**: accès données uniquement. Plusieurs implémentations possibles (in-memory, drizzle, etc.).
+- **Seeders**: un `*.seeder.ts` par module si besoin, branché dans l'auto-seed global.
 
 ### Rules
 - **EXACTLY 2 gateways**: `citizen` (`/api/citizen/*`) and `municipality` (`/api/municipality/*`) — never create a 3rd

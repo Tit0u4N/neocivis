@@ -1,7 +1,6 @@
-import { Hono, type Context } from 'hono';
-
+import { type Context, Hono } from 'hono';
+import type { UserService } from '@/modules/users/service/user.service';
 import { toUserPublicDto } from '@/modules/users/user.dto';
-import type { UserService } from '@/modules/users/user.service';
 
 export class UserController {
   constructor(private service: UserService) {}

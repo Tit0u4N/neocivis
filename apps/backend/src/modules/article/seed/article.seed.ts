@@ -1,6 +1,6 @@
 import type { Article } from '@repo/contracts/article';
 
-export const articleMockContent = [
+const articleSeedContent = [
   {
     type: 'h1',
     children: [
@@ -849,7 +849,11 @@ export const articleMockContent = [
   },
 ];
 
-export function getMockArticles(): Article[] {
+/**
+ * Source de vérité pour le seed DB des articles en dev.
+ * Anciennement `modules/article/article.mock.ts`.
+ */
+export function loadSeededArticlesDev(): Article[] {
   return [
     {
       id: '11111111-1111-1111-1111-111111111111',
@@ -858,13 +862,13 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Bienvenue dans notre ville',
           description: 'Découvrez les dernières actualités de notre commune.',
-          content: articleMockContent,
+          content: articleSeedContent,
         },
         {
           locale: 'en',
           title: 'Welcome to our city',
           description: 'Discover the latest news from our municipality.',
-          content: articleMockContent,
+          content: articleSeedContent,
         },
       ],
       coverImageUrl: 'https://picsum.photos/seed/city/800/400',
@@ -881,7 +885,7 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Travaux de voirie — Rue du Moulin',
           description: 'Informations sur les travaux en cours.',
-          content: articleMockContent,
+          content: articleSeedContent,
         },
       ],
       coverImageUrl: 'https://picsum.photos/seed/road/800/400',
@@ -898,7 +902,7 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Conseil municipal — Compte-rendu de janvier',
           description: 'Résumé des décisions prises lors du conseil du 25 janvier.',
-          content: articleMockContent,
+          content: articleSeedContent,
         },
         {
           locale: 'de',
@@ -930,7 +934,7 @@ export function getMockArticles(): Article[] {
           locale: 'fr',
           title: 'Fête de la musique 2026 — Appel à candidature',
           description: 'Vous êtes musicien·ne ? Rejoignez la fête !',
-          content: articleMockContent,
+          content: articleSeedContent,
         },
       ],
       status: 'draft',

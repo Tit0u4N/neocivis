@@ -7,7 +7,7 @@ import type {
   UpdateArticleInput,
   UpdateStatusInput,
 } from '@repo/contracts/article';
-import type { IArticleRepository } from './article.repository';
+import type { IArticleRepository } from '../repository/article.repository.interface';
 
 export class ArticleService {
   constructor(private repository: IArticleRepository) {}

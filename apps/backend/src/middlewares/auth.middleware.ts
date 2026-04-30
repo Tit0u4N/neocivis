@@ -1,7 +1,7 @@
 import type { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import { isInMemoryMode } from '@/core/runtime-config';
-import type { UserService } from '@/modules/users/user.service';
+import type { UserService } from '@/modules/users/service/user.service';
 import type { BaseUserRole } from '@/modules/users/user.types';
 
 function normalizeRoles(rolesHeaderValue: string): string[] {

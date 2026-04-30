@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { InMemoryArticleRepository } from './article.repository';
+import { InMemoryArticleRepository } from '../repository/article.inmemory.repository';
+import { ArticleSeeder } from '../seed/article.seeder';
 import { ArticleService } from './article.service';
 
 describe('ArticleService', () => {
-  const makeService = () => {
+  const makeService = async () => {
     const repository = new InMemoryArticleRepository();
+    const seeder = new ArticleSeeder(repository);
+    await seeder.seed();
     const service = new ArticleService(repository);
     return { repository, service };
   };
 
   describe('getAllArticles', () => {
     it('should return all articles', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const articles = await service.getAllArticles();
       expect(Array.isArray(articles)).toBe(true);
       expect(articles.length).toBeGreaterThan(0);
@@ -20,13 +23,13 @@ describe('ArticleService', () => {
 
   describe('getPublishedArticles', () => {
     it('should return only published articles', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const articles = await service.getPublishedArticles();
       expect(articles.every((a) => a.status === 'published')).toBe(true);
     });
 
     it('should not include draft articles', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const articles = await service.getPublishedArticles();
       expect(articles.some((a) => a.status === 'draft')).toBe(false);
     });
@@ -34,21 +37,21 @@ describe('ArticleService', () => {
 
   describe('getArticleById', () => {
     it('should return the article when found', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const all = await service.getAllArticles();
       const article = await service.getArticleById(all[0].id);
       expect(article.id).toBe(all[0].id);
     });
 
     it('should throw when article is not found', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       await expect(service.getArticleById('non-existing-id')).rejects.toThrow('Article not found');
     });
   });
 
   describe('createArticle', () => {
     it('should create an article with a generated id and timestamps', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const article = await service.createArticle(
         {
           translation: { locale: 'fr', title: 'Titre test', description: 'Desc', content: [] },
@@ -65,7 +68,7 @@ describe('ArticleService', () => {
     });
 
     it('should force the translation locale to fr', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const article = await service.createArticle(
         {
           translation: { locale: 'en', title: 'Test', content: [] },
@@ -79,7 +82,7 @@ describe('ArticleService', () => {
 
   describe('updateArticle', () => {
     it('should update article fields and refresh updatedAt', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Original', content: [] }, status: 'draft' },
         'author-1',
@@ -91,14 +94,14 @@ describe('ArticleService', () => {
     });
 
     it('should throw when article is not found', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       await expect(service.updateArticle('missing-id', {})).rejects.toThrow('Article not found');
     });
   });
 
   describe('deleteArticle', () => {
     it('should delete an existing article', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'À supprimer', content: [] }, status: 'draft' },
         'author-1',
@@ -108,14 +111,14 @@ describe('ArticleService', () => {
     });
 
     it('should throw when article is not found', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       await expect(service.deleteArticle('missing-id')).rejects.toThrow('Article not found');
     });
   });
 
   describe('updateStatus', () => {
     it('should change status to published and set publishedAt', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Brouillon', content: [] }, status: 'draft' },
         'author-1',
@@ -126,7 +129,7 @@ describe('ArticleService', () => {
     });
 
     it('should not overwrite publishedAt when re-publishing', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Article', content: [] }, status: 'draft' },
         'author-1',
@@ -138,7 +141,7 @@ describe('ArticleService', () => {
     });
 
     it('should change status back to draft', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const all = await service.getAllArticles();
       const published = all.find((a) => a.status === 'published');
       expect(published).toBeDefined();
@@ -152,7 +155,7 @@ describe('ArticleService', () => {
 
   describe('addTranslation', () => {
     it('should add a new translation to an existing article', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Article', content: [] }, status: 'draft' },
         'author-1',
@@ -167,7 +170,7 @@ describe('ArticleService', () => {
     });
 
     it('should throw when adding a duplicate locale', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Article', content: [] }, status: 'draft' },
         'author-1',
@@ -181,7 +184,7 @@ describe('ArticleService', () => {
 
   describe('updateTranslation', () => {
     it('should update an existing translation', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Original', content: [] }, status: 'draft' },
         'author-1',
@@ -192,7 +195,7 @@ describe('ArticleService', () => {
     });
 
     it('should throw when the translation does not exist', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Article', content: [] }, status: 'draft' },
         'author-1',
@@ -203,7 +206,7 @@ describe('ArticleService', () => {
 
   describe('deleteTranslation', () => {
     it('should delete a non-fr translation', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Article', content: [] }, status: 'draft' },
         'author-1',
@@ -214,7 +217,7 @@ describe('ArticleService', () => {
     });
 
     it('should throw when trying to delete the fr translation', async () => {
-      const { service } = makeService();
+      const { service } = await makeService();
       const created = await service.createArticle(
         { translation: { locale: 'fr', title: 'Article', content: [] }, status: 'draft' },
         'author-1',

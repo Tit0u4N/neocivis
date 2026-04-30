@@ -2,26 +2,7 @@ import type { Container } from '@azure/cosmos';
 import type { Article, ArticleLocale, ArticleTranslation, CreateArticleInput } from '@repo/contracts/article';
 import { getCosmosClient } from '@/infrastructure/azure/cosmos.client';
 import { optionalEnv } from '@/infrastructure/env';
-import { getMockArticles } from './article.mock';
-export { InMemoryArticleRepository } from './article.inmemory.repository';
-
-export interface IArticleRepository {
-  findAll(): Promise<Article[]>;
-  findAllPublished(): Promise<Article[]>;
-  findById(id: string): Promise<Article | undefined>;
-  create(
-    input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
-  ): Promise<Article>;
-  update(id: string, input: Partial<Article>): Promise<Article | undefined>;
-  delete(id: string): Promise<boolean>;
-  addTranslation(id: string, translation: ArticleTranslation): Promise<Article | undefined>;
-  updateTranslation(
-    id: string,
-    locale: ArticleLocale,
-    translation: Partial<ArticleTranslation>,
-  ): Promise<Article | undefined>;
-  deleteTranslation(id: string, locale: ArticleLocale): Promise<Article | undefined>;
-}
+import type { IArticleRepository } from './article.repository.interface';
 
 export function isCosmosConfigured(): boolean {
   return Boolean(optionalEnv('COSMOS_ENDPOINT') && optionalEnv('COSMOS_KEY'));
@@ -29,7 +10,6 @@ export function isCosmosConfigured(): boolean {
 
 export class CosmosArticleRepository implements IArticleRepository {
   private cosmosContainer: Container | null = null;
-  private seedPromise: Promise<void> | null = null;
 
   private async getContainer(): Promise<Container> {
     if (this.cosmosContainer) {
@@ -50,36 +30,13 @@ export class CosmosArticleRepository implements IArticleRepository {
     return container;
   }
 
-  private ensureSeeded(): Promise<void> {
-    if (this.seedPromise) {
-      return this.seedPromise;
-    }
-
-    this.seedPromise = (async () => {
-      const container = await this.getContainer();
-      const { resources } = await container.items.query<{ id: string }>('SELECT TOP 1 c.id FROM c').fetchAll();
-      if (resources.length > 0) {
-        return;
-      }
-
-      const mock = getMockArticles();
-      await Promise.all(mock.map((a) => container.items.upsert(a)));
-    })().finally(() => {
-      this.seedPromise = null;
-    });
-
-    return this.seedPromise;
-  }
-
   async findAll(): Promise<Article[]> {
-    await this.ensureSeeded();
     const container = await this.getContainer();
     const { resources } = await container.items.query<Article>('SELECT * FROM c').fetchAll();
     return resources;
   }
 
   async findAllPublished(): Promise<Article[]> {
-    await this.ensureSeeded();
     const container = await this.getContainer();
     const { resources } = await container.items
       .query<Article>({
@@ -91,7 +48,6 @@ export class CosmosArticleRepository implements IArticleRepository {
   }
 
   async findById(id: string): Promise<Article | undefined> {
-    await this.ensureSeeded();
     const container = await this.getContainer();
 
     const { resources } = await container.items
@@ -103,7 +59,6 @@ export class CosmosArticleRepository implements IArticleRepository {
   async create(
     input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
   ): Promise<Article> {
-    await this.ensureSeeded();
     const article: Article = {
       id: input.id,
       translations: [input.translation],
@@ -120,7 +75,6 @@ export class CosmosArticleRepository implements IArticleRepository {
   }
 
   async update(id: string, input: Partial<Article>): Promise<Article | undefined> {
-    await this.ensureSeeded();
     const container = await this.getContainer();
     const existing = await this.findById(id);
     if (!existing) {
@@ -132,7 +86,6 @@ export class CosmosArticleRepository implements IArticleRepository {
   }
 
   async delete(id: string): Promise<boolean> {
-    await this.ensureSeeded();
     const container = await this.getContainer();
     try {
       await container.item(id, id).delete();
@@ -177,4 +130,3 @@ export class CosmosArticleRepository implements IArticleRepository {
     return this.update(id, article);
   }
 }
-

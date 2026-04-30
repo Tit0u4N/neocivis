@@ -1,38 +1,24 @@
 import type { Article, ArticleLocale, ArticleTranslation, CreateArticleInput } from '@repo/contracts/article';
-import { getMockArticles } from './article.mock';
-import type { IArticleRepository } from './article.repository';
+import type { IArticleRepository } from './article.repository.interface';
 
 export class InMemoryArticleRepository implements IArticleRepository {
-  private seeded = false;
   private articles: Article[] = [];
 
-  private ensureSeeded(): void {
-    if (this.seeded) {
-      return;
-    }
-    this.articles = getMockArticles();
-    this.seeded = true;
-  }
-
   findAll(): Promise<Article[]> {
-    this.ensureSeeded();
     return Promise.resolve(this.articles);
   }
 
   findAllPublished(): Promise<Article[]> {
-    this.ensureSeeded();
     return Promise.resolve(this.articles.filter((a) => a.status === 'published'));
   }
 
   findById(id: string): Promise<Article | undefined> {
-    this.ensureSeeded();
     return Promise.resolve(this.articles.find((a) => a.id === id));
   }
 
   create(
     input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
   ): Promise<Article> {
-    this.ensureSeeded();
     const article: Article = {
       id: input.id,
       translations: [input.translation],
@@ -43,11 +29,10 @@ export class InMemoryArticleRepository implements IArticleRepository {
       authorId: input.authorId,
     };
     this.articles.push(article);
-    return article;
+    return Promise.resolve(article);
   }
 
   update(id: string, input: Partial<Article>): Promise<Article | undefined> {
-    this.ensureSeeded();
     const index = this.articles.findIndex((a) => a.id === id);
     if (index === -1) {
       return Promise.resolve(undefined);
@@ -58,7 +43,6 @@ export class InMemoryArticleRepository implements IArticleRepository {
   }
 
   delete(id: string): Promise<boolean> {
-    this.ensureSeeded();
     const index = this.articles.findIndex((a) => a.id === id);
     if (index === -1) {
       return Promise.resolve(false);
@@ -102,4 +86,3 @@ export class InMemoryArticleRepository implements IArticleRepository {
     return this.update(id, article);
   }
 }
-

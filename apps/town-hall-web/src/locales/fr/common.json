@@ -150,5 +150,65 @@
       "roleManagement": "Rôles",
       "webhook": "Webhook"
     }
+  },
+  "appManagement": {
+    "title": "Gestion de l'application",
+    "hint": "Faites glisser une tuile pour la repositionner. Tirez le coin bas-droit pour la redimensionner. Cliquez pour modifier.",
+    "grid": {
+      "title": "Catégories",
+      "add": "Ajouter",
+      "reset": "Réinitialiser",
+      "footer": "{{cols}} colonnes · {{rows}} lignes · {{count}} tuile(s)",
+      "tileAria": "Tuile : {{title}}",
+      "resizeAria": {
+        "right": "Redimensionner (droite)",
+        "bottom": "Redimensionner (bas)",
+        "br": "Redimensionner (coin)"
+      }
+    },
+    "settings": {
+      "title": "Paramètres de la tuile",
+      "sizeLabel": "{{w}}×{{h}} cellules",
+      "positionLabel": "col {{col}}, ligne {{row}}",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Titre de la tuile",
+      "linkLabel": "Lien vers",
+      "presetColors": "Couleurs prédéfinies",
+      "customColor": "Couleur personnalisée",
+      "bgTintHint": "La teinte de fond est générée automatiquement depuis la couleur choisie.",
+      "bgTintTitle": "Teinte du fond (générée automatiquement)",
+      "clear": "Effacer",
+      "delete": "Supprimer"
+    },
+    "icon": {
+      "label": "Icône",
+      "none": "Aucune",
+      "noneTitle": "Aucune icône",
+      "modalTitle": "Choisir une icône",
+      "searchPlaceholder": "Rechercher une icône…",
+      "searchResultCount": "{{count}} résultat(s)",
+      "allCount": "{{count}} icônes disponibles",
+      "noResults": "Aucun résultat pour « {{query}} »",
+      "searchHint": "Tapez un nom pour chercher parmi toutes les icônes"
+    },
+    "links": {
+      "Link": "Lien",
+      "General": "Général",
+      "Reports": "Signalements",
+      "Forum": "Forum",
+      "Establishment": "Établissement",
+      "Articles": "Articles",
+      "Events": "Événements",
+      "External URL": "URL externe"
+    },
+    "colors": {
+      "Corail": "Corail",
+      "Azur": "Azur",
+      "Ambre": "Ambre",
+      "Ardoise": "Ardoise",
+      "Forêt": "Forêt",
+      "Violet": "Violet"
+    },
+    "newTileTitle": "Nouveau"
   }
 }

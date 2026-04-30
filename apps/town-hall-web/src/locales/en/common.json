@@ -150,5 +150,65 @@
       "roleManagement": "Roles",
       "webhook": "Webhook"
     }
+  },
+  "appManagement": {
+    "title": "App Management",
+    "hint": "Drag a tile to reposition it. Pull the bottom-right corner to resize. Click to edit.",
+    "grid": {
+      "title": "Categories",
+      "add": "Add",
+      "reset": "Reset",
+      "footer": "{{cols}} columns · {{rows}} rows · {{count}} tile(s)",
+      "tileAria": "Tile: {{title}}",
+      "resizeAria": {
+        "right": "Resize (right)",
+        "bottom": "Resize (bottom)",
+        "br": "Resize (corner)"
+      }
+    },
+    "settings": {
+      "title": "Tile settings",
+      "sizeLabel": "{{w}}×{{h}} cells",
+      "positionLabel": "col {{col}}, row {{row}}",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Tile title",
+      "linkLabel": "Link to",
+      "presetColors": "Preset colors",
+      "customColor": "Custom color",
+      "bgTintHint": "The background tint is automatically generated from the chosen color.",
+      "bgTintTitle": "Background tint (auto-generated)",
+      "clear": "Clear",
+      "delete": "Delete"
+    },
+    "icon": {
+      "label": "Icon",
+      "none": "None",
+      "noneTitle": "No icon",
+      "modalTitle": "Choose an icon",
+      "searchPlaceholder": "Search for an icon…",
+      "searchResultCount": "{{count}} result(s)",
+      "allCount": "{{count}} icons available",
+      "noResults": "No results for \"{{query}}\"",
+      "searchHint": "Type a name to search all icons"
+    },
+    "links": {
+      "Link": "Link",
+      "General": "General",
+      "Reports": "Reports",
+      "Forum": "Forum",
+      "Establishment": "Establishment",
+      "Articles": "Articles",
+      "Events": "Events",
+      "External URL": "External URL"
+    },
+    "colors": {
+      "Corail": "Coral",
+      "Azur": "Azure",
+      "Ambre": "Amber",
+      "Ardoise": "Slate",
+      "Forêt": "Forest",
+      "Violet": "Purple"
+    },
+    "newTileTitle": "New"
   }
 }

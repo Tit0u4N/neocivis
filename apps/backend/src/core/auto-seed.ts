@@ -1,9 +1,13 @@
 import { getAutoSeedMode } from '@/core/runtime-config';
+import type { IArticleRepository } from '@/modules/article/article.repository';
+import { ArticleSeeder } from '@/modules/article/seed/article.seeder';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/user.service';
+import type { ISeeder } from './seeder.interface';
 
 type AutoSeedDeps = {
   userService: UserService;
+  articleRepository: IArticleRepository;
 };
 
 const AUTO_SEED_GLOBAL_KEY = '__neocivis_auto_seed_started__';
@@ -26,9 +30,16 @@ export function startAutoSeedOnStartup(deps: AutoSeedDeps): void {
   }
   markStarted();
 
-  const seeder = new UserSeeder(deps.userService);
+  const seederList: ISeeder[] = [new UserSeeder(deps.userService), new ArticleSeeder(deps.articleRepository)];
 
-  seeder.autoSeed(mode).catch((err: unknown) => {
+  (async () => {
+    for (const seeder of seederList) {
+      if (mode === 'RESET_DATA') {
+        await seeder.deleteAll();
+      }
+      await seeder.seed();
+    }
+  })().catch((err: unknown) => {
     // biome-ignore lint/suspicious/noConsole: startup seeding diagnostics
     console.error('[auto-seed] failed', err);
   });

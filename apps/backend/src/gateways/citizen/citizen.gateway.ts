@@ -22,12 +22,13 @@ const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : n
 // Import services
 const iamService = new KeycloakIAMService();
 const userService = new UserService(userRepository, iamService);
+const articleService = new ArticleService(articleRepository);
 
-startAutoSeedOnStartup({ userService });
+startAutoSeedOnStartup({ userService, articleRepository });
 
 // Import controllers
 const userController = new UserController(userService);
-const articleController = new ArticleController(new ArticleService(articleRepository));
+const articleController = new ArticleController(articleService);
 
 let app = new Hono().basePath('/api/citizen');
 

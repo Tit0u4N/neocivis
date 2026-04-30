@@ -25,15 +25,16 @@ const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : n
 // Import services
 const iamService = new KeycloakIAMService();
 const userService = new UserService(userRepository, iamService);
+const articleService = new ArticleService(articleRepository);
 const uploadService = optionalEnv('AZURE_STORAGE_CONNECTION_STRING')
   ? new AzureBlobUploadService()
   : new StubUploadService();
 
-startAutoSeedOnStartup({ userService });
+startAutoSeedOnStartup({ userService, articleRepository });
 
 // Import controllers
 const userController = new UserController(userService);
-const articleController = new ArticleController(new ArticleService(articleRepository));
+const articleController = new ArticleController(articleService);
 const uploadController = new UploadController(uploadService);
 
 const app = new Hono().basePath('/api/municipality');

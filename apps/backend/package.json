@@ -19,7 +19,6 @@
     "dev": "concurrently \"bun run watch\" \"bun run start\"",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run ./src/infrastructure/db/migrate.ts",
-    "db:seed:users": "bun run ./src/infrastructure/db/seed-users.ts",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },

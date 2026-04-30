@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import NeocivisLogo from '@/assets/images/neocivis_logo_white.svg';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
@@ -73,8 +74,7 @@ export default function LoginScreen() {
         <View style={styles.ringSm} />
 
         <Animated.View style={[styles.wordmarkRow, enterStyle]}>
-          <View style={styles.wordmarkDot} />
-          <Text style={styles.wordmark}>{t('login.brand').toUpperCase()}</Text>
+          <NeocivisLogo width={120} height={10} />
         </Animated.View>
 
         <Animated.View style={[styles.heroText, enterStyle]}>
@@ -173,21 +173,8 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
   },
   wordmarkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  wordmarkDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.85)',
-  },
-  wordmark: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 2.4,
+    marginLeft: -18,
+    marginTop: -10,
   },
   heroText: {
     gap: 6,

@@ -59,7 +59,6 @@ export default function LoginScreen() {
         start={{ x: 1, y: 0 }}
         end={{ x: 0.15, y: 0.9 }}
         style={StyleSheet.absoluteFill}
-        pointerEvents="none"
       />
       <LinearGradient
         colors={['rgba(0,0,0,0.70)', 'rgba(0,0,0,0)']}
@@ -67,12 +66,11 @@ export default function LoginScreen() {
         start={{ x: 0, y: 1 }}
         end={{ x: 0.85, y: 0.1 }}
         style={StyleSheet.absoluteFill}
-        pointerEvents="none"
       />
 
       <View style={styles.hero}>
-        <View style={styles.ringLg} pointerEvents="none" />
-        <View style={styles.ringSm} pointerEvents="none" />
+        <View style={styles.ringLg} />
+        <View style={styles.ringSm} />
 
         <Animated.View style={[styles.wordmarkRow, enterStyle]}>
           <View style={styles.wordmarkDot} />
@@ -90,7 +88,7 @@ export default function LoginScreen() {
         onLayout={(e) => setSheetSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
       >
         {sheetPath ? (
-          <Svg width={sheetSize.w} height={sheetSize.h} style={StyleSheet.absoluteFill} pointerEvents="none">
+          <Svg width={sheetSize.w} height={sheetSize.h} style={StyleSheet.absoluteFill}>
             <Path d={sheetPath} fill={backgroundColor} />
           </Svg>
         ) : null}
@@ -161,6 +159,7 @@ const styles = StyleSheet.create({
     borderRadius: 210,
     borderWidth: 1.2,
     borderColor: 'rgba(255,255,255,0.18)',
+    pointerEvents: 'none',
   },
   ringSm: {
     position: 'absolute',
@@ -171,6 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 90,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
+    pointerEvents: 'none',
   },
   wordmarkRow: {
     flexDirection: 'row',

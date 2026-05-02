@@ -19,6 +19,8 @@
     "dev": "concurrently \"bun run watch\" \"bun run start\"",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run ./src/infrastructure/db/migrate.ts",
+    "db:reset": "bun run ./src/infrastructure/db/reset.ts",
+    "db:seeding": "bun run ./src/core/seeding.ts",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },

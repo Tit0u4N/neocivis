@@ -1,5 +1,4 @@
 export * from '@/modules/users/repository/user.table';
-export * from './applicationMetadata.table';
 
 /**
  * Unique entry point for Drizzle for `drizzle-kit`:

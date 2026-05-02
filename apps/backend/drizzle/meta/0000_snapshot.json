@@ -1,41 +1,9 @@
 {
-  "id": "58d6522d-fe6a-4661-8f26-555b5a7badf6",
+  "id": "853d40e2-985b-4770-a630-d50a1581ebb7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.application_metadata": {
-      "name": "application_metadata",
-      "schema": "",
-      "columns": {
-        "key": {
-          "name": "key",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "value": {
-          "name": "value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -46,7 +14,7 @@
           "primaryKey": true,
           "notNull": true,
           "identity": {
-            "type": "always",
+            "type": "byDefault",
             "name": "users_id_seq",
             "schema": "public",
             "increment": "1",
@@ -56,12 +24,6 @@
             "cache": "1",
             "cycle": false
           }
-        },
-        "seed_id": {
-          "name": "seed_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         },
         "keycloak_id": {
           "name": "keycloak_id",
@@ -170,21 +132,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "users_seed_id_idx": {
-          "name": "users_seed_id_idx",
-          "columns": [
-            {
-              "expression": "seed_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {},
@@ -199,11 +146,7 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "ADMIN",
-        "EMPLOYEE",
-        "CITIZEN"
-      ]
+      "values": ["ADMIN", "EMPLOYEE", "CITIZEN"]
     }
   },
   "schemas": {},

@@ -3,9 +3,10 @@ import type { IArticleRepository } from '@/modules/article/repository/article.re
 import { ArticleSeeder } from '@/modules/article/seed/article.seeder';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/service/user.service';
+import type { AutoSeedMode } from './runtime-config';
 import type { ISeeder } from './seeder.interface';
 
-type AutoSeedDeps = {
+export type AutoSeedDeps = {
   userService: UserService;
   articleRepository: IArticleRepository;
 };
@@ -32,6 +33,13 @@ export async function startAutoSeedOnStartup(deps: AutoSeedDeps): Promise<void> 
   }
   markStarted();
 
+  await runSeeders(deps, mode).catch((err: unknown) => {
+    // biome-ignore lint/suspicious/noConsole: startup seeding diagnostics
+    console.error('[auto-seed] failed', err);
+  });
+}
+
+export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promise<void> {
   const seederList: ISeeder[] = [new UserSeeder(deps.userService), new ArticleSeeder(deps.articleRepository)];
 
   await Promise.all(
@@ -41,8 +49,5 @@ export async function startAutoSeedOnStartup(deps: AutoSeedDeps): Promise<void> 
       }
       await seeder.seed();
     }),
-  ).catch((err: unknown) => {
-    // biome-ignore lint/suspicious/noConsole: startup seeding diagnostics
-    console.error('[auto-seed] failed', err);
-  });
+  );
 }

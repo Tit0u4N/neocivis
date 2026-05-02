@@ -105,3 +105,6 @@ next-env.d.ts
 
 # --- Azure ---
 local.settings.json
+
+# --- Local data ---
+local-data/

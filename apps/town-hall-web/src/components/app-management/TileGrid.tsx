@@ -5,8 +5,9 @@ import * as LucideIcons from 'lucide-react';
 import { Plus, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { AppTile, MovePreview, ResizeHandle } from './useAppManagementPage';
-import { CELL, COLS, GAP, tintFrom } from './useAppManagementPage';
+import { tintFrom } from './useAppManagementPage';
 
 function TileGlyph({ id, size }: { id: string; size: number }) {
   if (!id || id === 'none') {
@@ -27,57 +28,19 @@ type ResizeHandleProps = {
 };
 
 function TileResizeHandle({ pos, blockId, onStart, ariaLabel }: ResizeHandleProps) {
-  const cursorMap: Record<ResizeHandle, string> = {
-    right: 'ew-resize',
-    bottom: 'ns-resize',
-    br: 'nwse-resize',
-  };
-
-  const styleMap: Record<ResizeHandle, React.CSSProperties> = {
-    right: {
-      position: 'absolute',
-      right: -3,
-      top: '20%',
-      width: 6,
-      height: '60%',
-      cursor: cursorMap[pos],
-      borderRadius: 3,
-      zIndex: 5,
-    },
-    bottom: {
-      position: 'absolute',
-      bottom: -3,
-      left: '20%',
-      width: '60%',
-      height: 6,
-      cursor: cursorMap[pos],
-      borderRadius: 3,
-      zIndex: 5,
-    },
-    br: {
-      position: 'absolute',
-      bottom: -5,
-      right: -5,
-      width: 14,
-      height: 14,
-      cursor: cursorMap[pos],
-      borderRadius: '50%',
-      zIndex: 6,
-      backgroundColor: '#fff',
-      border: '2px solid rgb(38,38,39)',
-    },
+  const classNameMap: Record<ResizeHandle, string> = {
+    right:
+      'absolute right-[-3px] top-[20%] w-[6px] h-[60%] cursor-ew-resize rounded-[3px] z-[5] bg-transparent border-none p-0',
+    bottom:
+      'absolute bottom-[-3px] left-[20%] w-[60%] h-[6px] cursor-ns-resize rounded-[3px] z-[5] bg-transparent border-none p-0',
+    br: 'absolute bottom-[-5px] right-[-5px] w-[14px] h-[14px] cursor-nwse-resize rounded-full z-[6] bg-white border-2 border-[rgb(38,38,39)] p-0',
   };
 
   return (
     <button
       type="button"
       aria-label={ariaLabel}
-      style={{
-        ...styleMap[pos],
-        background: 'none',
-        border: pos === 'br' ? '2px solid rgb(38,38,39)' : 'none',
-        padding: 0,
-      }}
+      className={classNameMap[pos]}
       onMouseDown={(e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -100,7 +63,6 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
   const { t } = useTranslation();
   const bg = tintFrom(block.fg, 0.86);
   const big = block.w >= 2 || block.h >= 2;
-  const iconBox = big ? 44 : 38;
   const iconSize = big ? 22 : 20;
 
   return (
@@ -112,48 +74,30 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
         onSelect(block.id);
         onMoveStart(block.id, e.clientX, e.clientY);
       }}
+      className={cn(
+        'relative flex flex-col justify-between rounded-[22px] overflow-visible border-0 outline-2 outline-solid outline-offset-2',
+        big ? 'p-4' : 'p-3',
+        isDragging
+          ? 'cursor-grabbing opacity-[0.35] transition-none'
+          : 'cursor-grab opacity-100 [transition:outline-color_0.12s,opacity_0.12s]',
+        isSelected ? 'outline-[rgb(38,38,39)]' : 'outline-transparent',
+      )}
       style={{
         gridColumn: `${block.col + 1} / span ${block.w}`,
         gridRow: `${block.row + 1} / span ${block.h}`,
         backgroundColor: bg,
-        borderRadius: 22,
-        cursor: isDragging ? 'grabbing' : 'grab',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: big ? 16 : 12,
-        position: 'relative',
-        outline: isSelected ? '2px solid rgb(38,38,39)' : '2px solid transparent',
-        outlineOffset: 2,
-        transition: isDragging ? 'none' : 'outline-color 0.12s, opacity 0.12s',
-        overflow: 'visible',
-        opacity: isDragging ? 0.35 : 1,
-        border: 'none',
       }}
     >
       <div
-        style={{
-          width: iconBox,
-          height: iconBox,
-          borderRadius: 12,
-          backgroundColor: 'rgba(255,255,255,0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: block.fg,
-        }}
+        className={cn('flex items-center justify-center rounded-xl bg-white/70', big ? 'w-11 h-11' : 'w-9.5 h-9.5')}
+        style={{ color: block.fg }}
       >
         <TileGlyph id={block.icon} size={iconSize} />
       </div>
 
       <div
-        style={{
-          fontWeight: 700,
-          fontSize: big ? 18 : 15,
-          color: block.fg,
-          lineHeight: 1.15,
-          letterSpacing: '-0.01em',
-        }}
+        className={cn('font-bold leading-[1.15] tracking-[-0.01em]', big ? 'text-[18px]' : 'text-[15px]')}
+        style={{ color: block.fg }}
       >
         {block.title}
       </div>
@@ -220,7 +164,7 @@ export function TileGrid({
   const showGhost = !!(movePreview?.activated && draggedBlock);
 
   return (
-    <div style={{ paddingRight: 32, flexShrink: 0 }}>
+    <div className="pr-8 shrink-0">
       <div className="mb-3.5 flex items-center justify-between">
         <span className="font-bold text-foreground text-lg">{t('appManagement.grid.title')}</span>
         <div className="flex gap-2">
@@ -237,15 +181,11 @@ export function TileGrid({
 
       <div
         ref={gridRef}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${COLS}, ${CELL}px)`,
-          gridAutoRows: `${CELL}px`,
-          gap: GAP,
-          width: gridW,
-          position: 'relative',
-          userSelect: isDragging ? 'none' : 'auto',
-        }}
+        className={cn(
+          'relative grid gap-3 grid-cols-[repeat(3,150px)] auto-rows-[150px]',
+          isDragging ? 'select-none' : 'select-auto',
+        )}
+        style={{ width: gridW }}
       >
         {blocks.map((block) => (
           <GridTile
@@ -262,22 +202,19 @@ export function TileGrid({
         {showGhost && draggedBlock && (
           <div
             aria-hidden="true"
+            className="rounded-[22px] pointer-events-none z-10 [transition:grid-column_0.08s,grid-row_0.08s]"
             style={{
               gridColumn: `${(movePreview?.col ?? 0) + 1} / span ${draggedBlock.w}`,
               gridRow: `${(movePreview?.row ?? 0) + 1} / span ${draggedBlock.h}`,
-              borderRadius: 22,
               border: `2px dashed ${draggedBlock.fg}`,
               backgroundColor: tintFrom(draggedBlock.fg, 0.93),
-              pointerEvents: 'none',
-              zIndex: 10,
-              transition: 'grid-column 0.08s, grid-row 0.08s',
             }}
           />
         )}
       </div>
 
       <p className="mt-3.5 text-muted-foreground text-xs">
-        {t('appManagement.grid.footer', { cols: COLS, rows, count: blocks.length })}
+        {t('appManagement.grid.footer', { cols: 3, rows, count: blocks.length })}
       </p>
     </div>
   );

@@ -66,7 +66,7 @@ export function AppManagementPage({
     <PageLayout title={t('appManagement.title')}>
       <p className="text-muted-foreground text-sm">{t('appManagement.hint')}</p>
 
-      <div className="flex gap-0" style={{ alignItems: 'flex-start' }}>
+      <div className="flex items-start gap-0">
         <TileGrid
           blocks={blocks}
           selectedId={selectedId}
@@ -86,7 +86,7 @@ export function AppManagementPage({
         <Separator orientation="vertical" className="mx-0 min-h-[480px] data-[orientation=vertical]:h-auto" />
 
         {/* Right: Tile settings */}
-        <div style={{ paddingLeft: 32, flex: 1, minWidth: 280 }}>
+        <div className="flex-1 min-w-[280px] pl-8">
           <span className="mb-5 block font-bold text-foreground text-lg">{t('appManagement.settings.title')}</span>
 
           <div className="flex flex-col gap-5">

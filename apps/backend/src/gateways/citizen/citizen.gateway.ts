@@ -14,7 +14,14 @@ import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.r
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/service/user.service';
 import { ArticleController } from './controllers/article.controller';
+import { ConfigController } from './controllers/config.controller';
+import { ReportController } from './controllers/report.controller';
 import { UserController } from './controllers/user.controller';
+import { StubUploadService } from '@/modules/upload/upload.service';
+import { ConfigService } from '@/modules/config/config.service';
+import { ReportService } from '@/modules/report/report.service';
+import { InMemoryReportRepository } from '@/modules/report/report.repository';
+import { InMemoryConfigRepository } from '@/modules/config/config.repository';
 
 // Import repositories
 const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
@@ -24,12 +31,16 @@ const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : n
 const iamService = new KeycloakIAMService();
 const userService = new UserService(userRepository, iamService);
 const articleService = new ArticleService(articleRepository);
+const reportRepository = new InMemoryReportRepository();
+const configRepository = new InMemoryConfigRepository();
 
 await startAutoSeedOnStartup({ userService, articleRepository });
 
 // Import controllers
 const userController = new UserController(userService);
 const articleController = new ArticleController(articleService);
+const reportController = new ReportController(new ReportService(reportRepository), new StubUploadService());
+const configController = new ConfigController(new ConfigService(configRepository));
 
 let app = new Hono().basePath('/api/citizen');
 
@@ -37,10 +48,13 @@ app = applyCorsMiddleware(app);
 app = applyDbMiddleware(app);
 app = applyMockApimMiddleware(app);
 app = applyUserMiddleware(app, userService);
-app = applyRoleMiddleware(app, ['CITIZEN']);
+app = applyRoleMiddleware(app, ['CITIZEN', 'ADMIN', 'EMPLOYEE']);
+
 
 // Register routes from controllers
 app.route('/user', userController.getRoutes());
 app.route('/articles', articleController.getRoutes());
+app.route('/reports', reportController.getRoutes());
+app.route('/config', configController.getRoutes());
 
 export default app;

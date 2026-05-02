@@ -1,59 +1,53 @@
-import MaterialIcons from '@expo/vector-icons/Feather';
-import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
+import { Tabs } from 'expo-router';
+import { CircleUser, Landmark, MessageSquare, Star, TriangleAlert } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Platform } from 'react-native';
-import { useColor } from '@/hooks/useColor';
+import { BottomNav } from '@/components/ui/bottom-nav';
+import { Icon } from '@/components/ui/icon';
 
 export default function TabsLayout() {
-  const primary = useColor('primary');
-  const foreground = useColor('foreground');
   const { t } = useTranslation();
 
   return (
-    <NativeTabs
-      minimizeBehavior="onScrollDown"
-      labelStyle={{
-        default: { color: primary },
-        selected: { color: foreground },
-      }}
-      iconColor={{
-        default: primary,
-        selected: foreground,
-      }}
-      labelVisibilityMode="labeled"
-      disableTransparentOnScrollEdge={true}
-    >
-      <NativeTabs.Trigger name="(city)">
-        {Platform.select({
-          ios: <Icon sf="building.2.fill" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="map-pin" />} />,
-        })}
-        <Label>{t('tabs.city')}</Label>
-      </NativeTabs.Trigger>
+    <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <BottomNav {...props} />}>
+      <Tabs.Screen
+        name="(city)"
+        options={{
+          title: t('tabs.city'),
+          tabBarIcon: ({ color }) => <Icon name={Landmark} size={20} color={color} />,
+        }}
+      />
 
-      <NativeTabs.Trigger name="report">
-        {Platform.select({
-          ios: <Icon sf="exclamationmark.triangle.fill" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="alert-triangle" />} />,
-        })}
-        <Label>{t('tabs.report')}</Label>
-      </NativeTabs.Trigger>
+      <Tabs.Screen
+        name="news"
+        options={{
+          title: t('tabs.news'),
+          tabBarIcon: ({ color }) => <Icon name={Star} size={20} color={color} />,
+        }}
+      />
 
-      <NativeTabs.Trigger name="forum">
-        {Platform.select({
-          ios: <Icon sf="bubble.left.and.bubble.right.fill" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="message-square" />} />,
-        })}
-        <Label>{t('tabs.forum')}</Label>
-      </NativeTabs.Trigger>
+      <Tabs.Screen
+        name="forum"
+        options={{
+          title: t('tabs.forum'),
+          tabBarIcon: ({ color }) => <Icon name={MessageSquare} size={20} color={color} />,
+        }}
+      />
 
-      <NativeTabs.Trigger name="account">
-        {Platform.select({
-          ios: <Icon sf="person.fill" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="user" />} />,
-        })}
-        <Label>{t('tabs.account')}</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+      <Tabs.Screen
+        name="report"
+        options={{
+          title: t('tabs.report'),
+          tabBarIcon: ({ color }) => <Icon name={TriangleAlert} size={20} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: t('tabs.account'),
+          tabBarIcon: ({ color }) => <Icon name={CircleUser} size={20} color={color} />,
+        }}
+      />
+    </Tabs>
   );
 }

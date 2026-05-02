@@ -2,6 +2,7 @@
   "login": {
     "brand": "NeoCivis",
     "title": "Welcome to\nNeoCivis",
+    "welcomeTo": "Welcome to",
     "subtitle": "Join us to stay up to date with your city's news",
     "signUp": "Sign Up",
     "signIn": "Log In",
@@ -9,18 +10,103 @@
   },
   "tabs": {
     "city": "City",
+    "news": "News",
     "report": "Report",
     "forum": "Forum",
     "account": "Account"
   },
   "city": {
-    "title": "City"
+    "title": "City",
+    "welcomeTitle": "Welcome to NeoCivis",
+    "welcomeSubtitle": "Find the latest news from your city here. Stay informed and engaged.",
+    "greeting": "Hello 👋",
+    "greetingNamed": "Hello {{name}} 👋",
+    "categories": "Categories",
+    "news": "News",
+    "seeAll": "See all"
+  },
+  "articles": {
+    "title": "Articles",
+    "latest": "Latest news",
+    "seeAll": "See all articles",
+    "loading": "Loading...",
+    "loadMore": "Load more",
+    "error": "Unable to load articles",
+    "empty": "No articles available",
+    "notFound": "Article not found"
+  },
+  "common": {
+    "relativeDate": {
+      "justNow": "just now",
+      "hoursAgo": "{{count}}h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{{count}}d ago"
+    }
   },
   "report": {
-    "title": "Report"
+    "title": "Reports",
+    "subtitle": "Help your city solve problems.",
+    "newReport": "New report",
+    "myReports": "My reports",
+    "noReports": "No reports.",
+    "notFound": "Report not found",
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "progress": "In progress",
+      "resolved": "Resolved"
+    },
+    "new": {
+      "headerTitle": "New report",
+      "title": "Report a problem",
+      "date": "Date",
+      "type": "Problem type",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the problem in detail...",
+      "photo": "Photo (optional)",
+      "photoCamera": "Take a photo",
+      "photoGallery": "Gallery",
+      "location": "GPS Location",
+      "locationLoading": "Getting your location...",
+      "locationDenied": "Location access denied",
+      "locationRetry": "Retry",
+      "locationRefresh": "Refresh",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "chars": "characters"
+    },
+    "detail": {
+      "headerTitle": "Details",
+      "date": "DATE",
+      "type": "TYPE",
+      "description": "DESCRIPTION",
+      "tracking": "TRACKING",
+      "received": "Received",
+      "takenCare": "Handled by services",
+      "takenCareAgo": "2 days ago",
+      "resolved": "Resolved",
+      "resolvedAgo": "1 day ago",
+      "noLocation": "Location not available",
+      "back": "Back",
+      "cancelReport": "Cancel report"
+    },
+    "cancel": {
+      "title": "Cancel this report?",
+      "subtitle": "This action is permanent. You can create a new report if needed.",
+      "keep": "Keep",
+      "confirm": "Confirm"
+    },
+    "columns": {
+      "subject": "Subject",
+      "date": "Date",
+      "status": "Status"
+    }
   },
   "forum": {
     "title": "Forum"
+  },
+  "news": {
+    "title": "News"
   },
   "account": {
     "title": "My account",

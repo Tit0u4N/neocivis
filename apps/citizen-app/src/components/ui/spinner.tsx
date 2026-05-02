@@ -309,10 +309,12 @@ export function LoadingOverlay({
     <Animated.View
       style={[
         styles.overlay,
-        { backgroundColor: backdrop ? defaultBackdropColor : 'transparent' },
+        {
+          backgroundColor: backdrop ? defaultBackdropColor : 'transparent',
+          pointerEvents: visible ? 'auto' : 'none'
+        },
         animatedOverlayStyle,
       ]}
-      pointerEvents={visible ? 'auto' : 'none'}
     >
       <View style={[styles.overlayContent, { backgroundColor: cardColor }]}>
         <Spinner {...spinnerProps} />

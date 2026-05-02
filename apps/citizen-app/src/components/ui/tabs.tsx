@@ -300,11 +300,11 @@ function CarouselContainer({
                 position: 'absolute',
                 width: screenWidth,
                 paddingTop: 16,
+                pointerEvents: "none"
               },
               style,
               previousStyle,
             ]}
-            pointerEvents="none"
           >
             {allTabContents[previousTab]}
           </Animated.View>

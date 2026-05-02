@@ -66,16 +66,14 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
   const iconSize = big ? 22 : 20;
 
   return (
-    <button
-      type="button"
-      aria-label={t('appManagement.grid.tileAria', { title: block.title })}
-      aria-pressed={isSelected}
+    // biome-ignore lint/a11y/noStaticElementInteractions: This is a tile not a real button so it's better to be a div
+    <div
       onMouseDown={(e) => {
         onSelect(block.id);
         onMoveStart(block.id, e.clientX, e.clientY);
       }}
       className={cn(
-        'relative flex flex-col justify-between rounded-[22px] overflow-visible border-0 outline-2 outline-solid outline-offset-2',
+        'relative flex flex-col justify-between overflow-visible rounded-[22px] border-0 outline-2 outline-solid outline-offset-2',
         big ? 'p-4' : 'p-3',
         isDragging
           ? 'cursor-grabbing opacity-[0.35] transition-none'
@@ -89,7 +87,7 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
       }}
     >
       <div
-        className={cn('flex items-center justify-center rounded-xl bg-white/70', big ? 'w-11 h-11' : 'w-9.5 h-9.5')}
+        className={cn('flex items-center justify-center rounded-xl bg-white/70', big ? 'h-11 w-11' : 'h-9.5 w-9.5')}
         style={{ color: block.fg }}
       >
         <TileGlyph id={block.icon} size={iconSize} />
@@ -124,7 +122,7 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
           />
         </>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -164,7 +162,7 @@ export function TileGrid({
   const showGhost = !!(movePreview?.activated && draggedBlock);
 
   return (
-    <div className="pr-8 shrink-0">
+    <div className="shrink-0 pr-8">
       <div className="mb-3.5 flex items-center justify-between">
         <span className="font-bold text-foreground text-lg">{t('appManagement.grid.title')}</span>
         <div className="flex gap-2">
@@ -182,7 +180,7 @@ export function TileGrid({
       <div
         ref={gridRef}
         className={cn(
-          'relative grid gap-3 grid-cols-[repeat(3,150px)] auto-rows-[150px]',
+          'relative grid auto-rows-[150px] grid-cols-[repeat(3,150px)] gap-3',
           isDragging ? 'select-none' : 'select-auto',
         )}
         style={{ width: gridW }}
@@ -202,7 +200,7 @@ export function TileGrid({
         {showGhost && draggedBlock && (
           <div
             aria-hidden="true"
-            className="rounded-[22px] pointer-events-none z-10 [transition:grid-column_0.08s,grid-row_0.08s]"
+            className="pointer-events-none z-10 rounded-[22px] [transition:grid-column_0.08s,grid-row_0.08s]"
             style={{
               gridColumn: `${(movePreview?.col ?? 0) + 1} / span ${draggedBlock.w}`,
               gridRow: `${(movePreview?.row ?? 0) + 1} / span ${draggedBlock.h}`,

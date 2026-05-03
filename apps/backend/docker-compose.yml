@@ -1,7 +1,7 @@
 services:
   # 1. PostgreSQL
   db-sql:
-    image: postgres:15
+    image: postgres:17
     restart: always
     environment:
       POSTGRES_USER: user
@@ -9,6 +9,13 @@ services:
       POSTGRES_DB: neocivis-data
     ports:
       - "5432:5432"
+    volumes:
+      - ./local-data/postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_admin -d my_app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 2. Azure Blob Storage (via Azurite)
   azure-storage:
@@ -19,6 +26,8 @@ services:
       - "10001:10001" # Queue service
       - "10002:10002" # Table service
     command: "azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck"
+    volumes:
+      - ./local-data/azurite-data:/data
 
   # 3. CosmosDB Emulator (Attention: gourmand en ressources)
   cosmos-db:
@@ -28,7 +37,24 @@ services:
       - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10
       - AZURE_COSMOS_EMULATOR_ENABLE_DATA_EXPLORER=true
       - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1:8082
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+      - DATA_PATH=/usr/cosmos/data
     ports:
-      - "8082:8081"   # Data Explorer
+      - "8082:8081"   # NoSQL API
       - "10250:10250" # MongoDB/SQL API
-      - "1234:1234"
+      - "1234:1234"   # UI Explorer
+    volumes:
+       - ./local-data/cosmos-data:/usr/cosmos/data
+
+  # 4. Azurite UI
+  azurite-ui:
+    image: sebagomez/azurestorageexplorer:latest
+    restart: always
+    container_name: azurite-ui
+    ports:
+      - "8083:8080"
+    environment:
+      # Connecte automatiquement l'interface web au conteneur azurite
+      - AZURE_STORAGE_CONNECTIONSTRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azure-storage:10000/devstoreaccount1;QueueEndpoint=http://azure-storage:10001/devstoreaccount1;TableEndpoint=http://azure-storage:10002/devstoreaccount1;
+    depends_on:
+      - azure-storage

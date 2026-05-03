@@ -192,6 +192,7 @@ Guidelines:
 - **Auth**: JWT Bearer tokens via Keycloak — validated in `src/middleware/`, never trust client-sent identity
 - **Validation**: Zod schemas in `packages/shared` — validate all request input in controllers via `safeParse()`
 - **Errors**: All errors returned as JSON to the frontend — error middleware in `src/middleware/`
+- **Réponses HTTP (contrôleurs)** : tout corps JSON renvoyé par un contrôleur doit être typé comme un **DTO défini dans `@repo/contracts`** (types exportés par le package `packages/shared/contracts`, ex. schémas Zod + `z.infer`, ou fichiers `*.dto.ts`). Ne pas exposer directement des entités domaine ou des types internes au backend. Chaque handler de contrôleur doit avoir un **type de retour explicite** : utiliser `Promise<ControllerJson<…>>` (`src/gateways/controller-json-response.ts`) — succès (`T` + code HTTP) **et** erreurs `ApiErrorDto` sur les codes client prévus par défaut ; passer `readonly []` comme 3ᵉ paramètre de `ControllerJson` si le handler ne renvoie jamais d’erreur JSON. Pour les succès, garder une variable ou annotation du **DTO de contrat** (ex. `const body: Article = …; return c.json(body)`).
 
 ### Backend Commands
 ```bash

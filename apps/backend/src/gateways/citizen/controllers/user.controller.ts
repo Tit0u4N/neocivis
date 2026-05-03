@@ -1,23 +1,25 @@
+import type { ApiErrorDto, UserMeDto, UserPublicDto } from '@repo/contracts';
 import { type Context, Hono } from 'hono';
+import type { ControllerJson } from '@/gateways/controller-json-response';
 import type { UserService } from '@/modules/users/service/user.service';
-import { toUserPublicDto } from '@/modules/users/user.dto';
+import { toUserMeDto, toUserPublicDto } from '@/modules/users/user.types';
 
 export class UserController {
   constructor(private service: UserService) {}
 
-  public getRoutes() {
+  public getRoutes(): Hono {
     const app = new Hono();
 
-    app.get('/me', async (c) => this.getMe(c));
-    app.get('/by-ids', async (c) => this.getUsersByIds(c));
+    app.get('/me', (c) => this.getMe(c));
+    app.get('/by-ids', (c) => this.getUsersByIds(c));
 
     return app;
   }
 
-  private async getUsersByIds(c: Context) {
+  private async getUsersByIds(c: Context): Promise<ControllerJson<UserPublicDto[]>> {
     const idsParam = c.req.query('ids');
     if (!idsParam) {
-      return c.json({ error: 'Missing ids query param' }, 400);
+      return c.json({ error: 'Missing ids query param' } satisfies ApiErrorDto, 400);
     }
 
     const ids = idsParam
@@ -27,19 +29,24 @@ export class UserController {
       .map((s) => Number(s));
 
     if (ids.length === 0 || !ids.every(Number.isFinite)) {
-      return c.json({ error: 'Invalid ids' }, 400);
+      return c.json({ error: 'Invalid ids' } satisfies ApiErrorDto, 400);
     }
 
     const users = await this.service.getByIds(ids);
-    return c.json(users.map(toUserPublicDto));
+    const body: UserPublicDto[] = users.map(toUserPublicDto);
+    return c.json(body, 200);
   }
 
-  private async getMe(c: Context) {
+  private async getMe(c: Context): Promise<ControllerJson<UserMeDto>> {
     const keycloakId = c.req.header('X-User-Id');
     if (!keycloakId) {
-      return c.json({ error: 'No user information found in headers' }, 400);
+      return c.json({ error: 'No user information found in headers' } satisfies ApiErrorDto, 400);
     }
     const user = await this.service.getByKeycloakId(keycloakId);
-    return user ? c.json(user) : c.json({ error: 'User not found' }, 404);
+    if (!user) {
+      return c.json({ error: 'User not found' } satisfies ApiErrorDto, 404);
+    }
+    const body: UserMeDto = toUserMeDto(user);
+    return c.json(body, 200);
   }
 }

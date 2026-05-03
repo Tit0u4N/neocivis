@@ -1,0 +1,41 @@
+meta {
+  name: 01 - Create article
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/api/municipality/articles
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "translation": {
+      "locale": "fr",
+      "title": "Bruno test article",
+      "description": "Created by Bruno scenario",
+      "content": []
+    },
+    "status": "draft"
+  }
+}
+
+script:post-response {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Saves article id", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body).to.have.property('id');
+    bru.setVar('articleId', body.id);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

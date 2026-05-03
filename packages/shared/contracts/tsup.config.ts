@@ -8,6 +8,8 @@ export default defineConfig((options: Options) => ({
     dto: 'src/dto/index.ts',
     'error-messages': 'src/error-messages/index.ts',
     report: 'src/report/report.schema.ts',
+    upload: 'src/upload/upload.dto.ts',
+    user: 'src/user/user.dto.ts',
   },
   clean: true,
   format: ['cjs', 'esm'],

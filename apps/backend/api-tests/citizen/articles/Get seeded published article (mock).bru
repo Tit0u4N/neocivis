@@ -1,0 +1,34 @@
+meta {
+  name: Get seeded published article (mock)
+  type: http
+  seq: 0
+}
+
+get {
+  url: {{url}}/api/citizen/articles/11111111-1111-1111-1111-111111111111
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Body matches seeded article", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.id).to.equal('11111111-1111-1111-1111-111111111111');
+    expect(body.status).to.equal('published');
+    expect(body.translation).to.be.an('object');
+  
+    const fr = body.translation;
+    expect(fr).to.be.an('object');
+    expect(fr.title).to.equal('Bienvenue dans notre ville');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

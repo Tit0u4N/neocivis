@@ -93,10 +93,7 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
         <TileGlyph id={block.icon} size={iconSize} />
       </div>
 
-      <div
-        className={cn('font-bold leading-[1.15] tracking-[-0.01em]', big ? 'text-[18px]' : 'text-[15px]')}
-        style={{ color: block.fg }}
-      >
+      <div className={cn('font-bold text-[18px] leading-[1.15] tracking-[-0.01em]')} style={{ color: block.fg }}>
         {block.title}
       </div>
 

@@ -8,12 +8,22 @@ export type TileIconId = string;
 export type TileLinkId =
   | 'Link'
   | 'General'
-  | 'Reports'
-  | 'Forum'
   | 'Establishment'
+  | 'FreePage'
+  | 'Forum'
+  | 'Reports'
   | 'Articles'
   | 'Events'
   | 'External URL';
+
+export type LinkGroupId = 'special' | 'freePage' | 'normal' | 'external';
+
+export const LINK_GROUPS: { groupId: LinkGroupId; options: TileLinkId[] }[] = [
+  { groupId: 'special', options: ['Link', 'General', 'Establishment'] },
+  { groupId: 'freePage', options: ['FreePage'] },
+  { groupId: 'normal', options: ['Forum', 'Reports', 'Articles', 'Events'] },
+  { groupId: 'external', options: ['External URL'] },
+];
 
 export type ResizeHandle = 'right' | 'bottom' | 'br';
 
@@ -62,17 +72,6 @@ export const COLS = 3;
 export const CELL = 150;
 export const GAP = 12;
 const DRAG_THRESHOLD = 5;
-
-export const LINK_OPTIONS: { id: TileLinkId; label: string }[] = [
-  { id: 'Link', label: 'Lien' },
-  { id: 'General', label: 'Général' },
-  { id: 'Reports', label: 'Signalements' },
-  { id: 'Forum', label: 'Forum' },
-  { id: 'Establishment', label: 'Établissement' },
-  { id: 'Articles', label: 'Articles' },
-  { id: 'Events', label: 'Événements' },
-  { id: 'External URL', label: 'URL externe' },
-];
 
 export const COLOR_PRESETS: ColorPreset[] = [
   { name: 'Corail', fg: 'rgb(244,69,40)', bg: 'rgb(255,229,224)' },

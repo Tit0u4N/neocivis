@@ -191,12 +191,19 @@
       "noResults": "Aucun résultat pour « {{query}} »",
       "searchHint": "Tapez un nom pour chercher parmi toutes les icônes"
     },
+    "linkGroups": {
+      "special": "Pages spéciales",
+      "freePage": "Pages libres",
+      "normal": "Pages standard",
+      "external": "Externe"
+    },
     "links": {
       "Link": "Lien",
       "General": "Général",
-      "Reports": "Signalements",
-      "Forum": "Forum",
       "Establishment": "Établissement",
+      "FreePage": "Page libre",
+      "Forum": "Forum",
+      "Reports": "Signalements",
       "Articles": "Articles",
       "Events": "Événements",
       "External URL": "URL externe"

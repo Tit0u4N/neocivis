@@ -191,12 +191,19 @@
       "noResults": "No results for \"{{query}}\"",
       "searchHint": "Type a name to search all icons"
     },
+    "linkGroups": {
+      "special": "Special pages",
+      "freePage": "Free pages",
+      "normal": "Standard pages",
+      "external": "External"
+    },
     "links": {
       "Link": "Link",
       "General": "General",
-      "Reports": "Reports",
-      "Forum": "Forum",
       "Establishment": "Establishment",
+      "FreePage": "Free page",
+      "Forum": "Forum",
+      "Reports": "Reports",
       "Articles": "Articles",
       "Events": "Events",
       "External URL": "External URL"

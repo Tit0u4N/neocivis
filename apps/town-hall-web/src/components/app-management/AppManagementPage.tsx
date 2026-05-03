@@ -1,46 +1,26 @@
 'use client';
 
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { IconPickerModal } from './IconPickerModal';
 import { TileGrid } from './TileGrid';
 import type { AppManagementViewModel, TileLinkId } from './useAppManagementPage';
-import { COLOR_PRESETS, hexToRgb, LINK_OPTIONS, rgbToHex, tintFrom } from './useAppManagementPage';
-
-type SelectFieldProps = {
-  label: string;
-  value: string;
-  options: { id: string; label: string }[];
-  onChange: (val: string) => void;
-};
-
-function SelectField({ label, value, options, onChange }: SelectFieldProps) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label className="font-medium text-muted-foreground text-xs">{label}</Label>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none rounded-lg border border-input bg-background py-2 pr-8 pl-3 font-[inherit] text-foreground text-sm outline-none focus:border-foreground"
-        >
-          {options.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2.5 size-3.5 text-muted-foreground" />
-      </div>
-    </div>
-  );
-}
+import { COLOR_PRESETS, hexToRgb, LINK_GROUPS, rgbToHex, tintFrom } from './useAppManagementPage';
 
 export function AppManagementPage({
   blocks,
@@ -83,10 +63,10 @@ export function AppManagementPage({
           handleMoveStart={handleMoveStart}
         />
 
-        <Separator orientation="vertical" className="mx-0 min-h-[480px] data-[orientation=vertical]:h-auto" />
+        <Separator orientation="vertical" className="mx-0 min-h-120 data-[orientation=vertical]:h-auto" />
 
         {/* Right: Tile settings */}
-        <div className="flex-1 min-w-[280px] pl-8">
+        <div className="min-w-70 flex-1 pl-8">
           <span className="mb-5 block font-bold text-foreground text-lg">{t('appManagement.settings.title')}</span>
 
           <div className="flex flex-col gap-5">
@@ -106,6 +86,7 @@ export function AppManagementPage({
                 {t('appManagement.settings.titleLabel')}
               </Label>
               <Input
+                className={'h-9'}
                 value={sel.title}
                 onChange={(e) => setBlockProp('title', e.target.value)}
                 placeholder={t('appManagement.settings.titlePlaceholder')}
@@ -115,12 +96,28 @@ export function AppManagementPage({
             {/* Icon + Link */}
             <div className="grid grid-cols-2 gap-3.5">
               <IconPickerModal value={sel.icon} onChange={(v) => setBlockProp('icon', v)} />
-              <SelectField
-                label={t('appManagement.settings.linkLabel')}
-                value={sel.link}
-                options={LINK_OPTIONS.map((o) => ({ id: o.id, label: t(`appManagement.links.${o.id}`) }))}
-                onChange={(v) => setBlockProp('link', v as TileLinkId)}
-              />
+              <div className="flex flex-col gap-1.5">
+                <Label className="font-medium text-muted-foreground text-xs">
+                  {t('appManagement.settings.linkLabel')}
+                </Label>
+                <Select value={sel.link} onValueChange={(v) => setBlockProp('link', v as TileLinkId)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position={'popper'}>
+                    {LINK_GROUPS.map((group) => (
+                      <SelectGroup key={group.groupId}>
+                        <SelectLabel>{t(`appManagement.linkGroups.${group.groupId}`)}</SelectLabel>
+                        {group.options.map((id) => (
+                          <SelectItem key={id} value={id}>
+                            {t(`appManagement.links.${id}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Color presets */}
@@ -177,7 +174,7 @@ export function AppManagementPage({
                 />
                 <div
                   title={t('appManagement.settings.bgTintTitle')}
-                  className="size-11 flex-shrink-0 rounded-xl border border-border"
+                  className="size-11 shrink-0 rounded-xl border border-border"
                   style={{ backgroundColor: tintFrom(sel.fg, 0.86) }}
                 />
               </div>

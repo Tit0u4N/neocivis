@@ -1,6 +1,6 @@
 # Backend (Hono on Azure Functions)
 
-## Prequisites
+## Prerequisites
 - Node.js 20 or later
 - Azure Functions Core Tools
 - Azure CLI
@@ -14,18 +14,110 @@ npm install -g azure-functions-core-tools@4 --unsafe-perm true
 or check the [official documentation](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript) for installation instructions.
 
 ### Download and install Azure CLI
-Consult the [official documentation](https://learn.microsoft.com/fr-fr/cli/azure/install-azure-cli-windows?view=azure-cli-latest&pivots=wingeti) for installation instructions.
+Consult the [official documentation](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) for installation instructions.
 
 
 ### Download and install Docker
 Consult the [official documentation](https://docs.docker.com/get-docker/) for installation instructions depending on your operating system.
 
+---
 
+## Environment configuration
+
+Two mechanisms apply depending on how you run the backend.
+
+### `local.settings.json` (Azure Functions host locally)
+
+Azure Functions Core Tools map the `Values` entries from `local.settings.json` into `process.env` when you run `func start` (or `bun run dev`).
+
+1. Copy the example file to `local.settings.json` (that file is gitignored; see `.funcignore`):
+
+   ```bash
+   cp local-example.settings.json local.settings.json
+   ```
+
+   On PowerShell:
+
+   ```powershell
+   Copy-Item local-example.settings.json local.settings.json
+   ```
+
+2. Fill in secrets and URLs for your machine (Postgres, Cosmos or emulator, Keycloak, Azure Storage, and so on).
+
+Useful keys (see `local-example.settings.json` and the source):
+
+| Variable | Purpose |
+|----------|---------|
+| `FUNCTIONS_WORKER_RUNTIME` | Must stay `node` for this project. |
+| `ENV_MODE` | e.g. `development`: enables certain local-only behavior (see `local-auth.middleware`). |
+| `IN_MEMORY` | `true` / `1` / `yes` / `on`: in-memory storage (no Postgres or Cosmos for main data); real environment checks are relaxed. |
+| `AUTO_SEED` (or `auto_seed`) | Runs a seed when gateways start; recognized values: `INSERT_ONLY`, `RESET_DATA` (see Seeding). |
+| `DATABASE_URL` | Postgres connection (Drizzle / users). |
+| `DATABASE_POOL_MAX` | Max pool size (default `5`). |
+| `COSMOS_ENDPOINT`, `COSMOS_KEY` | Cosmos DB (articles in persisted mode). |
+| `COSMOS_DATABASE_ID` | Optional, defaults to `neocivis`. |
+| `KEYCLOAK_*` | Optional at startup but required for real IAM sync (`KEYCLOAK_BASE_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`). |
+| `AZURE_STORAGE_CONNECTION_STRING`, `AZURE_ARTICLES_STORAGE_CONTAINER` | Required for uploads / blobs with the current implementation. |
+| `AZURE_STORAGE_BASE_URL` | Optional (derived public URLs). |
+
+When **not** in `IN_MEMORY` mode, `assertBackendEnv()` at startup requires at least `DATABASE_URL`, `COSMOS_ENDPOINT`, and `COSMOS_KEY`.
+
+### `.env` / `.env.local` (CLI scripts)
+
+The `db:reset` and `db:seeding` scripts load the **first** file found, in order, among `.env.local` then `.env`, under `apps/backend` (the process current working directory).
+
+Drizzle commands `db:generate`, `db:migrate`, `db:push`, and `db:studio` read `DATABASE_URL` from the process environment **without** loading those files automatically. Export `DATABASE_URL` in your shell, or run with an env file supported by Bun, for example:
+
+```bash
+bun --env-file=.env.local run db:migrate
+```
+
+---
+
+## Seeding (development data)
+
+Seeding fills **users** (via Keycloak when configured, otherwise fallback values) and **articles** (Cosmos or in-memory repository depending on mode).
+
+### `INSERT_ONLY` and `RESET_DATA`
+
+- **`INSERT_ONLY`**: runs `seed()` only on each seeder (users, articles). Existing data is not cleared first.
+- **`RESET_DATA`**: for each seeder, calls `deleteAll()` first, then `seed()`. Useful to get a clean dataset without manual cleanup.
+
+### Where these modes apply
+
+1. **Gateway startup** (`citizen` / `municipality`): if `AUTO_SEED` (or `auto_seed`) is exactly `INSERT_ONLY` or `RESET_DATA`, the same pipeline runs once (except when in-memory already handled as in `auto-seed.ts`). A missing or unrecognized value disables auto-seed.
+
+2. **Manual script** `bun run db:seeding`: defaults to `INSERT_ONLY`. Pass `--reset` for `RESET_DATA`:
+
+   ```bash
+   bun run db:seeding -- --reset
+   ```
+
+### Limitations
+
+- With **`IN_MEMORY`** enabled, the `db:seeding` script **exits with an error** and refuses to run. Startup auto-seed can still run in memory for local development.
+
+---
+
+## Database commands (`package.json`)
+
+Run these from `apps/backend`:
+
+| Script | Description |
+|--------|-------------|
+| `bun run db:generate` | Generates Drizzle SQL migration files from the schema (`drizzle-kit generate`). Requires `DATABASE_URL` in the environment. |
+| `bun run db:migrate` | Applies migrations from the `drizzle/` folder to Postgres (`migrate.ts`). Requires `DATABASE_URL`. |
+| `bun run db:push` | Pushes the schema to the database without migration files (`drizzle-kit push`). Handy for local iteration; use with care on real data. |
+| `bun run db:studio` | Opens Drizzle Studio (`drizzle-kit studio`). |
+| `bun run db:reset` | **Destructive**: orchestrated reset of Postgres and/or Cosmos. Requires **`--confirm`**. Targets: `--drizzle` / `--postgres` / `--postgress` (typo alias accepted in code), `--cosmos`, or `--all` / `--both`. With an interactive TTY and no target, the script prompts; without a TTY, the default is both. If Cosmos is not configured (`COSMOS_ENDPOINT` / `COSMOS_KEY`), the Cosmos step is skipped with a log line. Loads `.env.local` / `.env`. Example: `bun run db:reset -- --confirm --all` |
+| `bun run db:seeding` | Runs seeders (see Seeding). `--reset` selects `RESET_DATA`. Loads `.env.local` / `.env`. Not compatible with `IN_MEMORY`. |
+
+---
 
 ## Running the backend locally
 To run the backend locally, follow these steps:
 1. Navigate to the `apps/backend` directory.
-2. Install the dependencies (if you haven't already during the setup of the glbal project):
+2. Install the dependencies (if you haven't already during the setup of the global project):
 ```bash
 bun install
 ```
@@ -38,7 +130,7 @@ This will start the backend server locally, and you can access the API endpoints
 ### Running the backend in watch mode
 To run the backend in watch mode, which automatically restarts the server when file changes are detected, use the following command:
 ```bash
-yarn dev
+bun run dev
 ```
 
 ### Note on prestart
@@ -50,7 +142,7 @@ The `prestart` script is used to build the TypeScript code before starting the A
 Vitest is a testing framework for JavaScript and TypeScript. It's used to run unit tests for the backend code.
 All the tests are specified with the `.spec.ts` extension and are located in the `src` directory. To run the tests, execute the following command in the terminal:
 ```bash
-yarn test
+bun run test
 ```
 
 ### Tests with Bruno

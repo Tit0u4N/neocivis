@@ -154,6 +154,25 @@
   "appManagement": {
     "title": "Gestion de l'application",
     "hint": "Faites glisser une tuile pour la repositionner. Tirez le coin bas-droit pour la redimensionner. Cliquez pour modifier.",
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "tabs": {
+      "layout": "Disposition",
+      "carousel": "Carrousel"
+    },
+    "carousel": {
+      "hint": "Ajoutez des diapositives au carrousel affiché sur l'application citoyenne.",
+      "add": "Ajouter une diapositive",
+      "empty": "Aucune diapositive. Cliquez sur « Ajouter » pour commencer.",
+      "slideLabel": "Diapositive {{n}}",
+      "imageUrl": "URL de l'image",
+      "linkUrl": "URL du lien",
+      "translations": "Traductions",
+      "fieldTitle": "Titre",
+      "fieldDescription": "Description",
+      "fieldTag": "Tag"
+    },
     "grid": {
       "title": "Catégories",
       "add": "Ajouter",
@@ -177,6 +196,10 @@
       "customColor": "Couleur personnalisée",
       "bgTintHint": "La teinte de fond est générée automatiquement depuis la couleur choisie.",
       "bgTintTitle": "Teinte du fond (générée automatiquement)",
+      "translations": "Traductions",
+      "translationPlaceholder": "Nom en {{locale}}",
+      "externalUrl": "URL externe",
+      "pageId": "Identifiant de page",
       "clear": "Effacer",
       "delete": "Supprimer"
     },

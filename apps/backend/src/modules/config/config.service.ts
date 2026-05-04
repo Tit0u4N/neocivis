@@ -5,6 +5,7 @@ import type {
   Category,
   CategoryResolved,
   CitizenConfigResponse,
+  MunicipalityConfigResponse,
 } from '@repo/contracts/config';
 import type { IConfigRepository } from './config.repository';
 
@@ -21,6 +22,22 @@ export class ConfigService {
       carousel: carouselItems.sort((a, b) => a.order - b.order).map((item) => this.resolveCarouselItem(item, locale)),
       categories: categories.map((cat) => this.resolveCategory(cat, locale)),
     };
+  }
+
+  async getMunicipalityConfig(): Promise<MunicipalityConfigResponse> {
+    const [categories, carousel] = await Promise.all([
+      this.repository.getCategories(),
+      this.repository.getCarouselItems(),
+    ]);
+    return { categories, carousel };
+  }
+
+  async setCategories(categories: Category[]): Promise<Category[]> {
+    return await this.repository.setCategories(categories);
+  }
+
+  async setCarouselItems(items: CarouselItem[]): Promise<CarouselItem[]> {
+    return await this.repository.setCarouselItems(items);
   }
 
   private resolveCarouselItem(item: CarouselItem, locale: ArticleLocale): CarouselItemResolved {

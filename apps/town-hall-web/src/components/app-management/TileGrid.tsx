@@ -6,8 +6,8 @@ import { Plus, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { AppTile, MovePreview, ResizeHandle } from './useAppManagementPage';
-import { tintFrom } from './useAppManagementPage';
+import type { AppTile, MovePreview, ResizeHandle } from './useCategoryLayoutTab';
+import { tintFrom } from './useCategoryLayoutTab';
 
 function TileGlyph({ id, size }: { id: string; size: number }) {
   if (!id || id === 'none') {
@@ -22,8 +22,8 @@ function TileGlyph({ id, size }: { id: string; size: number }) {
 
 type ResizeHandleProps = {
   pos: ResizeHandle;
-  blockId: number;
-  onStart: (blockId: number, handle: ResizeHandle) => void;
+  blockId: string;
+  onStart: (blockId: string, handle: ResizeHandle) => void;
   ariaLabel: string;
 };
 
@@ -54,16 +54,17 @@ type GridTileProps = {
   block: AppTile;
   isSelected: boolean;
   isDragging: boolean;
-  onSelect: (id: number) => void;
-  onResizeStart: (blockId: number, handle: ResizeHandle) => void;
-  onMoveStart: (blockId: number, mouseX: number, mouseY: number) => void;
+  onSelect: (id: string) => void;
+  onResizeStart: (blockId: string, handle: ResizeHandle) => void;
+  onMoveStart: (blockId: string, mouseX: number, mouseY: number) => void;
 };
 
 function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMoveStart }: GridTileProps) {
   const { t } = useTranslation();
-  const bg = tintFrom(block.fg, 0.86);
-  const big = block.w >= 2 || block.h >= 2;
+  const bg = tintFrom(block.color, 0.86);
+  const big = block.colSpan >= 2 || block.rowSpan >= 2;
   const iconSize = big ? 22 : 20;
+  const displayName = block.translations.find((tr) => tr.locale === 'fr')?.name ?? block.translations[0]?.name ?? '';
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: This is a tile not a real button so it's better to be a div
@@ -81,20 +82,20 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
         isSelected ? 'outline-[rgb(38,38,39)]' : 'outline-transparent',
       )}
       style={{
-        gridColumn: `${block.col + 1} / span ${block.w}`,
-        gridRow: `${block.row + 1} / span ${block.h}`,
+        gridColumn: `${block.col + 1} / span ${block.colSpan}`,
+        gridRow: `${block.row + 1} / span ${block.rowSpan}`,
         backgroundColor: bg,
       }}
     >
       <div
         className={cn('flex items-center justify-center rounded-xl bg-white/70', big ? 'h-11 w-11' : 'h-9.5 w-9.5')}
-        style={{ color: block.fg }}
+        style={{ color: block.color }}
       >
         <TileGlyph id={block.icon} size={iconSize} />
       </div>
 
-      <div className={cn('font-bold text-[18px] leading-[1.15] tracking-[-0.01em]')} style={{ color: block.fg }}>
-        {block.title}
+      <div className={cn('font-bold text-[18px] leading-[1.15] tracking-[-0.01em]')} style={{ color: block.color }}>
+        {displayName}
       </div>
 
       {isSelected && (
@@ -125,18 +126,18 @@ function GridTile({ block, isSelected, isDragging, onSelect, onResizeStart, onMo
 
 export type TileGridProps = {
   blocks: AppTile[];
-  selectedId: number;
+  selectedId: string;
   rows: number;
   gridW: number;
   isDragging: boolean;
-  movingBlockId: number | null;
+  movingBlockId: string | null;
   movePreview: MovePreview | null;
   gridRef: React.RefObject<HTMLDivElement | null>;
-  selectBlock: (id: number) => void;
+  selectBlock: (id: string) => void;
   addBlock: () => void;
   resetBlocks: () => void;
-  handleResizeStart: (blockId: number, handle: ResizeHandle) => void;
-  handleMoveStart: (blockId: number, mouseX: number, mouseY: number) => void;
+  handleResizeStart: (blockId: string, handle: ResizeHandle) => void;
+  handleMoveStart: (blockId: string, mouseX: number, mouseY: number) => void;
 };
 
 export function TileGrid({
@@ -199,10 +200,10 @@ export function TileGrid({
             aria-hidden="true"
             className="pointer-events-none z-10 rounded-[22px] [transition:grid-column_0.08s,grid-row_0.08s]"
             style={{
-              gridColumn: `${(movePreview?.col ?? 0) + 1} / span ${draggedBlock.w}`,
-              gridRow: `${(movePreview?.row ?? 0) + 1} / span ${draggedBlock.h}`,
-              border: `2px dashed ${draggedBlock.fg}`,
-              backgroundColor: tintFrom(draggedBlock.fg, 0.93),
+              gridColumn: `${(movePreview?.col ?? 0) + 1} / span ${draggedBlock.colSpan}`,
+              gridRow: `${(movePreview?.row ?? 0) + 1} / span ${draggedBlock.rowSpan}`,
+              border: `2px dashed ${draggedBlock.color}`,
+              backgroundColor: tintFrom(draggedBlock.color, 0.93),
             }}
           />
         )}

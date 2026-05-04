@@ -4,6 +4,8 @@ import { getMockCarouselItems, getMockCategories } from './config.mock';
 export interface IConfigRepository {
   getCarouselItems(): Promise<CarouselItem[]>;
   getCategories(): Promise<Category[]>;
+  setCategories(categories: Category[]): Promise<Category[]>;
+  setCarouselItems(items: CarouselItem[]): Promise<CarouselItem[]>;
 }
 
 export class InMemoryConfigRepository implements IConfigRepository {
@@ -28,5 +30,17 @@ export class InMemoryConfigRepository implements IConfigRepository {
   getCategories(): Promise<Category[]> {
     this.ensureSeeded();
     return Promise.resolve(this.categories);
+  }
+
+  setCategories(categories: Category[]): Promise<Category[]> {
+    this.ensureSeeded();
+    this.categories = categories;
+    return Promise.resolve(this.categories);
+  }
+
+  setCarouselItems(items: CarouselItem[]): Promise<CarouselItem[]> {
+    this.ensureSeeded();
+    this.carouselItems = items;
+    return Promise.resolve(this.carouselItems);
   }
 }

@@ -1,22 +1,51 @@
 'use client';
 
+import { ConfigService } from '@repo/frontend-services/config';
 import { ImageIcon, Plus, Save, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { CarouselTabViewModel } from './useCarouselTab';
+import { useApi } from '@/providers/ApiProvider';
+import { useCarouselTab } from './useCarouselTab';
 
-type Props = {
-  vm: CarouselTabViewModel;
-  isSaving: boolean;
-  saveError: string | null;
-  saveConfig: () => Promise<void>;
-};
-
-export function CarouselTab({ vm, isSaving, saveError, saveConfig }: Props) {
-  const { carousel, addSlide, removeSlide, updateSlide, updateTranslation } = vm;
+export function CarouselTab() {
   const { t } = useTranslation();
+  const api = useApi();
+  const configService = new ConfigService(api);
+  const vm = useCarouselTab();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const { carousel, addSlide, removeSlide, updateSlide, updateTranslation, resetCarousel } = vm;
+
+  useEffect(() => {
+    configService
+      .getMunicipalityConfig()
+      .then((data) => resetCarousel(data.carousel))
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetCarousel]);
+
+  const saveConfig = useCallback(async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await configService.setCarouselItems(carousel);
+    } catch {
+      setSaveError(t('appManagement.saveError'));
+    } finally {
+      setIsSaving(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carousel, t]);
+
+  if (isLoading) {
+    return <p className="text-muted-foreground text-sm">{t('appManagement.loading')}</p>;
+  }
 
   return (
     <div className="flex flex-col gap-4">

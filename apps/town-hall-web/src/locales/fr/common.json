@@ -198,6 +198,7 @@
       "bgTintTitle": "Teinte du fond (générée automatiquement)",
       "translations": "Traductions",
       "translationPlaceholder": "Nom en {{locale}}",
+      "addTranslation": "Ajouter une langue",
       "externalUrl": "URL externe",
       "pageId": "Identifiant de page",
       "clear": "Effacer",

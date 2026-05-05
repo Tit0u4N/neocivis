@@ -1,8 +1,8 @@
 'use client';
 
 import type { CarouselItem } from '@repo/contracts/config';
-import { SUPPORTED_LOCALES } from '@repo/contracts/config';
 import { useCallback, useState } from 'react';
+import { useConfigStore } from '@/stores/config.store';
 
 export type CarouselTabViewModel = {
   carousel: CarouselItem[];
@@ -15,6 +15,7 @@ export type CarouselTabViewModel = {
 
 export function useCarouselTab(): CarouselTabViewModel {
   const [carousel, setCarousel] = useState<CarouselItem[]>([]);
+  const availableLocales = useConfigStore((s) => s.availableLocales);
 
   const resetCarousel = useCallback((items: CarouselItem[]) => {
     setCarousel(items);
@@ -26,10 +27,10 @@ export function useCarouselTab(): CarouselTabViewModel {
       {
         id: `slide-${Date.now()}`,
         order: prev.length,
-        translations: SUPPORTED_LOCALES.map((locale) => ({ locale, title: '', description: '', tag: '' })),
+        translations: availableLocales.map((locale) => ({ locale, title: '', description: '', tag: '' })),
       },
     ]);
-  }, []);
+  }, [availableLocales]);
 
   const removeSlide = useCallback((id: string) => {
     setCarousel((prev) => prev.filter((s) => s.id !== id).map((s, i) => ({ ...s, order: i })));

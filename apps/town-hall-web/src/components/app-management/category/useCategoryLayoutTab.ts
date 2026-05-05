@@ -3,6 +3,7 @@
 import type { Category, CategoryTranslation } from '@repo/contracts/config';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { type Locale, useConfigStore } from '@/stores/config.store';
 
 export type TileLinkType =
   | 'Link'
@@ -81,10 +82,9 @@ export const COLOR_PRESETS: ColorPreset[] = [
   { name: 'Violet', color: '#7C4FD9', bg: 'rgb(231,222,247)' },
 ];
 
-const DEFAULT_LOCALES = ['fr', 'en', 'de', 'it'] as const;
-
-const defaultTranslations = (nameFr: string): CategoryTranslation[] =>
-  DEFAULT_LOCALES.map((locale) => ({ locale, name: locale === 'fr' ? nameFr : '' }));
+const defaultTranslations = (defaultLocale: Locale, name: string): CategoryTranslation[] => [
+  { locale: defaultLocale, name },
+];
 
 export const initBlocks = (): AppTile[] => [
   {
@@ -280,12 +280,16 @@ export type CategoryLayoutTabViewModel = {
   resetBlocks: () => void;
   resetToData: (tiles: AppTile[]) => void;
   setBlockProp: <K extends keyof AppTile>(key: K, val: AppTile[K]) => void;
+  addLocaleToSelected: (locale: Locale) => void;
+  removeLocaleFromSelected: (locale: Locale) => void;
+  updateTranslationName: (locale: Locale, name: string) => void;
   handleResizeStart: (blockId: string, handle: ResizeHandle) => void;
   handleMoveStart: (blockId: string, mouseX: number, mouseY: number) => void;
 };
 
 export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   const { t } = useTranslation();
+  const defaultLocale = useConfigStore((s) => s.defaultLocale);
 
   const [blocks, setBlocks] = useState<AppTile[]>(initBlocks);
   const [selectedId, setSelectedId] = useState<string>('alaune');
@@ -311,6 +315,46 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   const setBlockProp = useCallback(
     <K extends keyof AppTile>(key: K, val: AppTile[K]) => {
       setBlocks((prev) => prev.map((b) => (b.id === selectedId ? { ...b, [key]: val } : b)));
+    },
+    [selectedId],
+  );
+
+  const addLocaleToSelected = useCallback(
+    (locale: Locale) => {
+      setBlocks((prev) =>
+        prev.map((b) =>
+          b.id === selectedId && !b.translations.some((tr) => tr.locale === locale)
+            ? { ...b, translations: [...b.translations, { locale, name: '' }] }
+            : b,
+        ),
+      );
+    },
+    [selectedId],
+  );
+
+  const removeLocaleFromSelected = useCallback(
+    (locale: Locale) => {
+      if (locale === defaultLocale) {
+        return;
+      }
+      setBlocks((prev) =>
+        prev.map((b) =>
+          b.id === selectedId ? { ...b, translations: b.translations.filter((tr) => tr.locale !== locale) } : b,
+        ),
+      );
+    },
+    [selectedId, defaultLocale],
+  );
+
+  const updateTranslationName = useCallback(
+    (locale: Locale, name: string) => {
+      setBlocks((prev) =>
+        prev.map((b) =>
+          b.id === selectedId
+            ? { ...b, translations: b.translations.map((tr) => (tr.locale === locale ? { ...tr, name } : tr)) }
+            : b,
+        ),
+      );
     },
     [selectedId],
   );
@@ -468,11 +512,11 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
         icon: 'none',
         color: '#2374E0',
         link: { type: 'Link' },
-        translations: defaultTranslations(t('appManagement.newTileTitle')),
+        translations: defaultTranslations(defaultLocale, t('appManagement.newTileTitle')),
       },
     ]);
     setSelectedId(newId);
-  }, [blocks, t]);
+  }, [blocks, t, defaultLocale]);
 
   const removeBlock = useCallback(
     (id: string) => {
@@ -509,6 +553,9 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
     resetBlocks,
     resetToData,
     setBlockProp,
+    addLocaleToSelected,
+    removeLocaleFromSelected,
+    updateTranslationName,
     handleResizeStart,
     handleMoveStart,
   };

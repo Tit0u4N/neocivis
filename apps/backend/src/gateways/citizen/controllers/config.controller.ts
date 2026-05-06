@@ -2,7 +2,7 @@ import type { ApiErrorDto, CitizenConfigResponse } from '@repo/contracts';
 import { ConfigQuery } from '@repo/contracts';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
-import type { ConfigService } from '@/modules/config/config.service';
+import type { ConfigService } from '@/modules/config/service/config.service';
 
 export class ConfigController {
   constructor(private configService: ConfigService) {}

@@ -5,7 +5,7 @@ import {
 } from '@repo/contracts';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
-import type { ConfigService } from '@/modules/config/config.service';
+import type { ConfigService } from '@/modules/config/service/config.service';
 
 export class MunicipalityConfigController {
   constructor(private configService: ConfigService) {}

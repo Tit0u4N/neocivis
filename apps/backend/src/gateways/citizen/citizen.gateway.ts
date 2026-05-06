@@ -9,7 +9,12 @@ import { applyRoleMiddleware } from '@/middlewares/role.middleware';
 import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
 import { InMemoryArticleRepository } from '@/modules/article/repository/article.inmemory.repository';
 import { ArticleService } from '@/modules/article/service/article.service';
+import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
+import { ConfigService } from '@/modules/config/service/config.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
+import { InMemoryReportRepository } from '@/modules/report/report.repository';
+import { ReportService } from '@/modules/report/report.service';
+import { StubUploadService } from '@/modules/upload/upload.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/service/user.service';
@@ -17,11 +22,6 @@ import { ArticleController } from './controllers/article.controller';
 import { ConfigController } from './controllers/config.controller';
 import { ReportController } from './controllers/report.controller';
 import { UserController } from './controllers/user.controller';
-import { StubUploadService } from '@/modules/upload/upload.service';
-import { ConfigService } from '@/modules/config/config.service';
-import { ReportService } from '@/modules/report/report.service';
-import { InMemoryReportRepository } from '@/modules/report/report.repository';
-import { InMemoryConfigRepository } from '@/modules/config/config.repository';
 
 // Import repositories
 const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
@@ -49,7 +49,6 @@ app = applyDbMiddleware(app);
 app = applyMockApimMiddleware(app);
 app = applyUserMiddleware(app, userService);
 app = applyRoleMiddleware(app, ['CITIZEN', 'ADMIN', 'EMPLOYEE']);
-
 
 // Register routes from controllers
 app.route('/user', userController.getRoutes());

@@ -7,7 +7,18 @@ meta {
 post {
   url: {{url}}/api/municipality/articles
   body: json
-  auth: inherit
+  auth: none
+}
+
+script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
 }
 
 body:json {

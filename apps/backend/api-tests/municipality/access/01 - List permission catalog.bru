@@ -1,0 +1,47 @@
+meta {
+  name: 01 - List permission catalog
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/api/municipality/permissions
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Returns the full catalog (>= 16 entries)", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    expect(body.length).to.be.at.least(16);
+    for (const p of body) {
+      expect(p).to.have.property('key').that.is.a('string');
+      expect(Object.keys(p)).to.deep.equal(['key']);
+    }
+  });
+
+  test("Includes ARTICLE_PUBLISH_PERMISSION", function() {
+    const body = res.getBody();
+    const keys = body.map((p) => p.key);
+    expect(keys).to.include('ARTICLE_PUBLISH_PERMISSION');
+    expect(keys).to.include('PAGE_CITY_HALL_MODIFY_PERMISSION');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

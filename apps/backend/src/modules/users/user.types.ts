@@ -31,8 +31,11 @@ export function toUserMeDto(user: User): UserMeDto {
     firstName: user.firstName,
     lastName: user.lastName,
     role: user.role,
-    // it will be set by the city service if needed
+    // city / memberships / permissions / roles are filled by the controller
+    // depending on the user role and the access/city services.
     city: undefined,
     memberships: [],
+    permissions: [],
+    roles: [],
   };
 }

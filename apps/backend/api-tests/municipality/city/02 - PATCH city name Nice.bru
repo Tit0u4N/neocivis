@@ -7,7 +7,7 @@ meta {
 patch {
   url: {{url}}/api/municipality/cities/{{cityNiceId}}
   body: json
-  auth: inherit
+  auth: none
 }
 
 headers {
@@ -21,6 +21,12 @@ body:json {
 }
 
 script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
   const axios = require('axios');
   const baseUrl = bru.getEnvVar('url');
   const auth = req.getHeader('Authorization');

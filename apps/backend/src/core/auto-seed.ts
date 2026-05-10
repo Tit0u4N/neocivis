@@ -1,4 +1,6 @@
 import { getAutoSeedMode, isInMemoryMode } from '@/core/runtime-config';
+import type { AccessService } from '@/modules/access/access.service';
+import { AccessSeeder } from '@/modules/access/seed/access.seeder';
 import type { IArticleRepository } from '@/modules/article/repository/article.repository.interface';
 import { ArticleSeeder } from '@/modules/article/seed/article.seeder';
 import type { ICityRepository } from '@/modules/city/repository/city.repository.interface';
@@ -15,6 +17,7 @@ export type AutoSeedDeps = {
   articleRepository: IArticleRepository;
   cityRepository: ICityRepository;
   iamService: IAMService;
+  accessService: AccessService;
 };
 
 const AUTO_SEED_GLOBAL_KEY = '__neocivis_auto_seed_started__';
@@ -50,6 +53,7 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
   const seederList: ISeeder[] = [
     new UserSeeder(deps.userService),
     new CitySeeder(deps.cityRepository, cityService, deps.userService),
+    new AccessSeeder(deps.accessService, cityService),
     new ArticleSeeder(deps.articleRepository),
   ];
 

@@ -1,0 +1,83 @@
+meta {
+  name: 03 - Create role
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/roles
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "name": "Bruno Test Role",
+    "description": "Rôle créé par Bruno pour tests automatisés",
+    "permissions": ["ARTICLE_PUBLISH_PERMISSION", "ARTICLE_MODIFY_PERMISSION"]
+  }
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const auth = req.getHeader('Authorization');
+  if (!baseUrl || !auth) {
+    throw new Error('Missing url or Authorization');
+  }
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: auth } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('No city in /api/municipality/user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+
+  // Hygiène : si un rôle "Bruno Test Role" existe déjà, on le supprime
+  // d'abord pour rendre la requête idempotente.
+  const existing = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/roles`, { headers: { Authorization: auth } });
+  const dup = (existing.data || []).find((r) => r.name === 'Bruno Test Role');
+  if (dup) {
+    await axios.delete(`${baseUrl}/api/municipality/cities/${cityId}/roles/${dup.id}`, { headers: { Authorization: auth } });
+  }
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/roles`);
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.id) {
+    bru.setVar('createdRoleId', body.id);
+  }
+}
+
+tests {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("Returns the new role with id and permissions", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id').that.is.a('string');
+    expect(body).to.have.property('name', 'Bruno Test Role');
+    expect(body).to.have.property('description');
+    expect(body).to.have.property('permissions').that.deep.equal([
+      'ARTICLE_PUBLISH_PERMISSION',
+      'ARTICLE_MODIFY_PERMISSION',
+    ]);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

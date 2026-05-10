@@ -7,7 +7,7 @@ meta {
 patch {
   url: {{url}}/api/municipality/articles/{{articleId}}/status
   body: json
-  auth: inherit
+  auth: none
 }
 
 body:json {
@@ -17,6 +17,15 @@ body:json {
 }
 
 script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
   if (!bru.getVar('articleId')) {
     throw new Error('Missing articleId. Run "01 - Create article" first.');
   }

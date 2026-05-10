@@ -4,6 +4,8 @@ export * from './common/api-response.dto';
 export * from './config/config.schema';
 export * from './dto';
 export * from './error-messages';
+export * from './permission/permission.schema';
 export * from './report/report.schema';
+export * from './role/role.schema';
 export * from './upload/upload.dto';
 export * from './user/user.dto';

@@ -5,7 +5,10 @@ import dotenv from 'dotenv';
 
 import { runSeeders } from '@/core/auto-seed';
 import { isInMemoryMode } from '@/core/runtime-config';
+import { AccessService } from '@/modules/access/access.service';
+import { DrizzleAccessRepository } from '@/modules/access/repository/access.drizzle.repository';
 import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
+import { CityService } from '@/modules/city/city.service';
 import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
@@ -39,10 +42,13 @@ async function main(): Promise<void> {
   const userRepository = new DrizzleUserRepository();
   const articleRepository = new CosmosArticleRepository();
   const cityRepository = new DrizzleCityRepository();
+  const accessRepository = new DrizzleAccessRepository();
   const iamService = new KeycloakIAMService();
   const userService = new UserService(userRepository, iamService);
+  const cityService = new CityService(cityRepository, userService, iamService);
+  const accessService = new AccessService(accessRepository, cityService, userService);
 
-  await runSeeders({ userService, articleRepository, cityRepository, iamService }, mode);
+  await runSeeders({ userService, articleRepository, cityRepository, iamService, accessService }, mode);
   // biome-ignore lint/suspicious/noConsole: script CLI
   console.info(`[seeding] done (mode=${mode})`);
 }

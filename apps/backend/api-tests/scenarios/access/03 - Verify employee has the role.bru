@@ -1,0 +1,60 @@
+meta {
+  name: Scenario - Verify employee has the role
+  type: http
+  seq: 953
+}
+
+get {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees/{{e2eEmployeeId}}/roles
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const auth = req.getHeader('Authorization');
+  let cityId = bru.getVar('cityNiceId');
+  let employeeId = bru.getVar('e2eEmployeeId');
+
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: auth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+  if (!employeeId) {
+    const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, { headers: { Authorization: auth } });
+    const employee = (employees.data || []).find((u) => u.username === 'employee-nice1');
+    employeeId = String(employee.id);
+    bru.setVar('e2eEmployeeId', employeeId);
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees/${employeeId}/roles`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Employee has at least the E2E Publisher role", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('userId');
+    expect(body).to.have.property('roles').that.is.an('array');
+    const roleNames = body.roles.map((r) => r.name);
+    expect(roleNames).to.include('E2E Publisher');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

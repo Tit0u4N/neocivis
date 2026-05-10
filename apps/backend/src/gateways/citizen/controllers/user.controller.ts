@@ -1,6 +1,7 @@
-import type { ApiErrorDto, UserMeDto, UserPublicDto } from '@repo/contracts';
+import type { ApiErrorDto, PermissionKey, RoleSummaryDto, UserMeDto, UserPublicDto } from '@repo/contracts';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { AccessService } from '@/modules/access/access.service';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
 import { toUserMeDto, toUserPublicDto } from '@/modules/users/user.types';
@@ -9,6 +10,7 @@ export class UserController {
   constructor(
     private service: UserService,
     private cityService: CityService,
+    private accessService: AccessService,
   ) {}
 
   public getRoutes(): Hono {
@@ -60,7 +62,21 @@ export class UserController {
 
     const cityId = await this.cityService.getScopedCityForAdminOrEmployee(user.id);
     const city = cityId ? await this.cityService.getCityPublicById(cityId) : null;
-    const body: UserMeDto = { ...base, city: city ?? undefined, memberships: [] };
+
+    let permissions: PermissionKey[] = [];
+    let roles: RoleSummaryDto[] = [];
+    if (cityId) {
+      permissions = await this.accessService.listEffectivePermissions(user, cityId);
+      roles = await this.accessService.listRoleSummariesForUserInCity(user, cityId);
+    }
+
+    const body: UserMeDto = {
+      ...base,
+      city: city ?? undefined,
+      memberships: [],
+      permissions,
+      roles,
+    };
     return c.json(body, 200);
   }
 }

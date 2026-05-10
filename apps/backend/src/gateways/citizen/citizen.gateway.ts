@@ -7,6 +7,9 @@ import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';
 import { applyCityAccessMiddleware } from '@/middlewares/city-access.middleware';
+import { AccessService } from '@/modules/access/access.service';
+import { DrizzleAccessRepository } from '@/modules/access/repository/access.drizzle.repository';
+import { InMemoryAccessRepository } from '@/modules/access/repository/access.inmemory.repository';
 import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
 import { InMemoryArticleRepository } from '@/modules/article/repository/article.inmemory.repository';
 import { ArticleService } from '@/modules/article/service/article.service';
@@ -32,19 +35,21 @@ import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.
 const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
 const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : new CosmosArticleRepository();
 const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new DrizzleCityRepository();
+const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
 const userService = new UserService(userRepository, iamService);
 const articleService = new ArticleService(articleRepository);
 const cityService = new CityService(cityRepository, userService, iamService);
+const accessService = new AccessService(accessRepository, cityService, userService);
 const reportRepository = new InMemoryReportRepository();
 const configRepository = new InMemoryConfigRepository();
 
-await startAutoSeedOnStartup({ userService, articleRepository, cityRepository, iamService });
+await startAutoSeedOnStartup({ userService, articleRepository, cityRepository, iamService, accessService });
 
 // Import controllers
-const userController = new UserController(userService, cityService);
+const userController = new UserController(userService, cityService, accessService);
 const articleController = new ArticleController(articleService);
 const reportController = new ReportController(new ReportService(reportRepository), new StubUploadService());
 const configController = new ConfigController(new ConfigService(configRepository));

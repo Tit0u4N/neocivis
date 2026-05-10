@@ -7,7 +7,15 @@ meta {
 get {
   url: {{url}}/api/municipality/articles
   body: none
-  auth: inherit
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
 }
 
 script:post-response {

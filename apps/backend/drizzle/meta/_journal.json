@@ -15,6 +15,13 @@
       "when": 1778424021073,
       "tag": "0001_groovy_kylun",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778436518706,
+      "tag": "0002_steep_kylun",
+      "breakpoints": true
     }
   ]
 }

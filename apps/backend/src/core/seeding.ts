@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { runSeeders } from '@/core/auto-seed';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
+import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { UserService } from '@/modules/users/service/user.service';
@@ -37,10 +38,11 @@ async function main(): Promise<void> {
   }
   const userRepository = new DrizzleUserRepository();
   const articleRepository = new CosmosArticleRepository();
+  const cityRepository = new DrizzleCityRepository();
   const iamService = new KeycloakIAMService();
   const userService = new UserService(userRepository, iamService);
 
-  await runSeeders({ userService, articleRepository }, mode);
+  await runSeeders({ userService, articleRepository, cityRepository, iamService }, mode);
   // biome-ignore lint/suspicious/noConsole: script CLI
   console.info(`[seeding] done (mode=${mode})`);
 }

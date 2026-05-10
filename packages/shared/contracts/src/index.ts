@@ -1,4 +1,5 @@
 export * from './article/article.schema';
+export * from './city/city.schema';
 export * from './common/api-response.dto';
 export * from './config/config.schema';
 export * from './dto';

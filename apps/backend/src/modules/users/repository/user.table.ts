@@ -17,9 +17,9 @@ export const users = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (t) => ({
-    keycloakIdIndex: index('users_keycloak_id_idx').on(t.keycloakId),
-    usernameIndex: index('users_username_idx').on(t.username),
-    usernameKeycloakIdIndex: index('users_username_keycloak_id_idx').on(t.username, t.keycloakId),
-  }),
+  (t) => [
+    index('users_keycloak_id_idx').on(t.keycloakId),
+    index('users_username_idx').on(t.username),
+    index('users_username_keycloak_id_idx').on(t.username, t.keycloakId),
+  ],
 );

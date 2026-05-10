@@ -182,12 +182,12 @@
         }
       ],
       "email": "cit1@example.com",
-      "last_name": "One",
-      "first_name": "Citizen",
+      "lastName": "One",
+      "firstName": "Citizen",
       "realmRoles": ["CITIZEN"]
     },
     {
-      "username": "municipal-employee1",
+      "username": "citizen2",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -197,13 +197,13 @@
           "temporary": false
         }
       ],
-      "email": "emp1@neocivis.cloud",
-      "last_name": "Employee1",
-      "first_name": "Municipal",
-      "realmRoles": ["EMPLOYEE", "SIGNAL_VIEW_PERMISSION", "SIGNAL_CREATE_PERMISSION", "SIGNAL_MODIFY_PERMISSION"]
+      "email": "cit2@example.com",
+      "lastName": "Two",
+      "firstName": "Citizen",
+      "realmRoles": ["CITIZEN"]
     },
     {
-      "username": "admin1",
+      "username": "citizen3",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -213,10 +213,106 @@
           "temporary": false
         }
       ],
-      "email": "admin@example.com",
-      "last_name": "Min",
-      "first_name": "Ad",
-      "realmRoles": ["ADMIN", "EMPLOYEE"]
+      "email": "cit3@example.com",
+      "lastName": "Three",
+      "firstName": "Citizen",
+      "realmRoles": ["CITIZEN"]
+    },
+    {
+      "username": "admin-nice",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "admin.nice@neocivis.cloud",
+      "lastName": "Nice",
+      "firstName": "Admin",
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "admin-biot",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "admin.biot@neocivis.cloud",
+      "lastName": "Biot",
+      "firstName": "Admin",
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "admin-marseille",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "admin.marseille@neocivis.cloud",
+      "lastName": "Marseille",
+      "firstName": "Admin",
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "employee-nice1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "employee.nice1@neocivis.cloud",
+      "lastName": "Nice1",
+      "firstName": "Employee",
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "employee-biot1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "employee.biot1@neocivis.cloud",
+      "lastName": "Biot1",
+      "firstName": "Employee",
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "employee-marseille1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "employee.marseille1@neocivis.cloud",
+      "lastName": "Marseille1",
+      "firstName": "Employee",
+      "realmRoles": ["EMPLOYEE"]
     }
   ]
 }

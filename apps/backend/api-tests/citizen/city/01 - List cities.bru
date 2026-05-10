@@ -1,0 +1,46 @@
+meta {
+  name: List cities
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/api/citizen/cities
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (Array.isArray(body)) {
+    const nice = body.find(function(c) { return c && c.name === 'Nice'; });
+    if (nice && nice.id) {
+      bru.setEnvVar('cityNiceId', nice.id);
+    }
+  }
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Returns array with Nice, Biot, Marseille seed names", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    const names = body.map(function(c) { return c.name; });
+    expect(names).to.include('Nice');
+    expect(names).to.include('Biot');
+    expect(names).to.include('Marseille');
+  });
+  
+  test("Sets cityNiceId for later requests", function() {
+    expect(bru.getEnvVar('cityNiceId')).to.be.a('string');
+    expect(bru.getEnvVar('cityNiceId').length).to.be.greaterThan(0);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

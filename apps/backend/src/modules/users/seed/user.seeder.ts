@@ -14,16 +14,21 @@ export class UserSeeder implements ISeeder {
     const seededUsers = loadSeededUsersFromRealmConfigDev();
     for (const seeded of seededUsers) {
       const kcUser = await this.userService.getIamUserByUsername(seeded.username);
-      const keycloakId = kcUser?.id ?? `seed:${seeded.username}`;
+      if (!kcUser) {
+        throw new Error(
+          `Keycloak user not found or IAM not configured for username="${seeded.username}". Seeding requires Keycloak.`,
+        );
+      }
+      const keycloakId = kcUser.id;
 
       await this.userService.seedFromKeycloak({
         id: seeded.seedId,
         keycloakId,
         role: seeded.role,
-        username: kcUser?.username ?? seeded.username,
-        email: kcUser?.email ?? seeded.email,
-        firstName: kcUser?.firstName ?? seeded.firstName,
-        lastName: kcUser?.lastName ?? seeded.lastName,
+        username: kcUser.username ?? seeded.username,
+        email: kcUser.email ?? seeded.email,
+        firstName: kcUser.firstName ?? seeded.firstName,
+        lastName: kcUser.lastName ?? seeded.lastName,
       });
     }
     const nextId = Math.max(...seededUsers.map((u) => u.seedId)) + 1;

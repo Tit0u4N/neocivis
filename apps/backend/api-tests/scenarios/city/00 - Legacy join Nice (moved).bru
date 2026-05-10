@@ -1,0 +1,40 @@
+meta {
+  name: (moved) Join Nice (legacy)
+  type: http
+  seq: 920
+}
+
+post {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/join
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body && typeof body.success === 'boolean') {
+    bru.setVar('cityJoinOk', body.success === true ? 'yes' : 'no');
+  }
+}
+
+tests {
+  test("Either 409 duplicate or 200 success with boolean", function() {
+    const status = res.getStatus();
+    expect(status === 409 || status === 200).to.be.true;
+    if (status === 200) {
+      const body = res.getBody();
+      expect(body).to.have.property('success');
+      expect(body.success).to.be.a('boolean');
+    }
+  });
+}
+
+vars:pre-request {
+  cityNiceId:
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

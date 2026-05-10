@@ -1,18 +1,18 @@
 meta {
-  name: 06 - Update translation (en)
+  name: 07 - Update status (published)
   type: http
-  seq: 6
+  seq: 937
 }
 
-put {
-  url: {{url}}/api/municipality/articles/{{articleId}}/translations/en
+patch {
+  url: {{url}}/api/municipality/articles/{{articleId}}/status
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "title": "Bruno test article (EN updated)"
+    "status": "published"
   }
 }
 
@@ -23,8 +23,8 @@ script:pre-request {
 }
 
 script:post-response {
-  test("Status is 200 or 404", function() {
-    expect([200, 404]).to.include(res.getStatus());
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
   });
 }
 

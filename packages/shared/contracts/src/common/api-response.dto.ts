@@ -9,6 +9,7 @@ export type ApiErrorWithDetailsDto = {
   details: unknown;
 };
 
+/** Réponse JSON minimale après une opération sans corps métier significatif (join, suppression, …). */
 export type OperationSuccessDto = {
-  success: true;
+  success: boolean;
 };

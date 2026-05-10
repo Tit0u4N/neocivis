@@ -1,7 +1,7 @@
 meta {
   name: 03 - Get article by id
   type: http
-  seq: 3
+  seq: 933
 }
 
 get {
@@ -12,7 +12,7 @@ get {
 
 script:pre-request {
   if (!bru.getVar('articleId')) {
-    throw new Error('Missing articleId. Run "01 - Create article" first.');
+    throw new Error('Missing articleId. Run \"01 - Create article\" first.');
   }
 }
 

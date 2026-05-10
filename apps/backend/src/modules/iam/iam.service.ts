@@ -22,4 +22,23 @@ export interface IAMService {
    * Retourne `null` si non configuré / introuvable.
    */
   getUserByUsername(username: string): Promise<IamUser | null>;
+
+  /**
+   * Crée un utilisateur Keycloak avec des realm roles.
+   * Doit throw si non configuré / échec Keycloak (on bloque).
+   */
+  createUser(input: {
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+    realmRoles: string[];
+  }): Promise<IamUser>;
+
+  /**
+   * Supprime un utilisateur Keycloak (coupe l'accès).
+   * Doit throw si non configuré / échec Keycloak (on bloque).
+   */
+  deleteUser(userId: string): Promise<void>;
 }

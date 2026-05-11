@@ -1,16 +1,25 @@
 meta {
   name: 03 - Get article by id
   type: http
-  seq: 3
+  seq: 933
 }
 
 get {
   url: {{url}}/api/municipality/articles/{{articleId}}
   body: none
-  auth: inherit
+  auth: none
 }
 
 script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
   if (!bru.getVar('articleId')) {
     throw new Error('Missing articleId. Run "01 - Create article" first.');
   }
@@ -31,4 +40,3 @@ settings {
   encodeUrl: true
   timeout: 0
 }
-

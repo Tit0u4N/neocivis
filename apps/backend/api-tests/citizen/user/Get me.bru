@@ -7,7 +7,15 @@ meta {
 get {
   url: {{url}}/api/citizen/user/me
   body: none
-  auth: inherit
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
 }
 
 script:post-response {

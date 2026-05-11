@@ -1,4 +1,6 @@
+export * from '@/modules/access/repository/access.table';
 export * from '@/modules/users/repository/user.table';
+export * from '@/modules/city/repository/city.table';
 
 /**
  * Unique entry point for Drizzle for `drizzle-kit`:

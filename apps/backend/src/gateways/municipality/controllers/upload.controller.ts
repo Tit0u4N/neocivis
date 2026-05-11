@@ -34,7 +34,8 @@ export class UploadController {
     }
 
     const buffer = await file.arrayBuffer();
-    const url = await this.service.uploadImage(buffer, file.name, file.type);
+    const cityId = c.req.param('cityId') ?? undefined;
+    const url = await this.service.uploadImage(buffer, file.name, file.type, cityId);
     const body: ImageUploadResponseDto = { url };
     return c.json(body, 201);
   }

@@ -12,7 +12,7 @@ import type { IConfigRepository } from '../repository/config.repository.interfac
 export class ConfigService {
   constructor(private repository: IConfigRepository) {}
 
-  async getConfig(locale: ConfigLocale): Promise<CitizenConfigResponse> {
+  async getConfig(cityId: string, locale: ConfigLocale): Promise<CitizenConfigResponse> {
     const [carouselItems, categories] = await Promise.all([
       this.repository.getCarouselItems(),
       this.repository.getCategories(),
@@ -24,7 +24,7 @@ export class ConfigService {
     };
   }
 
-  async getMunicipalityConfig(): Promise<MunicipalityConfigResponse> {
+  async getMunicipalityConfig(cityId: string): Promise<MunicipalityConfigResponse> {
     const [categories, carousel] = await Promise.all([
       this.repository.getCategories(),
       this.repository.getCarouselItems(),
@@ -32,11 +32,11 @@ export class ConfigService {
     return { categories, carousel };
   }
 
-  async setCategories(categories: Category[]): Promise<Category[]> {
+  async setCategories(cityId: string, categories: Category[]): Promise<Category[]> {
     return await this.repository.setCategories(categories);
   }
 
-  async setCarouselItems(items: CarouselItem[]): Promise<CarouselItem[]> {
+  async setCarouselItems(cityId: string, items: CarouselItem[]): Promise<CarouselItem[]> {
     return await this.repository.setCarouselItems(items);
   }
 

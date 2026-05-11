@@ -10,19 +10,20 @@ export class ConfigController {
   public getRoutes(): Hono {
     const app = new Hono();
 
-    app.get('/', (c) => this.getConfig(c));
+    app.get('/city/:cityId/:locale', (c) => this.getConfig(c));
 
     return app;
   }
 
   private async getConfig(c: Context): Promise<ControllerJson<CitizenConfigResponse>> {
-    const result = ConfigQuery.safeParse({ locale: c.req.query('locale') });
+    const { cityId, locale } = c.req.param();
+    const result = ConfigQuery.safeParse({ locale });
 
     if (!result.success) {
       return c.json({ error: 'Invalid query parameters' } satisfies ApiErrorDto, 400);
     }
 
-    const body: CitizenConfigResponse = await this.configService.getConfig(result.data.locale);
+    const body: CitizenConfigResponse = await this.configService.getConfig(cityId, result.data.locale);
     return c.json(body, 200);
   }
 }

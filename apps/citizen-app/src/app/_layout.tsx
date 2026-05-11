@@ -14,6 +14,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ApiProvider } from '@/providers/ApiProvider';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
+import { CityProvider } from '@/stores/city.store';
 import { Colors } from '@/theme/colors';
 import { ThemeProvider } from '@/theme/theme-provider';
 import 'react-native-reanimated';
@@ -208,8 +209,10 @@ export default function RootLayout() {
         <ThemeProvider>
           <AuthProvider>
             <ApiProvider>
-              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-              <InitialLayout />
+              <CityProvider>
+                <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+                <InitialLayout />
+              </CityProvider>
             </ApiProvider>
           </AuthProvider>
         </ThemeProvider>

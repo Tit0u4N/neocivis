@@ -1,8 +1,11 @@
 'use client';
 
 import type { Category, CategoryTranslation } from '@repo/contracts/config';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { ConfigService } from '@repo/frontend-services/config';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useApi } from '@/providers/ApiProvider';
+import { useCityStore } from '@/stores/city.store';
 import { type Locale, useConfigStore } from '@/stores/config.store';
 
 export type TileLinkType =
@@ -274,6 +277,10 @@ export type CategoryLayoutTabViewModel = {
   movingBlockId: string | null;
   movePreview: MovePreview | null;
   gridRef: React.RefObject<HTMLDivElement | null>;
+  isLoading: boolean;
+  isSaving: boolean;
+  saveError: string | null;
+  saveConfig: () => Promise<void>;
   selectBlock: (id: string) => void;
   addBlock: () => void;
   removeBlock: (id: string) => void;
@@ -290,9 +297,15 @@ export type CategoryLayoutTabViewModel = {
 export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   const { t } = useTranslation();
   const defaultLocale = useConfigStore((s) => s.defaultLocale);
+  const api = useApi();
+  const cityId = useCityStore((s) => s.cityId);
+  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
 
   const [blocks, setBlocks] = useState<AppTile[]>(initBlocks);
   const [selectedId, setSelectedId] = useState<string>('alaune');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [resizeDragInfo, setResizeDragInfo] = useState<ResizeDragInfo | null>(null);
   const [moveDragInfo, setMoveDragInfo] = useState<MoveDragInfo | null>(null);
   const [movePreview, setMovePreview] = useState<MovePreview | null>(null);
@@ -311,6 +324,26 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
     setBlocks(resolved);
     setSelectedId(resolved[0]?.id ?? 'alaune');
   }, []);
+
+  useEffect(() => {
+    configService
+      .getMunicipalityConfig()
+      .then((data) => resetToData(data.categories.map(categoryToTile)))
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, [configService, resetToData]);
+
+  const saveConfig = useCallback(async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await configService.setCategories(blocks.map(tileToCategory));
+    } catch {
+      setSaveError(t('appManagement.saveError'));
+    } finally {
+      setIsSaving(false);
+    }
+  }, [blocks, configService, t]);
 
   const setBlockProp = useCallback(
     <K extends keyof AppTile>(key: K, val: AppTile[K]) => {
@@ -547,6 +580,10 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
     movingBlockId: moveDragInfo?.blockId ?? null,
     movePreview,
     gridRef,
+    isLoading,
+    isSaving,
+    saveError,
+    saveConfig,
     selectBlock: setSelectedId,
     addBlock,
     removeBlock,

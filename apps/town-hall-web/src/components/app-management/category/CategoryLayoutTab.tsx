@@ -1,8 +1,6 @@
 'use client';
 
-import { ConfigService } from '@repo/frontend-services/config';
 import { Plus, Save, Trash2, X } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,27 +16,14 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { useApi } from '@/providers/ApiProvider';
 import { type Locale, useConfigStore } from '@/stores/config.store';
 import { IconPickerModal } from './IconPickerModal';
 import { TileGrid } from './TileGrid';
-import {
-  COLOR_PRESETS,
-  categoryToTile,
-  LINK_GROUPS,
-  tileToCategory,
-  tintFrom,
-  useCategoryLayoutTab,
-} from './useCategoryLayoutTab';
+import { COLOR_PRESETS, LINK_GROUPS, tintFrom, useCategoryLayoutTab } from './useCategoryLayoutTab';
 
 export function CategoryLayoutTab() {
   const { t } = useTranslation();
-  const api = useApi();
-  const configService = new ConfigService(api);
   const vm = useCategoryLayoutTab();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
 
   const {
     blocks,
@@ -50,11 +35,14 @@ export function CategoryLayoutTab() {
     movingBlockId,
     movePreview,
     gridRef,
+    isLoading,
+    isSaving,
+    saveError,
+    saveConfig,
     selectBlock,
     addBlock,
     removeBlock,
     resetBlocks,
-    resetToData,
     setBlockProp,
     addLocaleToSelected,
     removeLocaleFromSelected,
@@ -65,28 +53,6 @@ export function CategoryLayoutTab() {
   const availableLocales = useConfigStore((s) => s.availableLocales);
   const defaultLocale = useConfigStore((s) => s.defaultLocale);
   const missingLocales = availableLocales.filter((l) => !sel.translations.some((tr) => tr.locale === l));
-
-  useEffect(() => {
-    configService
-      .getMunicipalityConfig()
-      .then((data) => resetToData(data.categories.map(categoryToTile)))
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetToData, configService.getMunicipalityConfig]);
-
-  const saveConfig = useCallback(async () => {
-    setIsSaving(true);
-    setSaveError(null);
-    try {
-      await configService.setCategories(blocks.map(tileToCategory));
-    } catch {
-      setSaveError(t('appManagement.saveError'));
-    } finally {
-      setIsSaving(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blocks, t, configService.setCategories]);
 
   if (isLoading) {
     return <p className="text-muted-foreground text-sm">{t('appManagement.loading')}</p>;

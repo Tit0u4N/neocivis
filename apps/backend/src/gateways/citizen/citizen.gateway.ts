@@ -26,13 +26,13 @@ import { UserController } from './controllers/user.controller';
 // Import repositories
 const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
 const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : new CosmosArticleRepository();
+const reportRepository = new InMemoryReportRepository();
+const configRepository = new InMemoryConfigRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
 const userService = new UserService(userRepository, iamService);
 const articleService = new ArticleService(articleRepository);
-const reportRepository = new InMemoryReportRepository();
-const configRepository = new InMemoryConfigRepository();
 
 await startAutoSeedOnStartup({ userService, articleRepository });
 

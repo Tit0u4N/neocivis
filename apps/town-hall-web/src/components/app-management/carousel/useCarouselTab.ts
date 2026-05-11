@@ -1,11 +1,19 @@
 'use client';
 
 import type { CarouselItem } from '@repo/contracts/config';
-import { useCallback, useState } from 'react';
+import { ConfigService } from '@repo/frontend-services/config';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useApi } from '@/providers/ApiProvider';
+import { useCityStore } from '@/stores/city.store';
 import { useConfigStore } from '@/stores/config.store';
 
 export type CarouselTabViewModel = {
   carousel: CarouselItem[];
+  isLoading: boolean;
+  isSaving: boolean;
+  saveError: string | null;
+  saveConfig: () => Promise<void>;
   resetCarousel: (items: CarouselItem[]) => void;
   addSlide: () => void;
   removeSlide: (id: string) => void;
@@ -14,12 +22,40 @@ export type CarouselTabViewModel = {
 };
 
 export function useCarouselTab(): CarouselTabViewModel {
+  const { t } = useTranslation();
+  const api = useApi();
+  const cityId = useCityStore((s) => s.cityId);
+  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
+
   const [carousel, setCarousel] = useState<CarouselItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const availableLocales = useConfigStore((s) => s.availableLocales);
 
   const resetCarousel = useCallback((items: CarouselItem[]) => {
     setCarousel(items);
   }, []);
+
+  useEffect(() => {
+    configService
+      .getMunicipalityConfig()
+      .then((data) => resetCarousel(data.carousel))
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, [configService, resetCarousel]);
+
+  const saveConfig = useCallback(async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await configService.setCarouselItems(carousel);
+    } catch {
+      setSaveError(t('appManagement.saveError'));
+    } finally {
+      setIsSaving(false);
+    }
+  }, [carousel, configService, t]);
 
   const addSlide = useCallback(() => {
     setCarousel((prev) => [
@@ -57,5 +93,16 @@ export function useCarouselTab(): CarouselTabViewModel {
     [],
   );
 
-  return { carousel, resetCarousel, addSlide, removeSlide, updateSlide, updateTranslation };
+  return {
+    carousel,
+    isLoading,
+    isSaving,
+    saveError,
+    saveConfig,
+    resetCarousel,
+    addSlide,
+    removeSlide,
+    updateSlide,
+    updateTranslation,
+  };
 }

@@ -1,8 +1,8 @@
 import type { PermissionKey } from '@repo/contracts';
 import { and, eq, inArray, type SQL, sql } from 'drizzle-orm';
 import { getDb } from '@/infrastructure/db/client';
-import { isValidPermissionKey } from '../permission.catalog';
 import type { EmployeeRoleAssignment, Role } from '../access.types';
+import { isValidPermissionKey } from '../permission.catalog';
 import type {
   CreateRolePersistenceInput,
   IAccessRepository,
@@ -146,19 +146,13 @@ export class DrizzleAccessRepository implements IAccessRepository {
 
   async listAssignmentsByUserId(userId: number): Promise<EmployeeRoleAssignment[]> {
     const db = getDb();
-    const rows = await db
-      .select()
-      .from(employeeRoleAssignments)
-      .where(eq(employeeRoleAssignments.userId, userId));
+    const rows = await db.select().from(employeeRoleAssignments).where(eq(employeeRoleAssignments.userId, userId));
     return rows.map((r) => ({ userId: r.userId, roleId: r.roleId, createdAt: r.createdAt }));
   }
 
   async listAssignmentsByRoleId(roleId: string): Promise<EmployeeRoleAssignment[]> {
     const db = getDb();
-    const rows = await db
-      .select()
-      .from(employeeRoleAssignments)
-      .where(eq(employeeRoleAssignments.roleId, roleId));
+    const rows = await db.select().from(employeeRoleAssignments).where(eq(employeeRoleAssignments.roleId, roleId));
     return rows.map((r) => ({ userId: r.userId, roleId: r.roleId, createdAt: r.createdAt }));
   }
 

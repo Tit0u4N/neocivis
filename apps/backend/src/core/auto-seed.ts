@@ -3,12 +3,12 @@ import type { AccessService } from '@/modules/access/access.service';
 import { AccessSeeder } from '@/modules/access/seed/access.seeder';
 import type { IArticleRepository } from '@/modules/article/repository/article.repository.interface';
 import { ArticleSeeder } from '@/modules/article/seed/article.seeder';
-import type { ICityRepository } from '@/modules/city/repository/city.repository.interface';
 import { CityService } from '@/modules/city/city.service';
+import type { ICityRepository } from '@/modules/city/repository/city.repository.interface';
 import { CitySeeder } from '@/modules/city/seed/city.seeder';
+import type { IAMService } from '@/modules/iam/iam.service';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/service/user.service';
-import type { IAMService } from '@/modules/iam/iam.service';
 import type { AutoSeedMode } from './runtime-config';
 import type { ISeeder } from './seeder.interface';
 

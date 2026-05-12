@@ -25,4 +25,3 @@ export const citySeeds: CitySeed[] = [
     citizenUsernames: ['citizen3'],
   },
 ];
-

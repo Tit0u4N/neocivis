@@ -24,7 +24,11 @@ function jsonError(c: any, status: number, message: string) {
  *  - EMPLOYEE d'une city -> nécessite la permission via un de ses rôles.
  *  - sinon -> 403.
  */
-export function requirePermission(permissionKey: PermissionKey, accessService: AccessService, userService: UserService) {
+export function requirePermission(
+  permissionKey: PermissionKey,
+  accessService: AccessService,
+  userService: UserService,
+) {
   return createMiddleware(async (c, next) => {
     const cityId = c.req.param('cityId');
     if (!cityId) {

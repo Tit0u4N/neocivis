@@ -222,12 +222,8 @@
           "name": "cities_admin_user_id_users_id_fk",
           "tableFrom": "cities",
           "tableTo": "users",
-          "columnsFrom": [
-            "admin_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["admin_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -299,12 +295,8 @@
           "name": "city_citizens_city_id_cities_id_fk",
           "tableFrom": "city_citizens",
           "tableTo": "cities",
-          "columnsFrom": [
-            "city_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["city_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -312,12 +304,8 @@
           "name": "city_citizens_user_id_users_id_fk",
           "tableFrom": "city_citizens",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -325,10 +313,7 @@
       "compositePrimaryKeys": {
         "city_citizens_city_id_user_id_pk": {
           "name": "city_citizens_city_id_user_id_pk",
-          "columns": [
-            "city_id",
-            "user_id"
-          ]
+          "columns": ["city_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -397,12 +382,8 @@
           "name": "city_employees_city_id_cities_id_fk",
           "tableFrom": "city_employees",
           "tableTo": "cities",
-          "columnsFrom": [
-            "city_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["city_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -410,12 +391,8 @@
           "name": "city_employees_user_id_users_id_fk",
           "tableFrom": "city_employees",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -423,10 +400,7 @@
       "compositePrimaryKeys": {
         "city_employees_city_id_user_id_pk": {
           "name": "city_employees_city_id_user_id_pk",
-          "columns": [
-            "city_id",
-            "user_id"
-          ]
+          "columns": ["city_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -439,11 +413,7 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "ADMIN",
-        "EMPLOYEE",
-        "CITIZEN"
-      ]
+      "values": ["ADMIN", "EMPLOYEE", "CITIZEN"]
     }
   },
   "schemas": {},

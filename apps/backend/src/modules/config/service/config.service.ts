@@ -1,17 +1,18 @@
 import type {
-  ArticleLocale,
   CarouselItem,
   CarouselItemResolved,
   Category,
   CategoryResolved,
   CitizenConfigResponse,
+  ConfigLocale,
+  MunicipalityConfigResponse,
 } from '@repo/contracts/config';
-import type { IConfigRepository } from './config.repository';
+import type { IConfigRepository } from '../repository/config.repository.interface';
 
 export class ConfigService {
   constructor(private repository: IConfigRepository) {}
 
-  async getConfig(locale: ArticleLocale): Promise<CitizenConfigResponse> {
+  async getConfig(cityId: string, locale: ConfigLocale): Promise<CitizenConfigResponse> {
     const [carouselItems, categories] = await Promise.all([
       this.repository.getCarouselItems(),
       this.repository.getCategories(),
@@ -23,7 +24,23 @@ export class ConfigService {
     };
   }
 
-  private resolveCarouselItem(item: CarouselItem, locale: ArticleLocale): CarouselItemResolved {
+  async getMunicipalityConfig(cityId: string): Promise<MunicipalityConfigResponse> {
+    const [categories, carousel] = await Promise.all([
+      this.repository.getCategories(),
+      this.repository.getCarouselItems(),
+    ]);
+    return { categories, carousel };
+  }
+
+  async setCategories(cityId: string, categories: Category[]): Promise<Category[]> {
+    return await this.repository.setCategories(categories);
+  }
+
+  async setCarouselItems(cityId: string, items: CarouselItem[]): Promise<CarouselItem[]> {
+    return await this.repository.setCarouselItems(items);
+  }
+
+  private resolveCarouselItem(item: CarouselItem, locale: ConfigLocale): CarouselItemResolved {
     const t =
       item.translations.find((tr) => tr.locale === locale) ?? item.translations.find((tr) => tr.locale === 'fr')!;
     return {
@@ -37,7 +54,7 @@ export class ConfigService {
     };
   }
 
-  private resolveCategory(cat: Category, locale: ArticleLocale): CategoryResolved {
+  private resolveCategory(cat: Category, locale: ConfigLocale): CategoryResolved {
     const t = cat.translations.find((tr) => tr.locale === locale) ?? cat.translations.find((tr) => tr.locale === 'fr')!;
     return {
       id: cat.id,

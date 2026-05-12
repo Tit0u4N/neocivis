@@ -110,9 +110,7 @@ describe('CityService', () => {
     await repository.createCity({ id: 'NIC_00001', name: 'Nice', description: 'Desc', adminUserId: 1 });
     await repository.createCity({ id: 'BIO_00002', name: 'Biot', description: 'Desc', adminUserId: 2 });
     await repository.addEmployee('NIC_00001', 50);
-    await expect(service.assignEmployee('BIO_00002', 50)).rejects.toThrow(
-      'Employee already assigned to a city',
-    );
+    await expect(service.assignEmployee('BIO_00002', 50)).rejects.toThrow('Employee already assigned to a city');
   });
 
   it('assignEmployee assigns when employee has no assignment', async () => {

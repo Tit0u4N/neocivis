@@ -1,10 +1,10 @@
 import type { ApiErrorDto, CityPublicDto, OperationSuccessDto, UserPublicDto } from '@repo/contracts';
+import { UpdateCityInput as UpdateCityInputSchema } from '@repo/contracts/city';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
 import { toUserPublicDto } from '@/modules/users/user.types';
-import { UpdateCityInput as UpdateCityInputSchema } from '@repo/contracts/city';
 
 export class CityController {
   constructor(
@@ -63,7 +63,7 @@ export class CityController {
     const firstName = typeof bodyObj?.firstName === 'string' ? bodyObj.firstName : '';
     const lastName = typeof bodyObj?.lastName === 'string' ? bodyObj.lastName : '';
     const password = typeof bodyObj?.password === 'string' ? bodyObj.password : '';
-    if (!username || !email || !firstName || !lastName || !password) {
+    if (!(username && email && firstName && lastName && password)) {
       return c.json({ error: 'Invalid body' } satisfies ApiErrorDto, 400);
     }
 
@@ -92,4 +92,3 @@ export class CityController {
     }
   }
 }
-

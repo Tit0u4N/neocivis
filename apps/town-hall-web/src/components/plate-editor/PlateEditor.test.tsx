@@ -19,7 +19,7 @@ vi.mock('react-dnd', () => ({
 }));
 vi.mock('react-dnd-html5-backend', () => ({ HTML5Backend: {} }));
 
-import { PlateEditor } from './PlateEditor';
+import { PlateEditor } from './PlateEditor.impl';
 
 afterEach(cleanup);
 

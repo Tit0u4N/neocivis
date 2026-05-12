@@ -4,7 +4,13 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/components/ui/page-layout', () => ({
-  PageLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  // biome-ignore lint/style/useNamingConvention: React component name in mock object
+  PageLayout: ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div>
+      <h1>{title}</h1>
+      {children}
+    </div>
+  ),
 }));
 
 import { EstablishmentFormPage } from './EstablishmentFormPage';

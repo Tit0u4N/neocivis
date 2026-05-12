@@ -31,6 +31,8 @@ function makeProps(overrides: Partial<Parameters<typeof EstablishmentListPage>[0
     setTypeFilter: vi.fn(),
     searchQuery: '',
     setSearchQuery: vi.fn(),
+    viewMode: 'list' as const,
+    setViewMode: vi.fn(),
     confirmDeleteId: null,
     setConfirmDeleteId: vi.fn(),
     deletingId: null,
@@ -86,7 +88,7 @@ describe('EstablishmentListPage', () => {
   it('clicking the "Ajouter" button calls navigateToCreate', () => {
     const navigateToCreate = vi.fn();
     render(<EstablishmentListPage {...makeProps({ navigateToCreate })} />);
-    const addButton = screen.getByRole('button', { name: /ajouter/i });
+    const addButton = screen.getByRole('button', { name: 'Ajouter' });
     fireEvent.click(addButton);
     expect(navigateToCreate).toHaveBeenCalled();
   });

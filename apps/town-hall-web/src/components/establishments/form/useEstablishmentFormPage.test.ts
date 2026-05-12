@@ -28,6 +28,16 @@ vi.mock('@repo/frontend-services/establishment', () => ({
   }),
 }));
 
+const mockUploadService = {
+  uploadImage: vi.fn(),
+};
+vi.mock('@repo/frontend-services/upload', () => ({
+  // biome-ignore lint/style/useNamingConvention: React class name in mock object
+  UploadService: vi.fn(function (this: any) {
+    return mockUploadService;
+  }),
+}));
+
 import { useEstablishmentFormPage } from './useEstablishmentFormPage';
 
 afterEach(() => vi.clearAllMocks());

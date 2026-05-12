@@ -21,6 +21,7 @@ const mockEstablishmentService = {
   delete: vi.fn(),
 };
 vi.mock('@repo/frontend-services/establishment', () => ({
+  // biome-ignore lint/style/useNamingConvention: React class name in mock object
   EstablishmentService: vi.fn(function (this: any) {
     return mockEstablishmentService;
   }),

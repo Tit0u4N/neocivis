@@ -1,5 +1,6 @@
 'use client';
 
+import type { Establishment, EstablishmentType } from '@repo/contracts/establishment';
 import { Clock, LayoutGrid, List, MapPin, MoreHorizontal, Phone, Plus } from 'lucide-react';
 import {
   AlertDialog,
@@ -23,7 +24,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { PageLayout } from '@/components/ui/page-layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Establishment, EstablishmentType } from '@repo/contracts/establishment';
 import type { useEstablishmentListPage } from './useEstablishmentListPage';
 
 type Props = ReturnType<typeof useEstablishmentListPage>;

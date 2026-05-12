@@ -1,5 +1,6 @@
 'use client';
 
+import type { EstablishmentType } from '@repo/contracts/establishment';
 import { Loader2 } from 'lucide-react';
 import {
   AlertDialog,
@@ -19,7 +20,6 @@ import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { EstablishmentType } from '@repo/contracts/establishment';
 import type { useEstablishmentFormPage } from './useEstablishmentFormPage';
 
 type Props = ReturnType<typeof useEstablishmentFormPage>;

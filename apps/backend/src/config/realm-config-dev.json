@@ -73,63 +73,11 @@
       },
       {
         "name": "EMPLOYEE",
-        "description": "Eployé de la mairie"
+        "description": "Employé de la mairie"
       },
       {
         "name": "CITIZEN",
         "description": "Citoyen de la ville"
-      },
-      {
-        "name": "SIGNAL_VIEW_PERMISSION",
-        "description": "Voir les signalements"
-      },
-      {
-        "name": "SIGNAL_CREATE_PERMISSION",
-        "description": "Créer des signalements"
-      },
-      {
-        "name": "SIGNAL_MODIFY_PERMISSION",
-        "description": "Modifier des signalements"
-      },
-      {
-        "name": "FORUM_THREAD_CREATE_PERMISSION",
-        "description": "Créer un thread sur le forum"
-      },
-      {
-        "name": "FORUM_THREAD_DELETE_PERMISSION",
-        "description": "Supprimer un thread sur le forum"
-      },
-      {
-        "name": "FORUM_THREAD_MODIFY_PERMISSION",
-        "description": "Modifier un thread sur le forum"
-      },
-      {
-        "name": "FORUM_THREAD_DELETE_MESSAGE_PERMISSION",
-        "description": "Supprimer un message dans un thread sur le forum"
-      },
-      {
-        "name": "FORUM_THREAD_BAN_USER_PERMISSION",
-        "description": "Bannir un utilisateur d'un thread sur le forum"
-      },
-      {
-        "name": "FORUM_THREAD_UNBAN_USER_PERMISSION",
-        "description": "Débannir un utilisateur d'un thread sur le forum"
-      },
-      {
-        "name": "PAGE_CITY_HALL_MODIFY_PERMISSION",
-        "description": "Modifier des éléments de la page mairie"
-      },
-      {
-        "name": "PAGE_CITY_HALL_ANNOUNCE_PERMISSION",
-        "description": "Créer des annonces sur la page mairie"
-      },
-      {
-        "name": "NOTIFICATION_SEND_PERMISSION",
-        "description": "Envoyer des notifications aux utilisateurs"
-      },
-      {
-        "name": "WEBHOOK_PERMISSION",
-        "description": "Gestion des webhook"
       }
     ]
   },
@@ -159,6 +107,16 @@
       ]
     }
   ],
+  "smtpServer": {
+    "replyToDisplayName": "",
+    "starttls": "false",
+    "auth": "false",
+    "ssl": "false",
+    "port": "1025",
+    "host": "mailpit.neocivis.cloud",
+    "from": "iam-dev@neocivis.cloud",
+    "fromDisplayName": "IAM DEV Neocivis"
+  },
   "users": [
     {
       "username": "citizen1",
@@ -171,10 +129,13 @@
           "temporary": false
         }
       ],
+      "email": "cit1@example.com",
+      "lastName": "One",
+      "firstName": "Citizen",
       "realmRoles": ["CITIZEN"]
     },
     {
-      "username": "municipal-employee1",
+      "username": "citizen2",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -184,10 +145,13 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["EMPLOYEE", "SIGNAL_VIEW_PERMISSION", "SIGNAL_CREATE_PERMISSION", "SIGNAL_MODIFY_PERMISSION"]
+      "email": "cit2@example.com",
+      "lastName": "Two",
+      "firstName": "Citizen",
+      "realmRoles": ["CITIZEN"]
     },
     {
-      "username": "admin1",
+      "username": "citizen3",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -197,7 +161,106 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["ADMIN", "EMPLOYEE"]
+      "email": "cit3@example.com",
+      "lastName": "Three",
+      "firstName": "Citizen",
+      "realmRoles": ["CITIZEN"]
+    },
+    {
+      "username": "admin-nice",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "admin.nice@neocivis.cloud",
+      "lastName": "Nice",
+      "firstName": "Admin",
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "admin-biot",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "admin.biot@neocivis.cloud",
+      "lastName": "Biot",
+      "firstName": "Admin",
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "admin-marseille",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "admin.marseille@neocivis.cloud",
+      "lastName": "Marseille",
+      "firstName": "Admin",
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "employee-nice1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "employee.nice1@neocivis.cloud",
+      "lastName": "Nice1",
+      "firstName": "Employee",
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "employee-biot1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "employee.biot1@neocivis.cloud",
+      "lastName": "Biot1",
+      "firstName": "Employee",
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "employee-marseille1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "email": "employee.marseille1@neocivis.cloud",
+      "lastName": "Marseille1",
+      "firstName": "Employee",
+      "realmRoles": ["EMPLOYEE"]
     }
   ]
 }

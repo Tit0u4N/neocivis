@@ -1,7 +1,10 @@
 import { app } from '@azure/functions';
 import { azureHonoHandler } from '@marplex/hono-azurefunc-adapter';
+import { assertBackendEnv } from './core/env-check';
 import citizenGateway from './gateways/citizen/citizen.gateway';
 import municipalityGateway from './gateways/municipality/municipality.gateway';
+
+assertBackendEnv();
 
 // --- Fonction 1 : Module Citizen ---
 app.http('citizenModule', {

@@ -2,6 +2,7 @@
   "login": {
     "brand": "NeoCivis",
     "title": "Bienvenue sur\nNeoCivis",
+    "welcomeTo": "Bienvenue à",
     "subtitle": "Rejoins-nous si tu veux être au courant des actualités de ta ville",
     "signUp": "S'inscrire",
     "signIn": "Se connecter",
@@ -9,6 +10,7 @@
   },
   "tabs": {
     "city": "Ville",
+    "news": "Actualités",
     "report": "Signaler",
     "forum": "Forum",
     "account": "Compte"
@@ -102,6 +104,9 @@
   },
   "forum": {
     "title": "Forum"
+  },
+  "news": {
+    "title": "Actualités"
   },
   "account": {
     "title": "Mon compte",

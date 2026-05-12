@@ -1,0 +1,39 @@
+meta {
+  name: 08 - Delete translation (en)
+  type: http
+  seq: 938
+}
+
+delete {
+  url: {{url}}/api/municipality/articles/{{articleId}}/translations/en
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  if (!bru.getVar('articleId')) {
+    throw new Error('Missing articleId. Run "01 - Create article" first.');
+  }
+}
+
+script:post-response {
+  test("Status is 200/403/404", function() {
+    // 403 si tentative de supprimer la dernière traduction
+    expect([200, 403, 404]).to.include(res.getStatus());
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

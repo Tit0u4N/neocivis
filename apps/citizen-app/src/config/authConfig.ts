@@ -1,4 +1,5 @@
 import { makeRedirectUri } from 'expo-auth-session';
+import { Platform } from 'react-native';
 
 /**
  * Keycloak realm base URL — e.g. https://auth.neocivis.cloud/realms/neocivis
@@ -15,7 +16,7 @@ export const authConfig = {
    * offline_access is required for durable refresh tokens on mobile.
    * Without it, the refresh token may expire with the session.
    */
-  scopes: ['openid', 'profile', 'email', 'offline_access'],
+  scopes: ['openid', 'profile', 'email', Platform.OS !== 'web' ? 'offline_access' : ''],
   redirectUri: makeRedirectUri({
     scheme: 'neocivis-citizen-app',
   }),

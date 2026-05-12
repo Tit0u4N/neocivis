@@ -1,0 +1,43 @@
+meta {
+  name: 00 - Seed check (mock 111...)
+  type: http
+  seq: 0
+}
+
+get {
+  url: {{url}}/api/municipality/articles/11111111-1111-1111-1111-111111111111
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Body matches seeded article", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.id).to.equal('11111111-1111-1111-1111-111111111111');
+    expect(body.status).to.equal('published');
+    expect(body.translations).to.be.an('array');
+
+    const fr = body.translations.find((t) => t.locale === 'fr');
+    expect(fr).to.be.an('object');
+    expect(fr.title).to.equal('Bienvenue dans notre ville');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

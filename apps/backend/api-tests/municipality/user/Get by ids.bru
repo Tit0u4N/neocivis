@@ -1,0 +1,46 @@
+meta {
+  name: Get by ids
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{url}}/api/municipality/user/by-ids?ids=1
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+}
+
+script:post-response {
+  test("Status is 200 or 400", function() {
+    expect([200, 400]).to.include(res.getStatus());
+  });
+  
+  if (res.getStatus() === 200) {
+    test("Body is list of users (public dto)", function() {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      body.forEach(user => {
+        expect(user).to.have.property('id');
+        expect(user).to.have.property('username');
+        expect(user).to.have.property('firstName');
+        expect(user).to.have.property('lastName');
+        expect(user).to.not.have.property('email');
+        expect(user).to.not.have.property('role');
+        expect(user).to.not.have.property('keycloakId');
+      });
+    });
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

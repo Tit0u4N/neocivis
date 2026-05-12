@@ -7,23 +7,29 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '@/providers/ApiProvider';
 import { useCityStore } from '@/stores/city.store';
 import { type Locale, useConfigStore } from '@/stores/config.store';
+import { type LinkValue, linkValueToUrl, urlToLinkValue } from '../LinkPicker';
+
+//TODO : REVIEW THE LINK WITH THE BQCKEND WHEN THE MEDIA GALLERY IS READY
 
 export type CarouselTabViewModel = {
   carousel: CarouselItem[];
   selectedId: string;
   selectedSlide: CarouselItem | null;
-  activeLang: Locale;
+  defaultLocale: Locale;
   isLoading: boolean;
   isSaving: boolean;
   saveError: string | null;
   saveConfig: () => Promise<void>;
   setSelectedId: (id: string) => void;
-  setActiveLang: (locale: Locale) => void;
   addSlide: () => void;
   removeSlide: (id: string) => void;
   moveSlide: (id: string, dir: 1 | -1) => void;
   updateSlide: (id: string, patch: Partial<CarouselItem>) => void;
+  addLocaleToSelected: (locale: Locale) => void;
+  removeLocaleFromSelected: (locale: Locale) => void;
   updateTranslation: (slideId: string, locale: string, field: 'title' | 'description' | 'tag', value: string) => void;
+  getSlideLink: (slide: CarouselItem) => LinkValue;
+  updateSlideLink: (slideId: string, link: LinkValue) => void;
 };
 
 export function useCarouselTab(): CarouselTabViewModel {
@@ -34,7 +40,6 @@ export function useCarouselTab(): CarouselTabViewModel {
 
   const [carousel, setCarousel] = useState<CarouselItem[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');
-  const [activeLang, setActiveLang] = useState<Locale>('fr');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -78,8 +83,7 @@ export function useCarouselTab(): CarouselTabViewModel {
     };
     setCarousel((prev) => [...prev, newSlide]);
     setSelectedId(newId);
-    setActiveLang(defaultLocale);
-  }, [availableLocales, carousel.length, defaultLocale]);
+  }, [availableLocales, carousel.length]);
 
   const removeSlide = useCallback(
     (id: string) => {
@@ -111,6 +115,33 @@ export function useCarouselTab(): CarouselTabViewModel {
     setCarousel((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   }, []);
 
+  const addLocaleToSelected = useCallback(
+    (locale: Locale) => {
+      setCarousel((prev) =>
+        prev.map((s) =>
+          s.id === selectedSlide?.id && !s.translations.some((tr) => tr.locale === locale)
+            ? { ...s, translations: [...s.translations, { locale, title: '', description: '', tag: '' }] }
+            : s,
+        ),
+      );
+    },
+    [selectedSlide?.id],
+  );
+
+  const removeLocaleFromSelected = useCallback(
+    (locale: Locale) => {
+      if (locale === defaultLocale) {
+        return;
+      }
+      setCarousel((prev) =>
+        prev.map((s) =>
+          s.id === selectedSlide?.id ? { ...s, translations: s.translations.filter((tr) => tr.locale !== locale) } : s,
+        ),
+      );
+    },
+    [selectedSlide?.id, defaultLocale],
+  );
+
   const updateTranslation = useCallback(
     (slideId: string, locale: string, field: 'title' | 'description' | 'tag', value: string) => {
       setCarousel((prev) =>
@@ -118,13 +149,13 @@ export function useCarouselTab(): CarouselTabViewModel {
           if (s.id !== slideId) {
             return s;
           }
-          const hasLocale = s.translations.some((tr) => tr.locale === locale);
           const applyField = (tr: CarouselItemTranslation): CarouselItemTranslation => ({
             ...tr,
             title: field === 'title' ? value : tr.title,
             description: field === 'description' ? value : tr.description,
             tag: field === 'tag' ? value : tr.tag,
           });
+          const hasLocale = s.translations.some((tr) => tr.locale === locale);
           const translations: CarouselItemTranslation[] = hasLocale
             ? s.translations.map((tr) => (tr.locale === locale ? applyField(tr) : tr))
             : [...s.translations, applyField({ locale: locale as ConfigLocale, title: '', description: '', tag: '' })];
@@ -135,21 +166,33 @@ export function useCarouselTab(): CarouselTabViewModel {
     [],
   );
 
+  const getSlideLink = useCallback((slide: CarouselItem): LinkValue => urlToLinkValue(slide.linkUrl), []);
+
+  const updateSlideLink = useCallback(
+    (slideId: string, link: LinkValue) => {
+      updateSlide(slideId, { linkUrl: linkValueToUrl(link) });
+    },
+    [updateSlide],
+  );
+
   return {
     carousel,
     selectedId: selectedSlide?.id ?? '',
     selectedSlide,
-    activeLang,
+    defaultLocale,
     isLoading,
     isSaving,
     saveError,
     saveConfig,
     setSelectedId,
-    setActiveLang,
     addSlide,
     removeSlide,
     moveSlide,
     updateSlide,
+    addLocaleToSelected,
+    removeLocaleFromSelected,
     updateTranslation,
+    getSlideLink,
+    updateSlideLink,
   };
 }

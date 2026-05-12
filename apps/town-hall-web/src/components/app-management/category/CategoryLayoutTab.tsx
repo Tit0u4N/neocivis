@@ -1,25 +1,18 @@
 'use client';
 
-import { Plus, Save, Trash2, X } from 'lucide-react';
+import { Save, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { type Locale, useConfigStore } from '@/stores/config.store';
+import { useConfigStore } from '@/stores/config.store';
+import { LinkPicker } from '../LinkPicker';
+import { LocaleManager } from '../LocaleManager';
 import { IconPickerModal } from './IconPickerModal';
 import { TileGrid } from './TileGrid';
-import { COLOR_PRESETS, LINK_GROUPS, tintFrom, useCategoryLayoutTab } from './useCategoryLayoutTab';
+import { COLOR_PRESETS, tintFrom, useCategoryLayoutTab } from './useCategoryLayoutTab';
 
 export function CategoryLayoutTab() {
   const { t } = useTranslation();
@@ -50,9 +43,7 @@ export function CategoryLayoutTab() {
     handleResizeStart,
     handleMoveStart,
   } = vm;
-  const availableLocales = useConfigStore((s) => s.availableLocales);
   const defaultLocale = useConfigStore((s) => s.defaultLocale);
-  const missingLocales = availableLocales.filter((l) => !sel.translations.some((tr) => tr.locale === l));
 
   if (isLoading) {
     return <p className="text-muted-foreground text-sm">{t('appManagement.loading')}</p>;
@@ -97,101 +88,31 @@ export function CategoryLayoutTab() {
           </div>
 
           {/* Translations */}
-          <div className="flex flex-col gap-2">
-            <Label className="font-medium text-muted-foreground text-xs">
-              {t('appManagement.settings.translations')}
-            </Label>
-            <div className="flex flex-col gap-1.5">
-              {sel.translations.map((tr) => (
-                <div key={tr.locale} className="flex items-center gap-2">
-                  <span className="w-7 shrink-0 rounded bg-muted px-1.5 py-0.5 text-center font-mono text-xs">
-                    {tr.locale}
-                  </span>
-                  <Input
-                    className="h-8 text-sm"
-                    value={tr.name}
-                    onChange={(e) => updateTranslationName(tr.locale, e.target.value)}
-                    placeholder={t('appManagement.settings.translationPlaceholder', { locale: tr.locale })}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={tr.locale === defaultLocale}
-                    onClick={() => removeLocaleFromSelected(tr.locale)}
-                    className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                  >
-                    <X className="size-3.5" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            {missingLocales.length > 0 && (
-              <Select value="" onValueChange={(v) => addLocaleToSelected(v as Locale)}>
-                <SelectTrigger className="h-8 w-full text-xs">
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <Plus className="size-3.5" />
-                    <SelectValue placeholder={t('appManagement.settings.addTranslation')} />
-                  </div>
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  {missingLocales.map((locale) => (
-                    <SelectItem key={locale} value={locale}>
-                      <span className="font-mono">{locale}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <LocaleManager
+            label={t('appManagement.settings.translations')}
+            translations={sel.translations}
+            defaultLocale={defaultLocale}
+            onAdd={addLocaleToSelected}
+            onRemove={removeLocaleFromSelected}
+            renderRow={(tr) => (
+              <Input
+                className="h-8 text-sm"
+                value={tr.name}
+                onChange={(e) => updateTranslationName(tr.locale, e.target.value)}
+                placeholder={t('appManagement.settings.translationPlaceholder', { locale: tr.locale })}
+              />
             )}
-          </div>
+          />
 
           {/* Icon + Link */}
           <div className="grid grid-cols-2 gap-3.5">
             <IconPickerModal value={sel.icon} onChange={(v) => setBlockProp('icon', v)} />
-            <div className="flex flex-col gap-1.5">
-              <Label className="font-medium text-muted-foreground text-xs">
-                {t('appManagement.settings.linkLabel')}
-              </Label>
-              <Select value={sel.link.type} onValueChange={(v) => setBlockProp('link', { ...sel.link, type: v })}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  {LINK_GROUPS.map((group) => (
-                    <SelectGroup key={group.groupId}>
-                      <SelectLabel>{t(`appManagement.linkGroups.${group.groupId}`)}</SelectLabel>
-                      {group.options.map((id) => (
-                        <SelectItem key={id} value={id}>
-                          {t(`appManagement.links.${id}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <LinkPicker
+              label={t('appManagement.settings.linkLabel')}
+              value={sel.link}
+              onChange={(link) => setBlockProp('link', link)}
+            />
           </div>
-
-          {/* Link ID (for external URL or page ID) */}
-          {(sel.link.type === 'External URL' || sel.link.type === 'FreePage') && (
-            <div className="flex flex-col gap-1.5">
-              <Label className="font-medium text-muted-foreground text-xs">
-                {sel.link.type === 'External URL'
-                  ? t('appManagement.settings.externalUrl')
-                  : t('appManagement.settings.pageId')}
-              </Label>
-              <Input
-                className="h-9 font-mono text-sm"
-                value={sel.link.id ?? ''}
-                onChange={(e) =>
-                  setBlockProp('link', {
-                    ...sel.link,
-                    id: e.target.value || undefined,
-                  })
-                }
-                placeholder={sel.link.type === 'External URL' ? 'https://...' : 'page-id'}
-              />
-            </div>
-          )}
 
           {/* Color presets */}
           <div className="flex flex-col gap-2">

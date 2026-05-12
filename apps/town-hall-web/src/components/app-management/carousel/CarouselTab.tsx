@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { type Locale, useConfigStore } from '@/stores/config.store';
+import { LinkPicker } from '../LinkPicker';
+import { LocaleManager } from '../LocaleManager';
 import { useCarouselTab } from './useCarouselTab';
 
 export function CarouselTab() {
@@ -17,27 +18,26 @@ export function CarouselTab() {
     carousel,
     selectedId,
     selectedSlide,
-    activeLang,
+    defaultLocale,
     isLoading,
     isSaving,
     saveError,
     saveConfig,
     setSelectedId,
-    setActiveLang,
     addSlide,
     removeSlide,
     moveSlide,
     updateSlide,
+    addLocaleToSelected,
+    removeLocaleFromSelected,
     updateTranslation,
+    getSlideLink,
+    updateSlideLink,
   } = vm;
-
-  const availableLocales = useConfigStore((s) => s.availableLocales);
 
   if (isLoading) {
     return <p className="text-muted-foreground text-sm">{t('appManagement.loading')}</p>;
   }
-
-  const activeTranslation = selectedSlide?.translations.find((tr) => tr.locale === activeLang) ?? null;
 
   return (
     <div className="flex items-start gap-0 pt-3">
@@ -57,8 +57,8 @@ export function CarouselTab() {
           <div className="flex flex-col gap-2">
             {carousel.map((slide, i) => {
               const isSel = slide.id === selectedId;
-              const titleFr =
-                slide.translations.find((tr) => tr.locale === 'fr')?.title ||
+              const title =
+                slide.translations.find((tr) => tr.locale === defaultLocale)?.title ||
                 slide.translations.find((tr) => tr.title)?.title ||
                 '';
               return (
@@ -83,7 +83,7 @@ export function CarouselTab() {
                   {/* Info */}
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold text-foreground text-sm">
-                      {titleFr || t('appManagement.carousel.untitled')}
+                      {title || t('appManagement.carousel.untitled')}
                     </p>
                     {slide.linkUrl && <p className="truncate text-muted-foreground text-xs">→ {slide.linkUrl}</p>}
                   </div>
@@ -154,81 +154,55 @@ export function CarouselTab() {
               </div>
             </div>
 
-            {/* Locale tabs + translation fields */}
-            <div className="flex flex-col gap-0">
-              <Label className="mb-2 font-medium text-muted-foreground text-xs">
-                {t('appManagement.carousel.translations')}
-              </Label>
-              {/* Tab bar */}
-              <div className="-mb-px flex gap-1 border-border border-b">
-                {availableLocales.map((locale) => {
-                  const tr = selectedSlide.translations.find((t) => t.locale === locale);
-                  const filled = !!tr?.title?.trim();
-                  const isActive = activeLang === locale;
-                  return (
-                    <button
-                      key={locale}
-                      type="button"
-                      onClick={() => setActiveLang(locale as Locale)}
-                      className={cn(
-                        'flex items-center gap-1.5 border-b-2 px-3 py-2 font-medium text-xs transition-colors',
-                        isActive
-                          ? 'border-foreground text-foreground'
-                          : 'border-transparent text-muted-foreground hover:text-foreground',
-                      )}
-                    >
-                      <span className="font-mono uppercase">{locale}</span>
-                      <span
-                        className={cn('size-1.5 rounded-full', filled ? 'bg-green-500' : 'bg-muted-foreground/30')}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-              {/* Fields for active locale */}
-              <div className="mt-3 flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                  <Label className="text-muted-foreground text-xs">{t('appManagement.carousel.fieldTitle')}</Label>
-                  <Input
-                    value={activeTranslation?.title ?? ''}
-                    onChange={(e) => updateTranslation(selectedSlide.id, activeLang, 'title', e.target.value)}
-                    placeholder={t('appManagement.carousel.fieldTitle')}
-                    className="text-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-muted-foreground text-xs">
-                    {t('appManagement.carousel.fieldDescription')}
-                  </Label>
-                  <Input
-                    value={activeTranslation?.description ?? ''}
-                    onChange={(e) => updateTranslation(selectedSlide.id, activeLang, 'description', e.target.value)}
-                    placeholder={t('appManagement.carousel.fieldDescription')}
-                    className="text-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-muted-foreground text-xs">{t('appManagement.carousel.fieldTag')}</Label>
-                  <Input
-                    value={activeTranslation?.tag ?? ''}
-                    onChange={(e) => updateTranslation(selectedSlide.id, activeLang, 'tag', e.target.value)}
-                    placeholder={t('appManagement.carousel.fieldTag')}
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-            </div>
+            {/* Link */}
+            <LinkPicker
+              label={t('appManagement.carousel.linkUrl')}
+              value={getSlideLink(selectedSlide)}
+              onChange={(link) => updateSlideLink(selectedSlide.id, link)}
+            />
 
-            {/* Link URL */}
-            <div className="flex flex-col gap-1.5">
-              <Label className="font-medium text-muted-foreground text-xs">{t('appManagement.carousel.linkUrl')}</Label>
-              <Input
-                value={selectedSlide.linkUrl ?? ''}
-                onChange={(e) => updateSlide(selectedSlide.id, { linkUrl: e.target.value || undefined })}
-                placeholder="https://..."
-                className="text-sm"
-              />
-            </div>
+            {/* Translations — locale list with add/remove, like CategoryLayoutTab */}
+            <LocaleManager
+              label={t('appManagement.carousel.translations')}
+              translations={selectedSlide.translations}
+              defaultLocale={defaultLocale}
+              onAdd={addLocaleToSelected}
+              onRemove={removeLocaleFromSelected}
+              renderRow={(tr) => (
+                <>
+                  <div className="flex flex-col gap-1">
+                    <Label className="font-medium text-muted-foreground text-xs">
+                      {t('appManagement.carousel.fieldTitle')}
+                    </Label>
+                    <Input
+                      className="h-8 text-sm"
+                      value={tr.title}
+                      onChange={(e) => updateTranslation(selectedSlide.id, tr.locale, 'title', e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label className="font-medium text-muted-foreground text-xs">
+                      {t('appManagement.carousel.fieldDescription')}
+                    </Label>
+                    <Input
+                      className="h-8 text-sm"
+                      value={tr.description ?? ''}
+                      onChange={(e) => updateTranslation(selectedSlide.id, tr.locale, 'description', e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label className="font-medium text-muted-foreground text-xs">
+                      {t('appManagement.carousel.fieldTag')}
+                    </Label>
+                    <Input
+                      className="h-8 text-sm"
+                      value={tr.tag ?? ''}
+                      onChange={(e) => updateTranslation(selectedSlide.id, tr.locale, 'tag', e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
+            />
 
             {/* Actions */}
             <div className="flex items-center justify-between pt-1">

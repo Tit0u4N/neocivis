@@ -8,25 +8,8 @@ import { useApi } from '@/providers/ApiProvider';
 import { useCityStore } from '@/stores/city.store';
 import { type Locale, useConfigStore } from '@/stores/config.store';
 
-export type TileLinkType =
-  | 'Link'
-  | 'General'
-  | 'Establishment'
-  | 'FreePage'
-  | 'Forum'
-  | 'Reports'
-  | 'Articles'
-  | 'Events'
-  | 'External URL';
-
-export type LinkGroupId = 'special' | 'freePage' | 'normal' | 'external';
-
-export const LINK_GROUPS: { groupId: LinkGroupId; options: TileLinkType[] }[] = [
-  { groupId: 'special', options: ['Link', 'General', 'Establishment'] },
-  { groupId: 'freePage', options: ['FreePage'] },
-  { groupId: 'normal', options: ['Forum', 'Reports', 'Articles', 'Events'] },
-  { groupId: 'external', options: ['External URL'] },
-];
+export type { LinkGroupId, TileLinkType } from '../LinkPicker';
+export { LINK_GROUPS } from '../LinkPicker';
 
 export type ResizeHandle = 'right' | 'bottom' | 'br';
 

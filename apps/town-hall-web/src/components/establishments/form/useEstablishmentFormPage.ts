@@ -75,7 +75,7 @@ export function useEstablishmentFormPage(id?: string) {
   }, []);
 
   const validate = useCallback((): boolean => {
-    const result = CreateEstablishmentInput.safeParse(form);
+    const result = CreateEstablishmentInput.safeParse({ ...form, imageUrl: form.imageUrl || undefined });
     if (!result.success) {
       const newErrors: FormErrors = {};
       for (const issue of result.error.issues) {

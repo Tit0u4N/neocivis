@@ -4,6 +4,7 @@ import type { Article, ArticleStatus } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useArticlePreview } from '@/components/articles/preview/useArticlePreview';
 import { useApi } from '@/providers/ApiProvider';
 
 type StatusFilter = ArticleStatus | 'all';
@@ -18,6 +19,13 @@ export function useArticleListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+
+  const handleSelectArticle = useCallback((article: Article) => {
+    setSelectedArticle((prev) => (prev?.id === article.id ? null : article));
+  }, []);
+
+  const handleClosePreview = useCallback(() => setSelectedArticle(null), []);
 
   const fetchArticles = useCallback(async () => {
     setIsLoading(true);
@@ -92,6 +100,8 @@ export function useArticleListPage() {
     [router],
   );
 
+  const preview = useArticlePreview(selectedArticle);
+
   return {
     articles: filteredArticles,
     isLoading,
@@ -108,5 +118,9 @@ export function useArticleListPage() {
     navigateToCreate,
     navigateToEdit,
     navigateToTranslations,
+    selectedArticle,
+    handleSelectArticle,
+    handleClosePreview,
+    preview,
   };
 }

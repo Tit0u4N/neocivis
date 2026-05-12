@@ -1,13 +1,13 @@
 meta {
   name: 04 - Update article
   type: http
-  seq: 4
+  seq: 934
 }
 
 put {
   url: {{url}}/api/municipality/articles/{{articleId}}
   body: json
-  auth: inherit
+  auth: none
 }
 
 body:json {
@@ -22,6 +22,15 @@ body:json {
 }
 
 script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
   if (!bru.getVar('articleId')) {
     throw new Error('Missing articleId. Run "01 - Create article" first.');
   }

@@ -1,6 +1,12 @@
 import { getAutoSeedMode, isInMemoryMode } from '@/core/runtime-config';
+import type { AccessService } from '@/modules/access/access.service';
+import { AccessSeeder } from '@/modules/access/seed/access.seeder';
 import type { IArticleRepository } from '@/modules/article/repository/article.repository.interface';
 import { ArticleSeeder } from '@/modules/article/seed/article.seeder';
+import { CityService } from '@/modules/city/city.service';
+import type { ICityRepository } from '@/modules/city/repository/city.repository.interface';
+import { CitySeeder } from '@/modules/city/seed/city.seeder';
+import type { IAMService } from '@/modules/iam/iam.service';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/service/user.service';
 import type { AutoSeedMode } from './runtime-config';
@@ -9,6 +15,9 @@ import type { ISeeder } from './seeder.interface';
 export type AutoSeedDeps = {
   userService: UserService;
   articleRepository: IArticleRepository;
+  cityRepository: ICityRepository;
+  iamService: IAMService;
+  accessService: AccessService;
 };
 
 const AUTO_SEED_GLOBAL_KEY = '__neocivis_auto_seed_started__';
@@ -40,14 +49,18 @@ export async function startAutoSeedOnStartup(deps: AutoSeedDeps): Promise<void> 
 }
 
 export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promise<void> {
-  const seederList: ISeeder[] = [new UserSeeder(deps.userService), new ArticleSeeder(deps.articleRepository)];
+  const cityService = new CityService(deps.cityRepository, deps.userService, deps.iamService);
+  const seederList: ISeeder[] = [
+    new UserSeeder(deps.userService),
+    new CitySeeder(deps.cityRepository, cityService, deps.userService),
+    new AccessSeeder(deps.accessService, cityService),
+    new ArticleSeeder(deps.articleRepository),
+  ];
 
-  await Promise.all(
-    seederList.map(async (seeder) => {
-      if (mode === 'RESET_DATA') {
-        await seeder.deleteAll();
-      }
-      await seeder.seed();
-    }),
-  );
+  for (const seeder of seederList) {
+    if (mode === 'RESET_DATA') {
+      await seeder.deleteAll();
+    }
+    await seeder.seed();
+  }
 }

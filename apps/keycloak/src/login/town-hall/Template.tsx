@@ -1,6 +1,6 @@
 import { kcSanitize } from 'keycloakify/lib/kcSanitize';
 import type { TemplateProps } from 'keycloakify/login/TemplateProps';
-import neocivisIconColor from '@/assets/neocivi-icon-cx300.png';
+import neocivisLogoPrimary from '@/assets/neocivis_logo_primary.svg?url';
 import { cn } from '@/lib/utils';
 import type { I18n } from '../i18n';
 import type { KcContext } from '../KcContext';
@@ -27,8 +27,7 @@ export function TownHallTemplate(props: TemplateProps<KcContext, I18n>) {
         {/* Brand */}
         <div className="mb-8 flex w-full max-w-sm items-center gap-3">
           <div className="flex items-center">
-            <img src={neocivisIconColor} alt="NeoCivis" className="size-12 object-contain" />
-            <span className="mt-2 font-bold text-primary text-xl uppercase tracking-widest">NeoCivis</span>
+            <img src={neocivisLogoPrimary} alt="NeoCivis" className="h-4 w-auto object-contain" />
           </div>
 
           {/* Language switcher */}

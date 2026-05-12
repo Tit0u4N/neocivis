@@ -12,10 +12,10 @@ import { useUserListPage } from './useUserListPage';
 afterEach(() => vi.clearAllMocks());
 
 describe('useUserListPage', () => {
-  it('starts with all 5 mock users and not loading', () => {
+  it('starts with all 4 mock users and not loading', () => {
     const { result } = renderHook(() => useUserListPage());
     expect(result.current.isLoading).toBe(false);
-    expect(result.current.users).toHaveLength(5);
+    expect(result.current.users).toHaveLength(4);
     expect(result.current.error).toBeNull();
   });
 

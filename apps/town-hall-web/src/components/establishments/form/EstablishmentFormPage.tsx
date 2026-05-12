@@ -13,12 +13,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { EstablishmentType } from '../list/useEstablishmentListPage';
+import type { EstablishmentType } from '@repo/contracts/establishment';
 import type { useEstablishmentFormPage } from './useEstablishmentFormPage';
 
 type Props = ReturnType<typeof useEstablishmentFormPage>;
@@ -33,6 +34,7 @@ export function EstablishmentFormPage(props: Props) {
     apiError,
     showDiscardDialog,
     setField,
+    handleUploadImage,
     handleSubmit,
     handleCancel,
     handleBack,
@@ -145,6 +147,17 @@ export function EstablishmentFormPage(props: Props) {
             aria-invalid={errors.phone !== undefined}
           />
           {errors.phone && <p className="text-destructive text-xs">{errors.phone}</p>}
+        </div>
+
+        {/* Image */}
+        <div className="space-y-1.5">
+          <Label>Image</Label>
+          <ImageUpload
+            value={form.imageUrl || undefined}
+            onChange={(url) => setField('imageUrl', url ?? '')}
+            onUpload={handleUploadImage}
+            alt={form.name || "Image de l'établissement"}
+          />
         </div>
 
         {/* Actions */}

@@ -10,12 +10,15 @@ import {
   isCosmosConfigured,
 } from '@/modules/article/article.repository';
 import { ArticleService } from '@/modules/article/article.service';
+import { EstablishmentRepository } from '@/modules/establishment/establishment.repository';
+import { EstablishmentService } from '@/modules/establishment/establishment.service';
 import { ProductRepository } from '@/modules/product/product.repository';
 import { ProductService } from '@/modules/product/product.service';
 import { AzureBlobUploadService, StubUploadService } from '@/modules/upload/upload.service';
 import { UserRepository } from '@/modules/users/user.repository';
 import { UserService } from '@/modules/users/user.service';
 import { ArticleController } from './controllers/article.controller';
+import { EstablishmentController } from './controllers/establishment.controller';
 import { ProductController } from './controllers/product.controller';
 import { UploadController } from './controllers/upload.controller';
 import { UserController } from './controllers/user.controller';
@@ -24,11 +27,13 @@ import { UserController } from './controllers/user.controller';
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
 const articleRepository = isCosmosConfigured() ? new CosmosArticleRepository() : new InMemoryArticleRepository();
+const establishmentRepository = new EstablishmentRepository();
 
 // Import controllers
 const userController = new UserController(new UserService(userRepository));
 const productController = new ProductController(new ProductService(productRepository));
 const articleController = new ArticleController(new ArticleService(articleRepository));
+const establishmentController = new EstablishmentController(new EstablishmentService(establishmentRepository));
 const uploadService = optionalEnv('AZURE_STORAGE_CONNECTION_STRING')
   ? new AzureBlobUploadService()
   : new StubUploadService();
@@ -46,5 +51,6 @@ app.route('/user', userController.getRoutes());
 app.route('/product', productController.getRoutes());
 app.route('/articles', articleController.getRoutes());
 app.route('/uploads', uploadController.getRoutes());
+app.route('/establishment', establishmentController.getRoutes());
 
 export default app;

@@ -3,16 +3,50 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+// ---------------------------------------------------------------------------
+// Mocks
+// ---------------------------------------------------------------------------
+
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
+vi.mock('@/providers/ApiProvider', () => ({
+  useApi: () => ({}),
+}));
+
+const mockEstablishmentService = {
+  getById: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+};
+vi.mock('@repo/frontend-services/establishment', () => ({
+  EstablishmentService: vi.fn(function (this: any) {
+    return mockEstablishmentService;
+  }),
+}));
+
 import { useEstablishmentFormPage } from './useEstablishmentFormPage';
 
-afterEach(() => {
-  vi.clearAllMocks();
-});
+afterEach(() => vi.clearAllMocks());
+
+// ---------------------------------------------------------------------------
+// Fixtures
+// ---------------------------------------------------------------------------
+
+const ESTABLISHMENT = {
+  id: 'est-1',
+  name: 'Mairie principale',
+  type: 'mairie' as const,
+  address: '1 Place du Général de Gaulle',
+  hours: 'Lun-Ven 8h-17h',
+  phone: '04 93 32 80 00',
+};
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
 describe('useEstablishmentFormPage', () => {
   it('starts with empty fields and no errors in create mode', () => {
@@ -24,19 +58,29 @@ describe('useEstablishmentFormPage', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('flags isEditing when an id is passed', async () => {
+  it('loads establishment data in edit mode', async () => {
+    mockEstablishmentService.getById.mockResolvedValue(ESTABLISHMENT);
     const { result } = renderHook(() => useEstablishmentFormPage('est-1'));
+
     expect(result.current.isEditing).toBe(true);
     expect(result.current.isLoading).toBe(true);
     await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.form.name).toBe('Mairie principale');
+    expect(result.current.form.address).toBe('1 Place du Général de Gaulle');
   });
 
-  it('setField updates the form and clears the matching error', () => {
+  it('sets apiError when getById throws in edit mode', async () => {
+    mockEstablishmentService.getById.mockRejectedValue(new Error('Not found'));
+    const { result } = renderHook(() => useEstablishmentFormPage('est-1'));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.apiError).not.toBeNull();
+  });
+
+  it('setField updates the form and marks it as dirty', () => {
     const { result } = renderHook(() => useEstablishmentFormPage());
 
-    act(() => {
-      result.current.setField('name', 'Nouvelle mairie');
-    });
+    act(() => result.current.setField('name', 'Nouvelle mairie'));
 
     expect(result.current.form.name).toBe('Nouvelle mairie');
     expect(result.current.isDirty).toBe(true);
@@ -56,7 +100,8 @@ describe('useEstablishmentFormPage', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('handleSubmit redirects to the list when the form is valid', async () => {
+  it('handleSubmit calls create and redirects in create mode', async () => {
+    mockEstablishmentService.create.mockResolvedValue(ESTABLISHMENT);
     const { result } = renderHook(() => useEstablishmentFormPage());
 
     act(() => {
@@ -70,15 +115,28 @@ describe('useEstablishmentFormPage', () => {
       await result.current.handleSubmit();
     });
 
+    expect(mockEstablishmentService.create).toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith('/dashboard/establishment');
+  });
+
+  it('handleSubmit calls update and redirects in edit mode', async () => {
+    mockEstablishmentService.getById.mockResolvedValue(ESTABLISHMENT);
+    mockEstablishmentService.update.mockResolvedValue(ESTABLISHMENT);
+    const { result } = renderHook(() => useEstablishmentFormPage('est-1'));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+
+    expect(mockEstablishmentService.update).toHaveBeenCalledWith('est-1', expect.any(Object));
     expect(mockPush).toHaveBeenCalledWith('/dashboard/establishment');
   });
 
   it('handleCancel navigates away directly when the form is not dirty', () => {
     const { result } = renderHook(() => useEstablishmentFormPage());
 
-    act(() => {
-      result.current.handleCancel();
-    });
+    act(() => result.current.handleCancel());
 
     expect(mockPush).toHaveBeenCalledWith('/dashboard/establishment');
     expect(result.current.showDiscardDialog).toBe(false);
@@ -87,12 +145,8 @@ describe('useEstablishmentFormPage', () => {
   it('handleCancel opens the discard dialog when the form is dirty', () => {
     const { result } = renderHook(() => useEstablishmentFormPage());
 
-    act(() => {
-      result.current.setField('name', 'Modifié');
-    });
-    act(() => {
-      result.current.handleCancel();
-    });
+    act(() => result.current.setField('name', 'Modifié'));
+    act(() => result.current.handleCancel());
 
     expect(result.current.showDiscardDialog).toBe(true);
     expect(mockPush).not.toHaveBeenCalled();
@@ -101,34 +155,11 @@ describe('useEstablishmentFormPage', () => {
   it('confirmDiscard closes the dialog and navigates away', () => {
     const { result } = renderHook(() => useEstablishmentFormPage());
 
-    act(() => {
-      result.current.setField('name', 'Modifié');
-    });
-    act(() => {
-      result.current.handleCancel();
-    });
-    act(() => {
-      result.current.confirmDiscard();
-    });
+    act(() => result.current.setField('name', 'Modifié'));
+    act(() => result.current.handleCancel());
+    act(() => result.current.confirmDiscard());
 
     expect(result.current.showDiscardDialog).toBe(false);
     expect(mockPush).toHaveBeenCalledWith('/dashboard/establishment');
-  });
-
-  it('closeDiscardDialog hides the dialog without navigating', () => {
-    const { result } = renderHook(() => useEstablishmentFormPage());
-
-    act(() => {
-      result.current.setField('name', 'Modifié');
-    });
-    act(() => {
-      result.current.handleCancel();
-    });
-    act(() => {
-      result.current.closeDiscardDialog();
-    });
-
-    expect(result.current.showDiscardDialog).toBe(false);
-    expect(mockPush).not.toHaveBeenCalled();
   });
 });

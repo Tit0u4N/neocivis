@@ -7,6 +7,7 @@ export default defineConfig((options: Options) => ({
     config: 'src/config/config.schema.ts',
     dto: 'src/dto/index.ts',
     'error-messages': 'src/error-messages/index.ts',
+    establishment: 'src/establishment/establishment.schema.ts',
     report: 'src/report/report.schema.ts',
   },
   clean: true,

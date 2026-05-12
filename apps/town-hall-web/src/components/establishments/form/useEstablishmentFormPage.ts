@@ -1,8 +1,12 @@
 'use client';
 
+import type { EstablishmentType } from '@repo/contracts/establishment';
+import { CreateEstablishmentInput } from '@repo/contracts/establishment';
+import { EstablishmentService } from '@repo/frontend-services/establishment';
+import { UploadService } from '@repo/frontend-services/upload';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import type { EstablishmentType } from '../list/useEstablishmentListPage';
+import { useApi } from '@/providers/ApiProvider';
 
 type FormState = {
   name: string;
@@ -10,6 +14,7 @@ type FormState = {
   address: string;
   hours: string;
   phone: string;
+  imageUrl: string;
 };
 
 const DEFAULT_FORM: FormState = {
@@ -18,12 +23,16 @@ const DEFAULT_FORM: FormState = {
   address: '',
   hours: '',
   phone: '',
+  imageUrl: '',
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export function useEstablishmentFormPage(id?: string) {
   const router = useRouter();
+  const api = useApi();
+  const establishmentService = new EstablishmentService(api);
+  const uploadService = new UploadService(api);
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
@@ -34,21 +43,30 @@ export function useEstablishmentFormPage(id?: string) {
   const [isDirty, setIsDirty] = useState(false);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
 
-  // Édition : on simule le chargement de l'établissement.
-  // À remplacer par un appel au futur EstablishmentService quand le backend sera prêt.
   useEffect(() => {
     if (!isEditing) {
       return;
     }
-    setIsLoading(true);
-    const timeout = setTimeout(() => {
-      setForm(DEFAULT_FORM);
-      setIsLoading(false);
-    }, 100);
-    return () => {
-      clearTimeout(timeout);
+    const load = async () => {
+      setIsLoading(true);
+      try {
+        const establishment = await establishmentService.getById(id);
+        setForm({
+          name: establishment.name,
+          type: establishment.type,
+          address: establishment.address,
+          hours: establishment.hours,
+          phone: establishment.phone,
+          imageUrl: establishment.imageUrl ?? '',
+        });
+      } catch {
+        setApiError('Impossible de charger cet établissement.');
+      } finally {
+        setIsLoading(false);
+      }
     };
-  }, [isEditing]);
+    void load();
+  }, [id, isEditing, establishmentService.getById]);
 
   const setField = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -57,22 +75,22 @@ export function useEstablishmentFormPage(id?: string) {
   }, []);
 
   const validate = useCallback((): boolean => {
-    const newErrors: FormErrors = {};
-    if (!form.name.trim()) {
-      newErrors.name = 'Le nom est requis.';
+    const result = CreateEstablishmentInput.safeParse(form);
+    if (!result.success) {
+      const newErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const path = issue.path[0] as keyof FormState | undefined;
+        if (path) {
+          newErrors[path] = issue.message;
+        }
+      }
+      setErrors(newErrors);
+      return false;
     }
-    if (!form.address.trim()) {
-      newErrors.address = "L'adresse est requise.";
-    }
-    if (!form.hours.trim()) {
-      newErrors.hours = 'Les horaires sont requis.';
-    }
-    if (!form.phone.trim()) {
-      newErrors.phone = 'Le téléphone est requis.';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true;
   }, [form]);
+
+  const handleUploadImage = useCallback((file: File) => uploadService.uploadImage(file), [uploadService.uploadImage]);
 
   const handleSubmit = useCallback(async () => {
     setApiError(null);
@@ -81,8 +99,12 @@ export function useEstablishmentFormPage(id?: string) {
     }
     setIsSubmitting(true);
     try {
-      // À remplacer par : await establishmentService.create(form) / update(id, form)
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      const payload = { ...form, imageUrl: form.imageUrl || undefined };
+      if (isEditing && id) {
+        await establishmentService.update(id, payload);
+      } else {
+        await establishmentService.create(payload);
+      }
       setIsDirty(false);
       router.push('/dashboard/establishment');
     } catch {
@@ -90,7 +112,7 @@ export function useEstablishmentFormPage(id?: string) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [router, validate]);
+  }, [form, id, isEditing, router, validate, establishmentService.create, establishmentService.update]);
 
   const navigateAway = useCallback(() => {
     router.push('/dashboard/establishment');
@@ -131,6 +153,7 @@ export function useEstablishmentFormPage(id?: string) {
     isDirty,
     showDiscardDialog,
     setField,
+    handleUploadImage,
     handleSubmit,
     handleCancel,
     handleBack,

@@ -8,8 +8,8 @@ vi.mock('@/components/ui/page-layout', () => ({
   PageLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+import type { Establishment } from '@repo/contracts/establishment';
 import { EstablishmentListPage } from './EstablishmentListPage';
-import type { Establishment } from './useEstablishmentListPage';
 
 afterEach(cleanup);
 

@@ -1,6 +1,7 @@
 'use client';
 
 import type { CarouselItem, CarouselItemTranslation, ConfigLocale } from '@repo/contracts/config';
+import type { MediaImage } from '@repo/contracts/media';
 import { ConfigService } from '@repo/frontend-services/config';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +31,10 @@ export type CarouselTabViewModel = {
   updateTranslation: (slideId: string, locale: string, field: 'title' | 'description' | 'tag', value: string) => void;
   getSlideLink: (slide: CarouselItem) => LinkValue;
   updateSlideLink: (slideId: string, link: LinkValue) => void;
+  isPickerOpen: boolean;
+  openImagePicker: () => void;
+  closeImagePicker: () => void;
+  handleMediaSelect: (media: MediaImage) => void;
 };
 
 export function useCarouselTab(): CarouselTabViewModel {
@@ -43,6 +48,7 @@ export function useCarouselTab(): CarouselTabViewModel {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const availableLocales = useConfigStore((s) => s.availableLocales);
   const defaultLocale = useConfigStore((s) => s.defaultLocale);
 
@@ -166,6 +172,19 @@ export function useCarouselTab(): CarouselTabViewModel {
     [],
   );
 
+  const openImagePicker = useCallback(() => setIsPickerOpen(true), []);
+  const closeImagePicker = useCallback(() => setIsPickerOpen(false), []);
+
+  const handleMediaSelect = useCallback(
+    (media: MediaImage) => {
+      if (selectedSlide) {
+        updateSlide(selectedSlide.id, { imageUrl: media.url });
+      }
+      setIsPickerOpen(false);
+    },
+    [selectedSlide, updateSlide],
+  );
+
   const getSlideLink = useCallback((slide: CarouselItem): LinkValue => urlToLinkValue(slide.linkUrl), []);
 
   const updateSlideLink = useCallback(
@@ -194,5 +213,9 @@ export function useCarouselTab(): CarouselTabViewModel {
     updateTranslation,
     getSlideLink,
     updateSlideLink,
+    isPickerOpen,
+    openImagePicker,
+    closeImagePicker,
+    handleMediaSelect,
   };
 }

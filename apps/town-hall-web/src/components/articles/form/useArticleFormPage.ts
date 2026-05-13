@@ -2,6 +2,7 @@
 
 import type { ArticleStatus } from '@repo/contracts/article';
 import { CreateArticleInput } from '@repo/contracts/article';
+import type { MediaImage } from '@repo/contracts/media';
 import { ArticleService } from '@repo/frontend-services/article';
 import { UploadService } from '@repo/frontend-services/upload';
 import { useRouter } from 'next/navigation';
@@ -40,6 +41,7 @@ export function useArticleFormPage(id?: string) {
   const [apiError, setApiError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isEditing) {
@@ -132,6 +134,16 @@ export function useArticleFormPage(id?: string) {
 
   const handleUploadImage = useCallback((file: File) => uploadService.uploadImage(file), [uploadService.uploadImage]);
 
+  const openImagePicker = useCallback(() => setIsPickerOpen(true), []);
+  const closeImagePicker = useCallback(() => setIsPickerOpen(false), []);
+  const handleMediaSelect = useCallback(
+    (media: MediaImage) => {
+      setField('coverImageUrl', media.url);
+      setIsPickerOpen(false);
+    },
+    [setField],
+  );
+
   const navigateAway = useCallback(() => {
     router.push('/dashboard/articles');
   }, [router]);
@@ -172,6 +184,10 @@ export function useArticleFormPage(id?: string) {
     showDiscardDialog,
     setField,
     handleUploadImage,
+    isPickerOpen,
+    openImagePicker,
+    closeImagePicker,
+    handleMediaSelect,
     handleSubmit,
     handleCancel,
     handleBack,

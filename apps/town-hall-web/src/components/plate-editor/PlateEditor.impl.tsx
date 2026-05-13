@@ -41,9 +41,10 @@ import {
 } from 'lucide-react';
 import { KEYS } from 'platejs';
 import { Plate, PlateElement, type PlateElementProps, usePlateEditor } from 'platejs/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { MediaGallery } from '@/components/media-gallery/MediaGallery';
 
 import { Editor, EditorContainer } from '@/components/ui/editor';
 import { FixedToolbar } from '@/components/ui/fixed-toolbar';
@@ -141,19 +142,11 @@ type PlateEditorProps = {
   readOnly?: boolean;
   placeholder?: string;
   className?: string;
-  onUploadImage?: (file: File) => Promise<string>;
 };
 
-export function PlateEditor({
-  value,
-  onChange,
-  readOnly = false,
-  placeholder,
-  className,
-  onUploadImage,
-}: PlateEditorProps) {
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const imageUploadCallbackRef = useRef<((file: File) => Promise<void>) | null>(null);
+export function PlateEditor({ value, onChange, readOnly = false, placeholder, className }: PlateEditorProps) {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const pendingInsertRef = useRef<((url: string) => void) | null>(null);
 
   const editor = usePlateEditor({
     plugins: [
@@ -201,19 +194,14 @@ export function PlateEditor({
 
   return (
     <RadixTooltip.Provider>
-      {onUploadImage && (
-        <input
-          ref={imageInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file && imageUploadCallbackRef.current) {
-              void imageUploadCallbackRef.current(file);
-            }
-            e.target.value = '';
+      {isPickerOpen && (
+        <MediaGallery
+          mode="picker"
+          onSelect={(media) => {
+            pendingInsertRef.current?.(media.url);
+            setIsPickerOpen(false);
           }}
+          onClose={() => setIsPickerOpen(false)}
         />
       )}
       <Plate editor={editor} onChange={({ value: v }) => onChange?.(v as unknown[])} readOnly={readOnly}>
@@ -304,18 +292,10 @@ export function PlateEditor({
                   tooltip="Insérer une image"
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    if (onUploadImage) {
-                      imageUploadCallbackRef.current = async (file: File) => {
-                        const url = await onUploadImage(file);
-                        editor.tf.insertNodes({ type: ImagePlugin.key, url, children: [{ text: '' }] });
-                      };
-                      imageInputRef.current?.click();
-                    } else {
-                      const url = window.prompt("URL de l'image :");
-                      if (url) {
-                        editor.tf.insertNodes({ type: ImagePlugin.key, url, children: [{ text: '' }] });
-                      }
-                    }
+                    pendingInsertRef.current = (url: string) => {
+                      editor.tf.insertNodes({ type: ImagePlugin.key, url, children: [{ text: '' }] });
+                    };
+                    setIsPickerOpen(true);
                   }}
                 >
                   <Image />

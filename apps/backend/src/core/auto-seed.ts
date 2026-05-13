@@ -7,6 +7,8 @@ import { CityService } from '@/modules/city/city.service';
 import type { ICityRepository } from '@/modules/city/repository/city.repository.interface';
 import { CitySeeder } from '@/modules/city/seed/city.seeder';
 import type { IAMService } from '@/modules/iam/iam.service';
+import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
+import { MediaSeeder } from '@/modules/media/seed/media.seeder';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/service/user.service';
 import type { AutoSeedMode } from './runtime-config';
@@ -18,6 +20,7 @@ export type AutoSeedDeps = {
   cityRepository: ICityRepository;
   iamService: IAMService;
   accessService: AccessService;
+  mediaRepository: IMediaRepository;
 };
 
 const AUTO_SEED_GLOBAL_KEY = '__neocivis_auto_seed_started__';
@@ -56,6 +59,10 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     new AccessSeeder(deps.accessService, cityService),
     new ArticleSeeder(deps.articleRepository),
   ];
+
+  if (deps.mediaRepository) {
+    seederList.push(new MediaSeeder(deps.mediaRepository, cityService));
+  }
 
   for (const seeder of seederList) {
     if (mode === 'RESET_DATA') {

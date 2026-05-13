@@ -165,7 +165,11 @@ export class KeycloakIAMService implements IAMService {
     return { id, username: resolvedUsername, email, firstName, lastName };
   }
 
-  private async getRealmRoleRepresentation(env: KeycloakEnv, token: string, roleName: string): Promise<Record<string, unknown>> {
+  private async getRealmRoleRepresentation(
+    env: KeycloakEnv,
+    token: string,
+    roleName: string,
+  ): Promise<Record<string, unknown>> {
     const url = `${env.baseUrl}admin/realms/${encodeURIComponent(env.realm)}/roles/${encodeURIComponent(roleName)}`;
     const res = await fetch(url, {
       method: 'GET',

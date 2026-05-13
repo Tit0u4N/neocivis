@@ -1,11 +1,11 @@
 import type { Establishment } from '@repo/contracts/establishment';
 
-export function getMockEstablishments(): Establishment[] {
+export function getEstablishmentSeeds(): Establishment[] {
   return [
     {
       id: 'est-1',
       name: 'Mairie principale',
-      type: 'mairie',
+      type: 'town_hall',
       address: '1 Place du Général de Gaulle',
       hours: 'Lun-Ven 8h-17h',
       phone: '04 93 32 80 00',

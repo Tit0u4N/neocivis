@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const EstablishmentType = z.enum(['mairie', 'education', 'culture', 'sport']);
+export const EstablishmentType = z.enum(['town_hall', 'education', 'culture', 'sport']);
 export type EstablishmentType = z.infer<typeof EstablishmentType>;
 
 export const Establishment = z.object({

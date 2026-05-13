@@ -2,6 +2,7 @@
 
 import type { Establishment, EstablishmentType } from '@repo/contracts/establishment';
 import { Clock, LayoutGrid, List, MapPin, MoreHorizontal, Phone, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,21 +29,15 @@ import type { useEstablishmentListPage } from './useEstablishmentListPage';
 
 type Props = ReturnType<typeof useEstablishmentListPage>;
 
-const TYPE_LABELS: Record<EstablishmentType, string> = {
-  mairie: 'Mairie',
-  education: 'Éducation',
-  culture: 'Culture',
-  sport: 'Sport',
-};
-
 const TYPE_BADGE_VARIANTS: Record<EstablishmentType, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  mairie: 'destructive',
+  town_hall: 'destructive',
   education: 'default',
   culture: 'secondary',
   sport: 'outline',
 };
 
 function CardActions({ onEdit, onDeleteRequest }: Readonly<{ onEdit: () => void; onDeleteRequest: () => void }>) {
+  const { t } = useTranslation();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -54,10 +49,10 @@ function CardActions({ onEdit, onDeleteRequest }: Readonly<{ onEdit: () => void;
         )}
       />
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={onEdit}>Modifier</DropdownMenuItem>
+        <DropdownMenuItem onClick={onEdit}>{t('establishment.list.actions.edit')}</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onDeleteRequest} className="text-destructive">
-          Supprimer
+          {t('establishment.list.actions.delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -73,13 +68,14 @@ function EstablishmentRow({
   onEdit: () => void;
   onDeleteRequest: () => void;
 }>) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-4 rounded-lg border bg-background px-5 py-4 transition-colors hover:bg-muted/30">
       <div className="flex-1 space-y-2">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-sm">{establishment.name}</h3>
           <Badge variant={TYPE_BADGE_VARIANTS[establishment.type]} className="text-xs">
-            {TYPE_LABELS[establishment.type]}
+            {t(`establishment.types.${establishment.type}`)}
           </Badge>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-muted-foreground text-xs">
@@ -111,6 +107,7 @@ function EstablishmentTile({
   onEdit: () => void;
   onDeleteRequest: () => void;
 }>) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border bg-background transition-colors hover:bg-muted/30">
       <div className="relative aspect-video w-full bg-muted">
@@ -119,7 +116,7 @@ function EstablishmentTile({
           <img src={establishment.imageUrl} alt={establishment.name} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-muted-foreground text-xs">
-            Aucune image
+            {t('establishment.list.noImage')}
           </div>
         )}
         <div className="absolute top-2 right-2">
@@ -130,7 +127,7 @@ function EstablishmentTile({
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold text-sm">{establishment.name}</h3>
           <Badge variant={TYPE_BADGE_VARIANTS[establishment.type]} className="text-xs">
-            {TYPE_LABELS[establishment.type]}
+            {t(`establishment.types.${establishment.type}`)}
           </Badge>
         </div>
         <div className="space-y-1 text-muted-foreground text-xs">
@@ -169,16 +166,18 @@ export function EstablishmentListPage(props: Props) {
     navigateToEdit,
   } = props;
 
+  const { t } = useTranslation();
+
   return (
-    <PageLayout title="Établissements">
+    <PageLayout title={t('establishment.list.title')}>
       {/* Header row */}
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {establishments.length} établissement{establishments.length > 1 ? 's' : ''}
+          {t('establishment.list.count', { count: establishments.length })}
         </p>
         <Button onClick={navigateToCreate}>
           <Plus className="mr-2 size-4" />
-          Ajouter
+          {t('establishment.list.add')}
         </Button>
       </div>
 
@@ -186,18 +185,18 @@ export function EstablishmentListPage(props: Props) {
       <div className="flex flex-wrap items-center gap-3">
         <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as typeof typeFilter)}>
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Tous les types" />
+            <SelectValue placeholder={t('establishment.types.all')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous les types</SelectItem>
-            <SelectItem value="mairie">Mairie</SelectItem>
-            <SelectItem value="education">Éducation</SelectItem>
-            <SelectItem value="culture">Culture</SelectItem>
-            <SelectItem value="sport">Sport</SelectItem>
+            <SelectItem value="all">{t('establishment.types.all')}</SelectItem>
+            <SelectItem value="town_hall">{t('establishment.types.town_hall')}</SelectItem>
+            <SelectItem value="education">{t('establishment.types.education')}</SelectItem>
+            <SelectItem value="culture">{t('establishment.types.culture')}</SelectItem>
+            <SelectItem value="sport">{t('establishment.types.sport')}</SelectItem>
           </SelectContent>
         </Select>
         <Input
-          placeholder="Rechercher un établissement..."
+          placeholder={t('establishment.list.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-xs"
@@ -211,13 +210,13 @@ export function EstablishmentListPage(props: Props) {
             <SelectItem value="list">
               <span className="flex items-center gap-2">
                 <List className="size-4" />
-                Vue liste
+                {t('establishment.list.viewMode.list')}
               </span>
             </SelectItem>
             <SelectItem value="grid">
               <span className="flex items-center gap-2">
                 <LayoutGrid className="size-4" />
-                Vue mosaïque
+                {t('establishment.list.viewMode.grid')}
               </span>
             </SelectItem>
           </SelectContent>
@@ -233,9 +232,9 @@ export function EstablishmentListPage(props: Props) {
       {/* Cards */}
       {establishments.length === 0 && (
         <div className="rounded-lg border px-4 py-10 text-center text-muted-foreground">
-          <p className="font-medium">Aucun établissement</p>
+          <p className="font-medium">{t('establishment.list.empty.title')}</p>
           <Button variant="link" className="mt-1" onClick={navigateToCreate}>
-            Ajouter le premier
+            {t('establishment.list.empty.createFirst')}
           </Button>
         </div>
       )}
@@ -270,18 +269,16 @@ export function EstablishmentListPage(props: Props) {
       <AlertDialog open={confirmDeleteId !== null} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cet établissement ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. L'établissement sera définitivement supprimé.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t('establishment.list.deleteDialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('establishment.list.deleteDialog.description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t('establishment.list.deleteDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => confirmDeleteId && handleDelete(confirmDeleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Supprimer
+              {t('establishment.list.deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

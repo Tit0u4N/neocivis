@@ -3,12 +3,14 @@ import type { AccessService } from '@/modules/access/access.service';
 import { AccessSeeder } from '@/modules/access/seed/access.seeder';
 import type { IArticleRepository } from '@/modules/article/repository/article.repository.interface';
 import { ArticleSeeder } from '@/modules/article/seed/article.seeder';
-import type { ICityRepository } from '@/modules/city/repository/city.repository.interface';
 import { CityService } from '@/modules/city/city.service';
+import type { ICityRepository } from '@/modules/city/repository/city.repository.interface';
 import { CitySeeder } from '@/modules/city/seed/city.seeder';
+import type { IEstablishmentRepository } from '@/modules/establishment/repository/establishment.repository.interface';
+import { EstablishmentSeeder } from '@/modules/establishment/seed/establishment.seeder';
+import type { IAMService } from '@/modules/iam/iam.service';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/service/user.service';
-import type { IAMService } from '@/modules/iam/iam.service';
 import type { AutoSeedMode } from './runtime-config';
 import type { ISeeder } from './seeder.interface';
 
@@ -16,6 +18,7 @@ export type AutoSeedDeps = {
   userService: UserService;
   articleRepository: IArticleRepository;
   cityRepository: ICityRepository;
+  establishmentRepository: IEstablishmentRepository;
   iamService: IAMService;
   accessService: AccessService;
 };
@@ -55,6 +58,7 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     new CitySeeder(deps.cityRepository, cityService, deps.userService),
     new AccessSeeder(deps.accessService, cityService),
     new ArticleSeeder(deps.articleRepository),
+    new EstablishmentSeeder(deps.establishmentRepository),
   ];
 
   for (const seeder of seederList) {

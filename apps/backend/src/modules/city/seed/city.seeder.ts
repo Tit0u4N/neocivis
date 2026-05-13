@@ -1,8 +1,8 @@
 import type { ISeeder } from '@/core/seeder.interface';
-import type { CityService } from '../city.service';
 import type { UserService } from '@/modules/users/service/user.service';
-import { citySeeds } from './city.seed';
+import type { CityService } from '../city.service';
 import type { ICityRepository } from '../repository/city.repository.interface';
+import { citySeeds } from './city.seed';
 
 function normalizePrefix(name: string): string {
   const onlyLetters = name
@@ -81,4 +81,3 @@ export class CitySeeder implements ISeeder {
     }
   }
 }
-

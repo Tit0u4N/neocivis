@@ -10,9 +10,7 @@ import { users } from '@/modules/users/repository/user.table';
 export const roles = pgTable(
   'roles',
   {
-    id: text('id')
-      .primaryKey()
-      .default(sql`gen_random_uuid()`),
+    id: text('id').primaryKey().default(sql`gen_random_uuid()`),
     cityId: text('city_id')
       .notNull()
       .references(() => cities.id, { onDelete: 'cascade' }),
@@ -37,10 +35,7 @@ export const rolePermissions = pgTable(
       .references(() => roles.id, { onDelete: 'cascade' }),
     permissionKey: text('permission_key').notNull(),
   },
-  (t) => [
-    primaryKey({ columns: [t.roleId, t.permissionKey] }),
-    index('role_permissions_role_id_idx').on(t.roleId),
-  ],
+  (t) => [primaryKey({ columns: [t.roleId, t.permissionKey] }), index('role_permissions_role_id_idx').on(t.roleId)],
 );
 
 /**

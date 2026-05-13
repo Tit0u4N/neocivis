@@ -49,7 +49,7 @@ afterEach(() => vi.clearAllMocks());
 const ESTABLISHMENT = {
   id: 'est-1',
   name: 'Mairie principale',
-  type: 'mairie' as const,
+  type: 'town_hall' as const,
   address: '1 Place du Général de Gaulle',
   hours: 'Lun-Ven 8h-17h',
   phone: '04 93 32 80 00',

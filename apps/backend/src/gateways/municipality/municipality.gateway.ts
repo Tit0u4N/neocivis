@@ -19,8 +19,10 @@ import { ArticleService } from '@/modules/article/service/article.service';
 import { CityService } from '@/modules/city/city.service';
 import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
 import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.repository';
-import { EstablishmentRepository } from '@/modules/establishment/establishment.repository';
-import { EstablishmentService } from '@/modules/establishment/establishment.service';
+import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
+import { ConfigService } from '@/modules/config/service/config.service';
+import { InMemoryEstablishmentRepository } from '@/modules/establishment/repository/establishment.inmemory.repository';
+import { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureBlobUploadService, StubUploadService } from '@/modules/upload/upload.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
@@ -29,6 +31,7 @@ import { UserService } from '@/modules/users/service/user.service';
 import { AccessController } from './controllers/access.controller';
 import { ArticleController } from './controllers/article.controller';
 import { CityController } from './controllers/city.controller';
+import { MunicipalityConfigController } from './controllers/config.controller';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { UploadController } from './controllers/upload.controller';
 import { UserController } from './controllers/user.controller';
@@ -38,7 +41,8 @@ const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new Dri
 const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : new CosmosArticleRepository();
 const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new DrizzleCityRepository();
 const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
-const establishmentRepository = new EstablishmentRepository();
+const configRepository = new InMemoryConfigRepository();
+const establishmentRepository = new InMemoryEstablishmentRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
@@ -46,14 +50,24 @@ const userService = new UserService(userRepository, iamService);
 const articleService = new ArticleService(articleRepository);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
+const configService = new ConfigService(configRepository);
 const uploadService = isInMemoryMode() ? new AzureBlobUploadService() : new StubUploadService();
+const establishmentService = new EstablishmentService(establishmentRepository);
 
-await startAutoSeedOnStartup({ userService, articleRepository, cityRepository, iamService, accessService });
+await startAutoSeedOnStartup({
+  userService,
+  articleRepository,
+  cityRepository,
+  establishmentRepository,
+  iamService,
+  accessService,
+});
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
 const articleController = new ArticleController(articleService);
-const establishmentController = new EstablishmentController(new EstablishmentService(establishmentRepository));
+const establishmentController = new EstablishmentController(establishmentService);
+const municipalityConfigController = new MunicipalityConfigController(configService);
 const uploadController = new UploadController(uploadService);
 const cityController = new CityController(cityService, userService);
 const accessController = new AccessController(accessService, cityService, userService);
@@ -70,7 +84,9 @@ applyRoleMiddleware(app, ['EMPLOYEE', 'ADMIN']);
 app.route('/user', userController.getRoutes());
 app.route('/permissions', accessController.getCatalogRoutes());
 app.route('/articles', articleController.getRoutes());
+app.route('/config', municipalityConfigController.getRoutes());
 app.route('/uploads', uploadController.getRoutes());
+
 app.route('/establishment', establishmentController.getRoutes());
 
 // Permission gate for PATCH /cities/:cityId — DOIT être déclaré AVANT
@@ -107,10 +123,27 @@ const articlePermissionGate = createMiddleware(async (c, next) => {
   }
   return requirePermission(perm, accessService, userService)(c, next);
 });
+const establishmentMethodToPermission = new Map<string, PermissionKey>([
+  ['POST', 'ESTABLISHMENT_CREATE_PERMISSION'],
+  ['PUT', 'ESTABLISHMENT_MODIFY_PERMISSION'],
+  ['PATCH', 'ESTABLISHMENT_MODIFY_PERMISSION'],
+  ['DELETE', 'ESTABLISHMENT_DELETE_PERMISSION'],
+]);
+const establishmentPermissionGate = createMiddleware(async (c, next) => {
+  const perm = establishmentMethodToPermission.get(c.req.method);
+  if (!perm) {
+    await next();
+    return;
+  }
+  return requirePermission(perm, accessService, userService)(c, next);
+});
 cityScoped.use('/articles', articlePermissionGate);
 cityScoped.use('/articles/*', articlePermissionGate);
+cityScoped.use('/establishment', establishmentPermissionGate);
+cityScoped.use('/establishment/*', establishmentPermissionGate);
 
 cityScoped.route('/articles', articleController.getRoutes());
+cityScoped.route('/establishment', establishmentController.getRoutes());
 cityScoped.route('/uploads', uploadController.getRoutes());
 
 // Routes ADMIN-only (CRUD roles + assignations) sous /cities/:cityId.

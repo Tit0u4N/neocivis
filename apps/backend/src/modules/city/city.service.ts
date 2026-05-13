@@ -1,9 +1,9 @@
 import type { CityPublicDto } from '@repo/contracts/city';
-import type { User } from '@/modules/users/user.types';
 import type { IAMService } from '@/modules/iam/iam.service';
 import type { UserService } from '@/modules/users/service/user.service';
-import type { ICityRepository } from './repository/city.repository.interface';
+import type { User } from '@/modules/users/user.types';
 import { toCityPublicDto } from './city.types';
+import type { ICityRepository } from './repository/city.repository.interface';
 
 export type CreateEmployeeInput = Readonly<{
   username: string;
@@ -139,4 +139,3 @@ export class CityService {
     return await this.repository.isEmployeeOfCity(cityId, userId);
   }
 }
-

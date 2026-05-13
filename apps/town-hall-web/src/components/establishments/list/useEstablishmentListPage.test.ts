@@ -35,12 +35,12 @@ afterEach(() => vi.clearAllMocks());
 // Fixtures
 // ---------------------------------------------------------------------------
 
-function makeEstablishment(id: string, type: 'mairie' | 'education' | 'culture' | 'sport', name: string) {
+function makeEstablishment(id: string, type: 'town_hall' | 'education' | 'culture' | 'sport', name: string) {
   return { id, name, type, address: '1 rue de la Paix', hours: 'Lun-Ven 9h-17h', phone: '01 02 03 04 05' };
 }
 
 const ESTABLISHMENTS = [
-  makeEstablishment('est-1', 'mairie', 'Mairie principale'),
+  makeEstablishment('est-1', 'town_hall', 'Mairie principale'),
   makeEstablishment('est-2', 'education', 'École Jules Ferry'),
   makeEstablishment('est-3', 'culture', 'Médiathèque municipale'),
   makeEstablishment('est-4', 'sport', 'Stade municipal'),
@@ -69,14 +69,14 @@ describe('useEstablishmentListPage', () => {
     expect(result.current.error).not.toBeNull();
   });
 
-  it('filters by type "mairie"', async () => {
+  it('filters by type "town_hall"', async () => {
     mockEstablishmentService.getAll.mockResolvedValue(ESTABLISHMENTS);
     const { result } = renderHook(() => useEstablishmentListPage());
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    act(() => result.current.setTypeFilter('mairie'));
+    act(() => result.current.setTypeFilter('town_hall'));
 
-    expect(result.current.establishments.every((e) => e.type === 'mairie')).toBe(true);
+    expect(result.current.establishments.every((e) => e.type === 'town_hall')).toBe(true);
   });
 
   it('filters by type "education"', async () => {

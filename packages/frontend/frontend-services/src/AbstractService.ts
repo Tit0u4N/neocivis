@@ -8,4 +8,8 @@ export default abstract class AbstractService {
       prefixUrl: parentOptions.prefixUrl + prefixUrl,
     }));
   }
+
+  protected static createCityPath(cityId: string): string {
+    return `/city/${cityId}`;
+  }
 }

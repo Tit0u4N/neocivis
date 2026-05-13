@@ -132,6 +132,67 @@
       }
     }
   },
+  "establishment": {
+    "list": {
+      "title": "Establishments",
+      "add": "Add",
+      "count_one": "{{count}} establishment",
+      "count_other": "{{count}} establishments",
+      "searchPlaceholder": "Search an establishment…",
+      "noImage": "No image",
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "empty": {
+        "title": "No establishments",
+        "createFirst": "Add the first one"
+      },
+      "deleteDialog": {
+        "title": "Delete this establishment?",
+        "description": "This action is irreversible. The establishment will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "viewMode": {
+        "list": "List view",
+        "grid": "Grid view"
+      }
+    },
+    "form": {
+      "titleCreate": "New establishment",
+      "titleEdit": "Edit establishment",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "E.g. Main Town Hall",
+        "type": "Type",
+        "address": "Address",
+        "addressPlaceholder": "E.g. 1 Place du Général de Gaulle",
+        "hours": "Opening hours",
+        "hoursPlaceholder": "E.g. Mon-Fri 8am-5pm",
+        "phone": "Phone",
+        "phonePlaceholder": "E.g. 04 93 32 80 00",
+        "image": "Image",
+        "imageAlt": "Establishment image"
+      },
+      "discardDialog": {
+        "title": "Discard changes?",
+        "description": "Unsaved changes will be lost.",
+        "cancel": "Continue editing",
+        "confirm": "Discard"
+      },
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back"
+    },
+    "types": {
+      "all": "All types",
+      "town_hall": "Town Hall",
+      "education": "Education",
+      "culture": "Culture",
+      "sport": "Sport"
+    }
+  },
   "sidebar": {
     "sections": {
       "townHall": "Town Hall",
@@ -150,5 +211,102 @@
       "roleManagement": "Roles",
       "webhook": "Webhook"
     }
+  },
+  "appManagement": {
+    "title": "App Management",
+    "hint": "Drag a tile to reposition it. Pull the bottom-right corner to resize. Click to edit.",
+    "loading": "Loading…",
+    "save": "Save",
+    "saving": "Saving…",
+    "tabs": {
+      "layout": "Layout",
+      "carousel": "Carousel"
+    },
+    "carousel": {
+      "hint": "Add slides to the carousel displayed in the citizen app.",
+      "slides": "Slides",
+      "settings": "Slide settings",
+      "add": "Add",
+      "empty": "No slides yet. Click \"Add\" to get started.",
+      "slideLabel": "Slide {{n}}",
+      "untitled": "Untitled slide",
+      "count": "{{count}} slide(s)",
+      "remove": "Remove",
+      "imageUrl": "Image URL",
+      "imageHint": "16:9 format recommended",
+      "linkUrl": "Link URL",
+      "translations": "Translations",
+      "fieldTitle": "Title",
+      "fieldDescription": "Description",
+      "fieldTag": "Tag"
+    },
+    "grid": {
+      "title": "Categories",
+      "add": "Add",
+      "reset": "Reset",
+      "footer": "{{cols}} columns · {{rows}} rows · {{count}} tile(s)",
+      "tileAria": "Tile: {{title}}",
+      "resizeAria": {
+        "right": "Resize (right)",
+        "bottom": "Resize (bottom)",
+        "br": "Resize (corner)"
+      }
+    },
+    "settings": {
+      "title": "Tile settings",
+      "sizeLabel": "{{w}}×{{h}} cells",
+      "positionLabel": "col {{col}}, row {{row}}",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Tile title",
+      "linkLabel": "Link to",
+      "presetColors": "Preset colors",
+      "customColor": "Custom color",
+      "bgTintHint": "The background tint is automatically generated from the chosen color.",
+      "bgTintTitle": "Background tint (auto-generated)",
+      "translations": "Translations",
+      "translationPlaceholder": "Name in {{locale}}",
+      "addTranslation": "Add a language",
+      "externalUrl": "External URL",
+      "pageId": "Page ID",
+      "clear": "Clear",
+      "delete": "Delete"
+    },
+    "icon": {
+      "label": "Icon",
+      "none": "None",
+      "noneTitle": "No icon",
+      "modalTitle": "Choose an icon",
+      "searchPlaceholder": "Search for an icon…",
+      "searchResultCount": "{{count}} result(s)",
+      "allCount": "{{count}} icons available",
+      "noResults": "No results for \"{{query}}\"",
+      "searchHint": "Type a name to search all icons"
+    },
+    "linkGroups": {
+      "special": "Special pages",
+      "freePage": "Free pages",
+      "normal": "Standard pages",
+      "external": "External"
+    },
+    "links": {
+      "Link": "Link",
+      "General": "General",
+      "Establishment": "Establishment",
+      "FreePage": "Free page",
+      "Forum": "Forum",
+      "Reports": "Reports",
+      "Articles": "Articles",
+      "Events": "Events",
+      "External URL": "External URL"
+    },
+    "colors": {
+      "Corail": "Coral",
+      "Azur": "Azure",
+      "Ambre": "Amber",
+      "Ardoise": "Slate",
+      "Forêt": "Forest",
+      "Violet": "Purple"
+    },
+    "newTileTitle": "New"
   }
 }

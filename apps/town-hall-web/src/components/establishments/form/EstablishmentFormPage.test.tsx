@@ -3,6 +3,12 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, opts?: Record<string, unknown>) => (opts ? `${key}:${JSON.stringify(opts)}` : key),
+  }),
+}));
+
 vi.mock('@/components/ui/page-layout', () => ({
   // biome-ignore lint/style/useNamingConvention: React component name in mock object
   PageLayout: ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -22,10 +28,11 @@ function makeProps(overrides: Partial<Parameters<typeof EstablishmentFormPage>[0
     isEditing: false,
     form: {
       name: '',
-      type: 'mairie' as const,
+      type: 'town_hall' as const,
       address: '',
       hours: '',
       phone: '',
+      imageUrl: '',
     },
     errors: {},
     isLoading: false,
@@ -34,6 +41,7 @@ function makeProps(overrides: Partial<Parameters<typeof EstablishmentFormPage>[0
     isDirty: false,
     showDiscardDialog: false,
     setField: vi.fn(),
+    handleUploadImage: vi.fn(),
     handleSubmit: vi.fn(),
     handleCancel: vi.fn(),
     handleBack: vi.fn(),
@@ -46,12 +54,12 @@ function makeProps(overrides: Partial<Parameters<typeof EstablishmentFormPage>[0
 describe('EstablishmentFormPage', () => {
   it('renders the create title in create mode', () => {
     render(<EstablishmentFormPage {...makeProps({ isEditing: false })} />);
-    expect(screen.getAllByText('Nouvel établissement').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('establishment.form.titleCreate').length).toBeGreaterThan(0);
   });
 
   it('renders the edit title in edit mode', () => {
     render(<EstablishmentFormPage {...makeProps({ isEditing: true })} />);
-    expect(screen.getAllByText("Modifier l'établissement").length).toBeGreaterThan(0);
+    expect(screen.getAllByText('establishment.form.titleEdit').length).toBeGreaterThan(0);
   });
 
   it('renders skeletons while loading', () => {
@@ -83,7 +91,7 @@ describe('EstablishmentFormPage', () => {
   it('calls setField when name input changes', () => {
     const setField = vi.fn();
     render(<EstablishmentFormPage {...makeProps({ setField })} />);
-    const nameInput = screen.getByLabelText('Nom');
+    const nameInput = screen.getByLabelText('establishment.form.fields.name');
     fireEvent.change(nameInput, { target: { value: 'Mairie' } });
     expect(setField).toHaveBeenCalledWith('name', 'Mairie');
   });
@@ -91,7 +99,7 @@ describe('EstablishmentFormPage', () => {
   it('clicking the save button triggers handleSubmit', () => {
     const handleSubmit = vi.fn();
     render(<EstablishmentFormPage {...makeProps({ handleSubmit })} />);
-    const saveButton = screen.getByRole('button', { name: /enregistrer/i });
+    const saveButton = screen.getByRole('button', { name: 'establishment.form.save' });
     fireEvent.click(saveButton);
     expect(handleSubmit).toHaveBeenCalled();
   });
@@ -99,15 +107,15 @@ describe('EstablishmentFormPage', () => {
   it('clicking the cancel button triggers handleCancel', () => {
     const handleCancel = vi.fn();
     render(<EstablishmentFormPage {...makeProps({ handleCancel })} />);
-    const cancelButton = screen.getByRole('button', { name: /annuler/i });
+    const cancelButton = screen.getByRole('button', { name: 'establishment.form.cancel' });
     fireEvent.click(cancelButton);
     expect(handleCancel).toHaveBeenCalled();
   });
 
   it('disables save and cancel buttons while submitting', () => {
     render(<EstablishmentFormPage {...makeProps({ isSubmitting: true })} />);
-    const saveButton = screen.getByRole('button', { name: /enregistrer/i });
-    const cancelButton = screen.getByRole('button', { name: /annuler/i });
+    const saveButton = screen.getByRole('button', { name: 'establishment.form.save' });
+    const cancelButton = screen.getByRole('button', { name: 'establishment.form.cancel' });
     expect((saveButton as HTMLButtonElement).disabled).toBe(true);
     expect((cancelButton as HTMLButtonElement).disabled).toBe(true);
   });

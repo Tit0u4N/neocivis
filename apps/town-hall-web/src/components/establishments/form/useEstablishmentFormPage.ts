@@ -19,7 +19,7 @@ type FormState = {
 
 const DEFAULT_FORM: FormState = {
   name: '',
-  type: 'mairie',
+  type: 'town_hall',
   address: '',
   hours: '',
   phone: '',

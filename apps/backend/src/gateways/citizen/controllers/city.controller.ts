@@ -72,4 +72,3 @@ export class CityController {
     return c.json({ success: true } satisfies OperationSuccessDto, 200);
   }
 }
-

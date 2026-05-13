@@ -3,6 +3,12 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, opts?: Record<string, unknown>) => (opts ? `${key}:${JSON.stringify(opts)}` : key),
+  }),
+}));
+
 vi.mock('@/components/ui/page-layout', () => ({
   // biome-ignore lint/style/useNamingConvention: React component name in mock object
   PageLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -17,7 +23,7 @@ function makeEstablishment(overrides: Partial<Establishment> = {}): Establishmen
   return {
     id: 'est-1',
     name: 'Mairie principale',
-    type: 'mairie',
+    type: 'town_hall',
     address: '1 Place du Général de Gaulle',
     hours: 'Lun-Ven 8h-17h',
     phone: '04 93 32 80 00',
@@ -48,7 +54,7 @@ function makeProps(overrides: Partial<Parameters<typeof EstablishmentListPage>[0
 describe('EstablishmentListPage', () => {
   it('shows the empty state when there are no establishments', () => {
     render(<EstablishmentListPage {...makeProps({ establishments: [] })} />);
-    expect(screen.getByText('Aucun établissement')).toBeTruthy();
+    expect(screen.getByText('establishment.list.empty.title')).toBeTruthy();
   });
 
   it('renders a card for each establishment', () => {
@@ -61,16 +67,16 @@ describe('EstablishmentListPage', () => {
     expect(screen.getByText('Médiathèque')).toBeTruthy();
   });
 
-  it('shows the count in singular when only one establishment', () => {
+  it('shows the count with one establishment', () => {
     const establishments = [makeEstablishment()];
     render(<EstablishmentListPage {...makeProps({ establishments })} />);
-    expect(screen.getByText('1 établissement')).toBeTruthy();
+    expect(screen.getByText('establishment.list.count:{"count":1}')).toBeTruthy();
   });
 
-  it('shows the count in plural when multiple establishments', () => {
+  it('shows the count with multiple establishments', () => {
     const establishments = [makeEstablishment({ id: 'est-1' }), makeEstablishment({ id: 'est-2' })];
     render(<EstablishmentListPage {...makeProps({ establishments })} />);
-    expect(screen.getByText('2 établissements')).toBeTruthy();
+    expect(screen.getByText('establishment.list.count:{"count":2}')).toBeTruthy();
   });
 
   it('renders the address, hours and phone fields for an establishment', () => {
@@ -86,10 +92,10 @@ describe('EstablishmentListPage', () => {
     expect(screen.getByText('Quelque chose a foiré')).toBeTruthy();
   });
 
-  it('clicking the "Ajouter" button calls navigateToCreate', () => {
+  it('clicking the add button calls navigateToCreate', () => {
     const navigateToCreate = vi.fn();
     render(<EstablishmentListPage {...makeProps({ navigateToCreate })} />);
-    const addButton = screen.getByRole('button', { name: 'Ajouter' });
+    const addButton = screen.getByRole('button', { name: 'establishment.list.add' });
     fireEvent.click(addButton);
     expect(navigateToCreate).toHaveBeenCalled();
   });

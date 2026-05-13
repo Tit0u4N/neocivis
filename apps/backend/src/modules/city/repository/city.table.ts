@@ -58,4 +58,3 @@ export const cityCitizens = pgTable(
     index('city_citizens_user_id_idx').on(t.userId),
   ],
 );
-

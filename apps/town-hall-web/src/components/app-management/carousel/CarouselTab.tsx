@@ -2,6 +2,7 @@
 
 import { ChevronDown, ChevronUp, ImageIcon, Plus, Save, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { MediaGallery } from '@/components/media-gallery/MediaGallery';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,12 +28,15 @@ export function CarouselTab() {
     addSlide,
     removeSlide,
     moveSlide,
-    updateSlide,
     addLocaleToSelected,
     removeLocaleFromSelected,
     updateTranslation,
     getSlideLink,
     updateSlideLink,
+    isPickerOpen,
+    openImagePicker,
+    closeImagePicker,
+    handleMediaSelect,
   } = vm;
 
   if (isLoading) {
@@ -134,25 +138,28 @@ export function CarouselTab() {
               <Label className="font-medium text-muted-foreground text-xs">
                 {t('appManagement.carousel.imageUrl')}
               </Label>
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-4">
                 <div className="flex h-28 w-48 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border border-dashed bg-muted">
                   {selectedSlide.imageUrl ? (
+                    // biome-ignore lint/performance/noImgElement: external URL from media gallery
                     <img src={selectedSlide.imageUrl} alt="" className="size-full object-cover" />
                   ) : (
                     <ImageIcon className="size-7 text-muted-foreground/50" />
                   )}
                 </div>
-                <div className="flex flex-1 flex-col gap-2">
-                  <Input
-                    value={selectedSlide.imageUrl ?? ''}
-                    onChange={(e) => updateSlide(selectedSlide.id, { imageUrl: e.target.value || undefined })}
-                    placeholder="https://..."
-                    className="text-sm"
-                  />
+                <div className="flex flex-col gap-2">
+                  <Button variant="outline" size="sm" onClick={openImagePicker} className="gap-1.5">
+                    <ImageIcon className="size-3.5" />
+                    {selectedSlide.imageUrl
+                      ? t('appManagement.carousel.changeImage')
+                      : t('appManagement.carousel.chooseImage')}
+                  </Button>
                   <p className="text-muted-foreground text-xs">{t('appManagement.carousel.imageHint')}</p>
                 </div>
               </div>
             </div>
+
+            {isPickerOpen && <MediaGallery mode="picker" onSelect={handleMediaSelect} onClose={closeImagePicker} />}
 
             {/* Link */}
             <LinkPicker

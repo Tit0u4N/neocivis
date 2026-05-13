@@ -62,9 +62,9 @@ export function CarouselTab() {
                 slide.translations.find((tr) => tr.title)?.title ||
                 '';
               return (
-                <button
+                // biome-ignore lint/a11y/noStaticElementInteractions: Card
+                <div
                   key={slide.id}
-                  type="button"
                   onClick={() => setSelectedId(slide.id)}
                   className={cn(
                     'flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-all',
@@ -112,7 +112,7 @@ export function CarouselTab() {
                       <ChevronDown className="size-3.5" />
                     </button>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

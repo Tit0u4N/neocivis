@@ -9,7 +9,7 @@ export class InMemoryMediaRepository implements IMediaRepository {
   }
 
   findByCityId(cityId: string): Promise<MediaImage[]> {
-    return Promise.resolve(this.items.filter((m) => m.cityId === cityId));
+    return Promise.resolve(this.items);
   }
 
   findById(id: string): Promise<MediaImage | undefined> {

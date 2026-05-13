@@ -148,7 +148,58 @@
       "threads": "Threads",
       "userManagement": "Users",
       "roleManagement": "Roles",
-      "webhook": "Webhook"
+      "webhook": "Webhook",
+      "mediaGallery": "Media gallery"
+    }
+  },
+  "media": {
+    "page": {
+      "subtitle": "Manage images used in the application."
+    },
+    "gallery": {
+      "title": "Media gallery",
+      "subtitle": "Choose an image or upload a new one.",
+      "close": "Close",
+      "searchPlaceholder": "Search by title or usage…",
+      "uploading": "Uploading…",
+      "upload": "Upload",
+      "count": "{{filtered}} of {{total}} image(s)",
+      "noResults": "No images match your search.",
+      "unusedBadge": "Unused",
+      "usages": "{{count}} usage(s)",
+      "deleteAria": "Delete"
+    },
+    "upload": {
+      "title": "Upload an image",
+      "subtitle": "JPG, PNG or WebP · max 5 MB",
+      "dropTitle": "Drag an image here",
+      "dropSubtitle": "or click to browse",
+      "previewAlt": "Preview",
+      "titleLabel": "Title",
+      "titleOptional": "(optional)",
+      "titlePlaceholder": "e.g. Town hall facade in summer",
+      "titleHint": "A title helps you quickly find this image via search and identify its use over time.",
+      "cancel": "Cancel",
+      "confirm": "Upload",
+      "error": "Upload failed"
+    },
+    "delete": {
+      "title": "Delete this image?",
+      "description": "\"{{name}}\" will be permanently deleted. This action cannot be undone.",
+      "usedAt": "Used in {{count}} place(s):",
+      "notUsed": "This image is not used anywhere.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "error": "Delete failed"
+    },
+    "filters": {
+      "all": "All media",
+      "unused": "Unused"
+    },
+    "linkTypes": {
+      "carousel": "Carousel",
+      "articles": "Articles",
+      "establishments": "Establishments"
     }
   },
   "appManagement": {

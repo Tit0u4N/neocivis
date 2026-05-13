@@ -1,5 +1,5 @@
 import type { ApiErrorDto, MediaImage } from '@repo/contracts';
-import { type Context, Hono } from 'hono';
+import { type Context, Hono, type TypedResponse } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
 import type { MediaService } from '@/modules/media/service/media.service';
 
@@ -42,17 +42,20 @@ export class MediaController {
     }
 
     const cityId = c.req.param('cityId');
+    const rawTitle = formData.get('title');
+    const title = typeof rawTitle === 'string' ? rawTitle.trim() || undefined : undefined;
     const buffer = await file.arrayBuffer();
-    const media = await this.service.upload(cityId, buffer, file.name, file.type);
+    const media = await this.service.upload(cityId, buffer, file.name, file.type, title);
     return c.json(media, 201);
   }
 
-  private async deleteMedia(c: Context): Promise<ControllerJson<never, 204>> {
+  private async deleteMedia(c: Context): Promise<Response & TypedResponse<null, 204, 'body'>> {
     const id = c.req.param('id');
     try {
       await this.service.delete(id);
       return c.body(null, 204);
     } catch {
+      // @ts-expect-error
       return c.json({ error: `Media non trouvé: ${id}` } satisfies ApiErrorDto, 404);
     }
   }

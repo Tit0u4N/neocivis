@@ -13,13 +13,19 @@ export class MediaService {
     return this.repository.findByCityId(cityId);
   }
 
-  async upload(cityId: string, buffer: ArrayBuffer, filename: string, mimeType: string): Promise<MediaImage> {
+  async upload(
+    cityId: string,
+    buffer: ArrayBuffer,
+    filename: string,
+    mimeType: string,
+    title?: string,
+  ): Promise<MediaImage> {
     const url = await this.uploadService.uploadImage(buffer, filename, mimeType, cityId);
     const ext = filename.includes('.') ? filename.slice(filename.lastIndexOf('.')) : '';
     const storagePath = `${cityId}/${randomUUID()}${ext}`;
     const media: MediaImage = {
       id: randomUUID(),
-      title: filename,
+      title: title ?? filename,
       url,
       storagePath,
       cityId,

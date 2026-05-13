@@ -23,10 +23,6 @@ export class MediaSeeder implements ISeeder {
       if (!entries) {
         continue;
       }
-      const existing = await this.mediaRepository.findByCityId(city.id);
-      if (existing.length > 0) {
-        continue;
-      }
       const items = buildMediaSeed(city.id, entries);
       for (const item of items) {
         await this.mediaRepository.create(item);

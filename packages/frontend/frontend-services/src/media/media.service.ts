@@ -14,9 +14,12 @@ export class MediaService extends AbstractService {
     return await this.http.get(`media/city/${this.cityId}`).json<MediaImage[]>();
   }
 
-  async upload(file: File): Promise<MediaImage> {
+  async upload(file: File, title?: string): Promise<MediaImage> {
     const formData = new FormData();
     formData.append('file', file);
+    if (title) {
+      formData.append('title', title);
+    }
     return await this.http
       .extend({ headers: { 'Content-Type': undefined } })
       .post(`media/city/${this.cityId}/upload`, { body: formData })

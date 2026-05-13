@@ -58,8 +58,11 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     new CitySeeder(deps.cityRepository, cityService, deps.userService),
     new AccessSeeder(deps.accessService, cityService),
     new ArticleSeeder(deps.articleRepository),
-    new MediaSeeder(deps.mediaRepository, cityService),
   ];
+
+  if (deps.mediaRepository) {
+    seederList.push(new MediaSeeder(deps.mediaRepository, cityService));
+  }
 
   for (const seeder of seederList) {
     if (mode === 'RESET_DATA') {

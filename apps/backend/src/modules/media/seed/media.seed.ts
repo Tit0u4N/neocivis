@@ -5,7 +5,7 @@ type MediaSeedEntry = Omit<MediaImage, 'id' | 'cityId' | 'createdAt'>;
 
 export const mediaSeedsByCityName = new Map<string, MediaSeedEntry[]>([
   [
-    'Nice',
+    'CITY_TEST_ID',
     [
       {
         title: 'Promenade des Anglais',

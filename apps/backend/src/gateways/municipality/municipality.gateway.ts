@@ -42,6 +42,7 @@ const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : n
 const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new DrizzleCityRepository();
 const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
 const configRepository = new InMemoryConfigRepository();
+const mediaRepository = new InMemoryMediaRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
@@ -51,7 +52,6 @@ const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const configService = new ConfigService(configRepository);
 const uploadService = isInMemoryMode() ? new AzureBlobUploadService() : new StubUploadService();
-const mediaRepository = new InMemoryMediaRepository();
 const mediaService = new MediaService(mediaRepository, uploadService);
 
 await startAutoSeedOnStartup({

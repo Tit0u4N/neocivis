@@ -22,6 +22,8 @@ import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.
 import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import { ConfigService } from '@/modules/config/service/config.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
+import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
+import { MediaService } from '@/modules/media/service/media.service';
 import { AzureBlobUploadService, StubUploadService } from '@/modules/upload/upload.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
@@ -30,6 +32,7 @@ import { AccessController } from './controllers/access.controller';
 import { ArticleController } from './controllers/article.controller';
 import { CityController } from './controllers/city.controller';
 import { MunicipalityConfigController } from './controllers/config.controller';
+import { MediaController } from './controllers/media.controller';
 import { UploadController } from './controllers/upload.controller';
 import { UserController } from './controllers/user.controller';
 
@@ -48,14 +51,24 @@ const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const configService = new ConfigService(configRepository);
 const uploadService = isInMemoryMode() ? new AzureBlobUploadService() : new StubUploadService();
+const mediaRepository = new InMemoryMediaRepository();
+const mediaService = new MediaService(mediaRepository, uploadService);
 
-await startAutoSeedOnStartup({ userService, articleRepository, cityRepository, iamService, accessService });
+await startAutoSeedOnStartup({
+  userService,
+  articleRepository,
+  cityRepository,
+  iamService,
+  accessService,
+  mediaRepository,
+});
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
 const articleController = new ArticleController(articleService);
 const municipalityConfigController = new MunicipalityConfigController(configService);
 const uploadController = new UploadController(uploadService);
+const mediaController = new MediaController(mediaService);
 const cityController = new CityController(cityService, userService);
 const accessController = new AccessController(accessService, cityService, userService);
 
@@ -73,6 +86,7 @@ app.route('/permissions', accessController.getCatalogRoutes());
 app.route('/articles', articleController.getRoutes());
 app.route('/config', municipalityConfigController.getRoutes());
 app.route('/uploads', uploadController.getRoutes());
+app.route('/media', mediaController.getRoutes());
 
 // Permission gate for PATCH /cities/:cityId — DOIT être déclaré AVANT
 // `app.route('/cities', cityController.getRoutes())` pour s'appliquer.

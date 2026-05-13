@@ -1,7 +1,8 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
+import { ImageIcon, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { MediaGallery } from '@/components/media-gallery/MediaGallery';
 import { PlateEditor } from '@/components/plate-editor/PlateEditor';
 import {
   AlertDialog,
@@ -15,7 +16,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
-import { ImageUpload } from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
@@ -37,6 +37,10 @@ export function ArticleFormPage(props: Props) {
     showDiscardDialog,
     setField,
     handleUploadImage,
+    isPickerOpen,
+    openImagePicker,
+    closeImagePicker,
+    handleMediaSelect,
     handleSubmit,
     handleCancel,
     handleBack,
@@ -111,13 +115,30 @@ export function ArticleFormPage(props: Props) {
         {/* Image de couverture */}
         <div className="space-y-1.5">
           <Label>{t('articles.form.fields.coverImage')}</Label>
-          <ImageUpload
-            value={form.coverImageUrl || undefined}
-            onChange={(url) => setField('coverImageUrl', url ?? '')}
-            onUpload={handleUploadImage}
-            alt={t('articles.form.fields.coverImageAlt')}
-            error={errors.coverImageUrl}
-          />
+          <div className="flex items-center gap-4">
+            <div className="flex h-28 w-48 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border border-dashed bg-muted">
+              {form.coverImageUrl ? (
+                // biome-ignore lint/performance/noImgElement: external URL from media gallery
+                <img
+                  src={form.coverImageUrl}
+                  alt={t('articles.form.fields.coverImageAlt')}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <ImageIcon className="size-7 text-muted-foreground/50" />
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button variant="outline" size="sm" onClick={openImagePicker} className="gap-1.5">
+                <ImageIcon className="size-3.5" />
+                {form.coverImageUrl
+                  ? t('articles.form.fields.coverImageChange')
+                  : t('articles.form.fields.coverImageChoose')}
+              </Button>
+              {errors.coverImageUrl && <p className="text-destructive text-xs">{errors.coverImageUrl}</p>}
+            </div>
+          </div>
+          {isPickerOpen && <MediaGallery mode="picker" onSelect={handleMediaSelect} onClose={closeImagePicker} />}
         </div>
 
         {/* Statut */}

@@ -98,8 +98,10 @@
         "titlePlaceholder": "Article title",
         "description": "Description (optional)",
         "descriptionPlaceholder": "Summary or subtitle",
-        "coverImage": "Cover image (URL, optional)",
+        "coverImage": "Cover image (optional)",
         "coverImageAlt": "Cover preview",
+        "coverImageChoose": "Choose image",
+        "coverImageChange": "Change image",
         "status": "Status",
         "content": "Content",
         "contentPlaceholder": "Start writing your article…"

@@ -36,7 +36,6 @@ export function ArticleFormPage(props: Props) {
     apiError,
     showDiscardDialog,
     setField,
-    handleUploadImage,
     isPickerOpen,
     openImagePicker,
     closeImagePicker,
@@ -162,7 +161,6 @@ export function ArticleFormPage(props: Props) {
             value={form.content as unknown[] | undefined}
             onChange={(v) => setField('content', v)}
             placeholder={t('articles.form.fields.contentPlaceholder')}
-            onUploadImage={handleUploadImage}
           />
         </div>
 

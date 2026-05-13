@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   FileText,
   Flag,
-  LucideImageUpscale,
+  LucideBookImage,
   MessageSquare,
   Newspaper,
   Settings2,
@@ -34,7 +34,7 @@ export const SIDEBAR_SECTIONS: SidebarSectionConfig[] = [
     items: [
       { labelKey: 'sidebar.items.general', icon: FileText, href: '/dashboard/general' },
       { labelKey: 'sidebar.items.appManagement', icon: Settings2, href: '/dashboard/app-management' },
-      { labelKey: 'sidebar.items.mediaGallery', icon: LucideImageUpscale, href: '/dashboard/media' },
+      { labelKey: 'sidebar.items.mediaGallery', icon: LucideBookImage, href: '/dashboard/media' },
       { labelKey: 'sidebar.items.establishment', icon: Store, href: '/dashboard/establishment' },
       { labelKey: 'sidebar.items.article', icon: Newspaper, href: '/dashboard/articles' },
     ],

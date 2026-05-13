@@ -170,7 +170,7 @@ export function MediaGallery({ mode, selectedMediaId, onSelect, onClose }: Media
   if (mode === 'picker') {
     return (
       // biome-ignore lint/a11y/noStaticElementInteractions: For the picker
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-8" onClick={onClose}>
+      <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 p-8" onClick={onClose}>
         {inner}
       </div>
     );

@@ -55,7 +55,6 @@ jobs:
         cp -r apps/backend/src "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/src"
 
         cd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}"
-        bun install --production
 
     - name: 'Run Azure Functions Action (DEV)'
       if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment != 'main'

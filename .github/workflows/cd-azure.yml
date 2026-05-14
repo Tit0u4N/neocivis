@@ -42,10 +42,8 @@ jobs:
     - name: 'Resolve Project Dependencies Using Bun'
       shell: bash
       run: |
-        pushd './apps/backend'
         bun install
-        bun run build 
-        popd
+        bun turbo build --filter=backend
 
     - name: 'Copy Package to Temp Directory and install production dependencies'
       shell: bash

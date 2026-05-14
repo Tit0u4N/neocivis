@@ -64,10 +64,14 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     seederList.push(new MediaSeeder(deps.mediaRepository, cityService));
   }
 
-  for (const seeder of seederList) {
-    if (mode === 'RESET_DATA') {
+  if (mode === 'RESET_DATA') {
+    const deleteOrder = [...seederList].reverse();
+    for (const seeder of deleteOrder) {
       await seeder.deleteAll();
     }
+  }
+
+  for (const seeder of seederList) {
     await seeder.seed();
   }
 }

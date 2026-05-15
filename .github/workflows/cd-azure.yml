@@ -54,6 +54,15 @@ jobs:
         cp -r apps/backend/dist "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/dist"
         cp -r apps/backend/src "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/src"
 
+    - name: 'Remove devDependencies from package.json'
+      shell: bash
+      run: |
+        jq 'del(.devDependencies)' "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/package.json" > "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/package.json.tmp"
+        mv "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/package.json.tmp" "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}/package.json"
+
+    - name: 'Install production dependencies'
+      shell: bash
+      run: |
         cd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH_FOR_DEPLOY }}"
         bun install --production
 

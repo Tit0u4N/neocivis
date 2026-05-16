@@ -24,6 +24,8 @@ import { ConfigService } from '@/modules/config/service/config.service';
 import { InMemoryEstablishmentRepository } from '@/modules/establishment/repository/establishment.inmemory.repository';
 import { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
+import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
+import { MediaService } from '@/modules/media/service/media.service';
 import { AzureBlobUploadService, StubUploadService } from '@/modules/upload/upload.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
@@ -33,6 +35,7 @@ import { ArticleController } from './controllers/article.controller';
 import { CityController } from './controllers/city.controller';
 import { MunicipalityConfigController } from './controllers/config.controller';
 import { EstablishmentController } from './controllers/establishment.controller';
+import { MediaController } from './controllers/media.controller';
 import { UploadController } from './controllers/upload.controller';
 import { UserController } from './controllers/user.controller';
 
@@ -43,6 +46,7 @@ const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new Dri
 const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
 const configRepository = new InMemoryConfigRepository();
 const establishmentRepository = new InMemoryEstablishmentRepository();
+const mediaRepository = new InMemoryMediaRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
@@ -53,6 +57,7 @@ const accessService = new AccessService(accessRepository, cityService, userServi
 const configService = new ConfigService(configRepository);
 const uploadService = isInMemoryMode() ? new AzureBlobUploadService() : new StubUploadService();
 const establishmentService = new EstablishmentService(establishmentRepository);
+const mediaService = new MediaService(mediaRepository, uploadService);
 
 await startAutoSeedOnStartup({
   userService,
@@ -61,6 +66,7 @@ await startAutoSeedOnStartup({
   establishmentRepository,
   iamService,
   accessService,
+  mediaRepository,
 });
 
 // Import controllers
@@ -69,6 +75,7 @@ const articleController = new ArticleController(articleService);
 const establishmentController = new EstablishmentController(establishmentService);
 const municipalityConfigController = new MunicipalityConfigController(configService);
 const uploadController = new UploadController(uploadService);
+const mediaController = new MediaController(mediaService);
 const cityController = new CityController(cityService, userService);
 const accessController = new AccessController(accessService, cityService, userService);
 
@@ -86,6 +93,7 @@ app.route('/permissions', accessController.getCatalogRoutes());
 app.route('/articles', articleController.getRoutes());
 app.route('/config', municipalityConfigController.getRoutes());
 app.route('/uploads', uploadController.getRoutes());
+app.route('/media', mediaController.getRoutes());
 
 app.route('/establishment', establishmentController.getRoutes());
 

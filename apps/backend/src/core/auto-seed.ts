@@ -9,6 +9,8 @@ import { CitySeeder } from '@/modules/city/seed/city.seeder';
 import type { IEstablishmentRepository } from '@/modules/establishment/repository/establishment.repository.interface';
 import { EstablishmentSeeder } from '@/modules/establishment/seed/establishment.seeder';
 import type { IAMService } from '@/modules/iam/iam.service';
+import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
+import { MediaSeeder } from '@/modules/media/seed/media.seeder';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/service/user.service';
 import type { AutoSeedMode } from './runtime-config';
@@ -21,6 +23,7 @@ export type AutoSeedDeps = {
   establishmentRepository: IEstablishmentRepository;
   iamService: IAMService;
   accessService: AccessService;
+  mediaRepository?: IMediaRepository;
 };
 
 const AUTO_SEED_GLOBAL_KEY = '__neocivis_auto_seed_started__';
@@ -61,10 +64,18 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     new EstablishmentSeeder(deps.establishmentRepository),
   ];
 
-  for (const seeder of seederList) {
-    if (mode === 'RESET_DATA') {
+  if (deps.mediaRepository) {
+    seederList.push(new MediaSeeder(deps.mediaRepository, cityService));
+  }
+
+  if (mode === 'RESET_DATA') {
+    const deleteOrder = [...seederList].reverse();
+    for (const seeder of deleteOrder) {
       await seeder.deleteAll();
     }
+  }
+
+  for (const seeder of seederList) {
     await seeder.seed();
   }
 }

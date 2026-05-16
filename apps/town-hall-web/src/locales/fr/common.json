@@ -98,8 +98,10 @@
         "titlePlaceholder": "Titre de l'article",
         "description": "Description (optionnel)",
         "descriptionPlaceholder": "Résumé ou sous-titre",
-        "coverImage": "Image de couverture (URL, optionnel)",
+        "coverImage": "Image de couverture (optionnel)",
         "coverImageAlt": "Aperçu de la couverture",
+        "coverImageChoose": "Choisir une image",
+        "coverImageChange": "Changer l'image",
         "status": "Statut",
         "content": "Contenu",
         "contentPlaceholder": "Commencez à rédiger votre article…"
@@ -209,7 +211,58 @@
       "threads": "Fils de discussion",
       "userManagement": "Utilisateurs",
       "roleManagement": "Rôles",
-      "webhook": "Webhook"
+      "webhook": "Webhook",
+      "mediaGallery": "Galerie médias"
+    }
+  },
+  "media": {
+    "page": {
+      "subtitle": "Gérez les images utilisées dans l'application."
+    },
+    "gallery": {
+      "title": "Galerie médias",
+      "subtitle": "Choisissez une image ou téléchargez-en une nouvelle.",
+      "close": "Fermer",
+      "searchPlaceholder": "Rechercher par titre ou utilisation…",
+      "uploading": "Upload en cours…",
+      "upload": "Télécharger",
+      "count": "{{filtered}} sur {{total}} image(s)",
+      "noResults": "Aucune image ne correspond à votre recherche.",
+      "unusedBadge": "Non utilisé",
+      "usages": "{{count}} utilisation(s)",
+      "deleteAria": "Supprimer"
+    },
+    "upload": {
+      "title": "Télécharger une image",
+      "subtitle": "JPG, PNG ou WebP · max 5 Mo",
+      "dropTitle": "Glissez une image ici",
+      "dropSubtitle": "ou cliquez pour parcourir",
+      "previewAlt": "Aperçu",
+      "titleLabel": "Titre",
+      "titleOptional": "(optionnel)",
+      "titlePlaceholder": "ex. Façade de la mairie en été",
+      "titleHint": "Un titre vous permet de retrouver rapidement cette image via la recherche et d'identifier son usage au fil du temps.",
+      "cancel": "Annuler",
+      "confirm": "Télécharger",
+      "error": "Échec de l'upload"
+    },
+    "delete": {
+      "title": "Supprimer cette image ?",
+      "description": "« {{name}} » sera définitivement supprimée. Cette action est irréversible.",
+      "usedAt": "Utilisée à {{count}} endroit(s) :",
+      "notUsed": "Cette image n'est utilisée nulle part.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer",
+      "error": "Échec de la suppression"
+    },
+    "filters": {
+      "all": "Tous les médias",
+      "unused": "Non utilisés"
+    },
+    "linkTypes": {
+      "carousel": "Carousel",
+      "articles": "Articles",
+      "establishments": "Établissements"
     }
   },
   "appManagement": {
@@ -232,7 +285,9 @@
       "untitled": "Diapositive sans titre",
       "count": "{{count}} diapositive(s)",
       "remove": "Supprimer",
-      "imageUrl": "URL de l'image",
+      "imageUrl": "Image",
+      "chooseImage": "Choisir une image",
+      "changeImage": "Changer l'image",
       "imageHint": "Format 16:9 recommandé",
       "linkUrl": "URL du lien",
       "translations": "Traductions",

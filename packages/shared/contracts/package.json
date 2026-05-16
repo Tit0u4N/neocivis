@@ -29,6 +29,7 @@
     "./permission": "./src/permission/permission.schema.ts",
     "./report": "./src/report/report.schema.ts",
     "./role": "./src/role/role.schema.ts",
+    "./media": "./src/media/media.schema.ts",
     "./upload": "./src/upload/upload.dto.ts",
     "./user": "./src/user/user.dto.ts"
   }

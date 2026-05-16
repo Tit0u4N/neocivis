@@ -10,6 +10,7 @@ export default defineConfig((options: Options) => ({
     permission: 'src/permission/permission.service.ts',
     report: 'src/report/report.service.ts',
     upload: 'src/upload/upload.service.ts',
+    media: 'src/media/media.service.ts',
     testing: 'src/testing.ts',
   },
   clean: true,

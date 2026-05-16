@@ -12,7 +12,7 @@ import type { IConfigRepository } from '../repository/config.repository.interfac
 export class ConfigService {
   constructor(private repository: IConfigRepository) {}
 
-  async getConfig(_cityId: string, locale: ConfigLocale): Promise<CitizenConfigResponse> {
+  async getConfig(cityId: string, locale: ConfigLocale): Promise<CitizenConfigResponse> {
     const [carouselItems, categories] = await Promise.all([
       this.repository.getCarouselItems(),
       this.repository.getCategories(),
@@ -24,7 +24,7 @@ export class ConfigService {
     };
   }
 
-  async getMunicipalityConfig(_cityId: string): Promise<MunicipalityConfigResponse> {
+  async getMunicipalityConfig(cityId: string): Promise<MunicipalityConfigResponse> {
     const [categories, carousel] = await Promise.all([
       this.repository.getCategories(),
       this.repository.getCarouselItems(),
@@ -32,19 +32,17 @@ export class ConfigService {
     return { categories, carousel };
   }
 
-  async setCategories(_cityId: string, categories: Category[]): Promise<Category[]> {
+  async setCategories(cityId: string, categories: Category[]): Promise<Category[]> {
     return await this.repository.setCategories(categories);
   }
 
-  async setCarouselItems(_cityId: string, items: CarouselItem[]): Promise<CarouselItem[]> {
+  async setCarouselItems(cityId: string, items: CarouselItem[]): Promise<CarouselItem[]> {
     return await this.repository.setCarouselItems(items);
   }
 
   private resolveCarouselItem(item: CarouselItem, locale: ConfigLocale): CarouselItemResolved {
     const t =
-      item.translations.find((tr) => tr.locale === locale) ??
-      item.translations.find((tr) => tr.locale === 'fr') ??
-      item.translations[0];
+      item.translations.find((tr) => tr.locale === locale) ?? item.translations.find((tr) => tr.locale === 'fr')!;
     return {
       id: item.id,
       imageUrl: item.imageUrl,
@@ -57,10 +55,7 @@ export class ConfigService {
   }
 
   private resolveCategory(cat: Category, locale: ConfigLocale): CategoryResolved {
-    const t =
-      cat.translations.find((tr) => tr.locale === locale) ??
-      cat.translations.find((tr) => tr.locale === 'fr') ??
-      cat.translations[0];
+    const t = cat.translations.find((tr) => tr.locale === locale) ?? cat.translations.find((tr) => tr.locale === 'fr')!;
     return {
       id: cat.id,
       attachedPageId: cat.attachedPageId,

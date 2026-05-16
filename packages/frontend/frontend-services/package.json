@@ -35,6 +35,7 @@
     "./article": "./dist/article.js",
     "./establishment": "./dist/establishment.js",
     "./upload": "./dist/upload.js",
+    "./media": "./dist/media.js",
     "./testing": "./dist/testing.js"
   }
 }

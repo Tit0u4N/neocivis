@@ -27,12 +27,15 @@ export interface IAMService {
    * Crée un utilisateur Keycloak avec des realm roles.
    * Doit throw si non configuré / échec Keycloak (on bloque).
    */
+  /**
+   * Crée un utilisateur Keycloak sans mot de passe et envoie un e-mail
+   * pour que l'utilisateur définisse son mot de passe (UPDATE_PASSWORD).
+   */
   createUser(input: {
     username: string;
     email: string;
     firstName: string;
     lastName: string;
-    password: string;
     realmRoles: string[];
   }): Promise<IamUser>;
 
@@ -41,4 +44,16 @@ export interface IAMService {
    * Doit throw si non configuré / échec Keycloak (on bloque).
    */
   deleteUser(userId: string): Promise<void>;
+
+  /**
+   * Assigne des realm roles à un utilisateur existant.
+   * No-op si non configuré. Throw si Keycloak échoue.
+   */
+  assignRealmRoles(userId: string, realmRoles: string[]): Promise<void>;
+
+  /**
+   * Vérifie que l'utilisateur n'existe plus dans Keycloak (404 par id ou recherche username vide).
+   * Retourne `true` si IAM non configuré (impossible de vérifier).
+   */
+  isUserAbsentFromKeycloak(userId: string, username?: string): Promise<boolean>;
 }

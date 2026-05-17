@@ -1,7 +1,13 @@
 import { eq, inArray, sql } from 'drizzle-orm';
 import { getDb } from '@/infrastructure/db/client';
 import type { User } from '../user.types';
-import type { InsertSeededUserInput, IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
+import type {
+  InsertCitizenFromKeycloakInput,
+  InsertSeededUserInput,
+  IUserRepository,
+  UpdateUserProfileInput,
+  UpsertUserFromHeadersInput,
+} from './user.repository.interface';
 import { users } from './user.table';
 
 function mapRowToUser(r: typeof users.$inferSelect): User {
@@ -15,6 +21,7 @@ function mapRowToUser(r: typeof users.$inferSelect): User {
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
     role: r.role,
+    deletedAt: r.deletedAt,
   };
 }
 
@@ -74,6 +81,40 @@ export class DrizzleUserRepository implements IUserRepository {
         lastName: lastName ?? '',
         updatedAt: sql`now()`,
       })
+      .where(eq(users.keycloakId, keycloakId));
+  }
+
+  async insertCitizenFromKeycloak(input: InsertCitizenFromKeycloakInput): Promise<void> {
+    const db = getDb();
+    await db.insert(users).values({
+      keycloakId: input.keycloakId,
+      role: 'CITIZEN',
+      username: input.username,
+      email: input.email,
+      firstName: input.firstName,
+      lastName: input.lastName,
+    });
+  }
+
+  async updateProfile(input: UpdateUserProfileInput): Promise<void> {
+    const db = getDb();
+    await db
+      .update(users)
+      .set({
+        username: input.username,
+        email: input.email,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        updatedAt: sql`now()`,
+      })
+      .where(eq(users.keycloakId, input.keycloakId));
+  }
+
+  async markDeletedByKeycloakId(keycloakId: string): Promise<void> {
+    const db = getDb();
+    await db
+      .update(users)
+      .set({ deletedAt: sql`now()`, updatedAt: sql`now()` })
       .where(eq(users.keycloakId, keycloakId));
   }
 

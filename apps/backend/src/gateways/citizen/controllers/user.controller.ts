@@ -4,7 +4,7 @@ import type { ControllerJson } from '@/gateways/controller-json-response';
 import type { AccessService } from '@/modules/access/access.service';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
-import { toUserMeDto, toUserPublicDto } from '@/modules/users/user.types';
+import { toUserMeDto, toUserPublicDtoForCitizen } from '@/modules/users/user.types';
 
 export class UserController {
   constructor(
@@ -39,7 +39,7 @@ export class UserController {
     }
 
     const users = await this.service.getByIds(ids);
-    const body: UserPublicDto[] = users.map(toUserPublicDto);
+    const body: UserPublicDto[] = users.map(toUserPublicDtoForCitizen);
     return c.json(body, 200);
   }
 

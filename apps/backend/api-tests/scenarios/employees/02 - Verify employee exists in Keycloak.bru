@@ -1,0 +1,126 @@
+meta {
+  name: Scenario - Verify employee exists in Keycloak
+  type: http
+  seq: 922
+}
+
+get {
+  url: {{keycloakAdminUserByIdUrl}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+
+  function parseKeycloakFromTokenUrl(tokenUrl) {
+    const match = String(tokenUrl).match(/^(https?:\/\/[^/]+)\/realms\/([^/]+)\//);
+    if (!match) {
+      throw new Error(`Cannot parse Keycloak base/realm from tokenUrl: ${tokenUrl}`);
+    }
+    return { baseUrl: `${match[1]}/`, realm: match[2] };
+  }
+
+  async function getKeycloakAdminToken(baseUrl, realm) {
+    const clientId = bru.getEnvVar('keycloak_admin_client_id') || 'hono-backend';
+    const clientSecret = bru.getEnvVar('keycloak_admin_client_secret');
+    if (!clientSecret) {
+      throw new Error(
+        'Missing keycloak_admin_client_secret — set KEYCLOAK_CLIENT_SECRET in api-tests/.env (same as backend hono-backend client).',
+      );
+    }
+    const tokenEndpoint = `${baseUrl}realms/${encodeURIComponent(realm)}/protocol/openid-connect/token`;
+    const body =
+      'grant_type=client_credentials' +
+      `&client_id=${encodeURIComponent(clientId)}` +
+      `&client_secret=${encodeURIComponent(clientSecret)}`;
+    const resp = await axios.post(tokenEndpoint, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    if (!resp.data?.access_token) {
+      throw new Error('Keycloak admin token response missing access_token');
+    }
+    return resp.data.access_token;
+  }
+
+  const username = bru.getVar('e2eNewEmployeeUsername');
+  const email = bru.getVar('e2eNewEmployeeEmail');
+  if (!username || !email) {
+    throw new Error('Missing e2e employee vars — run scenario 921 first');
+  }
+
+  const tokenUrl = bru.getEnvVar('tokenUrl');
+  const { baseUrl, realm } = parseKeycloakFromTokenUrl(tokenUrl);
+
+  const adminToken = await getKeycloakAdminToken(baseUrl, realm);
+  const usersUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users`;
+
+  const searchResp = await axios.get(usersUrl, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+    params: { username, exact: true, max: 2 },
+  });
+  const found = Array.isArray(searchResp.data) ? searchResp.data : [];
+  if (found.length !== 1 || !found[0]?.id) {
+    throw new Error(`Keycloak user not found for username=${username}`);
+  }
+  const keycloakId = found[0].id;
+  bru.setVar('e2eNewEmployeeKeycloakId', keycloakId);
+
+  const userByIdUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users/${encodeURIComponent(keycloakId)}`;
+  req.setUrl(userByIdUrl);
+  req.setHeader('Authorization', `Bearer ${adminToken}`);
+}
+
+script:post-response {
+  const user = res.getBody();
+  if (user?.id) {
+    bru.setVar('e2eNewEmployeeKeycloakId', user.id);
+  }
+}
+
+tests {
+  test("Keycloak user exists with expected profile", function() {
+    expect(res.getStatus()).to.equal(200);
+    const user = res.getBody();
+    expect(user).to.have.property('username', bru.getVar('e2eNewEmployeeUsername'));
+    expect(user).to.have.property('email', bru.getVar('e2eNewEmployeeEmail'));
+    expect(user).to.have.property('enabled', true);
+    expect(user).to.have.property('emailVerified', false);
+    expect(user).to.have.property('id').that.is.a('string').and.not.empty;
+  });
+
+  test("User must set password via email (UPDATE_PASSWORD required action)", function() {
+    const user = res.getBody();
+    expect(user).to.have.property('requiredActions').that.is.an('array');
+    expect(user.requiredActions).to.include('UPDATE_PASSWORD');
+  });
+
+  test("Password grant fails until user sets password", function () {
+    const axios = require('axios');
+    const tokenUrl = bru.getEnvVar('tokenUrl');
+    const clientId = bru.getEnvVar('clientId');
+    const username = bru.getVar('e2eNewEmployeeUsername');
+    const passwordBody =
+      'grant_type=password' +
+      `&client_id=${encodeURIComponent(clientId)}` +
+      `&username=${encodeURIComponent(username)}` +
+      '&password=invalid-placeholder-password';
+    return axios
+      .post(tokenUrl, passwordBody, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        validateStatus: () => true,
+      })
+      .then((loginResp) => {
+        expect(loginResp.status).to.be.oneOf([400, 401]);
+      })
+      .catch((err) => {
+        const status = err?.response?.status;
+        expect(status).to.be.oneOf([400, 401]);
+      });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

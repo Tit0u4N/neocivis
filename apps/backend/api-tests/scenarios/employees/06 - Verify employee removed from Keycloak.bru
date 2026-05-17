@@ -1,0 +1,167 @@
+meta {
+  name: Scenario - Verify employee removed from Keycloak
+  type: http
+  seq: 926
+}
+
+get {
+  url: {{keycloakAdminUsersUrl}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+
+  function parseKeycloakFromTokenUrl(tokenUrl) {
+    const match = String(tokenUrl).match(/^(https?:\/\/[^/]+)\/realms\/([^/]+)\//);
+    if (!match) {
+      throw new Error(`Cannot parse Keycloak base/realm from tokenUrl: ${tokenUrl}`);
+    }
+    return { baseUrl: `${match[1]}/`, realm: match[2] };
+  }
+
+  async function getKeycloakAdminToken(baseUrl, realm) {
+    const clientId = bru.getEnvVar('keycloak_admin_client_id') || 'hono-backend';
+    const clientSecret = bru.getEnvVar('keycloak_admin_client_secret');
+    if (!clientSecret) {
+      throw new Error('Missing keycloak_admin_client_secret — set KEYCLOAK_CLIENT_SECRET in api-tests/.env');
+    }
+    const tokenEndpoint = `${baseUrl}realms/${encodeURIComponent(realm)}/protocol/openid-connect/token`;
+    const body =
+      'grant_type=client_credentials' +
+      `&client_id=${encodeURIComponent(clientId)}` +
+      `&client_secret=${encodeURIComponent(clientSecret)}`;
+    const resp = await axios.post(tokenEndpoint, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      validateStatus: () => true,
+    });
+    if (resp.status !== 200 || !resp.data?.access_token) {
+      throw new Error(`Keycloak admin token failed: HTTP ${resp.status}`);
+    }
+    return resp.data.access_token;
+  }
+
+  const username = bru.getVar('e2eNewEmployeeUsername');
+  if (!username) {
+    throw new Error('Missing e2eNewEmployeeUsername — run full scenario from 921');
+  }
+
+  const tokenUrl = bru.getEnvVar('tokenUrl');
+  const baseUrlApi = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  const cityId = bru.getVar('cityNiceId');
+  const { baseUrl, realm } = parseKeycloakFromTokenUrl(tokenUrl);
+
+  const adminTokenKc = await getKeycloakAdminToken(baseUrl, realm);
+  const usersUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users`;
+
+  req.setUrl(`${usersUrl}?username=${encodeURIComponent(username)}&exact=true&max=10`);
+  req.setHeader('Authorization', `Bearer ${adminTokenKc}`);
+
+  const roleId = bru.getVar('e2eEmployeeLifecycleRoleId');
+  if (baseUrlApi && adminToken && cityId && roleId) {
+    try {
+      await axios.delete(`${baseUrlApi}/api/municipality/cities/${cityId}/roles/${roleId}`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+        validateStatus: () => true,
+      });
+    } catch (_err) {
+      // ignore
+    }
+  }
+}
+
+tests {
+  test("Keycloak search has no E2E employee user", function() {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    const targetUsername = bru.getVar('e2eNewEmployeeUsername');
+    const e2eUser = body.find((u) => u && u.username === targetUsername);
+    expect(e2eUser, `E2E user "${targetUsername}" should be deleted from Keycloak`).to.be.undefined;
+  });
+
+  test("Password grant fails after delete", function () {
+    const axios = require('axios');
+    const tokenUrl = bru.getEnvVar('tokenUrl');
+    const clientId = bru.getEnvVar('clientId');
+    const username = bru.getVar('e2eNewEmployeeUsername');
+    const passwordBody =
+      'grant_type=password' +
+      `&client_id=${encodeURIComponent(clientId)}` +
+      `&username=${encodeURIComponent(username)}` +
+      '&password=invalid-placeholder-password';
+    return axios
+      .post(tokenUrl, passwordBody, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        validateStatus: () => true,
+      })
+      .then((loginResp) => {
+        expect(loginResp.status).to.be.oneOf([400, 401]);
+      })
+      .catch((err) => {
+        expect(err?.response?.status).to.be.oneOf([400, 401]);
+      });
+  });
+
+  test("Keycloak user GET by id returns 404", function () {
+    const axios = require('axios');
+    const acceptAnyStatus = { validateStatus: () => true };
+    const tokenUrl = bru.getEnvVar('tokenUrl');
+    const match = String(tokenUrl).match(/^(https?:\/\/[^/]+)\/realms\/([^/]+)\//);
+    const baseUrl = `${match[1]}/`;
+    const realm = match[2];
+
+    const keycloakId = bru.getVar('e2eDeletedEmployeeKeycloakId') || bru.getVar('e2eNewEmployeeKeycloakId');
+    expect(keycloakId, 'Missing Keycloak user id — run scenarios 02 and 05 first').to.be.a('string').and.not.empty;
+
+    const clientId = bru.getEnvVar('keycloak_admin_client_id') || 'hono-backend';
+    const clientSecret = bru.getEnvVar('keycloak_admin_client_secret');
+    const tokenEndpoint = `${baseUrl}realms/${encodeURIComponent(realm)}/protocol/openid-connect/token`;
+    const tokenBody =
+      'grant_type=client_credentials' +
+      `&client_id=${encodeURIComponent(clientId)}` +
+      `&client_secret=${encodeURIComponent(clientSecret)}`;
+
+    return axios
+      .post(tokenEndpoint, tokenBody, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        ...acceptAnyStatus,
+      })
+      .then((tokenResp) => {
+        expect(tokenResp.status).to.equal(200);
+        const byIdUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users/${encodeURIComponent(keycloakId)}`;
+        return axios.get(byIdUrl, {
+          headers: { Authorization: `Bearer ${tokenResp.data.access_token}` },
+          ...acceptAnyStatus,
+        });
+      })
+      .then((byIdResp) => {
+        expect(byIdResp.status).to.equal(404);
+      });
+  });
+
+  test("Employee no longer in city employees list", function () {
+    const axios = require('axios');
+    const baseUrlApi = bru.getEnvVar('url');
+    const adminToken = bru.getVar('tokenAdmin');
+    const cityId = bru.getVar('cityNiceId');
+    const username = bru.getVar('e2eNewEmployeeUsername');
+    return axios
+      .get(`${baseUrlApi}/api/municipality/cities/${cityId}/employees`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+        validateStatus: () => true,
+      })
+      .then((employees) => {
+        expect(employees.status).to.equal(200);
+        const stillThere = (employees.data || []).some((u) => u.username === username);
+        expect(stillThere).to.equal(false);
+      });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

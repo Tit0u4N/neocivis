@@ -20,6 +20,7 @@ function makeUser(overrides: Partial<User> & Pick<User, 'id' | 'role' | 'keycloa
     lastName: '',
     createdAt: now,
     updatedAt: now,
+    deletedAt: null,
     ...overrides,
   };
 }

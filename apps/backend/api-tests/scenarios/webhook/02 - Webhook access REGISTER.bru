@@ -1,0 +1,64 @@
+meta {
+  name: Scenario - Webhook access REGISTER (Bruno as Keycloak)
+  type: http
+  seq: 932
+}
+
+post {
+  url: {{url}}/api/webhook/post
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "time": {{$timestamp}},
+    "realmId": "{{keycloakAdminRealm}}",
+    "uid": "{{$randomUUID}}",
+    "authDetails": {
+      "realmId": "{{keycloakAdminRealm}}",
+      "clientId": "neocivis-townhall-app",
+      "userId": "{{webhookE2eKeycloakId}}",
+      "ipAddress": "127.0.0.1",
+      "username": "{{webhookE2eUsername}}",
+      "sessionId": "{{$randomUUID}}"
+    },
+    "type": "access.REGISTER",
+    "details": {
+      "auth_method": "openid-connect",
+      "auth_type": "code",
+      "register_method": "form",
+      "last_name": "{{webhookE2eLastName}}",
+      "redirect_uri": "http://localhost:3000",
+      "first_name": "{{webhookE2eFirstName}}",
+      "code_id": "{{$randomUUID}}",
+      "email": "{{webhookE2eEmail}}",
+      "username": "{{webhookE2eUsername}}"
+    }
+  }
+}
+
+script:pre-request {
+  const keycloakId = bru.getVar('webhookE2eKeycloakId') || bru.getEnvVar('webhookE2eKeycloakId');
+  if (!keycloakId) {
+    throw new Error('Missing webhookE2eKeycloakId — run scenario 931 first');
+  }
+  bru.setVar('webhookE2eKeycloakId', keycloakId);
+}
+
+tests {
+  test("Webhook accepts REGISTER payload", function() {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body).to.have.property('accepted', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

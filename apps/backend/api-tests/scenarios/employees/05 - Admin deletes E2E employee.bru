@@ -1,0 +1,72 @@
+meta {
+  name: Scenario - Admin deletes E2E employee
+  type: http
+  seq: 925
+}
+
+delete {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees/{{e2eNewEmployeeId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  const adminAuth = `Bearer ${adminToken}`;
+
+  const cityId = bru.getVar('cityNiceId');
+  let employeeId = bru.getVar('e2eNewEmployeeId');
+  const username = bru.getVar('e2eNewEmployeeUsername');
+  const keycloakId = bru.getVar('e2eNewEmployeeKeycloakId');
+
+  if (!employeeId && cityId && username) {
+    const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, {
+      headers: { Authorization: adminAuth },
+    });
+    const employee = (employees.data || []).find((u) => u.username === username);
+    if (!employee) {
+      throw new Error(`Employee ${username} not found — cannot delete`);
+    }
+    employeeId = String(employee.id);
+    bru.setVar('e2eNewEmployeeId', employeeId);
+  }
+
+  if (keycloakId) {
+    bru.setVar('e2eDeletedEmployeeKeycloakId', keycloakId);
+  }
+
+  req.setHeader('Authorization', adminAuth);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees/${employeeId}`);
+
+  if (keycloakId) {
+    bru.setVar('e2eDeletedEmployeeKeycloakId', keycloakId);
+  }
+}
+
+script:post-response {
+  const keycloakId = bru.getVar('e2eDeletedEmployeeKeycloakId') || bru.getVar('e2eNewEmployeeKeycloakId');
+  if (keycloakId) {
+    bru.setVar('e2eDeletedEmployeeKeycloakId', keycloakId);
+  }
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Returns OperationSuccessDto", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('success', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

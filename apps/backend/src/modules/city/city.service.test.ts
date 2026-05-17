@@ -126,7 +126,6 @@ describe('CityService', () => {
       email: 'employee-new@example.com',
       firstName: 'New',
       lastName: 'Employee',
-      password: 'secret123',
     });
     expect(iamMocks.createUser).toHaveBeenCalledWith(
       expect.objectContaining({

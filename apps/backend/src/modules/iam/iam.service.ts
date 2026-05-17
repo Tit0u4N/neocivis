@@ -27,12 +27,15 @@ export interface IAMService {
    * Crée un utilisateur Keycloak avec des realm roles.
    * Doit throw si non configuré / échec Keycloak (on bloque).
    */
+  /**
+   * Crée un utilisateur Keycloak sans mot de passe et envoie un e-mail
+   * pour que l'utilisateur définisse son mot de passe (UPDATE_PASSWORD).
+   */
   createUser(input: {
     username: string;
     email: string;
     firstName: string;
     lastName: string;
-    password: string;
     realmRoles: string[];
   }): Promise<IamUser>;
 

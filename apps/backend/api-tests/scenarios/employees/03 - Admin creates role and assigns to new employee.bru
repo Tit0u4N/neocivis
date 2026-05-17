@@ -1,0 +1,87 @@
+meta {
+  name: Scenario - Admin assigns role to new E2E employee
+  type: http
+  seq: 923
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees/{{e2eNewEmployeeId}}/roles/{{e2eEmployeeLifecycleRoleId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  const adminAuth = `Bearer ${adminToken}`;
+
+  const cityId = bru.getVar('cityNiceId');
+  let employeeId = bru.getVar('e2eNewEmployeeId');
+  const username = bru.getVar('e2eNewEmployeeUsername');
+  if (!cityId || !username) {
+    throw new Error('Missing cityNiceId or e2eNewEmployeeUsername — run scenarios 921-922 first');
+  }
+
+  if (!employeeId) {
+    const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, {
+      headers: { Authorization: adminAuth },
+    });
+    const employee = (employees.data || []).find((u) => u.username === username);
+    if (!employee) {
+      throw new Error(`Employee ${username} not found in city employees`);
+    }
+    employeeId = String(employee.id);
+    bru.setVar('e2eNewEmployeeId', employeeId);
+  }
+
+  const roleName = 'E2E Employee Lifecycle';
+  let roleId = bru.getVar('e2eEmployeeLifecycleRoleId');
+
+  const roles = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/roles`, {
+    headers: { Authorization: adminAuth },
+  });
+  const existing = (roles.data || []).find((r) => r.name === roleName);
+  if (existing) {
+    await axios.delete(`${baseUrl}/api/municipality/cities/${cityId}/roles/${existing.id}`, {
+      headers: { Authorization: adminAuth },
+    });
+  }
+
+  const createdRole = await axios.post(
+    `${baseUrl}/api/municipality/cities/${cityId}/roles`,
+    {
+      name: roleName,
+      description: 'Rôle E2E pour le cycle de vie employé Bruno',
+      permissions: ['ARTICLE_PUBLISH_PERMISSION'],
+    },
+    { headers: { Authorization: adminAuth, 'Content-Type': 'application/json' } },
+  );
+  roleId = createdRole.data?.id;
+  if (!roleId) {
+    throw new Error('Failed to create E2E Employee Lifecycle role');
+  }
+  bru.setVar('e2eEmployeeLifecycleRoleId', roleId);
+
+  req.setHeader('Authorization', adminAuth);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees/${employeeId}/roles/${roleId}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Returns OperationSuccessDto", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('success', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

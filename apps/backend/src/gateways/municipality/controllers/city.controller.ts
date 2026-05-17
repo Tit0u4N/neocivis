@@ -62,13 +62,12 @@ export class CityController {
     const email = typeof bodyObj?.email === 'string' ? bodyObj.email : '';
     const firstName = typeof bodyObj?.firstName === 'string' ? bodyObj.firstName : '';
     const lastName = typeof bodyObj?.lastName === 'string' ? bodyObj.lastName : '';
-    const password = typeof bodyObj?.password === 'string' ? bodyObj.password : '';
-    if (!(username && email && firstName && lastName && password)) {
+    if (!(username && email && firstName && lastName)) {
       return c.json({ error: 'Invalid body' } satisfies ApiErrorDto, 400);
     }
 
     try {
-      await this.cityService.createAndAssignEmployee(cityId, { username, email, firstName, lastName, password });
+      await this.cityService.createAndAssignEmployee(cityId, { username, email, firstName, lastName });
       return c.json({ success: true } satisfies OperationSuccessDto, 200);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Assign failed';

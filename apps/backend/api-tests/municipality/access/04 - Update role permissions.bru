@@ -1,0 +1,73 @@
+meta {
+  name: 04 - Update role permissions
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/roles/{{createdRoleId}}
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "description": "Mise à jour par Bruno",
+    "permissions": ["ARTICLE_PUBLISH_PERMISSION", "ARTICLE_MODIFY_PERMISSION", "ARTICLE_DELETE_PERMISSION"]
+  }
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const auth = req.getHeader('Authorization');
+  let cityId = bru.getVar('cityNiceId');
+  let roleId = bru.getVar('createdRoleId');
+
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: auth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+  if (!roleId) {
+    const list = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/roles`, { headers: { Authorization: auth } });
+    const role = (list.data || []).find((r) => r.name === 'Bruno Test Role');
+    if (!role) {
+      throw new Error('Bruno Test Role not found, run "03 - Create role" first');
+    }
+    roleId = role.id;
+    bru.setVar('createdRoleId', roleId);
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/roles/${roleId}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Permissions list was replaced with the new set", function() {
+    const body = res.getBody();
+    expect(body.permissions).to.deep.equal([
+      'ARTICLE_PUBLISH_PERMISSION',
+      'ARTICLE_MODIFY_PERMISSION',
+      'ARTICLE_DELETE_PERMISSION',
+    ]);
+    expect(body.description).to.equal('Mise à jour par Bruno');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

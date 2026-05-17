@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useApi } from '@/providers/ApiProvider';
 import { useAuth } from '@/providers/AuthProvider';
+import { useCityStore } from '@/stores/city.store';
 
 const HOME_PREVIEW_LIMIT = 3;
 
@@ -25,6 +26,7 @@ export function useHomeScreen() {
   const api = useApi();
   const { language } = useLanguage();
   const { user } = useAuth();
+  const { cityId } = useCityStore();
 
   const [articles, setArticles] = useState<ArticleWithResolvedTranslation[]>([]);
   const [carouselItems, setCarouselItems] = useState<CarouselItemResolved[]>([]);
@@ -34,7 +36,7 @@ export function useHomeScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const articleService = useMemo(() => new ArticleService(api), [api]);
-  const configService = useMemo(() => new ConfigService(api), [api]);
+  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
 
   useEffect(() => {
     setArticlesLoading(true);

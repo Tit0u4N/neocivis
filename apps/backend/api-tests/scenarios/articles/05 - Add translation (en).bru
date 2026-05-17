@@ -1,0 +1,48 @@
+meta {
+  name: 05 - Add translation (en)
+  type: http
+  seq: 935
+}
+
+post {
+  url: {{url}}/api/municipality/articles/{{articleId}}/translations
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "locale": "en",
+    "title": "Bruno test article (EN)",
+    "description": "English translation",
+    "content": []
+  }
+}
+
+script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  if (!bru.getVar('articleId')) {
+    throw new Error('Missing articleId. Run "01 - Create article" first.');
+  }
+}
+
+script:post-response {
+  test("Status is 201 or 409", function() {
+    // 409 si la traduction existe déjà
+    expect([201, 409]).to.include(res.getStatus());
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

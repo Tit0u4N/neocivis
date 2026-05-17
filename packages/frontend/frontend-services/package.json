@@ -34,6 +34,7 @@
     "./permission": "./dist/permission.js",
     "./article": "./dist/article.js",
     "./upload": "./dist/upload.js",
+    "./media": "./dist/media.js",
     "./testing": "./dist/testing.js"
   }
 }

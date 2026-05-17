@@ -16,8 +16,7 @@ export default function ReportLayout() {
         headerShadowVisible: false,
       }}
     >
-      <AppTopBar />
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="index" options={{ header: () => <AppTopBar /> }} />
       <Stack.Screen name="new" options={{ title: t('report.newReport') }} />
       <Stack.Screen name="[id]" options={{ title: t('report.detail.headerTitle') }} />
     </Stack>

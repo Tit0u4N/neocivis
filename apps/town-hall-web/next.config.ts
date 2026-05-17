@@ -2,10 +2,12 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  turbopack: {
-    root: '../..' +
-        ''
-  }
+  transpilePackages: ['@repo/contracts', '@repo/frontend-core', '@repo/frontend-services'],
+  experimental: {
+    webpackMemoryOptimizations: true,
+    preloadEntriesOnStart: false,
+    serverSourceMaps: false,
+  },
 };
 
 export default nextConfig;

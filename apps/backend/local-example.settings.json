@@ -2,10 +2,18 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "FUNCTIONS_EXTENSION_VERSION": "~4",
     "WEBSITE_NODE_DEFAULT_VERSION": "22",
     "ENV_MODE": "development",
+    "IN_MEMORY": "false",
     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+    "AUTO_SEED": "INSERT_ONLY",
+
+    "KEYCLOAK_BASE_URL": "https://auth.neocivis.cloud/",
+    "KEYCLOAK_REALM": "neocivis-dev",
+    "KEYCLOAK_CLIENT_ID": "hono-backend",
+    "KEYCLOAK_CLIENT_SECRET": "replace-me",
+    "KEYCLOAK_PASSWORD_SETUP_CLIENT_ID": "neocivis-townhall-app",
+    "KEYCLOAK_PASSWORD_SETUP_REDIRECT_URI": "http://localhost:3000",
 
     "DATABASE_URL": "postgresql://user:password@localhost:5432/neocivis-data",
 

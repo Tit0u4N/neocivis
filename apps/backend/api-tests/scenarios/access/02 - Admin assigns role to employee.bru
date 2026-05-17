@@ -1,0 +1,69 @@
+meta {
+  name: Scenario - Admin assigns role to employee
+  type: http
+  seq: 952
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees/{{e2eEmployeeId}}/roles/{{e2eRoleId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const url = req.getUrl ? req.getUrl() : '';
+  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
+  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
+  const token = bru.getVar(tokenKey);
+  if (!token) {
+    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const auth = req.getHeader('Authorization');
+  let cityId = bru.getVar('cityNiceId');
+  let roleId = bru.getVar('e2eRoleId');
+
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: auth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+  if (!roleId) {
+    const list = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/roles`, { headers: { Authorization: auth } });
+    const role = (list.data || []).find((r) => r.name === 'E2E Publisher');
+    if (!role) {
+      throw new Error('E2E Publisher role not found, run scenario 951 first');
+    }
+    roleId = role.id;
+    bru.setVar('e2eRoleId', roleId);
+  }
+
+  // Identifie l'id DB de employee-nice1 via la liste des employés de la ville.
+  const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, { headers: { Authorization: auth } });
+  const employee = (employees.data || []).find((u) => u.username === 'employee-nice1');
+  if (!employee) {
+    throw new Error('employee-nice1 not found in city employees');
+  }
+  bru.setVar('e2eEmployeeId', String(employee.id));
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees/${employee.id}/roles/${roleId}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Returns OperationSuccessDto", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('success', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

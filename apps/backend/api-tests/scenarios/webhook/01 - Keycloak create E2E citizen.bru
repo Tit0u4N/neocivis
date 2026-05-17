@@ -1,0 +1,189 @@
+meta {
+  name: Scenario - Keycloak create E2E citizen
+  type: http
+  seq: 931
+}
+
+post {
+  url: {{keycloakAdminUsersUrl}}
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "username": "{{webhookE2eUsername}}",
+    "email": "{{webhookE2eEmail}}",
+    "firstName": "{{webhookE2eFirstName}}",
+    "lastName": "{{webhookE2eLastName}}",
+    "enabled": true,
+    "emailVerified": true,
+    "credentials": [
+      {
+        "type": "password",
+        "value": "{{webhookE2ePassword}}",
+        "temporary": false
+      }
+    ]
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+
+  function parseKeycloakFromTokenUrl(tokenUrl) {
+    const match = String(tokenUrl).match(/^(https?:\/\/[^/]+)\/realms\/([^/]+)\//);
+    if (!match) {
+      throw new Error(`Cannot parse Keycloak base/realm from tokenUrl: ${tokenUrl}`);
+    }
+    return { baseUrl: `${match[1]}/`, realm: match[2] };
+  }
+
+  async function getKeycloakAdminToken(baseUrl, realm) {
+    const clientId = bru.getEnvVar('keycloak_admin_client_id') || 'hono-backend';
+    const clientSecret = bru.getEnvVar('keycloak_admin_client_secret');
+    if (!clientSecret) {
+      throw new Error('Missing keycloak_admin_client_secret — set KEYCLOAK_CLIENT_SECRET in api-tests/.env');
+    }
+    const tokenEndpoint = `${baseUrl}realms/${encodeURIComponent(realm)}/protocol/openid-connect/token`;
+    const body =
+      'grant_type=client_credentials' +
+      `&client_id=${encodeURIComponent(clientId)}` +
+      `&client_secret=${encodeURIComponent(clientSecret)}`;
+    const resp = await axios.post(tokenEndpoint, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    if (!resp.data?.access_token) {
+      throw new Error('Keycloak admin token response missing access_token');
+    }
+    return resp.data.access_token;
+  }
+
+  const tokenUrl = bru.getEnvVar('tokenUrl');
+  const { baseUrl, realm } = parseKeycloakFromTokenUrl(tokenUrl);
+  const adminToken = await getKeycloakAdminToken(baseUrl, realm);
+  const usersUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users`;
+
+  function persist(name, value) {
+    bru.setVar(name, value);
+    bru.setEnvVar(name, value);
+  }
+
+  persist('keycloakAdminUsersUrl', usersUrl);
+  persist('keycloakAdminRealm', realm);
+  persist('keycloakAdminBaseUrl', baseUrl);
+
+  const suffix = Date.now();
+  const username = `e2e-webhook-citizen-${suffix}`;
+  const email = `e2e-webhook-citizen-${suffix}@bruno.test`;
+  const password = `E2eWebhook!${suffix}`;
+  const firstName = 'Webhook';
+  const lastName = 'Citizen';
+
+  persist('webhookE2eUsername', username);
+  persist('webhookE2eEmail', email);
+  persist('webhookE2ePassword', password);
+  persist('webhookE2eFirstName', firstName);
+  persist('webhookE2eLastName', lastName);
+
+  // Hygiène : supprime les utilisateurs E2E webhook orphelins.
+  const staleResp = await axios.get(usersUrl, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+    params: { username: 'e2e-webhook-citizen-', max: 100 },
+  });
+  const stale = (Array.isArray(staleResp.data) ? staleResp.data : []).filter(
+    (u) => typeof u?.username === 'string' && u.username.startsWith('e2e-webhook-citizen-'),
+  );
+  for (const user of stale) {
+    if (!user?.id) {
+      continue;
+    }
+    try {
+      await axios.delete(`${usersUrl}/${encodeURIComponent(user.id)}`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+    } catch (_err) {
+      // ignore
+    }
+  }
+
+  req.setUrl(usersUrl);
+  req.setHeader('Authorization', `Bearer ${adminToken}`);
+  req.setHeader('Content-Type', 'application/json');
+}
+
+script:post-response {
+  const axios = require('axios');
+  const status = res.getStatus();
+  if (status !== 201 && status !== 409) {
+    return;
+  }
+
+  const baseUrl = bru.getVar('keycloakAdminBaseUrl') || bru.getEnvVar('keycloakAdminBaseUrl');
+  const realm = bru.getVar('keycloakAdminRealm') || bru.getEnvVar('keycloakAdminRealm');
+  const username = bru.getVar('webhookE2eUsername') || bru.getEnvVar('webhookE2eUsername');
+  const usersUrl = bru.getVar('keycloakAdminUsersUrl') || bru.getEnvVar('keycloakAdminUsersUrl');
+  if (!baseUrl || !realm || !username || !usersUrl) {
+    return;
+  }
+
+  const clientId = bru.getEnvVar('keycloak_admin_client_id') || 'hono-backend';
+  const clientSecret = bru.getEnvVar('keycloak_admin_client_secret');
+  const tokenEndpoint = `${baseUrl}realms/${encodeURIComponent(realm)}/protocol/openid-connect/token`;
+  const tokenBody =
+    'grant_type=client_credentials' +
+    `&client_id=${encodeURIComponent(clientId)}` +
+    `&client_secret=${encodeURIComponent(clientSecret)}`;
+  const tokenResp = await axios.post(tokenEndpoint, tokenBody, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+  const adminToken = tokenResp.data?.access_token;
+  if (!adminToken) {
+    return;
+  }
+
+  const searchResp = await axios.get(usersUrl, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+    params: { username, exact: true, max: 2 },
+  });
+  const found = Array.isArray(searchResp.data) ? searchResp.data : [];
+  if (found.length !== 1 || !found[0]?.id) {
+    return;
+  }
+  const keycloakId = found[0].id;
+  bru.setVar('webhookE2eKeycloakId', keycloakId);
+  bru.setEnvVar('webhookE2eKeycloakId', keycloakId);
+
+  const roleUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/roles/CITIZEN`;
+  const roleResp = await axios.get(roleUrl, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+    validateStatus: () => true,
+  });
+  if (roleResp.status === 200) {
+    const mapUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users/${encodeURIComponent(keycloakId)}/role-mappings/realm`;
+    await axios.post(mapUrl, [roleResp.data], {
+      headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+      validateStatus: () => true,
+    });
+  }
+}
+
+tests {
+  test("Keycloak user created (201) or already exists (409)", function() {
+    expect(res.getStatus()).to.be.oneOf([201, 409]);
+  });
+
+  test("Keycloak id stored for webhook steps", function() {
+    const keycloakId = bru.getVar('webhookE2eKeycloakId') || bru.getEnvVar('webhookE2eKeycloakId');
+    expect(keycloakId, 'run post-response or check Keycloak search').to.be.a('string').and.not.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

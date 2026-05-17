@@ -1,0 +1,56 @@
+meta {
+  name: Join Nice when already member → 409 or success
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/join
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const auth = req.getHeader('Authorization');
+  
+  if (!baseUrl || !auth) {
+    console.log('Missing url or Authorization');
+    return;
+  }
+  
+  // Assure que cityNiceId est dérivé de /user/me (pas dépendant d'un autre test).
+  const me = await axios.get(`${baseUrl}/api/citizen/user/me`, {
+    headers: { Authorization: auth },
+  });
+  const memberships = me.data?.memberships ?? [];
+  const nice = Array.isArray(memberships) ? memberships.find((m) => m && m.name === 'Nice') : null;
+  if (!nice?.id) {
+    throw new Error('Nice membership not found in /user/me');
+  }
+  bru.setVar('cityNiceId', nice.id);
+  req.setUrl(`${baseUrl}/api/citizen/cities/${nice.id}/join`);
+}
+
+tests {
+  test("Response is 409 (duplicate) or 200 (in-memory no-op)", function() {
+    const status = res.getStatus();
+    expect([200, 409]).to.include(status);
+    if (status === 200) {
+      const body = res.getBody();
+      expect(body.success).to.be.a('boolean');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

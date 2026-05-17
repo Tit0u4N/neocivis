@@ -1,0 +1,90 @@
+meta {
+  name: Scenario - Keycloak update user profile
+  type: http
+  seq: 934
+}
+
+put {
+  url: {{keycloakAdminUserByIdUrl}}
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "username": "{{webhookE2eUsername}}",
+    "email": "{{webhookE2eEmail}}",
+    "firstName": "{{webhookE2eFirstName}}",
+    "lastName": "{{webhookE2eLastName}}",
+    "enabled": true,
+    "emailVerified": true
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+
+  function getPersisted(name) {
+    const v = bru.getVar(name);
+    if (v !== undefined && v !== null && String(v) !== '') {
+      return v;
+    }
+    const e = bru.getEnvVar(name);
+    if (e !== undefined && e !== null && String(e) !== '') {
+      return e;
+    }
+    return undefined;
+  }
+
+  function persist(name, value) {
+    bru.setVar(name, value);
+    bru.setEnvVar(name, value);
+  }
+
+  const baseUrl = getPersisted('keycloakAdminBaseUrl');
+  const realm = getPersisted('keycloakAdminRealm');
+  const keycloakId = getPersisted('webhookE2eKeycloakId');
+  if (!baseUrl || !realm || !keycloakId) {
+    throw new Error('Missing Keycloak vars — run scenarios 931–933 first');
+  }
+
+  const clientId = bru.getEnvVar('keycloak_admin_client_id') || 'hono-backend';
+  const clientSecret = bru.getEnvVar('keycloak_admin_client_secret');
+  const tokenEndpoint = `${baseUrl}realms/${encodeURIComponent(realm)}/protocol/openid-connect/token`;
+  const tokenBody =
+    'grant_type=client_credentials' +
+    `&client_id=${encodeURIComponent(clientId)}` +
+    `&client_secret=${encodeURIComponent(clientSecret)}`;
+  const tokenResp = await axios.post(tokenEndpoint, tokenBody, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+  const adminToken = tokenResp.data?.access_token;
+  if (!adminToken) {
+    throw new Error('Keycloak admin token failed');
+  }
+
+  const userUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users/${encodeURIComponent(keycloakId)}`;
+  persist('keycloakAdminUserByIdUrl', userUrl);
+
+  persist('webhookE2eFirstName', 'WebhookUpdated');
+  persist('webhookE2eLastName', 'CitizenUpdated');
+
+  req.setUrl(userUrl);
+  req.setHeader('Authorization', `Bearer ${adminToken}`);
+  req.setHeader('Content-Type', 'application/json');
+}
+
+tests {
+  test("Keycloak profile updated", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

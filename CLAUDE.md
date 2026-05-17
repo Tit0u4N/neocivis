@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Always read before any task**: [`agent/project-context.md`](agent/project-context.md) — complete rules, stack versions, architecture patterns, and critical anti-patterns for the entire project
 - **Read before any frontend task** (`town-hall-web`, `citizen-app`, `keycloak-theme`): [`agent/design-system.md`](agent/design-system.md) — design tokens, brand guidelines, component specs, motion rules, and DO/DON'Ts for both the `citizen` and `town-hall` brands
+- **Read before any api test task**: [`agent/api-bruno-instructions.md`](agent/api-bruno-instructions.md) — instructions for using Bruno API client to test the backend API endpoints
 
 ## Project Overview
 
@@ -62,15 +63,18 @@ apps/
 │       └── components/
 └── backend/                # Hono + Azure Functions v4 (REST API)
     └── src/
-        ├── index.ts        # Azure Functions entry point (2 HTTP triggers)
-        ├── gateways/       # citizen/ and municipality/ — one Hono app each
+        ├── index.ts        # Azure Functions entry point (3 HTTP triggers)
+        ├── gateways/       # citizen/, municipality/, webhook/ — one Hono app each
         │   ├── citizen/
         │   │   ├── citizen.gateway.ts
         │   │   └── controllers/
-        │   └── municipality/
-        │       ├── municipality.gateway.ts
+        │   ├── municipality/
+        │   │   ├── municipality.gateway.ts
+        │   │   └── controllers/
+        │   └── webhook/
+        │       ├── webhook.gateway.ts
         │       └── controllers/
-        ├── modules/        # Business logic: {feature}.service.ts / .repository.ts / .types.ts
+        ├── modules/        # Business logic par module (voir structure ci-dessous)
         └── middleware/     # Hono middleware (auth, errors, logging, CORS)
 
 packages/
@@ -154,14 +158,44 @@ The backend follows a strict 4-layer architecture:
 |-------|----------|----------------|
 | **Gateway** | `src/gateways/{module}/` | Azure Function entry, Hono routing, DI wiring |
 | **Controller** | `src/gateways/{module}/controllers/` | Route handlers, request validation, no business logic |
-| **Service** | `src/modules/{feature}/` | All business logic |
-| **Repository** | `src/modules/{feature}/` | Data access only (in-memory now, ORM later) |
+| **Service** | `src/modules/{module}/service/` | All business logic |
+| **Repository** | `src/modules/{module}/repository/` | Data access only (in-memory now, ORM later) |
+
+### Structure d'un module (référence: `users`)
+
+Les “modules” backend sont organisés **par domaine** (ex: `users`, `article`, `upload`) et contiennent la logique métier, la persistance, et (optionnellement) le seed.
+
+Structure typique:
+
+```
+apps/backend/src/modules/
+└── users/
+    ├── repository/
+    │   ├── user.repository.interface.ts   # contrat du repository (port)
+    │   ├── user.inmemory.repository.ts    # impl in-memory (dev/tests)
+    │   ├── user.{DB impl}.repository.ts   # impl DB (drizzle ou cosmos)
+    │   └── user.table.ts                  # mapping/table/schema DB (optionel)
+    ├── service/
+    │   ├── user.service.ts                # logique métier (use-cases)
+    │   └── user.service.test.ts           # tests de service
+    ├── seed/
+    │   ├── user.seed.ts                   # source des données de seed (dev)
+    │   └── user.seeder.ts                 # orchestrateur de seed (impl `ISeeder`)
+    └── user.types.ts                      # types domaine (ex: `User`, `BaseUserRole`)
+```
+
+Guidelines:
+- **Controllers**: validation/format d'entrée + mapping DTO → service. Zéro logique métier.
+- **Services**: logique métier pure (use-cases), dépend de `repository` et éventuellement d'autres services (ex: `IAMService`).
+- **Repositories**: accès données uniquement. Plusieurs implémentations possibles (in-memory, drizzle, etc.).
+- **Seeders**: un `*.seeder.ts` par module si besoin, branché dans l'auto-seed global.
 
 ### Rules
-- **EXACTLY 2 gateways**: `citizen` (`/api/citizen/*`) and `municipality` (`/api/municipality/*`) — never create a 3rd
+- **3 gateways**: `citizen` (`/api/citizen/*`), `municipality` (`/api/municipality/*`), `webhook` (`/api/webhook/*` — Keycloak events, pas d’auth JWT)
 - **Auth**: JWT Bearer tokens via Keycloak — validated in `src/middleware/`, never trust client-sent identity
 - **Validation**: Zod schemas in `packages/shared` — validate all request input in controllers via `safeParse()`
 - **Errors**: All errors returned as JSON to the frontend — error middleware in `src/middleware/`
+- **Réponses HTTP (contrôleurs)** : tout corps JSON renvoyé par un contrôleur doit être typé comme un **DTO défini dans `@repo/contracts`** (types exportés par le package `packages/shared/contracts`, ex. schémas Zod + `z.infer`, ou fichiers `*.dto.ts`). Ne pas exposer directement des entités domaine ou des types internes au backend. Chaque handler de contrôleur doit avoir un **type de retour explicite** : utiliser `Promise<ControllerJson<…>>` (`src/gateways/controller-json-response.ts`) — succès (`T` + code HTTP) **et** erreurs `ApiErrorDto` sur les codes client prévus par défaut ; passer `readonly []` comme 3ᵉ paramètre de `ControllerJson` si le handler ne renvoie jamais d’erreur JSON. Pour les succès, garder une variable ou annotation du **DTO de contrat** (ex. `const body: Article = …; return c.json(body)`).
 
 ### Backend Commands
 ```bash

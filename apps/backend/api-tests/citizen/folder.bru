@@ -5,36 +5,3 @@ meta {
 auth {
   mode: none
 }
-
-script:pre-request {
-  const axios = require('axios');
-  
-  // 1. Récupération des variables depuis l'environnement actif de Bruno (Local ou Dev)
-  const tokenUrl = bru.getEnvVar("tokenUrl");
-  const clientId = bru.getEnvVar("clientId");
-  const username = bru.getEnvVar("username_citizen");
-  const password = bru.getEnvVar("password_citizen");
-  
-  // Petite sécurité : si on oublie de sélectionner un environnement, on arrête
-  if (!tokenUrl || !clientId || !username || !password) {
-    console.log("⚠️ Variables d'environnement manquantes. As-tu sélectionné 'Local' ou 'Dev' ?");
-    return; 
-  }
-  
-  const data = `grant_type=password&client_id=${encodeURIComponent(clientId)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
-  
-  try {
-    // 3. Appel à Keycloak pour récupérer le token
-    const response = await axios.post(tokenUrl, data, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
-    
-    const token = response.data.access_token;
-    
-    // 4. Injection automatique du Token dans la requête
-    req.setHeader('Authorization', `Bearer ${token}`);
-    
-  } catch (error) {
-    console.error("❌ Erreur lors de la récupération du token Keycloak:", error.response ? error.response.data : error.message);
-  }
-}

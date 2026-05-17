@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap");
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
@@ -39,7 +40,7 @@
   --card-foreground: hsl(223.8136 0.0000% 3.9388%);
   --popover: hsl(223.8136 -172.5242% 100.0000%);
   --popover-foreground: hsl(223.8136 0.0000% 3.9388%);
-  --primary: hsl(223.8136 0.0000% 9.0527%);
+  --primary: #589ba0;
   --primary-foreground: hsl(223.8136 0.0004% 98.0256%);
   --secondary: hsl(223.8136 0.0002% 96.0587%);
   --secondary-foreground: hsl(223.8136 0.0000% 9.0527%);
@@ -94,14 +95,13 @@
    municipality-customizable (injected at runtime).
    ===================================================== */
 .theme-citizen {
-  --primary: hsl(223.8136 0.0000% 9.0527%);
   --primary-foreground: hsl(223.8136 0.0004% 98.0256%);
   --radius: 0.625rem;
+  font-family: "Outfit", system-ui, -apple-system, sans-serif;
 }
 
 .theme-citizen.dark,
 .theme-citizen .dark {
-  --background: hsl(223.8136 0.0000% 3.9388%);
   --foreground: hsl(223.8136 0.0004% 98.0256%);
   --card: hsl(223.8136 0.0000% 9.0527%);
   --card-foreground: hsl(223.8136 0.0004% 98.0256%);
@@ -154,9 +154,113 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
 }
 
-/* Full-page gradient computed from runtime --primary */
+/* Full-page gradient (kept for backward compat) */
 @utility citizen-bg {
-  background: linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 65%, 199 91% 37%) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    color-mix(in oklab, var(--primary) 65%, oklch(50% 0.2 250)) 100%
+  );
+}
+
+/* =====================================================
+   Citizen hero/sheet layout — mirrors citizen-app login
+   ===================================================== */
+
+/* Root full-screen flex column */
+.citizen-fullscreen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Hero section — primary gradient background */
+.citizen-hero {
+  flex: 1.45;
+  min-height: 220px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(225deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 20%),
+    linear-gradient(45deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 55%), var(--primary);
+}
+
+/* Decorative concentric rings (top-right) */
+.citizen-ring-lg {
+  position: absolute;
+  top: -11.25rem;
+  right: -10rem;
+  width: 26.25rem;
+  height: 26.25rem;
+  border-radius: 50%;
+  border: 1.2px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+.citizen-ring-sm {
+  position: absolute;
+  top: -3.75rem;
+  right: 2.5rem;
+  width: 11.25rem;
+  height: 11.25rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+/* Hero typography */
+.citizen-kicker {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.125em;
+  margin-bottom: 0.25rem;
+}
+.citizen-hero-title {
+  font-family: "Outfit", system-ui, -apple-system, sans-serif;
+  font-size: clamp(3rem, 10vw, 3.75rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.027em;
+  color: #ffffff;
+}
+
+/* Bottom sheet — white panel with curved top (mobile) */
+.citizen-sheet {
+  flex: 1;
+  background: var(--background);
+  border-top-left-radius: 1.75rem;
+  border-top-right-radius: 1.75rem;
+  margin-top: -1.375rem;
+  z-index: 2;
+  overflow-y: auto;
+}
+
+/* ── Desktop: side-by-side layout ── */
+@media (min-width: 768px) {
+  .citizen-fullscreen {
+    flex-direction: row;
+  }
+
+  .citizen-hero {
+    flex: 1;
+    min-height: 100dvh;
+  }
+
+  .citizen-hero-title {
+    font-size: clamp(3.5rem, 4.5vw, 5rem);
+  }
+
+  /* Sheet becomes a right side panel */
+  .citizen-sheet {
+    flex: 0 0 clamp(360px, 42vw, 520px);
+    min-height: 100dvh;
+    border-radius: 1.75rem 0 0 1.75rem;
+    margin-top: 0;
+    margin-left: -1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
 
 /* =====================================================
@@ -169,7 +273,6 @@
   --card-foreground: hsl(0 0% 20%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(0 0% 20%);
-  --primary: hsl(212.8 65.2174% 22.5490%);
   --primary-foreground: hsl(0 0% 100%);
   --secondary: hsl(220 14.2857% 95.8824%);
   --secondary-foreground: hsl(215 13.7931% 34.1176%);
@@ -225,7 +328,6 @@
   --card-foreground: hsl(0 0% 89.8039%);
   --popover: hsl(0 0% 14.9020%);
   --popover-foreground: hsl(0 0% 89.8039%);
-  --primary: hsl(174.7806 172.2079% 30.6843%);
   --primary-foreground: hsl(0 0% 100%);
   --secondary: hsl(0 0% 14.9020%);
   --secondary-foreground: hsl(0 0% 89.8039%);

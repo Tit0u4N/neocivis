@@ -1,0 +1,69 @@
+meta {
+  name: Scenario - Verify citizen sees USER_DELETED
+  type: http
+  seq: 939
+}
+
+get {
+  url: {{url}}/api/citizen/user/by-ids?ids={{webhookE2eDbUserId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  function getPersisted(name) {
+    const v = bru.getVar(name);
+    if (v !== undefined && v !== null && String(v) !== '') {
+      return v;
+    }
+    const e = bru.getEnvVar(name);
+    if (e !== undefined && e !== null && String(e) !== '') {
+      return e;
+    }
+    return undefined;
+  }
+
+  const dbUserId = getPersisted('webhookE2eDbUserId');
+  const tokenCitizen = getPersisted('tokenCitizen');
+  if (!dbUserId) {
+    throw new Error('Missing webhookE2eDbUserId — run scenario 933 first');
+  }
+  if (!tokenCitizen) {
+    throw new Error('Missing tokenCitizen — folder or collection pre-request did not run');
+  }
+
+  req.setHeader('Authorization', `Bearer ${tokenCitizen}`);
+  req.setUrl(`${bru.getEnvVar('url')}/api/citizen/user/by-ids?ids=${encodeURIComponent(String(dbUserId))}`);
+
+  // Laisse le temps au webhook DELETE (step 08) de finir le soft delete côté backend.
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response contains exactly one user", function() {
+    const body = res.getBody();
+    expect(body, 'expected JSON array').to.be.an('array').with.lengthOf(1);
+  });
+
+  test("Deleted user is masked with USER_DELETED in all public fields", function() {
+    const body = res.getBody();
+    const user = body[0];
+    const expectedId = Number(bru.getVar('webhookE2eDbUserId') || bru.getEnvVar('webhookE2eDbUserId'));
+    const actualUsername = user?.username;
+
+    expect(user, 'missing user in response').to.be.an('object');
+    expect(user).to.have.property('id', expectedId);
+    expect(actualUsername, `username should be USER_DELETED but was "${actualUsername}"`).to.equal('USER_DELETED');
+    expect(user.firstName, `firstName should be USER_DELETED but was "${user.firstName}"`).to.equal('USER_DELETED');
+    expect(user.lastName, `lastName should be USER_DELETED but was "${user.lastName}"`).to.equal('USER_DELETED');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

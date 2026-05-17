@@ -127,6 +127,20 @@ func start
 ```
 This will start the backend server locally, and you can access the API endpoints at `http://localhost:7071/api`.
 
+### Webhook gateway (Keycloak)
+
+A third Azure Function serves Keycloak event webhooks (no JWT / APIM auth):
+
+| Route | Description |
+|-------|-------------|
+| `POST /api/webhook/post` | Receives Keycloak events (`access.REGISTER`, `access.UPDATE`, `access.DELETE`). Any body is accepted; invalid payloads are ignored with HTTP 200. Syncs the Postgres `users` table (soft delete on `access.DELETE`). |
+
+Configure the webhook URL in Keycloak (see `scripts/setup-keycloak-webhook.ts` and `KEYCLOAK_WEBHOOK_URL`, e.g. `http://localhost:7071/api/webhook/post`).
+
+**Local E2E (Bruno `scenarios/webhook`)** : set `IN_MEMORY` to `false` in `local.settings.json`. Each gateway is a separate Azure Function; in-memory repos are not shared across `citizen`, `municipality`, and `webhook`.
+
+After schema changes, apply migrations: `bun --env-file=.env.local run db:migrate`.
+
 ### Running the backend in watch mode
 To run the backend in watch mode, which automatically restarts the server when file changes are detected, use the following command:
 ```bash

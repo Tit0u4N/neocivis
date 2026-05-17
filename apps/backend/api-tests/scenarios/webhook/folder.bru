@@ -1,0 +1,72 @@
+meta {
+  name: webhook
+  seq: 930
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  // Self-contained pour `bru run scenarios/webhook` (sans dépendre du collection.bru).
+  const axios = require('axios');
+
+  const tokenUrl = bru.getEnvVar('tokenUrl');
+  const clientId = bru.getEnvVar('clientId');
+  if (!tokenUrl || !clientId) {
+    throw new Error('Missing env vars: tokenUrl / clientId');
+  }
+
+  const passwordCitizen = bru.getEnvVar('password_citizen');
+  const passwordMunicipality = bru.getEnvVar('password_municipality');
+
+  const actors = [
+    {
+      key: 'tokenAdmin',
+      username: bru.getEnvVar('username_municipality_admin'),
+      password: passwordMunicipality,
+    },
+    {
+      key: 'tokenEmployee',
+      username: bru.getEnvVar('username_municipality_employee'),
+      password: passwordMunicipality,
+    },
+    {
+      key: 'tokenCitizen',
+      username: bru.getEnvVar('username_citizen'),
+      password: passwordCitizen,
+    },
+  ];
+
+  for (const a of actors) {
+    if (!a.username || !a.password) {
+      throw new Error(`Missing env vars for ${a.key}. Check api-tests/.env`);
+    }
+  }
+
+  const fetched = await Promise.all(
+    actors.map(async (a) => {
+      const cached = bru.getVar(a.key) || bru.getEnvVar(a.key);
+      if (cached) {
+        return { key: a.key, token: cached };
+      }
+      const body =
+        'grant_type=password' +
+        `&client_id=${encodeURIComponent(clientId)}` +
+        `&username=${encodeURIComponent(a.username)}` +
+        `&password=${encodeURIComponent(a.password)}`;
+      const resp = await axios.post(tokenUrl, body, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
+      if (!resp.data?.access_token) {
+        throw new Error(`Token fetch failed for ${a.key}`);
+      }
+      return { key: a.key, token: resp.data.access_token };
+    }),
+  );
+
+  for (const { key, token } of fetched) {
+    bru.setVar(key, token);
+    bru.setEnvVar(key, token);
+  }
+}

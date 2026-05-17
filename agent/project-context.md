@@ -141,13 +141,16 @@ Bruno information -> [api-bruno-instructions.md](api-bruno-instructions.md)
 **Architecture — 4 Layers (strict):**
 ```
 src/
-├── index.ts                  # Azure Functions entry point — 2 HTTP triggers only
+├── index.ts                  # Azure Functions entry point — 3 HTTP triggers
 ├── gateways/
 │   ├── citizen/              # Citizen gateway (Azure Function)
 │   │   ├── citizen.gateway.ts
 │   │   └── controllers/      # Route handlers, no business logic
-│   └── municipality/         # Municipality gateway (Azure Function)
-│       ├── municipality.gateway.ts
+│   ├── municipality/         # Municipality gateway (Azure Function)
+│   │   ├── municipality.gateway.ts
+│   │   └── controllers/
+│   └── webhook/              # Keycloak webhook gateway (no JWT auth)
+│       ├── webhook.gateway.ts
 │       └── controllers/
 ├── modules/                  # Business logic layer
 │   └── {feature}/
@@ -158,9 +161,10 @@ src/
 ```
 
 **Gateway Rules:**
-- EXACTLY 2 gateways: `citizen` and `municipality` — NEVER create a 3rd
+- 3 gateways: `citizen`, `municipality`, and `webhook` (Keycloak event ingestion)
 - Each gateway is a separate Azure Function with its own Hono instance
-- Gateway base paths: `/api/citizen` and `/api/municipality`
+- Gateway base paths: `/api/citizen`, `/api/municipality`, `/api/webhook`
+- `webhook` exposes `POST /post` (`/api/webhook/post`) — accepts any body; malformed payloads are ignored (200). Handles `access.REGISTER`, `access.UPDATE`, `access.DELETE` to sync the `users` table with Keycloak.
 - Gateway instantiates repositories → services → controllers in order
 - Gateway calls `app.route('/feature', controller.getRoutes())`
 
@@ -341,7 +345,7 @@ src/
 - NEVER use arbitrary Tailwind values in town-hall-web — use CSS custom properties
 - NEVER create a `pages/` directory in town-hall-web — App Router only
 - NEVER add `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock` — only `bun.lock`
-- NEVER create a 3rd Azure Function gateway — only `citizen` and `municipality`
+- NEVER add Azure Function gateways beyond `citizen`, `municipality`, and `webhook`
 - NEVER write business logic in controllers — it belongs in services
 - NEVER access data directly from services — always go through repositories
 - NEVER define Zod schemas in the backend app — put them in `packages/shared`

@@ -14,6 +14,7 @@ describe('UserService', () => {
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       role: 'CITIZEN' as const,
+      deletedAt: null,
     },
     {
       id: 2,
@@ -25,6 +26,7 @@ describe('UserService', () => {
       createdAt: new Date('2026-01-02T00:00:00.000Z'),
       updatedAt: new Date('2026-01-02T00:00:00.000Z'),
       role: 'EMPLOYEE' as const,
+      deletedAt: null,
     },
   ];
 

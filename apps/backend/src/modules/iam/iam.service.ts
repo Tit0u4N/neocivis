@@ -44,4 +44,16 @@ export interface IAMService {
    * Doit throw si non configuré / échec Keycloak (on bloque).
    */
   deleteUser(userId: string): Promise<void>;
+
+  /**
+   * Assigne des realm roles à un utilisateur existant.
+   * No-op si non configuré. Throw si Keycloak échoue.
+   */
+  assignRealmRoles(userId: string, realmRoles: string[]): Promise<void>;
+
+  /**
+   * Vérifie que l'utilisateur n'existe plus dans Keycloak (404 par id ou recherche username vide).
+   * Retourne `true` si IAM non configuré (impossible de vérifier).
+   */
+  isUserAbsentFromKeycloak(userId: string, username?: string): Promise<boolean>;
 }

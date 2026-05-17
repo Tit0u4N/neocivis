@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/suspicious/useAwait: <explanation> */
+/** biome-ignore-all lint/suspicious/useAwait: Test file */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { IAMService } from '@/modules/iam/iam.service';
 import type { UserService } from '@/modules/users/service/user.service';
@@ -15,6 +15,7 @@ function makeUser(overrides: Partial<User> & Pick<User, 'id' | 'role' | 'keycloa
     lastName: '',
     createdAt: now,
     updatedAt: now,
+    deletedAt: null,
     ...overrides,
   };
 }

@@ -184,8 +184,8 @@ export class KeycloakIAMService implements IAMService {
       const text = await res.text();
       throw new Error(`Keycloak role fetch failed: HTTP ${res.status} ${res.statusText}\n${text}`);
     }
-    const json = await res.json() as Record<string, unknown>;
-    return (json) as Record<string, unknown>;
+    const json = (await res.json()) as Record<string, unknown>;
+    return json as Record<string, unknown>;
   }
 
   private async sendPasswordSetupEmail(env: KeycloakEnv, token: string, userId: string): Promise<void> {
@@ -275,6 +275,79 @@ export class KeycloakIAMService implements IAMService {
     await this.sendPasswordSetupEmail(env, token, created.id);
 
     return created;
+  }
+
+  async assignRealmRoles(userId: string, realmRoles: string[]): Promise<void> {
+    const env = this.getEnv();
+    if (!env || realmRoles.length === 0) {
+      return;
+    }
+
+    const token = await this.getAdminToken(env);
+    const roleReps = await Promise.all(
+      realmRoles.map(async (r) => await this.getRealmRoleRepresentation(env, token, r)),
+    );
+    const roleUrl = `${env.baseUrl}admin/realms/${encodeURIComponent(env.realm)}/users/${encodeURIComponent(
+      userId,
+    )}/role-mappings/realm`;
+    const roleRes = await fetch(roleUrl, {
+      method: 'POST',
+      // biome-ignore lint/style/useNamingConvention: HTTP header name
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(roleReps),
+    });
+    if (!roleRes.ok) {
+      const text = await roleRes.text();
+      throw new Error(`Keycloak role assign failed: HTTP ${roleRes.status} ${roleRes.statusText}\n${text}`);
+    }
+  }
+
+  async isUserAbsentFromKeycloak(userId: string, username?: string): Promise<boolean> {
+    const env = this.getEnv();
+    if (!env) {
+      return true;
+    }
+
+    const token = await this.getAdminToken(env);
+
+    if (username) {
+      const searchUrl = new URL(`${env.baseUrl}admin/realms/${encodeURIComponent(env.realm)}/users`);
+      searchUrl.searchParams.set('username', username);
+      searchUrl.searchParams.set('exact', 'true');
+      searchUrl.searchParams.set('max', '2');
+
+      const searchRes = await fetch(searchUrl, {
+        method: 'GET',
+        // biome-ignore lint/style/useNamingConvention: HTTP header name
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!searchRes.ok) {
+        return false;
+      }
+
+      const json = (await searchRes.json()) as unknown;
+      if (!Array.isArray(json) || json.length === 0) {
+        return true;
+      }
+
+      return !json.some((entry) => {
+        if (typeof entry !== 'object' || entry === null) {
+          return false;
+        }
+        const record = entry as Record<string, unknown>;
+        return record.id === userId;
+      });
+    }
+
+    const url = `${env.baseUrl}admin/realms/${encodeURIComponent(env.realm)}/users/${encodeURIComponent(userId)}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      // biome-ignore lint/style/useNamingConvention: HTTP header name
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return res.status === 404;
   }
 
   async deleteUser(userId: string): Promise<void> {

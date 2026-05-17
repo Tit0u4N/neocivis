@@ -2,6 +2,8 @@ export type { BaseUserRole } from '@repo/contracts';
 
 import type { BaseUserRole, UserMeDto, UserPublicDto } from '@repo/contracts';
 
+export const USER_DELETED_PLACEHOLDER = 'USER_DELETED';
+
 export type User = {
   id: number;
   keycloakId: string;
@@ -12,6 +14,7 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   role: BaseUserRole;
+  deletedAt: Date | null;
 };
 
 export function toUserPublicDto(user: User): UserPublicDto {
@@ -21,6 +24,19 @@ export function toUserPublicDto(user: User): UserPublicDto {
     firstName: user.firstName,
     lastName: user.lastName,
   };
+}
+
+/** Masque les utilisateurs supprimés pour les vues citoyen (ex. `/user/by-ids`). */
+export function toUserPublicDtoForCitizen(user: User): UserPublicDto {
+  if (user.deletedAt !== null) {
+    return {
+      id: user.id,
+      username: USER_DELETED_PLACEHOLDER,
+      firstName: USER_DELETED_PLACEHOLDER,
+      lastName: USER_DELETED_PLACEHOLDER,
+    };
+  }
+  return toUserPublicDto(user);
 }
 
 export function toUserMeDto(user: User): UserMeDto {

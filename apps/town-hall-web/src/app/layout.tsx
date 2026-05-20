@@ -11,6 +11,7 @@ import { I18nProvider } from '@/components/I18nProvider';
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { Button } from '@/components/ui/button';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
 import { ApiProvider } from '@/providers/ApiProvider';
 import { AuthProvider } from '@/providers/AuthProvider';
 
@@ -73,6 +74,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               </AuthGate>
             </AuthProvider>
           </AppProvider>
+          <Toaster />
         </I18nProvider>
       </body>
     </html>

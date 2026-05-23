@@ -15,7 +15,7 @@ const userService = new UserService(userRepository, iamService);
 const webhookService = new WebhookService(userService);
 const webhookController = new WebhookController(webhookService);
 
-const app = new Hono().basePath('/api/webhook');
+const app = new Hono().basePath('/webhook');
 
 applyCorsMiddleware(app);
 applyDbMiddleware(app);

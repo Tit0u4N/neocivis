@@ -21,7 +21,7 @@ const webhookRoutes = webhookController.getRoutes();
 applyCorsMiddleware(app);
 applyDbMiddleware(app);
 // APIM (déploiement) : /webhook/post — Azure Functions local : /api/webhook/post
-app.route('/webhook', webhookRoutes);
+app.route('/api-webhook/webhook', webhookRoutes);
 app.route('/api/webhook', webhookRoutes);
 
 export default app;

@@ -116,7 +116,7 @@ async function main(): Promise<void> {
   const payload = {
     url: env.webhookUrl,
     enabled: true,
-    eventTypes: ['access.REGISTER', 'access.UPDATE', 'access.DELETE'],
+    eventTypes: ['access.REGISTER', 'access.UPDATE', 'access.DELETE', "access.UPDATE_PROFILE"],
   };
 
   const createHeaders = new Headers();

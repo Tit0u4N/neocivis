@@ -15,10 +15,13 @@ const userService = new UserService(userRepository, iamService);
 const webhookService = new WebhookService(userService);
 const webhookController = new WebhookController(webhookService);
 
-const app = new Hono().basePath('/api/webhook');
+const app = new Hono();
+const webhookRoutes = webhookController.getRoutes();
 
 applyCorsMiddleware(app);
 applyDbMiddleware(app);
-app.route('/', webhookController.getRoutes());
+// APIM (déploiement) : /webhook/post — Azure Functions local : /api/webhook/post
+app.route('/api-webhook/webhook', webhookRoutes);
+app.route('/api/webhook', webhookRoutes);
 
 export default app;

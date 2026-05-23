@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const KEYCLOAK_WEBHOOK_EVENT_TYPES = ['access.REGISTER', 'access.UPDATE', 'access.DELETE'] as const;
+export const KEYCLOAK_WEBHOOK_EVENT_TYPES = ['access.REGISTER', 'access.UPDATE', 'access.DELETE', 'access.UPDATE_PROFILE'] as const;
 
 export type KeycloakWebhookEventType = (typeof KEYCLOAK_WEBHOOK_EVENT_TYPES)[number];
 

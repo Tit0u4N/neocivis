@@ -10,7 +10,8 @@ export class WebhookService {
         await this.userService.handleKeycloakRegister(keycloakUserId);
         return;
       case 'access.UPDATE':
-        await this.userService.handleKeycloakUpdate(keycloakUserId);
+      case 'access.UPDATE_PROFILE':
+      await this.userService.handleKeycloakUpdate(keycloakUserId);
         return;
       case 'access.DELETE':
         await this.userService.handleKeycloakDelete(keycloakUserId, username);

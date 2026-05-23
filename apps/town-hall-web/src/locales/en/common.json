@@ -363,5 +363,52 @@
       "Violet": "Purple"
     },
     "newTileTitle": "New"
+  },
+  "reports": {
+    "title": "Reports",
+    "export": "Export",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "resolved": "Resolved"
+    },
+    "tabs": {
+      "pending": "Pending reports",
+      "history": "History"
+    },
+    "view": {
+      "table": "Table view",
+      "map": "Map view"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Title",
+      "category": "Category",
+      "location": "Location",
+      "date": "Date",
+      "status": "Status",
+      "author": "Author",
+      "resolvedBy": "Resolved by",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "progress": "In progress",
+      "resolved": "Resolved",
+      "cancelled": "Cancelled"
+    },
+    "map": {
+      "placeholder": "Interactive map view — {{count}} report(s)"
+    },
+    "actions": {
+      "detail": "Detail"
+    },
+    "detail": {
+      "description": "Description",
+      "resolvedAt": "Resolved on"
+    },
+    "empty": "No reports",
+    "error": "Unable to load reports"
   }
 }

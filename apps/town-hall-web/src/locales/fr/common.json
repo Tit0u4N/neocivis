@@ -363,5 +363,52 @@
       "Violet": "Violet"
     },
     "newTileTitle": "Nouveau"
+  },
+  "reports": {
+    "title": "Signalements",
+    "export": "Exporter",
+    "stats": {
+      "total": "Total",
+      "pending": "En attente",
+      "inProgress": "En cours",
+      "resolved": "Résolu"
+    },
+    "tabs": {
+      "pending": "Signalements en cours",
+      "history": "Historique"
+    },
+    "view": {
+      "table": "Vue tableau",
+      "map": "Vue carte"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Titre",
+      "category": "Catégorie",
+      "location": "Localisation",
+      "date": "Date",
+      "status": "Statut",
+      "author": "Auteur",
+      "resolvedBy": "Traité par",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "En attente",
+      "progress": "En cours",
+      "resolved": "Résolu",
+      "cancelled": "Annulé"
+    },
+    "map": {
+      "placeholder": "Vue carte interactive — {{count}} signalement(s)"
+    },
+    "actions": {
+      "detail": "Détail"
+    },
+    "detail": {
+      "description": "Description",
+      "resolvedAt": "Résolu le"
+    },
+    "empty": "Aucun signalement",
+    "error": "Impossible de charger les signalements"
   }
 }

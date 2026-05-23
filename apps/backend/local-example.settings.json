@@ -12,6 +12,8 @@
     "KEYCLOAK_REALM": "neocivis-dev",
     "KEYCLOAK_CLIENT_ID": "hono-backend",
     "KEYCLOAK_CLIENT_SECRET": "replace-me",
+    "KEYCLOAK_PASSWORD_SETUP_CLIENT_ID": "neocivis-townhall-app",
+    "KEYCLOAK_PASSWORD_SETUP_REDIRECT_URI": "http://localhost:3000",
 
     "DATABASE_URL": "postgresql://user:password@localhost:5432/neocivis-data",
 

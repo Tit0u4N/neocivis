@@ -86,4 +86,88 @@ export class UserService {
   async setNextId(nextId: number): Promise<void> {
     await this.repository.setNextId(nextId);
   }
+
+  /**
+   * access.REGISTER : vérifie Keycloak, assigne le rôle realm CITIZEN, crée l'utilisateur en base.
+   * Ne fait rien si l'utilisateur n'existe pas dans Keycloak.
+   */
+  async handleKeycloakRegister(keycloakId: string): Promise<void> {
+    const profile = await this.iamService.getUserProfileById(keycloakId);
+    if (!profile) {
+      return;
+    }
+
+    await this.iamService.assignRealmRoles(keycloakId, ['CITIZEN']);
+
+    const existing = await this.repository.getByKeycloakId(keycloakId);
+    if (existing) {
+      if (existing.deletedAt !== null) {
+        return;
+      }
+      await this.repository.updateProfile({
+        keycloakId,
+        username: profile.username ?? '',
+        email: profile.email ?? '',
+        firstName: profile.firstName ?? '',
+        lastName: profile.lastName ?? '',
+      });
+      return;
+    }
+
+    await this.repository.insertCitizenFromKeycloak({
+      keycloakId,
+      username: profile.username ?? '',
+      email: profile.email ?? '',
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
+    });
+  }
+
+  /**
+   * access.UPDATE : met à jour nom / email depuis Keycloak (pas le rôle).
+   */
+  async handleKeycloakUpdate(keycloakId: string): Promise<void> {
+    const profile = await this.iamService.getUserProfileById(keycloakId);
+    if (!profile) {
+      return;
+    }
+
+    const existing = await this.repository.getByKeycloakId(keycloakId);
+    if (!existing || existing.deletedAt !== null) {
+      return;
+    }
+
+    await this.repository.updateProfile({
+      keycloakId,
+      username: profile.username ?? existing.username,
+      email: profile.email ?? existing.email,
+      firstName: profile.firstName ?? existing.firstName,
+      lastName: profile.lastName ?? existing.lastName,
+    });
+  }
+
+  /**
+   * access.DELETE : marque l'utilisateur supprimé (soft delete) seulement si Keycloak
+   * confirme que l'utilisateur n'existe plus (le webhook seul n'est pas une source de vérité).
+   * Keycloak peut mettre quelques secondes à propager la suppression → poll court.
+   */
+  async handleKeycloakDelete(keycloakId: string, username?: string): Promise<void> {
+    const maxAttempts = 20;
+    const delayMs = 500;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const absent = await this.iamService.isUserAbsentFromKeycloak(keycloakId, username);
+      if (absent) {
+        const existing = await this.repository.getByKeycloakId(keycloakId);
+        if (!existing) {
+          return;
+        }
+        await this.repository.markDeletedByKeycloakId(keycloakId);
+        return;
+      }
+      if (attempt < maxAttempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+  }
 }

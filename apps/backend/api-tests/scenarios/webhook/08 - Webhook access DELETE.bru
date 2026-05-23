@@ -1,0 +1,97 @@
+meta {
+  name: Scenario - Webhook access DELETE (Bruno as Keycloak)
+  type: http
+  seq: 938
+}
+
+post {
+  url: {{url}}/api/webhook/post
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "time": {{$timestamp}},
+    "realmId": "{{keycloakAdminRealm}}",
+    "uid": "{{$randomUUID}}",
+    "authDetails": {
+      "realmId": "{{keycloakAdminRealm}}",
+      "clientId": "neocivis-townhall-app",
+      "userId": "{{webhookE2eKeycloakId}}",
+      "ipAddress": "127.0.0.1",
+      "username": "{{webhookE2eUsername}}"
+    },
+    "type": "access.DELETE",
+    "details": {
+      "username": "{{webhookE2eUsername}}"
+    }
+  }
+}
+
+script:pre-request {
+  function getPersisted(name) {
+    const v = bru.getVar(name);
+    if (v !== undefined && v !== null && String(v) !== '') {
+      return v;
+    }
+    const e = bru.getEnvVar(name);
+    if (e !== undefined && e !== null && String(e) !== '') {
+      return e;
+    }
+    return undefined;
+  }
+
+  const keycloakId = getPersisted('webhookE2eKeycloakId');
+  if (!keycloakId) {
+    throw new Error('Missing webhookE2eKeycloakId');
+  }
+
+  if (getPersisted('webhookE2eKeycloakDeleteSent') !== 'true') {
+    throw new Error('Run scenario 937 first (Keycloak DELETE must return 204)');
+  }
+
+  // Pas de poll Keycloak ici : le backend poll avant le soft delete (évite le blocage UI/CLI).
+}
+
+script:post-response {
+  const axios = require('axios');
+  if (res.getStatus() !== 200) {
+    return;
+  }
+
+  const baseUrl = bru.getEnvVar('url');
+  const dbUserId = bru.getVar('webhookE2eDbUserId') || bru.getEnvVar('webhookE2eDbUserId');
+  const tokenCitizen = bru.getVar('tokenCitizen') || bru.getEnvVar('tokenCitizen');
+  if (!baseUrl || !dbUserId || !tokenCitizen) {
+    return;
+  }
+
+  for (let attempt = 0; attempt < 15; attempt += 1) {
+    const check = await axios.get(`${baseUrl}/api/citizen/user/by-ids?ids=${encodeURIComponent(String(dbUserId))}`, {
+      headers: { Authorization: `Bearer ${tokenCitizen}` },
+      validateStatus: () => true,
+    });
+    if (check.status === 200 && Array.isArray(check.data) && check.data[0]?.username === 'USER_DELETED') {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  console.warn('[webhook] USER_DELETED not visible yet — backend may still be polling Keycloak');
+}
+
+tests {
+  test("Webhook accepts DELETE payload", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('accepted', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

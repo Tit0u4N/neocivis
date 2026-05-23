@@ -1,0 +1,108 @@
+meta {
+  name: Scenario - Admin creates E2E employee
+  type: http
+  seq: 921
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "username": "{{e2eNewEmployeeUsername}}",
+    "email": "{{e2eNewEmployeeEmail}}",
+    "firstName": "Bruno",
+    "lastName": "E2E"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  const adminAuth = `Bearer ${adminToken}`;
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city context');
+  }
+  bru.setVar('cityNiceId', cityId);
+
+  const suffix = Date.now();
+  const username = `e2e-employee-${suffix}`;
+  const email = `e2e-employee-${suffix}@bruno.test`;
+
+  bru.setVar('e2eNewEmployeeUsername', username);
+  bru.setVar('e2eNewEmployeeEmail', email);
+
+  // Hygiène : supprime un éventuel employé E2E orphelin d'un run précédent.
+  const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, {
+    headers: { Authorization: adminAuth },
+  });
+  const stale = (employees.data || []).filter((u) => typeof u.username === 'string' && u.username.startsWith('e2e-employee-'));
+  for (const user of stale) {
+    try {
+      await axios.delete(`${baseUrl}/api/municipality/cities/${cityId}/employees/${user.id}`, {
+        headers: { Authorization: adminAuth },
+      });
+    } catch (_err) {
+      // ignore — peut déjà être absent côté IAM.
+    }
+  }
+
+  req.setHeader('Authorization', adminAuth);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees`);
+  req.setBody(
+    JSON.stringify({
+      username,
+      email,
+      firstName: 'Bruno',
+      lastName: 'E2E',
+    }),
+  );
+}
+
+script:post-response {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  const cityId = bru.getVar('cityNiceId');
+  const username = bru.getVar('e2eNewEmployeeUsername');
+  if (!baseUrl || !adminToken || !cityId || !username) {
+    return;
+  }
+  const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+  });
+  const created = (employees.data || []).find((u) => u.username === username);
+  if (created?.id) {
+    bru.setVar('e2eNewEmployeeId', String(created.id));
+  }
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Returns OperationSuccessDto", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('success', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

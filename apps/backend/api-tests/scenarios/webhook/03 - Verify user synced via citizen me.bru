@@ -1,0 +1,70 @@
+meta {
+  name: Scenario - Verify user synced via citizen me
+  type: http
+  seq: 933
+}
+
+get {
+  url: {{url}}/api/citizen/user/me
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const tokenUrl = bru.getEnvVar('tokenUrl');
+  const clientId = bru.getEnvVar('clientId');
+  const username = bru.getVar('webhookE2eUsername') || bru.getEnvVar('webhookE2eUsername');
+  const password = bru.getVar('webhookE2ePassword') || bru.getEnvVar('webhookE2ePassword');
+  if (!username || !password) {
+    throw new Error('Missing webhook E2E credentials — run scenario 931 first');
+  }
+
+  const body =
+    'grant_type=password' +
+    `&client_id=${encodeURIComponent(clientId)}` +
+    `&username=${encodeURIComponent(username)}` +
+    `&password=${encodeURIComponent(password)}`;
+  const resp = await axios.post(tokenUrl, body, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+  if (!resp.data?.access_token) {
+    throw new Error('E2E citizen password grant failed — user may not exist in Keycloak');
+  }
+  bru.setVar('webhookE2eCitizenToken', resp.data.access_token);
+  bru.setEnvVar('webhookE2eCitizenToken', resp.data.access_token);
+  req.setHeader('Authorization', `Bearer ${resp.data.access_token}`);
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body?.id) {
+    const id = String(body.id);
+    bru.setVar('webhookE2eDbUserId', id);
+    bru.setEnvVar('webhookE2eDbUserId', id);
+  }
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("User exists in DB with CITIZEN role and profile from Keycloak", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('username', bru.getVar('webhookE2eUsername'));
+    expect(body).to.have.property('email', bru.getVar('webhookE2eEmail'));
+    expect(body).to.have.property('firstName', bru.getVar('webhookE2eFirstName'));
+    expect(body).to.have.property('lastName', bru.getVar('webhookE2eLastName'));
+    expect(body).to.have.property('role', 'CITIZEN');
+    expect(body).to.have.property('id').that.is.a('number');
+    const id = String(body.id);
+    bru.setVar('webhookE2eDbUserId', id);
+    bru.setEnvVar('webhookE2eDbUserId', id);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

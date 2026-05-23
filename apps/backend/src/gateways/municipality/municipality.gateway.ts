@@ -83,7 +83,6 @@ applyRoleMiddleware(app, ['EMPLOYEE', 'ADMIN']);
 // Register routes from controllers
 app.route('/user', userController.getRoutes());
 app.route('/permissions', accessController.getCatalogRoutes());
-app.route('/articles', articleController.getRoutes());
 app.route('/config', municipalityConfigController.getRoutes());
 app.route('/uploads', uploadController.getRoutes());
 app.route('/media', mediaController.getRoutes());

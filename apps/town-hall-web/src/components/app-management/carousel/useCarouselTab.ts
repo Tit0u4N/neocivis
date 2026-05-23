@@ -41,7 +41,7 @@ export function useCarouselTab(): CarouselTabViewModel {
   const { t } = useTranslation();
   const api = useApi();
   const cityId = useCityStore((s) => s.cityId);
-  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
+  const configService = useMemo(() => (cityId ? new ConfigService(api, cityId) : null), [api, cityId]);
 
   const [carousel, setCarousel] = useState<CarouselItem[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');
@@ -55,6 +55,9 @@ export function useCarouselTab(): CarouselTabViewModel {
   const selectedSlide = carousel.find((s) => s.id === selectedId) ?? carousel[0] ?? null;
 
   useEffect(() => {
+    if (!configService) {
+      return;
+    }
     configService
       .getMunicipalityConfig()
       .then((data) => {
@@ -69,6 +72,9 @@ export function useCarouselTab(): CarouselTabViewModel {
   }, [configService]);
 
   const saveConfig = useCallback(async () => {
+    if (!configService) {
+      return;
+    }
     setIsSaving(true);
     setSaveError(null);
     try {

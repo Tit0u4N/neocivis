@@ -6,8 +6,9 @@ import type { MediaImage } from '@repo/contracts/media';
 import { ArticleService } from '@repo/frontend-services/article';
 import { UploadService } from '@repo/frontend-services/upload';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useApi } from '@/providers/ApiProvider';
+import { useCityStore } from '@/stores/city.store';
 
 type FormState = {
   title: string;
@@ -30,7 +31,8 @@ type FormErrors = Partial<Record<keyof FormState, string>>;
 export function useArticleFormPage(id?: string) {
   const router = useRouter();
   const api = useApi();
-  const articleService = new ArticleService(api);
+  const cityId = useCityStore((s) => s.cityId);
+  const articleService = useMemo(() => new ArticleService(api, cityId ?? ''), [api, cityId]);
   const uploadService = new UploadService(api);
   const isEditing = id !== undefined;
 

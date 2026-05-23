@@ -1,17 +1,15 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 type CityStore = {
-  cityId: string;
-  setCityId: (cityId: string) => void;
+  cityId: string | null;
+  cityName: string | null;
+  setCity: (cityId: string, cityName: string) => void;
+  clearCity: () => void;
 };
 
-export const useCityStore = create<CityStore>()(
-  persist(
-    (set) => ({
-      cityId: 'CITY_TEST_ID',
-      setCityId: (cityId) => set({ cityId }),
-    }),
-    { name: 'neocivis-city' },
-  ),
-);
+export const useCityStore = create<CityStore>()((set) => ({
+  cityId: null,
+  cityName: null,
+  setCity: (cityId, cityName) => set({ cityId, cityName }),
+  clearCity: () => set({ cityId: null, cityName: null }),
+}));

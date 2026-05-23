@@ -16,6 +16,10 @@ vi.mock('@/providers/ApiProvider', () => ({
   useApi: () => ({}),
 }));
 
+vi.mock('@/stores/city.store', () => ({
+  useCityStore: (sel: (s: { cityId: string | null }) => unknown) => sel({ cityId: 'NIC_00001' }),
+}));
+
 const mockArticleService = {
   getAll: vi.fn(),
   delete: vi.fn(),

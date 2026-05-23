@@ -282,7 +282,7 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   const defaultLocale = useConfigStore((s) => s.defaultLocale);
   const api = useApi();
   const cityId = useCityStore((s) => s.cityId);
-  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
+  const configService = useMemo(() => (cityId ? new ConfigService(api, cityId) : null), [api, cityId]);
 
   const [blocks, setBlocks] = useState<AppTile[]>(initBlocks);
   const [selectedId, setSelectedId] = useState<string>('alaune');
@@ -309,6 +309,9 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   }, []);
 
   useEffect(() => {
+    if (!configService) {
+      return;
+    }
     configService
       .getMunicipalityConfig()
       .then((data) => resetToData(data.categories.map(categoryToTile)))
@@ -317,6 +320,9 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   }, [configService, resetToData]);
 
   const saveConfig = useCallback(async () => {
+    if (!configService) {
+      return;
+    }
     setIsSaving(true);
     setSaveError(null);
     try {

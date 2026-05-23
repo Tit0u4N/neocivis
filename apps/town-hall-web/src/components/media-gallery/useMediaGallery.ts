@@ -52,7 +52,12 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   const { t } = useTranslation();
   const api = useApi();
   const cityId = useCityStore((s) => s.cityId);
-  const mediaService = useMemo(() => new MediaService(api, cityId), [api, cityId]);
+  const mediaService = useMemo(() => {
+    if (!cityId) {
+      return null;
+    }
+    return new MediaService(api, cityId);
+  }, [api, cityId]);
 
   const [mediaList, setMediaList] = useState<MediaImage[]>([]);
   const [search, setSearch] = useState('');
@@ -68,6 +73,9 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!mediaService) {
+      return;
+    }
     let cancelled = false;
     setIsLoading(true);
     mediaService
@@ -145,7 +153,7 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   }, []);
 
   const confirmUpload = useCallback(() => {
-    if (!pendingFile) {
+    if (!(pendingFile && mediaService)) {
       return;
     }
     setIsUploading(true);
@@ -169,7 +177,7 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   const closeDeleteDialog = useCallback(() => setDeleteTarget(null), []);
 
   const confirmDelete = useCallback(() => {
-    if (!deleteTarget) {
+    if (!(deleteTarget && mediaService)) {
       return;
     }
     const id = deleteTarget.id;

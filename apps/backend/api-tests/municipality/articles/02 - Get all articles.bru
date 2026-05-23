@@ -5,17 +5,29 @@ meta {
 }
 
 get {
-  url: {{url}}/api/municipality/articles
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/articles
   body: none
   auth: none
 }
 
 script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
   const token = bru.getVar('tokenAdmin');
   if (!token) {
     throw new Error('Missing tokenAdmin — collection pre-request did not run.');
   }
   req.setHeader('Authorization', `Bearer ${token}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city in /user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/articles`);
 }
 
 script:post-response {
@@ -28,7 +40,7 @@ script:post-response {
     expect(body).to.be.an('array');
   });
 
-  test("Seeded mock articles are present", function() {
+  test("Seeded mock articles are present for Nice", function() {
     const body = res.getBody();
     const ids = body.map((a) => a.id);
 
@@ -36,6 +48,7 @@ script:post-response {
     expect(ids).to.include('22222222-2222-2222-2222-222222222222');
     expect(ids).to.include('33333333-3333-3333-3333-333333333333');
     expect(ids).to.include('44444444-4444-4444-4444-444444444444');
+    expect(body.every((a) => a.cityId === bru.getVar('cityNiceId'))).to.be.true;
   });
 }
 

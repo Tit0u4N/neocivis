@@ -36,6 +36,17 @@ export class CosmosArticleRepository implements IArticleRepository {
     return resources;
   }
 
+  async findAllByCityId(cityId: string): Promise<Article[]> {
+    const container = await this.getContainer();
+    const { resources } = await container.items
+      .query<Article>({
+        query: 'SELECT * FROM c WHERE c.cityId = @cityId',
+        parameters: [{ name: '@cityId', value: cityId }],
+      })
+      .fetchAll();
+    return resources;
+  }
+
   async findAllPublished(): Promise<Article[]> {
     const container = await this.getContainer();
     const { resources } = await container.items
@@ -56,11 +67,32 @@ export class CosmosArticleRepository implements IArticleRepository {
     return resources[0];
   }
 
+  async findByIdAndCityId(id: string, cityId: string): Promise<Article | undefined> {
+    const container = await this.getContainer();
+    const { resources } = await container.items
+      .query<Article>({
+        query: 'SELECT * FROM c WHERE c.id = @id AND c.cityId = @cityId',
+        parameters: [
+          { name: '@id', value: id },
+          { name: '@cityId', value: cityId },
+        ],
+      })
+      .fetchAll();
+    return resources[0];
+  }
+
   async create(
-    input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
+    input: CreateArticleInput & {
+      id: string;
+      cityId: string;
+      authorId: string;
+      createdAt: string;
+      updatedAt: string;
+    },
   ): Promise<Article> {
     const article: Article = {
       id: input.id,
+      cityId: input.cityId,
       translations: [input.translation],
       coverImageUrl: input.coverImageUrl,
       status: input.status ?? 'draft',

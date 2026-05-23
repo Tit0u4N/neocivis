@@ -18,6 +18,10 @@ vi.mock('@/providers/ApiProvider', () => ({
   useApi: () => ({}),
 }));
 
+vi.mock('@/stores/city.store', () => ({
+  useCityStore: (sel: (s: { cityId: string | null }) => unknown) => sel({ cityId: 'NIC_00001' }),
+}));
+
 vi.mock('@repo/frontend-services/article', async () => {
   const { mockArticleService: instance } = await import('@repo/frontend-services/testing');
   return {

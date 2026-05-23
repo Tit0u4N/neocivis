@@ -20,7 +20,7 @@ export type AutoSeedDeps = {
   cityRepository: ICityRepository;
   iamService: IAMService;
   accessService: AccessService;
-  mediaRepository: IMediaRepository;
+  mediaRepository?: IMediaRepository;
 };
 
 const AUTO_SEED_GLOBAL_KEY = '__neocivis_auto_seed_started__';
@@ -57,7 +57,7 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     new UserSeeder(deps.userService),
     new CitySeeder(deps.cityRepository, cityService, deps.userService),
     new AccessSeeder(deps.accessService, cityService),
-    new ArticleSeeder(deps.articleRepository),
+    new ArticleSeeder(deps.articleRepository, cityService),
   ];
 
   if (deps.mediaRepository) {

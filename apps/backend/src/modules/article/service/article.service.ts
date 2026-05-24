@@ -10,10 +10,14 @@ import type {
   UpdateArticleInput,
   UpdateStatusInput,
 } from '@repo/contracts/article';
+import type { MediaLinkService } from '@/modules/media/service/media-link.service';
 import type { IArticleRepository } from '../repository/article.repository.interface';
 
 export class ArticleService {
-  constructor(private repository: IArticleRepository) {}
+  constructor(
+    private repository: IArticleRepository,
+    private mediaLinkService?: MediaLinkService,
+  ) {}
 
   getAllArticles(cityId: string): Promise<Article[]> {
     return this.repository.findAllByCityId(cityId);
@@ -31,9 +35,9 @@ export class ArticleService {
     return article;
   }
 
-  createArticle(cityId: string, input: CreateArticleInput, authorId: string): Promise<Article> {
+  async createArticle(cityId: string, input: CreateArticleInput, authorId: string): Promise<Article> {
     const translation = { ...input.translation, locale: 'fr' as const };
-    return this.repository.create({
+    const article = await this.repository.create({
       ...input,
       translation,
       id: randomUUID(),
@@ -42,24 +46,50 @@ export class ArticleService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
+    await this.syncMediaLinks(article);
+    return article;
   }
 
   async updateArticle(cityId: string, id: string, input: UpdateArticleInput): Promise<Article> {
     const existing = await this.getArticleById(cityId, id);
-    const updated = await this.repository.update(id, {
+    let translations = existing.translations;
+
+    if (input.translation) {
+      const locale = input.translation.locale ?? 'fr';
+      const index = translations.findIndex((t) => t.locale === locale);
+      if (index === -1) {
+        translations = [...translations, { ...input.translation, locale } as ArticleTranslation];
+      } else {
+        translations = translations.map((t, i) =>
+          i === index ? ({ ...t, ...input.translation, locale: t.locale } as ArticleTranslation) : t,
+        );
+      }
+    }
+
+    const status = input.status ?? existing.status;
+    const patch: Partial<Article> = {
       ...existing,
+      translations,
       coverImageUrl: input.coverImageUrl ?? existing.coverImageUrl,
-      status: input.status ?? existing.status,
+      status,
       updatedAt: new Date().toISOString(),
-    });
+    };
+
+    if (status === 'published' && existing.status !== 'published') {
+      patch.publishedAt = new Date().toISOString();
+    }
+
+    const updated = await this.repository.update(id, patch);
     if (!updated) {
       throw new Error(`Article not found: ${id}`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
   }
 
   async deleteArticle(cityId: string, id: string): Promise<void> {
     await this.getArticleById(cityId, id);
+    await this.mediaLinkService?.removeArticleMediaLinks(cityId, id);
     const deleted = await this.repository.delete(id);
     if (!deleted) {
       throw new Error(`Article not found: ${id}`);
@@ -92,6 +122,7 @@ export class ArticleService {
     if (!updated) {
       throw new Error(`Article not found: ${id}`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
   }
 
@@ -106,6 +137,7 @@ export class ArticleService {
     if (!updated) {
       throw new Error(`Translation for locale '${locale}' not found on article '${id}'`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
   }
 
@@ -118,7 +150,12 @@ export class ArticleService {
     if (!updated) {
       throw new Error(`Translation for locale '${locale}' not found on article '${id}'`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
+  }
+
+  private async syncMediaLinks(article: Article): Promise<void> {
+    await this.mediaLinkService?.syncArticleMediaLinks(article);
   }
 
   private resolveTranslation(translations: ArticleTranslation[], preferredLocale: ArticleLocale): ArticleTranslation {

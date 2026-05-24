@@ -25,16 +25,8 @@ vi.mock('@/stores/city.store', () => ({
 vi.mock('@repo/frontend-services/article', async () => {
   const { mockArticleService: instance } = await import('@repo/frontend-services/testing');
   return {
+    // biome-ignore lint/style/useNamingConvention: mocked module export name
     ArticleService: vi.fn(function (this: any) {
-      return instance;
-    }),
-  };
-});
-
-vi.mock('@repo/frontend-services/upload', async () => {
-  const { mockUploadService: instance } = await import('@repo/frontend-services/testing');
-  return {
-    UploadService: vi.fn(function (this: any) {
       return instance;
     }),
   };

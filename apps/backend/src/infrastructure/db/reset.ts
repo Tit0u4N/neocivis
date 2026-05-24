@@ -3,8 +3,9 @@
  *
  * Choices:
  * - Postgres/Drizzle only
- * - Cosmos only
- * - Both
+ * - Cosmos only (+ Azure Blob media when configured)
+ * - Both (+ blob with Cosmos)
+ * - Blob only (`--blob`)
  *
  * Destructive: requires explicit `--confirm`.
  */
@@ -15,6 +16,7 @@ import { createInterface } from 'node:readline/promises';
 
 import dotenv from 'dotenv';
 import { optionalEnv } from '@/infrastructure/env';
+import { isBlobStorageConfigured, resetBlobStorage } from './reset-blob';
 import { resetCosmos } from './reset-cosmos';
 import { resetDrizzle } from './reset-drizzle';
 
@@ -43,16 +45,20 @@ function isCosmosConfigured(): boolean {
   return Boolean(optionalEnv('COSMOS_ENDPOINT') && optionalEnv('COSMOS_KEY'));
 }
 
-type ResetTarget = 'DRIZZLE' | 'COSMOS' | 'BOTH';
+type ResetTarget = 'DRIZZLE' | 'COSMOS' | 'BLOB' | 'BOTH';
 
 function parseTargetFromArgs(): ResetTarget | null {
   const argv = process.argv;
   const wantsDrizzle = argv.includes('--drizzle') || argv.includes('--postgres') || argv.includes('--postgress');
   const wantsCosmos = argv.includes('--cosmos');
+  const wantsBlob = argv.includes('--blob') || argv.includes('--storage');
   const wantsAll = argv.includes('--all') || argv.includes('--both');
 
   if (wantsAll || (wantsDrizzle && wantsCosmos)) {
     return 'BOTH';
+  }
+  if (wantsBlob && !wantsDrizzle && !wantsCosmos) {
+    return 'BLOB';
   }
   if (wantsDrizzle) {
     return 'DRIZZLE';
@@ -75,12 +81,14 @@ async function promptTarget(): Promise<ResetTarget> {
     // biome-ignore lint/suspicious/noConsole: script CLI
     console.info('  1) Postgres (Drizzle)');
     // biome-ignore lint/suspicious/noConsole: script CLI
-    console.info('  2) Cosmos DB');
+    console.info('  2) Cosmos DB (+ Azure Blob media si configuré)');
     // biome-ignore lint/suspicious/noConsole: script CLI
-    console.info('  3) Les deux');
+    console.info('  3) Azure Blob media uniquement');
+    // biome-ignore lint/suspicious/noConsole: script CLI
+    console.info('  4) Les deux (Postgres + Cosmos + Blob)');
 
-    const answer = (await rl.question('Choix (1/2/3) [3]: ')).trim();
-    if (answer === '' || answer === '3') {
+    const answer = (await rl.question('Choix (1/2/3/4) [4]: ')).trim();
+    if (answer === '' || answer === '4') {
       return 'BOTH';
     }
     if (answer === '1') {
@@ -89,8 +97,11 @@ async function promptTarget(): Promise<ResetTarget> {
     if (answer === '2') {
       return 'COSMOS';
     }
+    if (answer === '3') {
+      return 'BLOB';
+    }
     // biome-ignore lint/suspicious/noConsole: script CLI
-    console.warn('Choix invalide, on fait "les deux" par défaut.');
+    console.warn('Choix invalide, on fait Postgres + Cosmos + Blob par défaut.');
     return 'BOTH';
   } finally {
     rl.close();
@@ -114,6 +125,15 @@ async function main(): Promise<void> {
     } else {
       // biome-ignore lint/suspicious/noConsole: script CLI
       console.info('[db:reset] cosmos not configured; skipping');
+    }
+  }
+
+  if (target === 'BLOB' || target === 'COSMOS' || target === 'BOTH') {
+    if (isBlobStorageConfigured()) {
+      await resetBlobStorage();
+    } else {
+      // biome-ignore lint/suspicious/noConsole: script CLI
+      console.info('[db:reset] azure blob storage not configured; skipping');
     }
   }
 }

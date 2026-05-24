@@ -104,6 +104,27 @@ describe('ArticleService', () => {
       expect(updated.coverImageUrl).toBe('https://example.com/img.jpg');
     });
 
+    it('should persist french translation changes on update', async () => {
+      const { service } = await makeService();
+      const created = await service.createArticle(
+        CITY_ID,
+        { translation: { locale: 'fr', title: 'Original', description: 'Avant', content: [] }, status: 'draft' },
+        'author-1',
+      );
+      const updated = await service.updateArticle(CITY_ID, created.id, {
+        translation: {
+          locale: 'fr',
+          title: 'Modifié',
+          description: 'Après',
+          content: [{ type: 'p', children: [{ text: 'Nouveau contenu' }] }],
+        },
+      });
+      const fr = updated.translations.find((t) => t.locale === 'fr');
+      expect(fr?.title).toBe('Modifié');
+      expect(fr?.description).toBe('Après');
+      expect(fr?.content).toEqual([{ type: 'p', children: [{ text: 'Nouveau contenu' }] }]);
+    });
+
     it('should throw when article is not found', async () => {
       const { service } = await makeService();
       await expect(service.updateArticle(CITY_ID, 'missing-id', {})).rejects.toThrow('Article not found');

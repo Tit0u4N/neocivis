@@ -1,6 +1,7 @@
 import type { Container } from '@azure/cosmos';
 import type { Article, ArticleLocale, ArticleTranslation, CreateArticleInput } from '@repo/contracts/article';
 import { getCosmosClient } from '@/infrastructure/azure/cosmos.client';
+import { getCosmosContainer } from '@/infrastructure/azure/cosmos.setup';
 import { optionalEnv } from '@/infrastructure/env';
 import type { IArticleRepository } from './article.repository.interface';
 
@@ -17,14 +18,7 @@ export class CosmosArticleRepository implements IArticleRepository {
     }
 
     const client = getCosmosClient();
-    const databaseId = optionalEnv('COSMOS_DATABASE_ID') ?? 'neocivis';
-    const containerId = 'articles';
-
-    const { database } = await client.databases.createIfNotExists({ id: databaseId });
-    const { container } = await database.containers.createIfNotExists({
-      id: containerId,
-      partitionKey: { paths: ['/id'] },
-    });
+    const container = await getCosmosContainer(client, 'articles');
 
     this.cosmosContainer = container;
     return container;

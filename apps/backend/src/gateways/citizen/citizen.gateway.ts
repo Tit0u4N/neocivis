@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { startAutoSeedOnStartup } from '@/core/auto-seed';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
@@ -19,9 +18,10 @@ import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.
 import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import { ConfigService } from '@/modules/config/service/config.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
+import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
 import { InMemoryReportRepository } from '@/modules/report/report.repository';
 import { ReportService } from '@/modules/report/report.service';
-import { StubUploadService } from '@/modules/upload/upload.service';
+import { AzureBlobUploadService } from '@/modules/upload/upload.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/service/user.service';
@@ -45,13 +45,13 @@ const articleService = new ArticleService(articleRepository);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const reportRepository = new InMemoryReportRepository();
-
-await startAutoSeedOnStartup({ userService, articleRepository, cityRepository, iamService, accessService });
+const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
+const uploadService = new AzureBlobUploadService(mediaBlobService);
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
 const articleController = new ArticleController(articleService);
-const reportController = new ReportController(new ReportService(reportRepository), new StubUploadService());
+const reportController = new ReportController(new ReportService(reportRepository), uploadService);
 const configController = new ConfigController(new ConfigService(configRepository));
 const cityController = new CityController(cityService, userService);
 

@@ -1,12 +1,26 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useLoaderStore } from '@/stores/loader.store';
 import { NeocivisLoader } from './NeocivisLoader';
 
-export function GlobalLoader() {
-  const isLoading = useLoaderStore((s) => s.count > 0);
+// Delay before showing the loader — avoids flicker on fast requests.
+const SHOW_DELAY_MS = 200;
 
-  if (isLoading) {
+export function GlobalLoader() {
+  const isActive = useLoaderStore((s) => s.count > 0);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!isActive) {
+      setVisible(false);
+      return;
+    }
+    const timer = setTimeout(() => setVisible(true), SHOW_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [isActive]);
+
+  if (visible) {
     return (
       <div
         className={
@@ -17,5 +31,5 @@ export function GlobalLoader() {
       </div>
     );
   }
-  return null
+  return null;
 }

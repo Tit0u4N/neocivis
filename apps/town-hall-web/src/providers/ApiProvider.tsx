@@ -5,7 +5,6 @@ import type { KyInstance } from 'ky';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from 'react-oidc-context';
-import { useLoaderStore } from '@/stores/loader.store';
 
 type ApiContextValue = {
   api: KyInstance;
@@ -30,19 +29,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         tokenProvider: async () => authRef.current.user?.access_token ?? null,
         onUnauthorized: () => {
           void authRef.current.signinRedirect();
-        },
-      }).extend({
-        hooks: {
-          beforeRequest: [
-            () => {
-              useLoaderStore.getState().startLoading();
-            },
-          ],
-          afterResponse: [
-            () => {
-              useLoaderStore.getState().stopLoading();
-            },
-          ],
         },
       }),
     [],

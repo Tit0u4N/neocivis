@@ -158,9 +158,6 @@
     "page": {
       "subtitle": "Gérez les images utilisées dans l'application."
     },
-    "load": {
-      "error": "Impossible de charger la galerie"
-    },
     "gallery": {
       "title": "Galerie médias",
       "subtitle": "Choisissez une image ou téléchargez-en une nouvelle.",
@@ -186,8 +183,7 @@
       "titleHint": "Un titre vous permet de retrouver rapidement cette image via la recherche et d'identifier son usage au fil du temps.",
       "cancel": "Annuler",
       "confirm": "Télécharger",
-      "error": "Échec de l'upload",
-      "success": "Image téléchargée"
+      "error": "Échec de l'upload"
     },
     "delete": {
       "title": "Supprimer cette image ?",
@@ -196,8 +192,7 @@
       "notUsed": "Cette image n'est utilisée nulle part.",
       "cancel": "Annuler",
       "confirm": "Supprimer",
-      "error": "Échec de la suppression",
-      "success": "Image supprimée"
+      "error": "Échec de la suppression"
     },
     "filters": {
       "all": "Tous les médias",

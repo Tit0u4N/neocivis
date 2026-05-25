@@ -37,6 +37,11 @@
     "description": "Cette page n'existe pas ou a été déplacée.",
     "backToDashboard": "Retour au tableau de bord"
   },
+  "noCity": {
+    "title": "Aucune commune associée",
+    "description": "Votre compte n'est rattaché à aucune commune. Veuillez contacter votre administrateur pour obtenir l'accès à un espace mairie.",
+    "logout": "Se déconnecter"
+  },
   "settings": {
     "appearance": "Apparence",
     "language": {

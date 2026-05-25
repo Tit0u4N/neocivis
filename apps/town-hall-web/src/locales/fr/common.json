@@ -163,6 +163,9 @@
     "page": {
       "subtitle": "Gérez les images utilisées dans l'application."
     },
+    "load": {
+      "error": "Impossible de charger la galerie"
+    },
     "gallery": {
       "title": "Galerie médias",
       "subtitle": "Choisissez une image ou téléchargez-en une nouvelle.",
@@ -188,7 +191,8 @@
       "titleHint": "Un titre vous permet de retrouver rapidement cette image via la recherche et d'identifier son usage au fil du temps.",
       "cancel": "Annuler",
       "confirm": "Télécharger",
-      "error": "Échec de l'upload"
+      "error": "Échec de l'upload",
+      "success": "Image téléchargée"
     },
     "delete": {
       "title": "Supprimer cette image ?",
@@ -197,7 +201,8 @@
       "notUsed": "Cette image n'est utilisée nulle part.",
       "cancel": "Annuler",
       "confirm": "Supprimer",
-      "error": "Échec de la suppression"
+      "error": "Échec de la suppression",
+      "success": "Image supprimée"
     },
     "filters": {
       "all": "Tous les médias",
@@ -267,6 +272,9 @@
       "addTranslation": "Ajouter une langue",
       "externalUrl": "URL externe",
       "pageId": "Identifiant de page",
+      "article": "Article",
+      "articlePlaceholder": "Rechercher un article…",
+      "noArticles": "Aucun article disponible",
       "clear": "Effacer",
       "delete": "Supprimer"
     },
@@ -283,7 +291,7 @@
     },
     "linkGroups": {
       "special": "Pages spéciales",
-      "freePage": "Pages libres",
+      "articlePage": "Page article",
       "normal": "Pages standard",
       "external": "Externe"
     },
@@ -291,12 +299,12 @@
       "Link": "Lien",
       "General": "Général",
       "Establishment": "Établissement",
-      "FreePage": "Page libre",
+      "ArticlePage": "Page article",
       "Forum": "Forum",
       "Reports": "Signalements",
       "Articles": "Articles",
       "Events": "Événements",
-      "External URL": "URL externe"
+      "ExternalURL": "URL externe"
     },
     "colors": {
       "Corail": "Corail",

@@ -5,6 +5,19 @@ import { MediaImageLinkType as MediaImageLinkTypeSchema } from '@repo/contracts/
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useServices } from '@/providers/ServicesProvider';
+import { toast } from 'sonner';
+
+async function extractApiError(err: unknown): Promise<string | undefined> {
+  if (err instanceof Error && 'response' in err && err.response instanceof Response) {
+    try {
+      const body = (await err.response.json()) as { error?: string };
+      return typeof body?.error === 'string' ? body.error : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
+}
 
 export type MediaFilter = 'all' | MediaImageLinkType | 'unused';
 
@@ -26,13 +39,11 @@ export type MediaGalleryViewModel = {
   linkTypeLabels: Record<MediaImageLinkType, string>;
   isLoading: boolean;
   isUploading: boolean;
-  uploadError: string | null;
   isUploadModalOpen: boolean;
   pendingFile: File | null;
   uploadTitle: string;
   deleteTarget: MediaImage | null;
   isDeleting: boolean;
-  deleteError: string | null;
   setSearch: (s: string) => void;
   setActiveFilter: (f: MediaFilter) => void;
   selectMedia: (media: MediaImage) => void;
@@ -55,13 +66,11 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   const [activeFilter, setActiveFilter] = useState<MediaFilter>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [uploadTitle, setUploadTitle] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<MediaImage | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -74,9 +83,11 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
           setIsLoading(false);
         }
       })
-      .catch(() => {
+      .catch(async (err: unknown) => {
         if (!cancelled) {
           setIsLoading(false);
+          const description = await extractApiError(err);
+          toast.error(t('media.load.error'), { description });
         }
       });
     return () => {
@@ -145,21 +156,22 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
       return;
     }
     setIsUploading(true);
-    setUploadError(null);
     const title = uploadTitle.trim() || undefined;
     closeUploadModal();
     void mediaService
       .upload(pendingFile, title)
       .then((uploaded) => {
         setMediaList((prev) => [uploaded, ...prev]);
+        toast.success(t('media.upload.success'));
       })
-      .catch(() => {
-        setUploadError(t('media.upload.error'));
+      .catch(async (err: unknown) => {
+        const description = await extractApiError(err);
+        toast.error(t('media.upload.error'), { description });
       })
       .finally(() => {
         setIsUploading(false);
       });
-  }, [pendingFile, uploadTitle, mediaService, closeUploadModal]);
+  }, [pendingFile, uploadTitle, mediaService, closeUploadModal, t]);
 
   const openDeleteDialog = useCallback((media: MediaImage) => setDeleteTarget(media), []);
   const closeDeleteDialog = useCallback(() => setDeleteTarget(null), []);
@@ -170,20 +182,21 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
     }
     const id = deleteTarget.id;
     setIsDeleting(true);
-    setDeleteError(null);
     closeDeleteDialog();
     void mediaService
       .delete(id)
       .then(() => {
         setMediaList((prev) => prev.filter((m) => m.id !== id));
+        toast.success(t('media.delete.success'));
       })
-      .catch(() => {
-        setDeleteError(t('media.delete.error'));
+      .catch(async (err: unknown) => {
+        const description = await extractApiError(err);
+        toast.error(t('media.delete.error'), { description });
       })
       .finally(() => {
         setIsDeleting(false);
       });
-  }, [deleteTarget, mediaService, closeDeleteDialog]);
+  }, [deleteTarget, mediaService, closeDeleteDialog, t]);
 
   return {
     mediaList,
@@ -194,13 +207,11 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
     linkTypeLabels,
     isLoading,
     isUploading,
-    uploadError,
     isUploadModalOpen,
     pendingFile,
     uploadTitle,
     deleteTarget,
     isDeleting,
-    deleteError,
     setSearch,
     setActiveFilter,
     selectMedia,

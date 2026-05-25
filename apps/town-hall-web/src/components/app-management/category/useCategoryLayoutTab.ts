@@ -523,7 +523,7 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
         rowSpan: 1,
         icon: 'none',
         color: '#2374E0',
-        link: { type: 'Link' },
+        link: { type: 'General' },
         translations: defaultTranslations(defaultLocale, t('appManagement.newTileTitle')),
       },
     ]);

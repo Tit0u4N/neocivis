@@ -158,6 +158,9 @@
     "page": {
       "subtitle": "Manage images used in the application."
     },
+    "load": {
+      "error": "Failed to load the gallery"
+    },
     "gallery": {
       "title": "Media gallery",
       "subtitle": "Choose an image or upload a new one.",
@@ -183,7 +186,8 @@
       "titleHint": "A title helps you quickly find this image via search and identify its use over time.",
       "cancel": "Cancel",
       "confirm": "Upload",
-      "error": "Upload failed"
+      "error": "Upload failed",
+      "success": "Image uploaded"
     },
     "delete": {
       "title": "Delete this image?",
@@ -192,7 +196,8 @@
       "notUsed": "This image is not used anywhere.",
       "cancel": "Cancel",
       "confirm": "Delete",
-      "error": "Delete failed"
+      "error": "Delete failed",
+      "success": "Image deleted"
     },
     "filters": {
       "all": "All media",

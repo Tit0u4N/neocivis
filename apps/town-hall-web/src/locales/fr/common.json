@@ -262,6 +262,9 @@
       "addTranslation": "Ajouter une langue",
       "externalUrl": "URL externe",
       "pageId": "Identifiant de page",
+      "article": "Article",
+      "articlePlaceholder": "Rechercher un article…",
+      "noArticles": "Aucun article disponible",
       "clear": "Effacer",
       "delete": "Supprimer"
     },
@@ -278,7 +281,7 @@
     },
     "linkGroups": {
       "special": "Pages spéciales",
-      "freePage": "Pages libres",
+      "articlePage": "Page article",
       "normal": "Pages standard",
       "external": "Externe"
     },
@@ -286,12 +289,12 @@
       "Link": "Lien",
       "General": "Général",
       "Establishment": "Établissement",
-      "FreePage": "Page libre",
+      "ArticlePage": "Page article",
       "Forum": "Forum",
       "Reports": "Signalements",
       "Articles": "Articles",
       "Events": "Événements",
-      "External URL": "URL externe"
+      "ExternalURL": "URL externe"
     },
     "colors": {
       "Corail": "Corail",

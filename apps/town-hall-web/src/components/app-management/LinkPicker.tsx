@@ -56,7 +56,7 @@ export function urlToLinkValue(url?: string): LinkValue {
   if (KNOWN_TYPES.has(url)) {
     return { type: url };
   }
-  return { type: 'External URL', value: url };
+  return { type: 'ExternalURL', value: url };
 }
 
 export function linkValueToUrl(link: LinkValue): string | undefined {

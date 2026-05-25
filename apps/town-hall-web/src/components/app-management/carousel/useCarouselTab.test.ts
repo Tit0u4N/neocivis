@@ -372,10 +372,10 @@ describe('useCarouselTab', () => {
   });
 
   describe('getSlideLink / updateSlideLink', () => {
-    it('should return type "Link" for a slide with no linkUrl', async () => {
+    it('should return type "General" for a slide with no linkUrl', async () => {
       const { result } = await setup([slide1]);
 
-      expect(result.current.getSlideLink(slide1).type).toBe('Link');
+      expect(result.current.getSlideLink(slide1).type).toBe('General');
     });
 
     it('should return the corresponding type for a known linkUrl', async () => {
@@ -385,13 +385,13 @@ describe('useCarouselTab', () => {
       expect(result.current.getSlideLink(slideWithLink).type).toBe('Forum');
     });
 
-    it('should return "External URL" type with the URL as id for an unknown linkUrl', async () => {
+    it('should return "ExternalURL" type with the URL as value for an unknown linkUrl', async () => {
       const slideWithExternalLink: CarouselItem = { ...slide1, linkUrl: 'https://external.com' };
       const { result } = await setup([slideWithExternalLink]);
 
       const link = result.current.getSlideLink(slideWithExternalLink);
-      expect(link.type).toBe('External URL');
-      expect(link.id).toBe('https://external.com');
+      expect(link.type).toBe('ExternalURL');
+      expect(link.value).toBe('https://external.com');
     });
 
     it('should update the slide linkUrl from a LinkValue', async () => {
@@ -409,7 +409,7 @@ describe('useCarouselTab', () => {
       const { result } = await setup([slideWithLink]);
 
       act(() => {
-        result.current.updateSlideLink('slide-1', { type: 'Link' });
+        result.current.updateSlideLink('slide-1', { type: 'General' });
       });
 
       expect(result.current.carousel[0]?.linkUrl).toBeUndefined();

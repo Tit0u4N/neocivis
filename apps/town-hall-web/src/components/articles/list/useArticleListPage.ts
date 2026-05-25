@@ -1,20 +1,16 @@
 'use client';
 
 import type { Article, ArticleStatus } from '@repo/contracts/article';
-import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useArticlePreview } from '@/components/articles/preview/useArticlePreview';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
+import { useServices } from '@/providers/ServicesProvider';
 
 type StatusFilter = ArticleStatus | 'all';
 
 export function useArticleListPage() {
   const router = useRouter();
-  const api = useApi();
-  const cityId = useCityStore((s) => s.cityId);
-  const articleService = useMemo(() => new ArticleService(api, cityId ?? ''), [api, cityId]);
+  const { article: articleService } = useServices();
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

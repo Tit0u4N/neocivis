@@ -11,14 +11,6 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string) => k }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
-vi.mock('@/stores/city.store', () => ({
-  useCityStore: (sel: (s: { cityId: string }) => unknown) => sel({ cityId: 'city-test' }),
-}));
-
 vi.mock('@/stores/config.store', () => ({
   useConfigStore: (sel: (s: { defaultLocale: string }) => unknown) => sel({ defaultLocale: 'fr' }),
 }));
@@ -28,10 +20,8 @@ const mockConfigService = {
   setCategories: vi.fn(),
 };
 
-vi.mock('@repo/frontend-services/config', () => ({
-  ConfigService: vi.fn(function (this: unknown) {
-    return mockConfigService;
-  }),
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ config: mockConfigService }),
 }));
 
 import { initBlocks, tileToCategory, useCategoryLayoutTab } from './useCategoryLayoutTab';

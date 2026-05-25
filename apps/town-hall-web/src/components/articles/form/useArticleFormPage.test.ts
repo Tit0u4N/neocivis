@@ -14,21 +14,10 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
-vi.mock('@/stores/city.store', () => ({
-  useCityStore: (sel: (s: { cityId: string | null }) => unknown) => sel({ cityId: 'NIC_00001' }),
-}));
-
-vi.mock('@repo/frontend-services/article', async () => {
+vi.mock('@/providers/ServicesProvider', async () => {
   const { mockArticleService: instance } = await import('@repo/frontend-services/testing');
   return {
-    // biome-ignore lint/style/useNamingConvention: mocked module export name
-    ArticleService: vi.fn(function (this: any) {
-      return instance;
-    }),
+    useServices: () => ({ article: instance }),
   };
 });
 

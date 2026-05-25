@@ -12,23 +12,13 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
-vi.mock('@/stores/city.store', () => ({
-  useCityStore: (sel: (s: { cityId: string | null }) => unknown) => sel({ cityId: 'NIC_00001' }),
-}));
-
 const mockArticleService = {
   getAll: vi.fn(),
   delete: vi.fn(),
   updateStatus: vi.fn(),
 };
-vi.mock('@repo/frontend-services/article', () => ({
-  ArticleService: vi.fn(function (this: any) {
-    return mockArticleService;
-  }),
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ article: mockArticleService }),
 }));
 
 import { useArticleListPage } from './useArticleListPage';

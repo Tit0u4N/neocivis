@@ -3,11 +3,9 @@
 import type { ArticleStatus } from '@repo/contracts/article';
 import { CreateArticleInput } from '@repo/contracts/article';
 import type { MediaImage } from '@repo/contracts/media';
-import { ArticleService } from '@repo/frontend-services/article';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
+import { useCallback, useEffect, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
 
 type FormState = {
   title: string;
@@ -29,9 +27,7 @@ type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export function useArticleFormPage(id?: string) {
   const router = useRouter();
-  const api = useApi();
-  const cityId = useCityStore((s) => s.cityId);
-  const articleService = useMemo(() => new ArticleService(api, cityId ?? ''), [api, cityId]);
+  const { article: articleService } = useServices();
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);

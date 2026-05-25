@@ -2,11 +2,9 @@
 
 import type { MediaImage, MediaImageLinkType } from '@repo/contracts/media';
 import { MediaImageLinkType as MediaImageLinkTypeSchema } from '@repo/contracts/media';
-import { MediaService } from '@repo/frontend-services/media';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
+import { useServices } from '@/providers/ServicesProvider';
 
 export type MediaFilter = 'all' | MediaImageLinkType | 'unused';
 
@@ -50,14 +48,7 @@ export type MediaGalleryViewModel = {
 
 export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGalleryViewModel {
   const { t } = useTranslation();
-  const api = useApi();
-  const cityId = useCityStore((s) => s.cityId);
-  const mediaService = useMemo(() => {
-    if (!cityId) {
-      return null;
-    }
-    return new MediaService(api, cityId);
-  }, [api, cityId]);
+  const { media: mediaService } = useServices();
 
   const [mediaList, setMediaList] = useState<MediaImage[]>([]);
   const [search, setSearch] = useState('');
@@ -73,9 +64,6 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!mediaService) {
-      return;
-    }
     let cancelled = false;
     setIsLoading(true);
     mediaService
@@ -153,7 +141,7 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   }, []);
 
   const confirmUpload = useCallback(() => {
-    if (!(pendingFile && mediaService)) {
+    if (!pendingFile) {
       return;
     }
     setIsUploading(true);
@@ -177,7 +165,7 @@ export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGaller
   const closeDeleteDialog = useCallback(() => setDeleteTarget(null), []);
 
   const confirmDelete = useCallback(() => {
-    if (!(deleteTarget && mediaService)) {
+    if (!deleteTarget) {
       return;
     }
     const id = deleteTarget.id;

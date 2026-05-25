@@ -1,6 +1,14 @@
 import type { PermissionKey } from '@repo/contracts';
 import { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
+import {
+  createAccessRepository,
+  createArticleRepository,
+  createCityRepository,
+  createConfigRepository,
+  createMediaRepository,
+  createUserRepository,
+} from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
@@ -10,24 +18,13 @@ import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { requirePermission } from '@/middlewares/permission.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';
 import { AccessService } from '@/modules/access/access.service';
-import { DrizzleAccessRepository } from '@/modules/access/repository/access.drizzle.repository';
-import { InMemoryAccessRepository } from '@/modules/access/repository/access.inmemory.repository';
-import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
-import { InMemoryArticleRepository } from '@/modules/article/repository/article.inmemory.repository';
 import { ArticleService } from '@/modules/article/service/article.service';
 import { CityService } from '@/modules/city/city.service';
-import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
-import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.repository';
-import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import { ConfigService } from '@/modules/config/service/config.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
-import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
-import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
 import { MediaService } from '@/modules/media/service/media.service';
 import { MediaLinkService } from '@/modules/media/service/media-link.service';
-import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
-import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/service/user.service';
 import { AccessController } from './controllers/access.controller';
 import { ArticleController } from './controllers/article.controller';
@@ -37,13 +34,13 @@ import { MediaController } from './controllers/media.controller';
 import { UserController } from './controllers/user.controller';
 
 // Import repositories
-const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
-const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : new CosmosArticleRepository();
-const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new DrizzleCityRepository();
-const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
-const configRepository = new InMemoryConfigRepository();
+const userRepository = createUserRepository();
+const articleRepository = createArticleRepository();
+const cityRepository = createCityRepository();
+const accessRepository = createAccessRepository();
+const configRepository = createConfigRepository();
 const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
-const mediaRepository = isInMemoryMode() ? new InMemoryMediaRepository() : new CosmosMediaRepository();
+const mediaRepository = createMediaRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();

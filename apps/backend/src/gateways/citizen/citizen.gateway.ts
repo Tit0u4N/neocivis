@@ -1,4 +1,12 @@
 import { Hono } from 'hono';
+import {
+  createAccessRepository,
+  createArticleRepository,
+  createCityRepository,
+  createConfigRepository,
+  createReportRepository,
+  createUserRepository,
+} from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
@@ -7,23 +15,13 @@ import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';
 import { AccessService } from '@/modules/access/access.service';
-import { DrizzleAccessRepository } from '@/modules/access/repository/access.drizzle.repository';
-import { InMemoryAccessRepository } from '@/modules/access/repository/access.inmemory.repository';
-import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
-import { InMemoryArticleRepository } from '@/modules/article/repository/article.inmemory.repository';
 import { ArticleService } from '@/modules/article/service/article.service';
 import { CityService } from '@/modules/city/city.service';
-import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
-import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.repository';
-import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import { ConfigService } from '@/modules/config/service/config.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
-import { InMemoryReportRepository } from '@/modules/report/report.repository';
 import { ReportService } from '@/modules/report/report.service';
 import { AzureBlobUploadService } from '@/modules/upload/upload.service';
-import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
-import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/service/user.service';
 import { ArticleController } from './controllers/article.controller';
 import { CityController } from './controllers/city.controller';
@@ -32,11 +30,11 @@ import { ReportController } from './controllers/report.controller';
 import { UserController } from './controllers/user.controller';
 
 // Import repositories
-const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
-const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : new CosmosArticleRepository();
-const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new DrizzleCityRepository();
-const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
-const configRepository = new InMemoryConfigRepository();
+const userRepository = createUserRepository();
+const articleRepository = createArticleRepository();
+const cityRepository = createCityRepository();
+const accessRepository = createAccessRepository();
+const configRepository = createConfigRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
@@ -44,7 +42,7 @@ const userService = new UserService(userRepository, iamService);
 const articleService = new ArticleService(articleRepository);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
-const reportRepository = new InMemoryReportRepository();
+const reportRepository = createReportRepository();
 const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
 const uploadService = new AzureBlobUploadService(mediaBlobService);
 

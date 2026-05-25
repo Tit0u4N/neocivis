@@ -1,15 +1,13 @@
 import { Hono } from 'hono';
-import { isInMemoryMode } from '@/core/runtime-config';
+import { createUserRepository } from '@/core/in-memory-repositories';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
 import { applyCorsMiddleware } from '@/middlewares/cors.middleware';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
-import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
-import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/service/user.service';
 import { WebhookService } from '@/modules/webhook/webhook.service';
 import { WebhookController } from './controllers/webhook.controller';
 
-const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
+const userRepository = createUserRepository();
 const iamService = new KeycloakIAMService();
 const userService = new UserService(userRepository, iamService);
 const webhookService = new WebhookService(userService);

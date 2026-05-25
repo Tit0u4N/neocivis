@@ -27,7 +27,7 @@ type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export function useArticleFormPage(id?: string) {
   const router = useRouter();
-  const { article: articleService } = useServices();
+  const { articleService: articleService } = useServices();
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);

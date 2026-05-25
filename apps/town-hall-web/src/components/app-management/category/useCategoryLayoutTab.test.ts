@@ -21,7 +21,7 @@ const mockConfigService = {
 };
 
 vi.mock('@/providers/ServicesProvider', () => ({
-  useServices: () => ({ config: mockConfigService }),
+  useServices: () => ({ configService: mockConfigService }),
 }));
 
 import { initBlocks, tileToCategory, useCategoryLayoutTab } from './useCategoryLayoutTab';

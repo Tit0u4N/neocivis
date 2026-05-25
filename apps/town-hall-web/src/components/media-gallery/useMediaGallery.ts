@@ -59,7 +59,7 @@ export type MediaGalleryViewModel = {
 
 export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGalleryViewModel {
   const { t } = useTranslation();
-  const { media: mediaService } = useServices();
+  const { mediaService: mediaService } = useServices();
 
   const [mediaList, setMediaList] = useState<MediaImage[]>([]);
   const [search, setSearch] = useState('');

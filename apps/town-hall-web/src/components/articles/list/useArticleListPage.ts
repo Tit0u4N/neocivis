@@ -10,7 +10,7 @@ type StatusFilter = ArticleStatus | 'all';
 
 export function useArticleListPage() {
   const router = useRouter();
-  const { article: articleService } = useServices();
+  const { articleService: articleService } = useServices();
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

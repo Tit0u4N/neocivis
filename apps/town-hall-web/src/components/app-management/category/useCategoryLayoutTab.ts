@@ -278,7 +278,7 @@ export type CategoryLayoutTabViewModel = {
 export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   const { t } = useTranslation();
   const defaultLocale = useConfigStore((s) => s.defaultLocale);
-  const { config: configService } = useServices();
+  const { configService: configService } = useServices();
 
   const [blocks, setBlocks] = useState<AppTile[]>(initBlocks);
   const [selectedId, setSelectedId] = useState<string>('alaune');

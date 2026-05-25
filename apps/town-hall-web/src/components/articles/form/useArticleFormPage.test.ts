@@ -17,7 +17,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/providers/ServicesProvider', async () => {
   const { mockArticleService: instance } = await import('@repo/frontend-services/testing');
   return {
-    useServices: () => ({ article: instance }),
+    useServices: () => ({ articleService: instance }),
   };
 });
 

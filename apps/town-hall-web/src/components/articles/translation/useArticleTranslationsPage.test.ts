@@ -19,7 +19,7 @@ const mockArticleService = {
   deleteTranslation: vi.fn(),
 };
 vi.mock('@/providers/ServicesProvider', () => ({
-  useServices: () => ({ article: mockArticleService }),
+  useServices: () => ({ articleService: mockArticleService }),
 }));
 
 import { useArticleTranslationsPage } from './useArticleTranslationsPage';

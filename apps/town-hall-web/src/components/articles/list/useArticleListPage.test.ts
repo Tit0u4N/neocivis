@@ -18,7 +18,7 @@ const mockArticleService = {
   updateStatus: vi.fn(),
 };
 vi.mock('@/providers/ServicesProvider', () => ({
-  useServices: () => ({ article: mockArticleService }),
+  useServices: () => ({ articleService: mockArticleService }),
 }));
 
 import { useArticleListPage } from './useArticleListPage';

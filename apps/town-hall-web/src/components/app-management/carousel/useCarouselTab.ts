@@ -37,7 +37,7 @@ export type CarouselTabViewModel = {
 
 export function useCarouselTab(): CarouselTabViewModel {
   const { t } = useTranslation();
-  const { config: configService } = useServices();
+  const { configService: configService } = useServices();
 
   const [carousel, setCarousel] = useState<CarouselItem[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');

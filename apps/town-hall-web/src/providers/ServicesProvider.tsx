@@ -13,9 +13,9 @@ import { useCityStore } from '@/stores/city.store';
  * (auth, permission, upload, report) are created where they are used.
  */
 type ServicesContextValue = {
-  article: ArticleService;
-  config: ConfigService;
-  media: MediaService;
+  articleService: ArticleService;
+  configService: ConfigService;
+  mediaService: MediaService;
 };
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(undefined);
@@ -24,7 +24,7 @@ const ServicesContext = createContext<ServicesContextValue | undefined>(undefine
  * Provides the city-scoped services to the dashboard.
  * Must be mounted under `CityGate`, which guarantees a resolved `cityId`.
  */
-export function ServicesProvider({ children }: { children: ReactNode }) {
+export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>) {
   const api = useApi();
   const cityId = useCityStore((s) => s.cityId);
 
@@ -34,9 +34,9 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
 
   const services = useMemo<ServicesContextValue>(
     () => ({
-      article: new ArticleService(api, cityId),
-      config: new ConfigService(api, cityId),
-      media: new MediaService(api, cityId),
+      articleService: new ArticleService(api, cityId),
+      configService: new ConfigService(api, cityId),
+      mediaService: new MediaService(api, cityId),
     }),
     [api, cityId],
   );

@@ -19,21 +19,13 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => {
-  const stableApi = {};
-  return { useApi: () => stableApi };
-});
-
-vi.mock('@/stores/city.store', () => ({
-  useCityStore: (selector: (s: { cityId: string }) => unknown) =>
-    selector({ cityId: 'test-city-id' }),
-}));
-
-vi.mock('@repo/frontend-services/media', () => ({
-  // biome-ignore lint/style/useNamingConvention: mock class requires PascalCase
-  MediaService: vi.fn(function () {
-    return { getAll: mockGetAll, upload: mockUpload, delete: mockDelete };
-  }),
+const mockMediaService = {
+  getAll: mockGetAll,
+  upload: mockUpload,
+  delete: mockDelete,
+}
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ mediaService: mockMediaService }),
 }));
 
 vi.mock('sonner', () => ({

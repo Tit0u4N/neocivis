@@ -22,7 +22,7 @@ const DEFAULT_TRANSLATION_FORM: Omit<TranslationFormState, 'locale'> = {
 
 export function useArticleTranslationsPage(id: string) {
   const router = useRouter();
-  const { article: articleService } = useServices();
+  const { articleService: articleService } = useServices();
   const [article, setArticle] = useState<Article | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

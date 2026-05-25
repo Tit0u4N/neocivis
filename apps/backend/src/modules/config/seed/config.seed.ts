@@ -16,6 +16,9 @@ export function getMockCategories(): Category[] {
         { locale: 'de', name: 'Aktuell' },
         { locale: 'it', name: 'In primo piano' },
       ],
+      link: {
+        type: "General"
+      }
     },
     {
       id: 'pratique',
@@ -30,6 +33,9 @@ export function getMockCategories(): Category[] {
         { locale: 'de', name: 'Praktisch' },
         { locale: 'it', name: 'Pratico' },
       ],
+      link: {
+        type: "General"
+      }
     },
     {
       id: 'urgence',
@@ -44,6 +50,9 @@ export function getMockCategories(): Category[] {
         { locale: 'de', name: 'Notfall' },
         { locale: 'it', name: 'Emergenza' },
       ],
+      link: {
+        type: "General"
+      }
     },
     {
       id: 'travaux',
@@ -58,6 +67,9 @@ export function getMockCategories(): Category[] {
         { locale: 'de', name: 'Baustellen' },
         { locale: 'it', name: 'Lavori' },
       ],
+      link: {
+        type: "General"
+      }
     },
     {
       id: 'sondage',
@@ -71,6 +83,10 @@ export function getMockCategories(): Category[] {
         { locale: 'de', name: 'Umfrage' },
         { locale: 'it', name: 'Sondaggio' },
       ],
+      link: {
+        type: "ExternalURL",
+        value: 'https://example.com/sondage'
+      }
     },
     {
       id: 'divers',
@@ -84,6 +100,10 @@ export function getMockCategories(): Category[] {
         { locale: 'de', name: 'Sonstiges' },
         { locale: 'it', name: 'Varie' },
       ],
+      link: {
+        type: "ArticlePage",
+        value: '22222222-2222-2222-2222-222222222222'
+      }
     },
   ];
 }

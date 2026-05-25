@@ -143,10 +143,6 @@ export function MediaGallery({ mode, selectedMediaId, onSelect, onClose }: Media
         )}
       </div>
 
-      {(vm.uploadError ?? vm.deleteError) && (
-        <p className="px-6 pb-3 text-destructive text-xs">{vm.uploadError ?? vm.deleteError}</p>
-      )}
-
       <DeleteConfirmDialog
         target={vm.deleteTarget}
         linkTypeLabels={vm.linkTypeLabels}

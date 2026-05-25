@@ -15,28 +15,17 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => {
-  const stableApi = {};
-  return { useApi: () => stableApi };
-});
-
-vi.mock('@/stores/city.store', () => ({
-  useCityStore: (selector: (s: { cityId: string }) => unknown) => selector({ cityId: 'test-city-id' }),
-}));
-
 vi.mock('@/stores/config.store', () => ({
   useConfigStore: (selector: (s: { availableLocales: string[]; defaultLocale: string }) => unknown) =>
     selector({ availableLocales: ['fr', 'en'], defaultLocale: 'fr' }),
 }));
 
-vi.mock('@repo/frontend-services/config', () => ({
-  // biome-ignore lint/style/useNamingConvention: mock class requires PascalCase
-  ConfigService: vi.fn(function () {
-    return {
-      getMunicipalityConfig: mockGetMunicipalityConfig,
-      setCarouselItems: mockSetCarouselItems,
-    };
-  }),
+const mockConfigService = {
+  getMunicipalityConfig: mockGetMunicipalityConfig,
+  setCarouselItems: mockSetCarouselItems,
+}
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ configService: mockConfigService }),
 }));
 
 // ---------------------------------------------------------------------------
@@ -511,6 +500,7 @@ describe('useCarouselTab', () => {
 
       expect(result.current.isSaving).toBe(true);
 
+      // biome-ignore lint/suspicious/useAwait: TEST
       await act(async () => {
         resolveSave([slide1]);
       });

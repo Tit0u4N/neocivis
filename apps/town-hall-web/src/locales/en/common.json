@@ -37,6 +37,11 @@
     "description": "This page does not exist or has been moved.",
     "backToDashboard": "Back to dashboard"
   },
+  "noCity": {
+    "title": "No city assigned",
+    "description": "Your account is not linked to any city. Please contact your administrator to get access to a town hall workspace.",
+    "logout": "Log out"
+  },
   "settings": {
     "appearance": "Appearance",
     "language": {

@@ -14,25 +14,10 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
-vi.mock('@repo/frontend-services/article', async () => {
+vi.mock('@/providers/ServicesProvider', async () => {
   const { mockArticleService: instance } = await import('@repo/frontend-services/testing');
   return {
-    ArticleService: vi.fn(function (this: any) {
-      return instance;
-    }),
-  };
-});
-
-vi.mock('@repo/frontend-services/upload', async () => {
-  const { mockUploadService: instance } = await import('@repo/frontend-services/testing');
-  return {
-    UploadService: vi.fn(function (this: any) {
-      return instance;
-    }),
+    useServices: () => ({ articleService: instance }),
   };
 });
 

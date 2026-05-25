@@ -3,15 +3,12 @@ import type { KyInstance } from 'ky';
 import AbstractService from '../AbstractService';
 
 export class MediaService extends AbstractService {
-  constructor(
-    kyInstance: KyInstance,
-    private readonly cityId: string,
-  ) {
-    super(kyInstance, '');
+  constructor(kyInstance: KyInstance, cityId: string) {
+    super(kyInstance, `/cities/${cityId}`);
   }
 
   async getAll(): Promise<MediaImage[]> {
-    return await this.http.get(`media/city/${this.cityId}`).json<MediaImage[]>();
+    return await this.http.get('media').json<MediaImage[]>();
   }
 
   async upload(file: File, title?: string): Promise<MediaImage> {
@@ -22,7 +19,7 @@ export class MediaService extends AbstractService {
     }
     return await this.http
       .extend({ headers: { 'Content-Type': undefined } })
-      .post(`media/city/${this.cityId}/upload`, { body: formData })
+      .post('media/upload', { body: formData })
       .json<MediaImage>();
   }
 

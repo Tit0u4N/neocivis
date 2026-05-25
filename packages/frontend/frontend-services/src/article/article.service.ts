@@ -17,8 +17,8 @@ export interface GetPublishedParams {
 }
 
 export class ArticleService extends AbstractService {
-  constructor(kyInstance: KyInstance) {
-    super(kyInstance, '');
+  constructor(kyInstance: KyInstance, cityId?: string) {
+    super(kyInstance, cityId ? `/cities/${cityId}` : '');
   }
 
   async getAll(): Promise<Article[]> {

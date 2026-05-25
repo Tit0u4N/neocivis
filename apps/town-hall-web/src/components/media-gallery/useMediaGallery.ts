@@ -2,12 +2,10 @@
 
 import type { MediaImage, MediaImageLinkType } from '@repo/contracts/media';
 import { MediaImageLinkType as MediaImageLinkTypeSchema } from '@repo/contracts/media';
-import { MediaService } from '@repo/frontend-services/media';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useServices } from '@/providers/ServicesProvider';
 import { toast } from 'sonner';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
 
 async function extractApiError(err: unknown): Promise<string | undefined> {
   if (err instanceof Error && 'response' in err && err.response instanceof Response) {
@@ -61,9 +59,7 @@ export type MediaGalleryViewModel = {
 
 export function useMediaGallery({ onSelect }: UseMediaGalleryProps): MediaGalleryViewModel {
   const { t } = useTranslation();
-  const api = useApi();
-  const cityId = useCityStore((s) => s.cityId);
-  const mediaService = useMemo(() => new MediaService(api, cityId), [api, cityId]);
+  const { mediaService: mediaService } = useServices();
 
   const [mediaList, setMediaList] = useState<MediaImage[]>([]);
   const [search, setSearch] = useState('');

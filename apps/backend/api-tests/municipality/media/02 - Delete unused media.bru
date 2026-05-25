@@ -1,0 +1,43 @@
+meta {
+  name: 02 - Delete unused media
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/media/{{mediaGalleryExtraId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city in /user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+  bru.setVar('mediaGalleryExtraId', 'a1000001-0000-4000-8000-000000000008');
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/media/a1000001-0000-4000-8000-000000000008`);
+}
+
+script:post-response {
+  test("Status is 204", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

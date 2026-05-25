@@ -1,13 +1,5 @@
+import type { UserMeDto } from '@repo/contracts';
 import type { KyInstance } from 'ky';
-
-// TODO : update withe the real API
-
-export type UserProfile = {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-};
 
 export type UpdateUserData = {
   email?: string;
@@ -16,22 +8,25 @@ export type UpdateUserData = {
 };
 
 /**
- * Handles user profile operations via the authenticated API client.
- * Authentication lifecycle (tokens, OIDC) is not managed here — it is
- * delegated to the KyInstance provided at construction time via createApiClient.
+ * Handles authenticated user profile operations via the municipality/citizen API.
+ * Authentication lifecycle (tokens, OIDC) is delegated to the injected KyInstance.
  */
 export class AuthService {
   constructor(private readonly api: KyInstance) {}
 
-  async getCurrentUser(): Promise<UserProfile> {
-    return this.api.get('profile').json<UserProfile>();
+  async getMe(): Promise<UserMeDto> {
+    return await this.api.get('user/me').json<UserMeDto>();
   }
 
-  async updateUser(data: UpdateUserData): Promise<UserProfile> {
-    return this.api.patch('profile', { json: data }).json<UserProfile>();
+  // TODO: wire update/delete when backend endpoints exist (OR REDIRECT TO KEYCLOAK UI)
+  // biome-ignore lint/suspicious/useAwait: TODO handle update/delete
+  async updateUser(_data: UpdateUserData): Promise<UserMeDto> {
+    throw new Error('Not implemented');
   }
 
+  // TODO: wire delete when backend endpoints exist (OR REDIRECT TO KEYCLOAK UI)
+  // biome-ignore lint/suspicious/useAwait: TODO handle delete
   async deleteAccount(): Promise<void> {
-    await this.api.delete('profile');
+    throw new Error('Not implemented');
   }
 }

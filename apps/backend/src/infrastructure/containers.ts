@@ -1,3 +1,4 @@
 export enum ContainerName {
-  ARTICLES = 'articles',
+  Articles = 'articles',
+  Reports = 'reports',
 }

@@ -7,10 +7,12 @@ export interface IUploadService {
 }
 
 export class AzureBlobUploadService implements IUploadService {
+  constructor(private containerName: ContainerName = ContainerName.Articles) {}
+
   async uploadImage(buffer: ArrayBuffer, filename: string, mimeType: string, cityId?: string): Promise<string> {
-    const service = getBlobServiceClient(ContainerName.ARTICLES);
-    const containerName = getUploadsContainerName(ContainerName.ARTICLES);
-    const container = service.getContainerClient(containerName);
+    const service = getBlobServiceClient(this.containerName);
+    const containerNameStr = getUploadsContainerName(this.containerName);
+    const container = service.getContainerClient(containerNameStr);
     await container.createIfNotExists({
       access: 'blob',
     });

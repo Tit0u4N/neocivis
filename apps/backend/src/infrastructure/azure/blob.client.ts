@@ -23,8 +23,10 @@ export function getBlobServiceClient(name: ContainerName): BlobServiceClient {
 
 export function getUploadsContainerName(name: ContainerName): string {
   switch (name) {
-    case ContainerName.ARTICLES:
+    case ContainerName.Articles:
       return requiredEnv('AZURE_ARTICLES_STORAGE_CONTAINER');
+    case ContainerName.Reports:
+      return requiredEnv('AZURE_REPORTS_STORAGE_CONTAINER');
     default:
       throw new Error(`Container ${name} not found`);
   }

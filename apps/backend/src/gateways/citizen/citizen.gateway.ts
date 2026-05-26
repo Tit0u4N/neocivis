@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { startAutoSeedOnStartup } from '@/core/auto-seed';
 import { isInMemoryMode } from '@/core/runtime-config';
+import { ContainerName } from '@/infrastructure/containers';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
 import { applyCityAccessMiddleware } from '@/middlewares/city-access.middleware';
@@ -19,9 +20,11 @@ import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.
 import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import { ConfigService } from '@/modules/config/service/config.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
+import { QwenService } from '@/modules/report/qwen.service';
+import { CosmosReportRepository } from '@/modules/report/report.cosmos.repository';
 import { InMemoryReportRepository } from '@/modules/report/report.repository';
 import { ReportService } from '@/modules/report/report.service';
-import { StubUploadService } from '@/modules/upload/upload.service';
+import { AzureBlobUploadService } from '@/modules/upload/upload.service';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import { UserService } from '@/modules/users/service/user.service';
@@ -37,6 +40,7 @@ const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : n
 const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new DrizzleCityRepository();
 const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
 const configRepository = new InMemoryConfigRepository();
+const reportRepository = isInMemoryMode() ? new InMemoryReportRepository() : new CosmosReportRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
@@ -44,14 +48,16 @@ const userService = new UserService(userRepository, iamService);
 const articleService = new ArticleService(articleRepository);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
-const reportRepository = new InMemoryReportRepository();
+const qwenService = new QwenService();
+const reportService = new ReportService(reportRepository, qwenService);
+const reportUploadService = new AzureBlobUploadService(ContainerName.Reports);
 
 await startAutoSeedOnStartup({ userService, articleRepository, cityRepository, iamService, accessService });
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
 const articleController = new ArticleController(articleService);
-const reportController = new ReportController(new ReportService(reportRepository), new StubUploadService());
+const reportController = new ReportController(reportService, reportUploadService);
 const configController = new ConfigController(new ConfigService(configRepository));
 const cityController = new CityController(cityService, userService);
 

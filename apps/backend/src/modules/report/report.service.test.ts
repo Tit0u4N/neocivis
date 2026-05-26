@@ -130,6 +130,64 @@ describe('ReportService', () => {
     });
   });
 
+  describe('getCityReports', () => {
+    it('retourne tous les signalements de la ville, tous auteurs confondus', async () => {
+      const { service } = makeService();
+      await service.createReport({ desc: 'Voirie auteur A', authorId: 'user-A', photoUrl: 'https://x/a.jpg' });
+      await service.createReport({ desc: 'Voirie auteur B', authorId: 'user-B', photoUrl: 'https://x/b.jpg' });
+
+      const result = await service.getCityReports('city-1', 1, 10);
+      const authors = new Set(result.data.map((r) => r.authorId));
+      expect(authors.has('user-A')).toBe(true);
+      expect(authors.has('user-B')).toBe(true);
+    });
+
+    it('calcule correctement totalPages sur le total de la ville', async () => {
+      const { service } = makeService();
+      const baseline = (await service.getCityReports('city-1', 1, 1)).total;
+      for (let i = 0; i < 5; i++) {
+        await service.createReport({ desc: `Signalement ${i} long`, authorId: 'user-X', photoUrl: 'https://x/x.jpg' });
+      }
+      const limit = 2;
+      const result = await service.getCityReports('city-1', 1, limit);
+      expect(result.total).toBe(baseline + 5);
+      expect(result.totalPages).toBe(Math.ceil((baseline + 5) / limit));
+      expect(result.data.length).toBeLessThanOrEqual(limit);
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('met à jour le statut et updatedAt', async () => {
+      const { service, repo } = makeService();
+      const created = await service.createReport({
+        desc: 'Trottoir abîmé',
+        authorId: 'user-1',
+        photoUrl: 'https://x/a.jpg',
+      });
+      await repo.update(created.id, { updatedAt: '2020-01-01T00:00:00.000Z' });
+      const updated = await service.updateStatus('city-1', created.id, 'progress');
+      expect(updated.status).toBe('progress');
+      expect(updated.updatedAt).not.toBe('2020-01-01T00:00:00.000Z');
+    });
+
+    it("renseigne resolvedAt lorsque le statut passe à 'resolved'", async () => {
+      const { service } = makeService();
+      const created = await service.createReport({
+        desc: 'Lampadaire cassé',
+        authorId: 'user-1',
+        photoUrl: 'https://x/a.jpg',
+      });
+      const updated = await service.updateStatus('city-1', created.id, 'resolved');
+      expect(updated.status).toBe('resolved');
+      expect(updated.resolvedAt).toBeDefined();
+    });
+
+    it("lève une erreur si le signalement n'existe pas", async () => {
+      const { service } = makeService();
+      await expect(service.updateStatus('city-1', 'id-inexistant', 'resolved')).rejects.toThrow('Report not found');
+    });
+  });
+
   describe('cancelReport', () => {
     it('passe le statut à cancelled', async () => {
       const { service } = makeService();

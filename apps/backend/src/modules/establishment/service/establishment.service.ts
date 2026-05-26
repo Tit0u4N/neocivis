@@ -2,7 +2,7 @@ import type { Establishment } from '@repo/contracts/establishment';
 import type { IEstablishmentRepository } from '../repository/establishment.repository.interface';
 
 export class EstablishmentService {
-  constructor(private repository: IEstablishmentRepository) {}
+  constructor(private readonly repository: IEstablishmentRepository) {}
 
   list(_cityId: string): Promise<Establishment[]> {
     return this.repository.list();

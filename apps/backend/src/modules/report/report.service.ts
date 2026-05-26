@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { GpsLocation, PaginatedReportsResponse, Report } from '@repo/contracts/report';
+import type { GpsLocation, PaginatedReportsResponse, Report, ReportStatus } from '@repo/contracts/report';
 import type { IReportRepository } from './report.types';
 
 function deriveTitle(desc: string, maxLen = 60): string {
@@ -13,7 +13,7 @@ function deriveTitle(desc: string, maxLen = 60): string {
 }
 
 export class ReportService {
-  constructor(private repo: IReportRepository) {}
+  constructor(private readonly repo: IReportRepository) {}
 
   createReport(input: { desc: string; authorId: string; location?: GpsLocation; photoUrl: string }): Promise<Report> {
     const now = new Date().toISOString();
@@ -42,9 +42,37 @@ export class ReportService {
     };
   }
 
+  // --- Municipality (city-scoped, not author-scoped) ---
+
+  async getCityReports(_cityId: string, page: number, limit: number): Promise<PaginatedReportsResponse> {
+    const { items, total } = await this.repo.findAll(page, limit);
+    return {
+      data: items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async updateStatus(_cityId: string, id: string, status: ReportStatus): Promise<Report> {
+    const report = await this.repo.findById(id);
+    if (!report) {
+      throw new Error('Report not found');
+    }
+    const now = new Date().toISOString();
+    const patch: Partial<Report> = { status, updatedAt: now };
+    if (status === 'resolved') {
+      patch.resolvedAt = now;
+    }
+    return this.repo.update(id, patch);
+  }
+
+  // --- Citizen (author-scoped) ---
+
   async getReportByIdForUser(id: string, authorId: string): Promise<Report> {
     const report = await this.repo.findById(id);
-    if (!report || report.authorId !== authorId) {
+    if (report?.authorId !== authorId) {
       throw new Error('Report not found');
     }
     return report;

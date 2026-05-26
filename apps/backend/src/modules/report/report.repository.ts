@@ -22,6 +22,13 @@ export class InMemoryReportRepository implements IReportRepository {
     return Promise.resolve({ items: sorted.slice(start, start + limit), total: own.length });
   }
 
+  findAll(page: number, limit: number): Promise<{ items: Report[]; total: number }> {
+    this.ensureSeeded();
+    const sorted = [...this.reports].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const start = (page - 1) * limit;
+    return Promise.resolve({ items: sorted.slice(start, start + limit), total: this.reports.length });
+  }
+
   findById(id: string): Promise<Report | null> {
     this.ensureSeeded();
     return Promise.resolve(this.reports.find((r) => r.id === id) ?? null);

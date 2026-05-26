@@ -7,6 +7,7 @@ import {
   createCityRepository,
   createConfigRepository,
   createMediaRepository,
+  createReportRepository,
   createUserRepository,
   createEstablishmentRepository
 } from '@/core/in-memory-repositories';
@@ -27,6 +28,7 @@ import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
 import { MediaService } from '@/modules/media/service/media.service';
 import { MediaLinkService } from '@/modules/media/service/media-link.service';
+import { ReportService } from '@/modules/report/report.service';
 import { UserService } from '@/modules/users/service/user.service';
 import { AccessController } from './controllers/access.controller';
 import { ArticleController } from './controllers/article.controller';
@@ -34,6 +36,7 @@ import { CityController } from './controllers/city.controller';
 import { MunicipalityConfigController } from './controllers/config.controller';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { MediaController } from './controllers/media.controller';
+import { ReportController } from './controllers/report.controller';
 import { UserController } from './controllers/user.controller';
 
 // Import repositories
@@ -45,6 +48,7 @@ const configRepository = createConfigRepository();
 const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
 const establishmentRepository = createEstablishmentRepository();
 const mediaRepository = createMediaRepository();
+const reportRepository = createReportRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
@@ -56,6 +60,7 @@ const accessService = new AccessService(accessRepository, cityService, userServi
 const configService = new ConfigService(configRepository);
 const mediaService = new MediaService(mediaRepository, mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository);
+const reportService = new ReportService(reportRepository);
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
@@ -63,6 +68,7 @@ const articleController = new ArticleController(articleService);
 const establishmentController = new EstablishmentController(establishmentService);
 const municipalityConfigController = new MunicipalityConfigController(configService);
 const mediaController = new MediaController(mediaService);
+const reportController = new ReportController(reportService);
 const cityController = new CityController(cityService, userService);
 const accessController = new AccessController(accessService, cityService, userService);
 
@@ -129,13 +135,28 @@ const establishmentPermissionGate = createMiddleware(async (c, next) => {
   }
   return requirePermission(perm, accessService, userService)(c, next);
 });
+const reportMethodToPermission = new Map<string, PermissionKey>([
+  ['GET', 'SIGNAL_VIEW_PERMISSION'],
+  ['PATCH', 'SIGNAL_MODIFY_PERMISSION'],
+]);
+const reportPermissionGate = createMiddleware(async (c, next) => {
+  const perm = reportMethodToPermission.get(c.req.method);
+  if (!perm) {
+    await next();
+    return;
+  }
+  return requirePermission(perm, accessService, userService)(c, next);
+});
 cityScoped.use('/articles', articlePermissionGate);
 cityScoped.use('/articles/*', articlePermissionGate);
 cityScoped.use('/establishment', establishmentPermissionGate);
 cityScoped.use('/establishment/*', establishmentPermissionGate);
+cityScoped.use('/reports', reportPermissionGate);
+cityScoped.use('/reports/*', reportPermissionGate);
 
 cityScoped.route('/articles', articleController.getRoutes());
 cityScoped.route('/establishment', establishmentController.getRoutes());
+cityScoped.route('/reports', reportController.getRoutes());
 cityScoped.route('/media', mediaController.getRoutes());
 
 // Routes ADMIN-only (CRUD roles + assignations) sous /cities/:cityId.

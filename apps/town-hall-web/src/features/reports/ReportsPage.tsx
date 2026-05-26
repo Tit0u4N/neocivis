@@ -234,14 +234,17 @@ function ReportsTable({
                 </td>
                 <td className="px-4 py-3">
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                      >
-                        <MoreHorizontal className="size-4" />
-                      </button>
-                    </DropdownMenuTrigger>
+                    <DropdownMenuTrigger
+                      render={(props) => (
+                        <button
+                          type="button"
+                          className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                          {...props}
+                        >
+                          <MoreHorizontal className="size-4" />
+                        </button>
+                      )}
+                    />
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => setSelectedReport(r)}>
                         {t('reports.actions.detail')}

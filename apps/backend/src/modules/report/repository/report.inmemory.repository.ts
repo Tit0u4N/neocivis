@@ -44,7 +44,7 @@ export class InMemoryReportRepository implements IReportRepository {
     this.ensureSeeded();
     const idx = this.reports.findIndex((r) => r.id === id);
     if (idx === -1) {
-      return Promise.reject(new Error(`Report not found: ${id}`));
+      throw new Error(`Report not found: ${id}`);
     }
     this.reports[idx] = { ...this.reports[idx], ...patch };
     return Promise.resolve(this.reports[idx]);

@@ -6,6 +6,7 @@ import {
   createConfigRepository,
   createReportRepository,
   createUserRepository,
+  createEstablishmentRepository
 } from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
@@ -18,7 +19,6 @@ import { AccessService } from '@/modules/access/access.service';
 import { ArticleService } from '@/modules/article/service/article.service';
 import { CityService } from '@/modules/city/city.service';
 import { ConfigService } from '@/modules/config/service/config.service';
-import { InMemoryEstablishmentRepository } from '@/modules/establishment/repository/establishment.inmemory.repository';
 import { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
@@ -38,7 +38,7 @@ const articleRepository = createArticleRepository();
 const cityRepository = createCityRepository();
 const accessRepository = createAccessRepository();
 const configRepository = createConfigRepository();
-const establishmentRepository = new InMemoryEstablishmentRepository();
+const establishmentRepository = createEstablishmentRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();

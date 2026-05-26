@@ -49,7 +49,7 @@ const mediaLinkService = new MediaLinkService(mediaRepository);
 const articleService = new ArticleService(articleRepository, mediaLinkService);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
-const configService = new ConfigService(configRepository);
+const configService = new ConfigService(configRepository, mediaRepository);
 const mediaService = new MediaService(mediaRepository, mediaBlobService);
 
 // Import controllers

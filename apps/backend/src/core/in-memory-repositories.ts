@@ -9,11 +9,12 @@ import type { ICityRepository } from '@/modules/city/repository/city.repository.
 import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
 import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.repository';
 import type { IConfigRepository } from '@/modules/config/repository/config.repository.interface';
+import { CosmosConfigRepository } from '@/modules/config/repository/config.cosmos.repository';
 import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
 import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
-import type { IReportRepository } from '@/modules/report/report.repository.interface';
+import type { IReportRepository } from '@/modules/report/report.types';
 import { InMemoryReportRepository } from '@/modules/report/report.repository';
 import type { IUserRepository } from '@/modules/users/repository/user.repository.interface';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
@@ -87,7 +88,7 @@ export function createMediaRepository(): IMediaRepository {
 }
 
 export function createConfigRepository(): IConfigRepository {
-  return isInMemoryMode() ? sharedConfigRepository() : new InMemoryConfigRepository();
+  return isInMemoryMode() ? sharedConfigRepository() : new CosmosConfigRepository();
 }
 
 export function createReportRepository(): IReportRepository {

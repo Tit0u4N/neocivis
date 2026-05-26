@@ -10,62 +10,94 @@ import type {
   UpdateArticleInput,
   UpdateStatusInput,
 } from '@repo/contracts/article';
+import type { MediaLinkService } from '@/modules/media/service/media-link.service';
 import type { IArticleRepository } from '../repository/article.repository.interface';
 
 export class ArticleService {
-  constructor(private repository: IArticleRepository) {}
+  constructor(
+    private repository: IArticleRepository,
+    private mediaLinkService?: MediaLinkService,
+  ) {}
 
-  getAllArticles(): Promise<Article[]> {
-    return this.repository.findAll();
+  getAllArticles(cityId: string): Promise<Article[]> {
+    return this.repository.findAllByCityId(cityId);
   }
 
   getPublishedArticles(): Promise<Article[]> {
     return this.repository.findAllPublished();
   }
 
-  async getArticleById(id: string): Promise<Article> {
-    const article = await this.repository.findById(id);
+  async getArticleById(cityId: string, id: string): Promise<Article> {
+    const article = await this.repository.findByIdAndCityId(id, cityId);
     if (!article) {
       throw new Error(`Article not found: ${id}`);
     }
     return article;
   }
 
-  createArticle(input: CreateArticleInput, authorId: string): Promise<Article> {
+  async createArticle(cityId: string, input: CreateArticleInput, authorId: string): Promise<Article> {
     const translation = { ...input.translation, locale: 'fr' as const };
-    return this.repository.create({
+    const article = await this.repository.create({
       ...input,
       translation,
       id: randomUUID(),
+      cityId,
       authorId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
+    await this.syncMediaLinks(article);
+    return article;
   }
 
-  async updateArticle(id: string, input: UpdateArticleInput): Promise<Article> {
-    const existing = await this.getArticleById(id);
-    const updated = await this.repository.update(id, {
+  async updateArticle(cityId: string, id: string, input: UpdateArticleInput): Promise<Article> {
+    const existing = await this.getArticleById(cityId, id);
+    let translations = existing.translations;
+
+    if (input.translation) {
+      const locale = input.translation.locale ?? 'fr';
+      const index = translations.findIndex((t) => t.locale === locale);
+      if (index === -1) {
+        translations = [...translations, { ...input.translation, locale } as ArticleTranslation];
+      } else {
+        translations = translations.map((t, i) =>
+          i === index ? ({ ...t, ...input.translation, locale: t.locale } as ArticleTranslation) : t,
+        );
+      }
+    }
+
+    const status = input.status ?? existing.status;
+    const patch: Partial<Article> = {
       ...existing,
+      translations,
       coverImageUrl: input.coverImageUrl ?? existing.coverImageUrl,
-      status: input.status ?? existing.status,
+      status,
       updatedAt: new Date().toISOString(),
-    });
+    };
+
+    if (status === 'published' && existing.status !== 'published') {
+      patch.publishedAt = new Date().toISOString();
+    }
+
+    const updated = await this.repository.update(id, patch);
     if (!updated) {
       throw new Error(`Article not found: ${id}`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
   }
 
-  async deleteArticle(id: string): Promise<void> {
+  async deleteArticle(cityId: string, id: string): Promise<void> {
+    await this.getArticleById(cityId, id);
+    await this.mediaLinkService?.removeArticleMediaLinks(cityId, id);
     const deleted = await this.repository.delete(id);
     if (!deleted) {
       throw new Error(`Article not found: ${id}`);
     }
   }
 
-  async updateStatus(id: string, input: UpdateStatusInput): Promise<Article> {
-    const existing = await this.getArticleById(id);
+  async updateStatus(cityId: string, id: string, input: UpdateStatusInput): Promise<Article> {
+    const existing = await this.getArticleById(cityId, id);
     const patch: Partial<Article> = {
       status: input.status,
       updatedAt: new Date().toISOString(),
@@ -80,8 +112,8 @@ export class ArticleService {
     return updated;
   }
 
-  async addTranslation(id: string, input: AddTranslationInput): Promise<Article> {
-    const existing = await this.getArticleById(id);
+  async addTranslation(cityId: string, id: string, input: AddTranslationInput): Promise<Article> {
+    const existing = await this.getArticleById(cityId, id);
     const hasDuplicate = existing.translations.some((t) => t.locale === input.locale);
     if (hasDuplicate) {
       throw new Error(`Translation for locale '${input.locale}' already exists`);
@@ -90,28 +122,40 @@ export class ArticleService {
     if (!updated) {
       throw new Error(`Article not found: ${id}`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
   }
 
-  async updateTranslation(id: string, locale: ArticleLocale, input: Partial<AddTranslationInput>): Promise<Article> {
-    await this.getArticleById(id);
+  async updateTranslation(
+    cityId: string,
+    id: string,
+    locale: ArticleLocale,
+    input: Partial<AddTranslationInput>,
+  ): Promise<Article> {
+    await this.getArticleById(cityId, id);
     const updated = await this.repository.updateTranslation(id, locale, input);
     if (!updated) {
       throw new Error(`Translation for locale '${locale}' not found on article '${id}'`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
   }
 
-  async deleteTranslation(id: string, locale: ArticleLocale): Promise<Article> {
+  async deleteTranslation(cityId: string, id: string, locale: ArticleLocale): Promise<Article> {
     if (locale === 'fr') {
       throw new Error("Cannot delete the default 'fr' translation");
     }
-    await this.getArticleById(id);
+    await this.getArticleById(cityId, id);
     const updated = await this.repository.deleteTranslation(id, locale);
     if (!updated) {
       throw new Error(`Translation for locale '${locale}' not found on article '${id}'`);
     }
+    await this.syncMediaLinks(updated);
     return updated;
+  }
+
+  private async syncMediaLinks(article: Article): Promise<void> {
+    await this.mediaLinkService?.syncArticleMediaLinks(article);
   }
 
   private resolveTranslation(translations: ArticleTranslation[], preferredLocale: ArticleLocale): ArticleTranslation {
@@ -154,7 +198,10 @@ export class ArticleService {
   }
 
   async getArticleByIdResolved(id: string, preferredLocale: ArticleLocale): Promise<ArticleWithResolvedTranslation> {
-    const article = await this.getArticleById(id);
+    const article = await this.repository.findById(id);
+    if (!article) {
+      throw new Error(`Article not found: ${id}`);
+    }
     return this.resolveArticle(article, preferredLocale);
   }
 }

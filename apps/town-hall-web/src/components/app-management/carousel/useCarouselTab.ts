@@ -2,11 +2,9 @@
 
 import type { CarouselItem, CarouselItemTranslation, ConfigLocale } from '@repo/contracts/config';
 import type { MediaImage } from '@repo/contracts/media';
-import { ConfigService } from '@repo/frontend-services/config';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
+import { useServices } from '@/providers/ServicesProvider';
 import { type Locale, useConfigStore } from '@/stores/config.store';
 import { type LinkValue, linkValueToUrl, urlToLinkValue } from '../LinkPicker';
 
@@ -39,9 +37,7 @@ export type CarouselTabViewModel = {
 
 export function useCarouselTab(): CarouselTabViewModel {
   const { t } = useTranslation();
-  const api = useApi();
-  const cityId = useCityStore((s) => s.cityId);
-  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
+  const { configService: configService } = useServices();
 
   const [carousel, setCarousel] = useState<CarouselItem[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');

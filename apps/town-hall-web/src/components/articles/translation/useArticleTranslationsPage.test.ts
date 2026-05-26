@@ -12,21 +12,14 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
 const mockArticleService = {
   getById: vi.fn(),
   addTranslation: vi.fn(),
   updateTranslation: vi.fn(),
   deleteTranslation: vi.fn(),
 };
-vi.mock('@repo/frontend-services/article', () => ({
-  // biome-ignore lint/suspicious/noExplicitAny: test mock
-  ArticleService: vi.fn(function (this: any) {
-    return mockArticleService;
-  }),
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ articleService: mockArticleService }),
 }));
 
 import { useArticleTranslationsPage } from './useArticleTranslationsPage';

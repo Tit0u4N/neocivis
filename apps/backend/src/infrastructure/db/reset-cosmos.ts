@@ -4,7 +4,11 @@
  */
 import type { CosmosClient } from '@azure/cosmos';
 import { getCosmosClient } from '@/infrastructure/azure/cosmos.client';
-import { optionalEnv } from '@/infrastructure/env';
+import {
+  COSMOS_CONTAINER_IDS,
+  ensureCosmosDatabaseAndContainers,
+  getCosmosDatabaseId,
+} from '@/infrastructure/azure/cosmos.setup';
 
 function assertConfirm(): void {
   if (!process.argv.includes('--confirm')) {
@@ -30,8 +34,7 @@ function getCosmosStatusCode(err: unknown): number | undefined {
 }
 
 export async function resetCosmos(client: CosmosClient): Promise<void> {
-  const databaseId = optionalEnv('COSMOS_DATABASE_ID') ?? 'neocivis';
-  const containerId = 'articles';
+  const databaseId = getCosmosDatabaseId();
 
   try {
     await client.database(databaseId).delete();
@@ -44,13 +47,11 @@ export async function resetCosmos(client: CosmosClient): Promise<void> {
     }
   }
 
-  const { database } = await client.databases.createIfNotExists({ id: databaseId });
-  await database.containers.createIfNotExists({
-    id: containerId,
-    partitionKey: { paths: ['/id'] },
-  });
+  await ensureCosmosDatabaseAndContainers(client);
   // biome-ignore lint/suspicious/noConsole: script CLI
-  console.info(`[db:reset:cosmos] cosmos database ensured (db=${databaseId}, container=${containerId})`);
+  console.info(
+    `[db:reset:cosmos] cosmos database ensured (db=${databaseId}, containers=${COSMOS_CONTAINER_IDS.join(', ')})`,
+  );
 }
 
 async function main(): Promise<void> {

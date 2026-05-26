@@ -1,35 +1,85 @@
-import { randomUUID } from 'node:crypto';
-import type { MediaImage } from '@repo/contracts/media';
+import type { MediaImageLink } from '@repo/contracts/media';
 
-type MediaSeedEntry = Omit<MediaImage, 'id' | 'cityId' | 'createdAt'>;
+export type MediaSeedTemplate = {
+  id: string;
+  title: string;
+  sourceUrl: string;
+  filename: string;
+  mimeType: string;
+  links?: MediaImageLink[];
+};
 
-export const mediaSeedsByCityName = new Map<string, MediaSeedEntry[]>([
+/** Fixed Nice media ids referenced by article/config seeders. */
+export const NICE_MEDIA_IDS = {
+  carousel1: 'a1000001-0000-4000-8000-000000000001',
+  carousel2: 'a1000001-0000-4000-8000-000000000002',
+  carousel3: 'a1000001-0000-4000-8000-000000000003',
+  articleCover1: 'a1000001-0000-4000-8000-000000000004',
+  articleCover2: 'a1000001-0000-4000-8000-000000000005',
+  articleInline: 'a1000001-0000-4000-8000-000000000006',
+  establishment1: 'a1000001-0000-4000-8000-000000000007',
+  galleryExtra: 'a1000001-0000-4000-8000-000000000008',
+} as const;
+
+export const mediaSeedsByCityName = new Map<string, MediaSeedTemplate[]>([
   [
-    'CITY_TEST_ID',
+    'Nice',
     [
       {
-        title: 'Promenade des Anglais',
-        url: 'https://picsum.photos/seed/nice-promenade/800/500',
-        storagePath: 'nice/promenade-des-anglais.jpg',
-        links: [],
+        id: NICE_MEDIA_IDS.carousel1,
+        title: 'Promenade des Anglais — Carousel',
+        sourceUrl: 'https://picsum.photos/seed/nice-carousel-1/800/400',
+        filename: 'nice-carousel-1.jpg',
+        mimeType: 'image/jpeg',
       },
       {
-        title: 'Vieux-Nice — Marché du Cours Saleya',
-        url: 'https://picsum.photos/seed/nice-marche/800/500',
-        storagePath: 'nice/vieux-nice-marche.jpg',
-        links: [],
+        id: NICE_MEDIA_IDS.carousel2,
+        title: 'Vieux-Nice — Carousel',
+        sourceUrl: 'https://picsum.photos/seed/nice-carousel-2/800/400',
+        filename: 'nice-carousel-2.jpg',
+        mimeType: 'image/jpeg',
       },
       {
-        title: 'Carnaval de Nice 2026',
-        url: 'https://picsum.photos/seed/nice-carnaval/800/500',
-        storagePath: 'nice/carnaval-2026.jpg',
-        links: [{ idLink: randomUUID(), type: 'carousel', title: 'Carnaval 2026' }],
+        id: NICE_MEDIA_IDS.carousel3,
+        title: 'Carnaval de Nice — Carousel',
+        sourceUrl: 'https://picsum.photos/seed/nice-carousel-3/800/400',
+        filename: 'nice-carousel-3.jpg',
+        mimeType: 'image/jpeg',
       },
       {
+        id: NICE_MEDIA_IDS.articleCover1,
+        title: 'Bienvenue — Couverture article',
+        sourceUrl: 'https://picsum.photos/seed/nice-cover-1/1200/630',
+        filename: 'nice-cover-1.jpg',
+        mimeType: 'image/jpeg',
+      },
+      {
+        id: NICE_MEDIA_IDS.articleCover2,
+        title: 'Travaux voirie — Couverture article',
+        sourceUrl: 'https://picsum.photos/seed/nice-cover-2/800/400',
+        filename: 'nice-cover-2.jpg',
+        mimeType: 'image/jpeg',
+      },
+      {
+        id: NICE_MEDIA_IDS.articleInline,
+        title: 'Illustration article',
+        sourceUrl: 'https://picsum.photos/seed/nice-inline/600/400',
+        filename: 'nice-inline.jpg',
+        mimeType: 'image/jpeg',
+      },
+      {
+        id: NICE_MEDIA_IDS.establishment1,
         title: 'Hôtel de Ville de Nice',
-        url: 'https://picsum.photos/seed/nice-hotel-ville/800/500',
-        storagePath: 'nice/hotel-de-ville.jpg',
-        links: [{ idLink: randomUUID(), type: 'establishments', title: 'Mairie de Nice' }],
+        sourceUrl: 'https://picsum.photos/seed/nice-hotel-ville/800/500',
+        filename: 'nice-hotel-ville.jpg',
+        mimeType: 'image/jpeg',
+      },
+      {
+        id: NICE_MEDIA_IDS.galleryExtra,
+        title: 'Marché du Cours Saleya',
+        sourceUrl: 'https://picsum.photos/seed/nice-marche/400/300',
+        filename: 'nice-marche-thumb.jpg',
+        mimeType: 'image/jpeg',
       },
     ],
   ],
@@ -37,22 +87,32 @@ export const mediaSeedsByCityName = new Map<string, MediaSeedEntry[]>([
     'Biot',
     [
       {
-        title: 'Village de Biot',
-        url: 'https://picsum.photos/seed/biot-village/800/500',
-        storagePath: 'biot/village.jpg',
-        links: [],
+        id: 'b2000002-0000-4000-8000-000000000001',
+        title: 'Village de Biot — Carousel',
+        sourceUrl: 'https://picsum.photos/seed/biot-carousel/800/400',
+        filename: 'biot-carousel.jpg',
+        mimeType: 'image/jpeg',
       },
       {
+        id: 'b2000002-0000-4000-8000-000000000002',
+        title: 'Village de Biot — Couverture',
+        sourceUrl: 'https://picsum.photos/seed/biot-cover/1200/630',
+        filename: 'biot-cover.jpg',
+        mimeType: 'image/jpeg',
+      },
+      {
+        id: 'b2000002-0000-4000-8000-000000000003',
         title: 'Musée Fernand Léger',
-        url: 'https://picsum.photos/seed/biot-leger/800/500',
-        storagePath: 'biot/musee-leger.jpg',
-        links: [{ idLink: randomUUID(), type: 'establishments', title: 'Musée Fernand Léger' }],
+        sourceUrl: 'https://picsum.photos/seed/biot-leger/800/500',
+        filename: 'biot-leger.jpg',
+        mimeType: 'image/jpeg',
       },
       {
-        title: 'Verrerie de Biot',
-        url: 'https://picsum.photos/seed/biot-verrerie/800/500',
-        storagePath: 'biot/verrerie.jpg',
-        links: [{ idLink: randomUUID(), type: 'carousel', title: 'Artisanat local' }],
+        id: 'b2000002-0000-4000-8000-000000000004',
+        title: 'Verrerie de Biot — Vignette',
+        sourceUrl: 'https://picsum.photos/seed/biot-verrerie/400/300',
+        filename: 'biot-verrerie.jpg',
+        mimeType: 'image/jpeg',
       },
     ],
   ],
@@ -60,38 +120,40 @@ export const mediaSeedsByCityName = new Map<string, MediaSeedEntry[]>([
     'Marseille',
     [
       {
-        title: 'Vieux-Port de Marseille',
-        url: 'https://picsum.photos/seed/marseille-vieux-port/800/500',
-        storagePath: 'marseille/vieux-port.jpg',
-        links: [{ idLink: randomUUID(), type: 'carousel', title: 'Vieux-Port' }],
+        id: 'c3000003-0000-4000-8000-000000000001',
+        title: 'Vieux-Port — Carousel',
+        sourceUrl: 'https://picsum.photos/seed/marseille-carousel/800/400',
+        filename: 'marseille-carousel.jpg',
+        mimeType: 'image/jpeg',
       },
       {
-        title: 'Notre-Dame de la Garde',
-        url: 'https://picsum.photos/seed/marseille-bonne-mere/800/500',
-        storagePath: 'marseille/notre-dame-garde.jpg',
-        links: [],
+        id: 'c3000003-0000-4000-8000-000000000002',
+        title: 'Notre-Dame de la Garde — Couverture',
+        sourceUrl: 'https://picsum.photos/seed/marseille-cover/1200/630',
+        filename: 'marseille-cover.jpg',
+        mimeType: 'image/jpeg',
       },
       {
-        title: 'Calanques de Marseille',
-        url: 'https://picsum.photos/seed/marseille-calanques/800/500',
-        storagePath: 'marseille/calanques.jpg',
-        links: [{ idLink: randomUUID(), type: 'articles', title: 'Parc national des Calanques' }],
+        id: 'c3000003-0000-4000-8000-000000000003',
+        title: 'Calanques — Inline',
+        sourceUrl: 'https://picsum.photos/seed/marseille-calanques/600/400',
+        filename: 'marseille-calanques.jpg',
+        mimeType: 'image/jpeg',
       },
       {
-        title: 'MuCEM',
-        url: 'https://picsum.photos/seed/marseille-mucem/800/500',
-        storagePath: 'marseille/mucem.jpg',
-        links: [{ idLink: randomUUID(), type: 'establishments', title: 'MuCEM' }],
+        id: 'c3000003-0000-4000-8000-000000000004',
+        title: 'MuCEM — Établissement',
+        sourceUrl: 'https://picsum.photos/seed/marseille-mucem/800/500',
+        filename: 'marseille-mucem.jpg',
+        mimeType: 'image/jpeg',
+      },
+      {
+        id: 'c3000003-0000-4000-8000-000000000005',
+        title: 'Vieux-Port — Vignette',
+        sourceUrl: 'https://picsum.photos/seed/marseille-vieux-port/400/300',
+        filename: 'marseille-vieux-port.jpg',
+        mimeType: 'image/jpeg',
       },
     ],
   ],
 ]);
-
-export function buildMediaSeed(cityId: string, entries: MediaSeedEntry[]): MediaImage[] {
-  return entries.map((entry) => ({
-    ...entry,
-    id: randomUUID(),
-    cityId,
-    createdAt: new Date().toISOString(),
-  }));
-}

@@ -10,7 +10,10 @@ import { DrizzleAccessRepository } from '@/modules/access/repository/access.driz
 import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
 import { CityService } from '@/modules/city/city.service';
 import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
+import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
+import { AzureMediaBlobService } from '@/modules/media/media-blob.service';
+import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { UserService } from '@/modules/users/service/user.service';
 
@@ -43,12 +46,27 @@ async function main(): Promise<void> {
   const articleRepository = new CosmosArticleRepository();
   const cityRepository = new DrizzleCityRepository();
   const accessRepository = new DrizzleAccessRepository();
+  const mediaRepository = new CosmosMediaRepository();
+  const mediaBlobService = new AzureMediaBlobService();
+  const configRepository = new InMemoryConfigRepository();
   const iamService = new KeycloakIAMService();
   const userService = new UserService(userRepository, iamService);
   const cityService = new CityService(cityRepository, userService, iamService);
   const accessService = new AccessService(accessRepository, cityService, userService);
 
-  await runSeeders({ userService, articleRepository, cityRepository, iamService, accessService }, mode);
+  await runSeeders(
+    {
+      userService,
+      articleRepository,
+      cityRepository,
+      iamService,
+      accessService,
+      mediaRepository,
+      mediaBlobService,
+      configRepository,
+    },
+    mode,
+  );
   // biome-ignore lint/suspicious/noConsole: script CLI
   console.info(`[seeding] done (mode=${mode})`);
 }

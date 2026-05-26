@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CityId } from '../city/city.schema';
 
 export const ArticleStatus = z.enum(['draft', 'published']);
 export type ArticleStatus = z.infer<typeof ArticleStatus>;
@@ -16,6 +17,7 @@ export type ArticleTranslation = z.infer<typeof ArticleTranslation>;
 
 export const Article = z.object({
   id: z.string().uuid(),
+  cityId: CityId,
   translations: z.array(ArticleTranslation).min(1),
   coverImageUrl: z.string().url().optional(),
   status: ArticleStatus,
@@ -58,6 +60,7 @@ export type ArticlesListQuery = z.infer<typeof ArticlesListQuery>;
 
 export const ArticleWithResolvedTranslation = z.object({
   id: z.string().uuid(),
+  cityId: CityId,
   translation: ArticleTranslation,
   coverImageUrl: z.string().url().optional(),
   status: ArticleStatus,

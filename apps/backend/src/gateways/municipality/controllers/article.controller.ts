@@ -30,14 +30,20 @@ export class ArticleController {
     return app;
   }
 
+  private getCityId(c: Context): string {
+    return c.req.param('cityId');
+  }
+
   private async listAll(c: Context): Promise<ControllerJson<Article[], 200, readonly []>> {
-    const body: Article[] = await this.articleService.getAllArticles();
+    const cityId = this.getCityId(c);
+    const body: Article[] = await this.articleService.getAllArticles(cityId);
     return c.json(body, 200);
   }
 
   private async getById(c: Context): Promise<ControllerJson<Article>> {
+    const cityId = this.getCityId(c);
     try {
-      const article = await this.articleService.getArticleById(c.req.param('id'));
+      const article = await this.articleService.getArticleById(cityId, c.req.param('id'));
       const body: Article = article;
       return c.json(body, 200);
     } catch {
@@ -46,25 +52,27 @@ export class ArticleController {
   }
 
   private async create(c: Context): Promise<ControllerJson<Article, 201>> {
+    const cityId = this.getCityId(c);
     const bodyJson = await c.req.json();
     const parsed = CreateArticleInput.safeParse(bodyJson);
     if (!parsed.success) {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
     const authorId = (c.get('userId') as string) ?? 'unknown';
-    const article = await this.articleService.createArticle(parsed.data, authorId);
+    const article = await this.articleService.createArticle(cityId, parsed.data, authorId);
     const body: Article = article;
     return c.json(body, 201);
   }
 
   private async update(c: Context): Promise<ControllerJson<Article>> {
+    const cityId = this.getCityId(c);
     const bodyJson = await c.req.json();
     const parsed = UpdateArticleInput.safeParse(bodyJson);
     if (!parsed.success) {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
     try {
-      const article = await this.articleService.updateArticle(c.req.param('id'), parsed.data);
+      const article = await this.articleService.updateArticle(cityId, c.req.param('id'), parsed.data);
       const body: Article = article;
       return c.json(body, 200);
     } catch {
@@ -73,8 +81,9 @@ export class ArticleController {
   }
 
   private async remove(c: Context): Promise<ControllerJson<OperationSuccessDto>> {
+    const cityId = this.getCityId(c);
     try {
-      await this.articleService.deleteArticle(c.req.param('id'));
+      await this.articleService.deleteArticle(cityId, c.req.param('id'));
       return c.json({ success: true } satisfies OperationSuccessDto, 200);
     } catch {
       return c.json({ error: 'Article not found' } satisfies ApiErrorDto, 404);
@@ -82,13 +91,14 @@ export class ArticleController {
   }
 
   private async patchStatus(c: Context): Promise<ControllerJson<Article>> {
+    const cityId = this.getCityId(c);
     const bodyJson = await c.req.json();
     const parsed = UpdateStatusInput.safeParse(bodyJson);
     if (!parsed.success) {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
     try {
-      const article = await this.articleService.updateStatus(c.req.param('id'), parsed.data);
+      const article = await this.articleService.updateStatus(cityId, c.req.param('id'), parsed.data);
       const body: Article = article;
       return c.json(body, 200);
     } catch {
@@ -97,13 +107,14 @@ export class ArticleController {
   }
 
   private async addTranslation(c: Context): Promise<ControllerJson<Article, 201>> {
+    const cityId = this.getCityId(c);
     const bodyJson = await c.req.json();
     const parsed = AddTranslationInput.safeParse(bodyJson);
     if (!parsed.success) {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
     try {
-      const article = await this.articleService.addTranslation(c.req.param('id'), parsed.data);
+      const article = await this.articleService.addTranslation(cityId, c.req.param('id'), parsed.data);
       const body: Article = article;
       return c.json(body, 201);
     } catch (err) {
@@ -116,6 +127,7 @@ export class ArticleController {
   }
 
   private async updateTranslation(c: Context): Promise<ControllerJson<Article>> {
+    const cityId = this.getCityId(c);
     const localeParsed = ArticleLocale.safeParse(c.req.param('locale'));
     if (!localeParsed.success) {
       return c.json({ error: 'Invalid locale' } satisfies ApiErrorDto, 400);
@@ -126,7 +138,12 @@ export class ArticleController {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
     try {
-      const article = await this.articleService.updateTranslation(c.req.param('id'), localeParsed.data, parsed.data);
+      const article = await this.articleService.updateTranslation(
+        cityId,
+        c.req.param('id'),
+        localeParsed.data,
+        parsed.data,
+      );
       const body: Article = article;
       return c.json(body, 200);
     } catch {
@@ -135,12 +152,13 @@ export class ArticleController {
   }
 
   private async deleteTranslation(c: Context): Promise<ControllerJson<Article>> {
+    const cityId = this.getCityId(c);
     const localeParsed = ArticleLocale.safeParse(c.req.param('locale'));
     if (!localeParsed.success) {
       return c.json({ error: 'Invalid locale' } satisfies ApiErrorDto, 400);
     }
     try {
-      const article = await this.articleService.deleteTranslation(c.req.param('id'), localeParsed.data);
+      const article = await this.articleService.deleteTranslation(cityId, c.req.param('id'), localeParsed.data);
       const body: Article = article;
       return c.json(body, 200);
     } catch (err) {

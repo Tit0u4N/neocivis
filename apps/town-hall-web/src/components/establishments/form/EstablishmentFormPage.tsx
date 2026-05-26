@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
+import { ImageIcon, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
@@ -13,8 +13,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { BackButton } from '@/components/ui/back-button';
+import { MediaGallery } from '@/components/media-gallery/MediaGallery';
 import { Button } from '@/components/ui/button';
-import { ImageUpload } from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
@@ -33,8 +33,11 @@ export function EstablishmentFormPage(props: Props) {
     isSubmitting,
     apiError,
     showDiscardDialog,
+    isPickerOpen,
     setField,
-    handleUploadImage,
+    openImagePicker,
+    closeImagePicker,
+    handleMediaSelect,
     handleSubmit,
     handleCancel,
     handleBack,
@@ -158,12 +161,27 @@ export function EstablishmentFormPage(props: Props) {
         {/* Image */}
         <div className="space-y-1.5">
           <Label>{t('establishment.form.fields.image')}</Label>
-          <ImageUpload
-            value={form.imageUrl || undefined}
-            onChange={(url) => setField('imageUrl', url ?? '')}
-            onUpload={handleUploadImage}
-            alt={form.name || t('establishment.form.fields.imageAlt')}
-          />
+          <div className="flex items-center gap-4">
+            <div className="flex h-28 w-48 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border border-dashed bg-muted">
+              {form.imageUrl ? (
+                // biome-ignore lint/performance/noImgElement: external URL from media gallery
+                <img
+                  src={form.imageUrl}
+                  alt={form.name || t('establishment.form.fields.imageAlt')}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <ImageIcon className="size-7 text-muted-foreground/50" />
+              )}
+            </div>
+            <Button variant="outline" size="sm" onClick={openImagePicker} className="gap-1.5">
+              <ImageIcon className="size-3.5" />
+              {form.imageUrl
+                ? t('establishment.form.fields.imageChange')
+                : t('establishment.form.fields.imageChoose')}
+            </Button>
+          </div>
+          {isPickerOpen && <MediaGallery mode="picker" onSelect={handleMediaSelect} onClose={closeImagePicker} />}
         </div>
 
         {/* Actions */}

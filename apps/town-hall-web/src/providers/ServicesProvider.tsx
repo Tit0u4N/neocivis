@@ -2,6 +2,7 @@
 
 import { ArticleService } from '@repo/frontend-services/article';
 import { ConfigService } from '@repo/frontend-services/config';
+import { EstablishmentService } from '@repo/frontend-services/establishment';
 import { MediaService } from '@repo/frontend-services/media';
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
 import { useApi } from '@/providers/ApiProvider';
@@ -15,6 +16,7 @@ import { useCityStore } from '@/stores/city.store';
 type ServicesContextValue = {
   articleService: ArticleService;
   configService: ConfigService;
+  establishmentService: EstablishmentService;
   mediaService: MediaService;
 };
 
@@ -36,6 +38,7 @@ export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>
     () => ({
       articleService: new ArticleService(api, cityId),
       configService: new ConfigService(api, cityId),
+      establishmentService: new EstablishmentService(api, cityId),
       mediaService: new MediaService(api, cityId),
     }),
     [api, cityId],

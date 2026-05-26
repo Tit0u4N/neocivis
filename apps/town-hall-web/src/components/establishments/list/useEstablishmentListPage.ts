@@ -1,10 +1,9 @@
 'use client';
 
 import type { Establishment, EstablishmentType } from '@repo/contracts/establishment';
-import { EstablishmentService } from '@repo/frontend-services/establishment';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
+import { useServices } from '@/providers/ServicesProvider';
 
 export type ViewMode = 'list' | 'grid';
 
@@ -12,7 +11,7 @@ type TypeFilter = EstablishmentType | 'all';
 
 export function useEstablishmentListPage() {
   const router = useRouter();
-  const establishmentService = new EstablishmentService(useApi());
+  const { establishmentService } = useServices();
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');

@@ -12,30 +12,13 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
 const mockEstablishmentService = {
   getById: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
 };
-vi.mock('@repo/frontend-services/establishment', () => ({
-  // biome-ignore lint/style/useNamingConvention: React class name in mock object
-  EstablishmentService: vi.fn(function (this: any) {
-    return mockEstablishmentService;
-  }),
-}));
-
-const mockUploadService = {
-  uploadImage: vi.fn(),
-};
-vi.mock('@repo/frontend-services/upload', () => ({
-  // biome-ignore lint/style/useNamingConvention: React class name in mock object
-  UploadService: vi.fn(function (this: any) {
-    return mockUploadService;
-  }),
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ establishmentService: mockEstablishmentService }),
 }));
 
 import { useEstablishmentFormPage } from './useEstablishmentFormPage';

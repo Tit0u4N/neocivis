@@ -2,11 +2,10 @@
 
 import type { EstablishmentType } from '@repo/contracts/establishment';
 import { CreateEstablishmentInput } from '@repo/contracts/establishment';
-import { EstablishmentService } from '@repo/frontend-services/establishment';
-import { UploadService } from '@repo/frontend-services/upload';
+import type { MediaImage } from '@repo/contracts/media';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
+import { useServices } from '@/providers/ServicesProvider';
 
 type FormState = {
   name: string;
@@ -30,9 +29,7 @@ type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export function useEstablishmentFormPage(id?: string) {
   const router = useRouter();
-  const api = useApi();
-  const establishmentService = new EstablishmentService(api);
-  const uploadService = new UploadService(api);
+  const { establishmentService } = useServices();
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
@@ -42,6 +39,7 @@ export function useEstablishmentFormPage(id?: string) {
   const [apiError, setApiError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isEditing) {
@@ -90,7 +88,15 @@ export function useEstablishmentFormPage(id?: string) {
     return true;
   }, [form]);
 
-  const handleUploadImage = useCallback((file: File) => uploadService.uploadImage(file), [uploadService.uploadImage]);
+  const openImagePicker = useCallback(() => setIsPickerOpen(true), []);
+  const closeImagePicker = useCallback(() => setIsPickerOpen(false), []);
+  const handleMediaSelect = useCallback(
+    (media: MediaImage) => {
+      setField('imageUrl', media.url);
+      setIsPickerOpen(false);
+    },
+    [setField],
+  );
 
   const handleSubmit = useCallback(async () => {
     setApiError(null);
@@ -152,8 +158,11 @@ export function useEstablishmentFormPage(id?: string) {
     apiError,
     isDirty,
     showDiscardDialog,
+    isPickerOpen,
     setField,
-    handleUploadImage,
+    openImagePicker,
+    closeImagePicker,
+    handleMediaSelect,
     handleSubmit,
     handleCancel,
     handleBack,

@@ -3,8 +3,8 @@ import type { KyInstance } from 'ky';
 import AbstractService from '../AbstractService';
 
 export class EstablishmentService extends AbstractService {
-  constructor(kyInstance: KyInstance) {
-    super(kyInstance, '');
+  constructor(kyInstance: KyInstance, cityId: string) {
+    super(kyInstance, `/cities/${cityId}`);
   }
 
   async getAll(): Promise<Establishment[]> {

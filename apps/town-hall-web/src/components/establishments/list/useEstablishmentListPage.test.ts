@@ -12,19 +12,12 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
 const mockEstablishmentService = {
   getAll: vi.fn(),
   delete: vi.fn(),
 };
-vi.mock('@repo/frontend-services/establishment', () => ({
-  // biome-ignore lint/style/useNamingConvention: React class name in mock object
-  EstablishmentService: vi.fn(function (this: any) {
-    return mockEstablishmentService;
-  }),
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ establishmentService: mockEstablishmentService }),
 }));
 
 import { useEstablishmentListPage } from './useEstablishmentListPage';

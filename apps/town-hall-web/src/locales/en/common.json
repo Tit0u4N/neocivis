@@ -180,7 +180,9 @@
         "phone": "Phone",
         "phonePlaceholder": "E.g. 04 93 32 80 00",
         "image": "Image",
-        "imageAlt": "Establishment image"
+        "imageAlt": "Establishment image",
+        "imageChoose": "Choose an image",
+        "imageChange": "Change image"
       },
       "discardDialog": {
         "title": "Discard changes?",

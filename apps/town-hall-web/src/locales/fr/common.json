@@ -180,7 +180,9 @@
         "phone": "Téléphone",
         "phonePlaceholder": "Ex : 04 93 32 80 00",
         "image": "Image",
-        "imageAlt": "Image de l'établissement"
+        "imageAlt": "Image de l'établissement",
+        "imageChoose": "Choisir une image",
+        "imageChange": "Changer l'image"
       },
       "discardDialog": {
         "title": "Abandonner les modifications ?",

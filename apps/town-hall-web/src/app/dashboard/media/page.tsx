@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { MediaGallery } from '@/components/media-gallery/MediaGallery';
+import { MediaGallery } from '@/features/media-gallery/MediaGallery';
 
 export default function MediaPage() {
   const { t } = useTranslation();

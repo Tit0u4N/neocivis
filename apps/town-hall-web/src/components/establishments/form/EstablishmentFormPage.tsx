@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { BackButton } from '@/components/ui/back-button';
-import { MediaGallery } from '@/components/media-gallery/MediaGallery';
+import { MediaGallery } from '@/features/media-gallery/MediaGallery';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

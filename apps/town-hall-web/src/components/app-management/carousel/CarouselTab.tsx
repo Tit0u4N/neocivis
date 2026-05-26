@@ -2,7 +2,7 @@
 
 import { ChevronDown, ChevronUp, ImageIcon, Plus, Save, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { MediaGallery } from '@/components/media-gallery/MediaGallery';
+import { MediaGallery } from '@/features/media-gallery/MediaGallery';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

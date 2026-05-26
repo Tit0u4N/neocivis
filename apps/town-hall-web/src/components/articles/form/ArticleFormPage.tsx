@@ -2,7 +2,7 @@
 
 import { ImageIcon, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { MediaGallery } from '@/components/media-gallery/MediaGallery';
+import { MediaGallery } from '@/features/media-gallery/MediaGallery';
 import { PlateEditor } from '@/components/plate-editor/PlateEditor';
 import {
   AlertDialog,

@@ -28,7 +28,7 @@ import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
 import { MediaService } from '@/modules/media/service/media.service';
 import { MediaLinkService } from '@/modules/media/service/media-link.service';
-import { ReportService } from '@/modules/report/report.service';
+import { ReportService } from '@/modules/report/service/report.service';
 import { UserService } from '@/modules/users/service/user.service';
 import { AccessController } from './controllers/access.controller';
 import { ArticleController } from './controllers/article.controller';

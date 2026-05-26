@@ -15,8 +15,8 @@ import { IEstablishmentRepository } from "@/modules/establishment/repository/est
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
 import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
-import { InMemoryReportRepository } from '@/modules/report/report.repository';
-import { IReportRepository } from "@/modules/report/report.types";
+import { InMemoryReportRepository } from '@/modules/report/repository/report.inmemory.repository';
+import type { IReportRepository } from '@/modules/report/repository/report.repository.interface';
 import type { IUserRepository } from '@/modules/users/repository/user.repository.interface';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';

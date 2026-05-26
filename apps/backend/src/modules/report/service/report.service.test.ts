@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { InMemoryReportRepository } from './report.repository';
+import { InMemoryReportRepository } from '../repository/report.inmemory.repository';
 import { ReportService } from './report.service';
 
 describe('ReportService', () => {

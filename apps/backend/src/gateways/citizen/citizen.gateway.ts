@@ -22,7 +22,7 @@ import { ConfigService } from '@/modules/config/service/config.service';
 import { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
-import { ReportService } from '@/modules/report/report.service';
+import { ReportService } from '@/modules/report/service/report.service';
 import { AzureBlobUploadService } from '@/modules/upload/upload.service';
 import { UserService } from '@/modules/users/service/user.service';
 import { ArticleController } from './controllers/article.controller';

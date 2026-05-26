@@ -3,7 +3,7 @@ import { type PaginatedReportsResponse, type Report, ReportStatus, ReportsListQu
 import { type Context, Hono } from 'hono';
 import { z } from 'zod';
 import type { ControllerJson } from '@/gateways/controller-json-response';
-import type { ReportService } from '@/modules/report/report.service';
+import type { ReportService } from '@/modules/report/service/report.service';
 
 const UpdateReportStatusBody = z.object({ status: ReportStatus });
 

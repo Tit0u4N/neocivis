@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { GpsLocation, PaginatedReportsResponse, Report, ReportStatus } from '@repo/contracts/report';
-import type { IReportRepository } from './report.types';
+import type { IReportRepository } from '../repository/report.repository.interface';
 
 function deriveTitle(desc: string, maxLen = 60): string {
   const trimmed = desc.trim();

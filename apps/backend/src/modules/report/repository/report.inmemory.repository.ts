@@ -1,6 +1,6 @@
 import type { Report } from '@repo/contracts/report';
-import { getMockReports } from './report.mock';
-import type { IReportRepository } from './report.types';
+import { getMockReports } from '../seed/report.seed';
+import type { IReportRepository } from './report.repository.interface';
 
 export class InMemoryReportRepository implements IReportRepository {
   private seeded = false;

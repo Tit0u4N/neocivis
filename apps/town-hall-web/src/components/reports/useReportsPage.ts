@@ -1,10 +1,8 @@
 'use client';
 
 import type { Report, ReportStatus } from '@repo/contracts/report';
-import { MunicipalityReportService } from '@repo/frontend-services/municipality-report';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
+import { useServices } from '@/providers/ServicesProvider';
 
 export type ReportSection = 'pending' | 'history';
 export type ReportView = 'table' | 'map';
@@ -133,9 +131,7 @@ const MOCK_REPORTS: Report[] = [
 ];
 
 export function useReportsPage(): ReportsPageViewModel {
-  const api = useApi();
-  const cityId = useCityStore((s) => s.cityId);
-  const reportService = useMemo(() => new MunicipalityReportService(api, cityId), [api, cityId]);
+  const { reportService } = useServices();
 
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);

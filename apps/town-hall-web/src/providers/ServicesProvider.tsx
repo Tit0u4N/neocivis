@@ -4,6 +4,7 @@ import { ArticleService } from '@repo/frontend-services/article';
 import { ConfigService } from '@repo/frontend-services/config';
 import { EstablishmentService } from '@repo/frontend-services/establishment';
 import { MediaService } from '@repo/frontend-services/media';
+import { ReportService } from '@repo/frontend-services/report';
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
 import { useApi } from '@/providers/ApiProvider';
 import { useCityStore } from '@/stores/city.store';
@@ -11,13 +12,14 @@ import { useCityStore } from '@/stores/city.store';
 /**
  * City-scoped business services, instantiated once per resolved city.
  * Only services that require a `cityId` live here; non-scoped services
- * (auth, permission, upload, report) are created where they are used.
+ * (auth, permission, upload) are created where they are used.
  */
 type ServicesContextValue = {
   articleService: ArticleService;
   configService: ConfigService;
   establishmentService: EstablishmentService;
   mediaService: MediaService;
+  reportService: ReportService;
 };
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(undefined);
@@ -40,6 +42,7 @@ export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>
       configService: new ConfigService(api, cityId),
       establishmentService: new EstablishmentService(api, cityId),
       mediaService: new MediaService(api, cityId),
+      reportService: new ReportService(api, cityId),
     }),
     [api, cityId],
   );

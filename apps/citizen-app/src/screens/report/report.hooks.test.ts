@@ -47,6 +47,10 @@ vi.mock('@/providers/ApiProvider', () => {
   return { useApi: () => stableApi };
 });
 
+vi.mock('@/stores/city.store', () => ({
+  useCityStore: () => ({ cityId: 'city-1', setCityId: vi.fn() }),
+}));
+
 function createReportServiceMock() {
   return {
     getMine: mockGetMine,

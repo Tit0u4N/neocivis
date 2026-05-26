@@ -29,7 +29,6 @@
   },
   "exports": {
     "./report": "./dist/report.js",
-    "./municipality-report": "./dist/municipality-report.js",
     "./auth": "./dist/auth.js",
     "./config": "./dist/config.js",
     "./permission": "./dist/permission.js",

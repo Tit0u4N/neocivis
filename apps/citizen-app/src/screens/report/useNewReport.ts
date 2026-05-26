@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useApi } from '@/providers/ApiProvider';
+import { useCityStore } from '@/stores/city.store';
 
 export interface GpsCoords {
   latitude: number;
@@ -16,7 +17,8 @@ export type PhotoState = { status: 'none' } | { status: 'picked'; uri: string; f
 
 export function useNewReport() {
   const api = useApi();
-  const reportService = useMemo(() => new ReportService(api), [api]);
+  const { cityId } = useCityStore();
+  const reportService = useMemo(() => new ReportService(api, cityId), [api, cityId]);
 
   const [desc, setDesc] = useState('');
   const [photo, setPhoto] = useState<PhotoState>({ status: 'none' });

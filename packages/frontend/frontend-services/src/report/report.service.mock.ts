@@ -5,6 +5,8 @@ export interface IMockReportService {
   getMine: ReturnType<typeof vi.fn>;
   getById: ReturnType<typeof vi.fn>;
   cancel: ReturnType<typeof vi.fn>;
+  getAll: ReturnType<typeof vi.fn>;
+  updateStatus: ReturnType<typeof vi.fn>;
 }
 
 export const mockReportService: IMockReportService = {
@@ -12,4 +14,6 @@ export const mockReportService: IMockReportService = {
   getMine: vi.fn(),
   getById: vi.fn(),
   cancel: vi.fn(),
+  getAll: vi.fn(),
+  updateStatus: vi.fn(),
 };

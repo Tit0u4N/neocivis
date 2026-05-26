@@ -7,7 +7,7 @@ export const SUPPORTED_LOCALES = ['fr', 'en', 'de', 'it'] as const;
 
 export const CategoryLink = z.object({
   type: z.string(),
-  id: z.string().optional(),
+  value: z.string().optional(),
 });
 export type CategoryLink = z.infer<typeof CategoryLink>;
 

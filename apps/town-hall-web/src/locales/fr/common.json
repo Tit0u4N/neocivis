@@ -37,6 +37,11 @@
     "description": "Cette page n'existe pas ou a été déplacée.",
     "backToDashboard": "Retour au tableau de bord"
   },
+  "noCity": {
+    "title": "Aucune commune associée",
+    "description": "Votre compte n'est rattaché à aucune commune. Veuillez contacter votre administrateur pour obtenir l'accès à un espace mairie.",
+    "logout": "Se déconnecter"
+  },
   "settings": {
     "appearance": "Apparence",
     "language": {
@@ -323,6 +328,9 @@
       "addTranslation": "Ajouter une langue",
       "externalUrl": "URL externe",
       "pageId": "Identifiant de page",
+      "article": "Article",
+      "articlePlaceholder": "Rechercher un article…",
+      "noArticles": "Aucun article disponible",
       "clear": "Effacer",
       "delete": "Supprimer"
     },
@@ -339,7 +347,7 @@
     },
     "linkGroups": {
       "special": "Pages spéciales",
-      "freePage": "Pages libres",
+      "articlePage": "Page article",
       "normal": "Pages standard",
       "external": "Externe"
     },
@@ -347,12 +355,12 @@
       "Link": "Lien",
       "General": "Général",
       "Establishment": "Établissement",
-      "FreePage": "Page libre",
+      "ArticlePage": "Page article",
       "Forum": "Forum",
       "Reports": "Signalements",
       "Articles": "Articles",
       "Events": "Événements",
-      "External URL": "URL externe"
+      "ExternalURL": "URL externe"
     },
     "colors": {
       "Corail": "Corail",

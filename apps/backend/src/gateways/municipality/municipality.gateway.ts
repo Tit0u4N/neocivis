@@ -1,7 +1,14 @@
 import type { PermissionKey } from '@repo/contracts';
 import { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
-import { startAutoSeedOnStartup } from '@/core/auto-seed';
+import {
+  createAccessRepository,
+  createArticleRepository,
+  createCityRepository,
+  createConfigRepository,
+  createMediaRepository,
+  createUserRepository,
+} from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
 import { applyUserMiddleware } from '@/middlewares/auth.middleware';
@@ -11,24 +18,15 @@ import { applyMockApimMiddleware } from '@/middlewares/local-auth.middleware';
 import { requirePermission } from '@/middlewares/permission.middleware';
 import { applyRoleMiddleware } from '@/middlewares/role.middleware';
 import { AccessService } from '@/modules/access/access.service';
-import { DrizzleAccessRepository } from '@/modules/access/repository/access.drizzle.repository';
-import { InMemoryAccessRepository } from '@/modules/access/repository/access.inmemory.repository';
-import { CosmosArticleRepository } from '@/modules/article/repository/article.cosmos.repository';
-import { InMemoryArticleRepository } from '@/modules/article/repository/article.inmemory.repository';
 import { ArticleService } from '@/modules/article/service/article.service';
 import { CityService } from '@/modules/city/city.service';
-import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.repository';
-import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.repository';
-import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import { ConfigService } from '@/modules/config/service/config.service';
 import { InMemoryEstablishmentRepository } from '@/modules/establishment/repository/establishment.inmemory.repository';
 import { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
-import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
+import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
 import { MediaService } from '@/modules/media/service/media.service';
-import { AzureBlobUploadService, StubUploadService } from '@/modules/upload/upload.service';
-import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
-import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
+import { MediaLinkService } from '@/modules/media/service/media-link.service';
 import { UserService } from '@/modules/users/service/user.service';
 import { AccessController } from './controllers/access.controller';
 import { ArticleController } from './controllers/article.controller';
@@ -36,45 +34,34 @@ import { CityController } from './controllers/city.controller';
 import { MunicipalityConfigController } from './controllers/config.controller';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { MediaController } from './controllers/media.controller';
-import { UploadController } from './controllers/upload.controller';
 import { UserController } from './controllers/user.controller';
 
 // Import repositories
-const userRepository = isInMemoryMode() ? new InMemoryUserRepository() : new DrizzleUserRepository();
-const articleRepository = isInMemoryMode() ? new InMemoryArticleRepository() : new CosmosArticleRepository();
-const cityRepository = isInMemoryMode() ? new InMemoryCityRepository() : new DrizzleCityRepository();
-const accessRepository = isInMemoryMode() ? new InMemoryAccessRepository() : new DrizzleAccessRepository();
-const configRepository = new InMemoryConfigRepository();
+const userRepository = createUserRepository();
+const articleRepository = createArticleRepository();
+const cityRepository = createCityRepository();
+const accessRepository = createAccessRepository();
+const configRepository = createConfigRepository();
+const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
 const establishmentRepository = new InMemoryEstablishmentRepository();
-const mediaRepository = new InMemoryMediaRepository();
+const mediaRepository = createMediaRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
 const userService = new UserService(userRepository, iamService);
-const articleService = new ArticleService(articleRepository);
+const mediaLinkService = new MediaLinkService(mediaRepository);
+const articleService = new ArticleService(articleRepository, mediaLinkService);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const configService = new ConfigService(configRepository);
-const uploadService = isInMemoryMode() ? new AzureBlobUploadService() : new StubUploadService();
+const mediaService = new MediaService(mediaRepository, mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository);
-const mediaService = new MediaService(mediaRepository, uploadService);
-
-await startAutoSeedOnStartup({
-  userService,
-  articleRepository,
-  cityRepository,
-  establishmentRepository,
-  iamService,
-  accessService,
-  mediaRepository,
-});
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
 const articleController = new ArticleController(articleService);
 const establishmentController = new EstablishmentController(establishmentService);
 const municipalityConfigController = new MunicipalityConfigController(configService);
-const uploadController = new UploadController(uploadService);
 const mediaController = new MediaController(mediaService);
 const cityController = new CityController(cityService, userService);
 const accessController = new AccessController(accessService, cityService, userService);
@@ -90,10 +77,7 @@ applyRoleMiddleware(app, ['EMPLOYEE', 'ADMIN']);
 // Register routes from controllers
 app.route('/user', userController.getRoutes());
 app.route('/permissions', accessController.getCatalogRoutes());
-app.route('/articles', articleController.getRoutes());
 app.route('/config', municipalityConfigController.getRoutes());
-app.route('/uploads', uploadController.getRoutes());
-app.route('/media', mediaController.getRoutes());
 
 app.route('/establishment', establishmentController.getRoutes());
 
@@ -152,7 +136,7 @@ cityScoped.use('/establishment/*', establishmentPermissionGate);
 
 cityScoped.route('/articles', articleController.getRoutes());
 cityScoped.route('/establishment', establishmentController.getRoutes());
-cityScoped.route('/uploads', uploadController.getRoutes());
+cityScoped.route('/media', mediaController.getRoutes());
 
 // Routes ADMIN-only (CRUD roles + assignations) sous /cities/:cityId.
 cityScoped.route('/', accessController.getCityScopedRoutes());

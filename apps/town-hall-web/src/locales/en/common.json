@@ -37,6 +37,11 @@
     "description": "This page does not exist or has been moved.",
     "backToDashboard": "Back to dashboard"
   },
+  "noCity": {
+    "title": "No city assigned",
+    "description": "Your account is not linked to any city. Please contact your administrator to get access to a town hall workspace.",
+    "logout": "Log out"
+  },
   "settings": {
     "appearance": "Appearance",
     "language": {
@@ -323,6 +328,9 @@
       "addTranslation": "Add a language",
       "externalUrl": "External URL",
       "pageId": "Page ID",
+      "article": "Article",
+      "articlePlaceholder": "Search for an article…",
+      "noArticles": "No articles available",
       "clear": "Clear",
       "delete": "Delete"
     },
@@ -339,7 +347,7 @@
     },
     "linkGroups": {
       "special": "Special pages",
-      "freePage": "Free pages",
+      "articlePage": "Article page",
       "normal": "Standard pages",
       "external": "External"
     },
@@ -347,12 +355,12 @@
       "Link": "Link",
       "General": "General",
       "Establishment": "Establishment",
-      "FreePage": "Free page",
+      "ArticlePage": "Article page",
       "Forum": "Forum",
       "Reports": "Reports",
       "Articles": "Articles",
       "Events": "Events",
-      "External URL": "External URL"
+      "ExternalURL": "External URL"
     },
     "colors": {
       "Corail": "Coral",

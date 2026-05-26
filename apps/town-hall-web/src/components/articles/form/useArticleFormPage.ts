@@ -3,11 +3,9 @@
 import type { ArticleStatus } from '@repo/contracts/article';
 import { CreateArticleInput } from '@repo/contracts/article';
 import type { MediaImage } from '@repo/contracts/media';
-import { ArticleService } from '@repo/frontend-services/article';
-import { UploadService } from '@repo/frontend-services/upload';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
+import { useServices } from '@/providers/ServicesProvider';
 
 type FormState = {
   title: string;
@@ -29,9 +27,7 @@ type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export function useArticleFormPage(id?: string) {
   const router = useRouter();
-  const api = useApi();
-  const articleService = new ArticleService(api);
-  const uploadService = new UploadService(api);
+  const { articleService: articleService } = useServices();
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
@@ -132,8 +128,6 @@ export function useArticleFormPage(id?: string) {
     }
   }, [form, id, isEditing, router, validate, articleService.create, articleService.update]);
 
-  const handleUploadImage = useCallback((file: File) => uploadService.uploadImage(file), [uploadService.uploadImage]);
-
   const openImagePicker = useCallback(() => setIsPickerOpen(true), []);
   const closeImagePicker = useCallback(() => setIsPickerOpen(false), []);
   const handleMediaSelect = useCallback(
@@ -183,7 +177,6 @@ export function useArticleFormPage(id?: string) {
     isDirty,
     showDiscardDialog,
     setField,
-    handleUploadImage,
     isPickerOpen,
     openImagePicker,
     closeImagePicker,

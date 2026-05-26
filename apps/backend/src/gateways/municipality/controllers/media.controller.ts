@@ -12,15 +12,19 @@ export class MediaController {
   getRoutes(): Hono {
     const app = new Hono();
 
-    app.get('/city/:cityId', (c) => this.getAll(c));
-    app.post('/city/:cityId/upload', (c) => this.upload(c));
+    app.get('/', (c) => this.getAll(c));
+    app.post('/upload', (c) => this.upload(c));
     app.delete('/:id', (c) => this.deleteMedia(c));
 
     return app;
   }
 
+  private getCityId(c: Context): string {
+    return c.req.param('cityId');
+  }
+
   private async getAll(c: Context): Promise<ControllerJson<MediaImage[], 200, readonly []>> {
-    const cityId = c.req.param('cityId');
+    const cityId = this.getCityId(c);
     const media = await this.service.getAllByCityId(cityId);
     return c.json(media, 200);
   }
@@ -41,7 +45,7 @@ export class MediaController {
       return c.json({ error: 'Fichier trop volumineux. Maximum 5 Mo.' } satisfies ApiErrorDto, 400);
     }
 
-    const cityId = c.req.param('cityId');
+    const cityId = this.getCityId(c);
     const rawTitle = formData.get('title');
     const title = typeof rawTitle === 'string' ? rawTitle.trim() || undefined : undefined;
     const buffer = await file.arrayBuffer();
@@ -50,9 +54,10 @@ export class MediaController {
   }
 
   private async deleteMedia(c: Context): Promise<Response & TypedResponse<null, 204, 'body'>> {
+    const cityId = this.getCityId(c);
     const id = c.req.param('id');
     try {
-      await this.service.delete(id);
+      await this.service.delete(cityId, id);
       return c.body(null, 204);
     } catch {
       // @ts-expect-error

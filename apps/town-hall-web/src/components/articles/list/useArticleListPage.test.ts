@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 'use client';
 
 import { act, renderHook, waitFor } from '@testing-library/react';
@@ -12,19 +14,13 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => ({}),
-}));
-
 const mockArticleService = {
   getAll: vi.fn(),
   delete: vi.fn(),
   updateStatus: vi.fn(),
 };
-vi.mock('@repo/frontend-services/article', () => ({
-  ArticleService: vi.fn(function (this: any) {
-    return mockArticleService;
-  }),
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ articleService: mockArticleService }),
 }));
 
 import { useArticleListPage } from './useArticleListPage';

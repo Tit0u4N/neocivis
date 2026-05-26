@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import type { MediaImage } from '@repo/contracts/media';
-import type { IUploadService } from '@/modules/upload/upload.service';
+import type { IMediaBlobService } from '../media-blob.service';
 import type { IMediaRepository } from '../repository/media.repository.interface';
 
 export class MediaService {
   constructor(
     private readonly repository: IMediaRepository,
-    private readonly uploadService: IUploadService,
+    private readonly blobService: IMediaBlobService,
   ) {}
 
   getAllByCityId(cityId: string): Promise<MediaImage[]> {
@@ -20,14 +20,12 @@ export class MediaService {
     mimeType: string,
     title?: string,
   ): Promise<MediaImage> {
-    const url = await this.uploadService.uploadImage(buffer, filename, mimeType, cityId);
-    const ext = filename.includes('.') ? filename.slice(filename.lastIndexOf('.')) : '';
-    const storagePath = `${cityId}/${randomUUID()}${ext}`;
+    const uploaded = await this.blobService.uploadImage(buffer, filename, mimeType, cityId);
     const media: MediaImage = {
       id: randomUUID(),
       title: title ?? filename,
-      url,
-      storagePath,
+      url: uploaded.url,
+      storagePath: uploaded.storagePath,
       cityId,
       createdAt: new Date().toISOString(),
       links: [],
@@ -35,15 +33,20 @@ export class MediaService {
     return this.repository.create(media);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(cityId: string, id: string): Promise<void> {
+    const media = await this.repository.findByIdAndCityId(id, cityId);
+    if (!media) {
+      throw new Error(`Media not found: ${id}`);
+    }
+    await this.blobService.deleteByStoragePath(media.storagePath);
     const deleted = await this.repository.delete(id);
     if (!deleted) {
       throw new Error(`Media not found: ${id}`);
     }
   }
 
-  async getById(id: string): Promise<MediaImage> {
-    const media = await this.repository.findById(id);
+  async getById(cityId: string, id: string): Promise<MediaImage> {
+    const media = await this.repository.findByIdAndCityId(id, cityId);
     if (!media) {
       throw new Error(`Media not found: ${id}`);
     }

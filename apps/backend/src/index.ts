@@ -1,6 +1,7 @@
 import { app } from '@azure/functions';
 import { azureHonoHandler } from '@marplex/hono-azurefunc-adapter';
 import { assertBackendEnv } from './core/env-check';
+import './core/seed-bootstrap';
 import citizenGateway from './gateways/citizen/citizen.gateway';
 import municipalityGateway from './gateways/municipality/municipality.gateway';
 import webhookGateway from './gateways/webhook/webhook.gateway';

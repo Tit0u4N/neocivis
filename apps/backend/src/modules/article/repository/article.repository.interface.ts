@@ -2,10 +2,18 @@ import type { Article, ArticleLocale, ArticleTranslation, CreateArticleInput } f
 
 export interface IArticleRepository {
   findAll(): Promise<Article[]>;
+  findAllByCityId(cityId: string): Promise<Article[]>;
   findAllPublished(): Promise<Article[]>;
   findById(id: string): Promise<Article | undefined>;
+  findByIdAndCityId(id: string, cityId: string): Promise<Article | undefined>;
   create(
-    input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
+    input: CreateArticleInput & {
+      id: string;
+      cityId: string;
+      authorId: string;
+      createdAt: string;
+      updatedAt: string;
+    },
   ): Promise<Article>;
   update(id: string, input: Partial<Article>): Promise<Article | undefined>;
   delete(id: string): Promise<boolean>;

@@ -1,11 +1,9 @@
 'use client';
 
 import type { Category, CategoryTranslation } from '@repo/contracts/config';
-import { ConfigService } from '@repo/frontend-services/config';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
+import { useServices } from '@/providers/ServicesProvider';
 import { type Locale, useConfigStore } from '@/stores/config.store';
 
 export type { LinkGroupId, TileLinkType } from '../LinkPicker';
@@ -280,9 +278,7 @@ export type CategoryLayoutTabViewModel = {
 export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
   const { t } = useTranslation();
   const defaultLocale = useConfigStore((s) => s.defaultLocale);
-  const api = useApi();
-  const cityId = useCityStore((s) => s.cityId);
-  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
+  const { configService: configService } = useServices();
 
   const [blocks, setBlocks] = useState<AppTile[]>(initBlocks);
   const [selectedId, setSelectedId] = useState<string>('alaune');
@@ -527,7 +523,7 @@ export function useCategoryLayoutTab(): CategoryLayoutTabViewModel {
         rowSpan: 1,
         icon: 'none',
         color: '#2374E0',
-        link: { type: 'Link' },
+        link: { type: 'General' },
         translations: defaultTranslations(defaultLocale, t('appManagement.newTileTitle')),
       },
     ]);

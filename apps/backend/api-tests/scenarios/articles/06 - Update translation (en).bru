@@ -5,7 +5,7 @@ meta {
 }
 
 put {
-  url: {{url}}/api/municipality/articles/{{articleId}}/translations/en
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/articles/{{articleId}}/translations/en
   body: json
   auth: none
 }
@@ -17,23 +17,33 @@ body:json {
 }
 
 script:pre-request {
-  const url = req.getUrl ? req.getUrl() : '';
-  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
-  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
-  const token = bru.getVar(tokenKey);
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
   if (!token) {
-    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
   }
   req.setHeader('Authorization', `Bearer ${token}`);
 
-  if (!bru.getVar('articleId')) {
+  const articleId = bru.getVar('articleId');
+  if (!articleId) {
     throw new Error('Missing articleId. Run "01 - Create article" first.');
   }
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city in /user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/articles/${articleId}/translations/en`);
 }
 
 script:post-response {
-  test("Status is 200 or 404", function() {
-    expect([200, 404]).to.include(res.getStatus());
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
   });
 }
 
@@ -41,4 +51,3 @@ settings {
   encodeUrl: true
   timeout: 0
 }
-

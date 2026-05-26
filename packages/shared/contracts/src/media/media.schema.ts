@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CityId } from '../city/city.schema';
 
 export const MediaImageLinkType = z.enum(['carousel', 'articles', 'establishments']);
 export type MediaImageLinkType = z.infer<typeof MediaImageLinkType>;
@@ -15,7 +16,7 @@ export const MediaImage = z.object({
   title: z.string().optional(),
   url: z.string().url(),
   storagePath: z.string(),
-  cityId: z.string().uuid(),
+  cityId: CityId,
   createdAt: z.string().datetime(),
   links: z.array(MediaImageLink),
 });

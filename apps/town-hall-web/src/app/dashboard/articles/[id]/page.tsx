@@ -1,8 +1,8 @@
 'use client';
 
 import { use } from 'react';
-import { ArticleFormPage } from '@/components/articles/form/ArticleFormPage';
-import { useArticleFormPage } from '@/components/articles/form/useArticleFormPage';
+import { ArticleFormPage } from '../../../../features/articles/form/ArticleFormPage';
+import { useArticleFormPage } from '../../../../features/articles/form/useArticleFormPage';
 
 type Props = {
   params: Promise<{ id: string }>;

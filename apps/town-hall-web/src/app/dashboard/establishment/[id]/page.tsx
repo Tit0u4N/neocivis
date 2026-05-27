@@ -1,8 +1,8 @@
 'use client';
 
 import { use } from 'react';
-import { EstablishmentFormPage } from '@/components/establishments/form/EstablishmentFormPage';
-import { useEstablishmentFormPage } from '@/components/establishments/form/useEstablishmentFormPage';
+import { EstablishmentFormPage } from '../../../../features/establishments/form/EstablishmentFormPage';
+import { useEstablishmentFormPage } from '../../../../features/establishments/form/useEstablishmentFormPage';
 
 type Props = {
   params: Promise<{ id: string }>;

@@ -1,7 +1,5 @@
 'use client';
 
-import { ImageIcon, Loader2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,15 +9,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { BackButton } from '@/components/ui/back-button';
-import { MediaGallery } from '@/features/media-gallery/MediaGallery';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { PageLayout } from '@/components/ui/page-layout';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
+} from 'apps/town-hall-web/src/components/ui/alert-dialog';
+import { BackButton } from 'apps/town-hall-web/src/components/ui/back-button';
+import { Button } from 'apps/town-hall-web/src/components/ui/button';
+import { Input } from 'apps/town-hall-web/src/components/ui/input';
+import { Label } from 'apps/town-hall-web/src/components/ui/label';
+import { PageLayout } from 'apps/town-hall-web/src/components/ui/page-layout';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'apps/town-hall-web/src/components/ui/select';
+import { Skeleton } from 'apps/town-hall-web/src/components/ui/skeleton';
+import { MediaGallery } from 'apps/town-hall-web/src/features/media-gallery/MediaGallery';
+import { ImageIcon, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { useEstablishmentFormPage } from './useEstablishmentFormPage';
 
 type Props = ReturnType<typeof useEstablishmentFormPage>;
@@ -176,9 +182,7 @@ export function EstablishmentFormPage(props: Props) {
             </div>
             <Button variant="outline" size="sm" onClick={openImagePicker} className="gap-1.5">
               <ImageIcon className="size-3.5" />
-              {form.imageUrl
-                ? t('establishment.form.fields.imageChange')
-                : t('establishment.form.fields.imageChoose')}
+              {form.imageUrl ? t('establishment.form.fields.imageChange') : t('establishment.form.fields.imageChoose')}
             </Button>
           </div>
           {isPickerOpen && <MediaGallery mode="picker" onSelect={handleMediaSelect} onClose={closeImagePicker} />}

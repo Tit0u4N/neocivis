@@ -2,8 +2,6 @@
 
 import type { Article } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Combobox,
   ComboboxContent,
@@ -11,9 +9,9 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-} from '@/components/ui/combobox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from 'apps/town-hall-web/src/components/ui/combobox';
+import { Input } from 'apps/town-hall-web/src/components/ui/input';
+import { Label } from 'apps/town-hall-web/src/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -22,8 +20,10 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useApi } from '@/providers/ApiProvider';
+} from 'apps/town-hall-web/src/components/ui/select';
+import { useApi } from 'apps/town-hall-web/src/providers/ApiProvider';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type TileLinkType =
   | 'General'
@@ -40,7 +40,6 @@ export const LINK_GROUPS: { groupId: LinkGroupId; options: TileLinkType[] }[] = 
   { groupId: 'special', options: ['General', 'Establishment', 'ArticlePage'] },
   { groupId: 'normal', options: ['Forum', 'Reports', 'Articles'] },
   { groupId: 'external', options: ['ExternalURL'] },
-
 ];
 
 export type LinkValue = { type: string; value?: string };
@@ -51,7 +50,7 @@ const DEFAULT_LINK: TileLinkType = 'General';
 
 export function urlToLinkValue(url?: string): LinkValue {
   if (!url) {
-    return {type: DEFAULT_LINK};
+    return { type: DEFAULT_LINK };
   }
   if (KNOWN_TYPES.has(url)) {
     return { type: url };
@@ -85,9 +84,14 @@ export function LinkPicker({ label, value, onChange }: Readonly<LinkPickerProps>
   const [articles, setArticles] = useState<Article[]>([]);
 
   useEffect(() => {
-    if (value.type !== 'ArticlePage') { return; }
+    if (value.type !== 'ArticlePage') {
+      return;
+    }
     const service = new ArticleService(api);
-    service.getAll().then(setArticles).catch(() => {});
+    service
+      .getAll()
+      .then(setArticles)
+      .catch(() => {});
   }, [value.type, api]);
 
   return (
@@ -112,14 +116,14 @@ export function LinkPicker({ label, value, onChange }: Readonly<LinkPickerProps>
       </Select>
       {value.type === 'ArticlePage' && (
         <div className="flex flex-col gap-1">
-          <Label className="font-medium text-muted-foreground text-xs">
-            {t('appManagement.settings.article')}
-          </Label>
+          <Label className="font-medium text-muted-foreground text-xs">{t('appManagement.settings.article')}</Label>
           <Combobox
             value={value.value ?? null}
             onValueChange={(id) => onChange({ ...value, value: id ?? undefined })}
             itemToStringLabel={(articleId) => {
-              if (!articleId) { return ''; }
+              if (!articleId) {
+                return '';
+              }
               const article = articles.find((a) => a.id === articleId);
               return article ? getArticleTitle(article) : articleId;
             }}
@@ -144,9 +148,7 @@ export function LinkPicker({ label, value, onChange }: Readonly<LinkPickerProps>
       )}
       {value.type === 'ExternalURL' && (
         <div className="flex flex-col gap-1">
-          <Label className="font-medium text-muted-foreground text-xs">
-            {t('appManagement.settings.externalUrl')}
-          </Label>
+          <Label className="font-medium text-muted-foreground text-xs">{t('appManagement.settings.externalUrl')}</Label>
           <Input
             className="h-9 font-mono text-sm"
             value={value.value ?? ''}

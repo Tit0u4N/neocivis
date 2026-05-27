@@ -1,35 +1,33 @@
 'use client';
 
-import type { EstablishmentType } from '@repo/contracts/establishment';
-import { CreateEstablishmentInput } from '@repo/contracts/establishment';
+import type { ArticleStatus } from '@repo/contracts/article';
+import { CreateArticleInput } from '@repo/contracts/article';
 import type { MediaImage } from '@repo/contracts/media';
+import { useServices } from 'apps/town-hall-web/src/providers/ServicesProvider';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { useServices } from '@/providers/ServicesProvider';
 
 type FormState = {
-  name: string;
-  type: EstablishmentType;
-  address: string;
-  hours: string;
-  phone: string;
-  imageUrl: string;
+  title: string;
+  description: string;
+  content: unknown;
+  coverImageUrl: string;
+  status: ArticleStatus;
 };
 
 const DEFAULT_FORM: FormState = {
-  name: '',
-  type: 'town_hall',
-  address: '',
-  hours: '',
-  phone: '',
-  imageUrl: '',
+  title: '',
+  description: '',
+  content: [],
+  coverImageUrl: '',
+  status: 'draft',
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
 
-export function useEstablishmentFormPage(id?: string) {
+export function useArticleFormPage(id?: string) {
   const router = useRouter();
-  const { establishmentService } = useServices();
+  const { articleService } = useServices();
   const isEditing = id !== undefined;
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
@@ -48,23 +46,23 @@ export function useEstablishmentFormPage(id?: string) {
     const load = async () => {
       setIsLoading(true);
       try {
-        const establishment = await establishmentService.getById(id);
+        const article = await articleService.getById(id);
+        const frTranslation = article.translations.find((t) => t.locale === 'fr');
         setForm({
-          name: establishment.name,
-          type: establishment.type,
-          address: establishment.address,
-          hours: establishment.hours,
-          phone: establishment.phone,
-          imageUrl: establishment.imageUrl ?? '',
+          title: frTranslation?.title ?? '',
+          description: frTranslation?.description ?? '',
+          content: (frTranslation?.content as unknown as unknown[]) ?? [],
+          coverImageUrl: article.coverImageUrl ?? '',
+          status: article.status,
         });
       } catch {
-        setApiError('Impossible de charger cet établissement.');
+        setApiError('Impossible de charger cet article.');
       } finally {
         setIsLoading(false);
       }
     };
     void load();
-  }, [id, isEditing, establishmentService.getById]);
+  }, [id, isEditing, articleService.getById]);
 
   const setField = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -73,11 +71,21 @@ export function useEstablishmentFormPage(id?: string) {
   }, []);
 
   const validate = useCallback((): boolean => {
-    const result = CreateEstablishmentInput.safeParse({ ...form, imageUrl: form.imageUrl || undefined });
+    const result = CreateArticleInput.safeParse({
+      translation: {
+        locale: 'fr',
+        title: form.title,
+        description: form.description || undefined,
+        content: form.content,
+      },
+      coverImageUrl: form.coverImageUrl || undefined,
+      status: form.status,
+    });
+
     if (!result.success) {
       const newErrors: FormErrors = {};
       for (const issue of result.error.issues) {
-        const path = issue.path[0] as keyof FormState | undefined;
+        const path = issue.path[1] as keyof FormState | undefined;
         if (path) {
           newErrors[path] = issue.message;
         }
@@ -88,16 +96,6 @@ export function useEstablishmentFormPage(id?: string) {
     return true;
   }, [form]);
 
-  const openImagePicker = useCallback(() => setIsPickerOpen(true), []);
-  const closeImagePicker = useCallback(() => setIsPickerOpen(false), []);
-  const handleMediaSelect = useCallback(
-    (media: MediaImage) => {
-      setField('imageUrl', media.url);
-      setIsPickerOpen(false);
-    },
-    [setField],
-  );
-
   const handleSubmit = useCallback(async () => {
     setApiError(null);
     if (!validate()) {
@@ -105,23 +103,43 @@ export function useEstablishmentFormPage(id?: string) {
     }
     setIsSubmitting(true);
     try {
-      const payload = { ...form, imageUrl: form.imageUrl || undefined };
+      const payload = {
+        translation: {
+          locale: 'fr' as const,
+          title: form.title,
+          description: form.description || undefined,
+          content: form.content as unknown[],
+        },
+        coverImageUrl: form.coverImageUrl || undefined,
+        status: form.status,
+      };
+
       if (isEditing && id) {
-        await establishmentService.update(id, payload);
+        await articleService.update(id, payload);
       } else {
-        await establishmentService.create(payload);
+        await articleService.create(payload);
       }
       setIsDirty(false);
-      router.push('/dashboard/establishment');
+      router.push('/dashboard/articles');
     } catch {
       setApiError("Une erreur est survenue lors de l'enregistrement.");
     } finally {
       setIsSubmitting(false);
     }
-  }, [form, id, isEditing, router, validate, establishmentService.create, establishmentService.update]);
+  }, [form, id, isEditing, router, validate, articleService.create, articleService.update]);
+
+  const openImagePicker = useCallback(() => setIsPickerOpen(true), []);
+  const closeImagePicker = useCallback(() => setIsPickerOpen(false), []);
+  const handleMediaSelect = useCallback(
+    (media: MediaImage) => {
+      setField('coverImageUrl', media.url);
+      setIsPickerOpen(false);
+    },
+    [setField],
+  );
 
   const navigateAway = useCallback(() => {
-    router.push('/dashboard/establishment');
+    router.push('/dashboard/articles');
   }, [router]);
 
   const handleCancel = useCallback(() => {
@@ -158,8 +176,8 @@ export function useEstablishmentFormPage(id?: string) {
     apiError,
     isDirty,
     showDiscardDialog,
-    isPickerOpen,
     setField,
+    isPickerOpen,
     openImagePicker,
     closeImagePicker,
     handleMediaSelect,

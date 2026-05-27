@@ -2,10 +2,10 @@
 
 import type { CarouselItem, CarouselItemTranslation, ConfigLocale } from '@repo/contracts/config';
 import type { MediaImage } from '@repo/contracts/media';
+import { useServices } from 'apps/town-hall-web/src/providers/ServicesProvider';
+import { type Locale, useConfigStore } from 'apps/town-hall-web/src/stores/config.store';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useServices } from '@/providers/ServicesProvider';
-import { type Locale, useConfigStore } from '@/stores/config.store';
 import { type LinkValue, linkValueToUrl, urlToLinkValue } from '../LinkPicker';
 
 //TODO : REVIEW THE LINK WITH THE BQCKEND WHEN THE MEDIA GALLERY IS READY
@@ -37,7 +37,7 @@ export type CarouselTabViewModel = {
 
 export function useCarouselTab(): CarouselTabViewModel {
   const { t } = useTranslation();
-  const { configService: configService } = useServices();
+  const { configService } = useServices();
 
   const [carousel, setCarousel] = useState<CarouselItem[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');

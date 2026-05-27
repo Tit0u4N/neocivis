@@ -1,12 +1,18 @@
 'use client';
 
+import { Button } from 'apps/town-hall-web/src/components/ui/button';
+import { Label } from 'apps/town-hall-web/src/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'apps/town-hall-web/src/components/ui/select';
+import { type Locale, useConfigStore } from 'apps/town-hall-web/src/stores/config.store';
 import { Plus, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { type Locale, useConfigStore } from '@/stores/config.store';
 
 type LocaleRow = { locale: string };
 

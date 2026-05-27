@@ -1,8 +1,7 @@
-import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 import type { CarouselItem } from '@repo/contracts/config';
 import type { MediaImage } from '@repo/contracts/media';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useCarouselTab } from './useCarouselTab';
 
@@ -23,7 +22,7 @@ vi.mock('@/stores/config.store', () => ({
 const mockConfigService = {
   getMunicipalityConfig: mockGetMunicipalityConfig,
   setCarouselItems: mockSetCarouselItems,
-}
+};
 vi.mock('@/providers/ServicesProvider', () => ({
   useServices: () => ({ configService: mockConfigService }),
 }));
@@ -491,7 +490,11 @@ describe('useCarouselTab', () => {
 
     it('should set isSaving to true while the save is pending', async () => {
       let resolveSave!: (value: CarouselItem[]) => void;
-      mockSetCarouselItems.mockReturnValue(new Promise<CarouselItem[]>((res) => { resolveSave = res; }));
+      mockSetCarouselItems.mockReturnValue(
+        new Promise<CarouselItem[]>((res) => {
+          resolveSave = res;
+        }),
+      );
       const { result } = await setup([slide1]);
 
       act(() => {

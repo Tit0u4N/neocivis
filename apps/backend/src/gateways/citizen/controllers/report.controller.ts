@@ -7,7 +7,7 @@ import {
 } from '@repo/contracts/report';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
-import type { ReportService } from '@/modules/report/report.service';
+import type { ReportService } from '@/modules/report/service/report.service';
 import type { IUploadService } from '@/modules/upload/upload.service';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];

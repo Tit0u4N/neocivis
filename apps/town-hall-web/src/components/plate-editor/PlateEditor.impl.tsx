@@ -44,7 +44,7 @@ import { Plate, PlateElement, type PlateElementProps, usePlateEditor } from 'pla
 import { useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { MediaGallery } from '@/components/media-gallery/MediaGallery';
+import { MediaGallery } from '@/features/media-gallery/MediaGallery';
 
 import { Editor, EditorContainer } from '@/components/ui/editor';
 import { FixedToolbar } from '@/components/ui/fixed-toolbar';

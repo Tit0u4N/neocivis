@@ -139,6 +139,69 @@
       }
     }
   },
+  "establishment": {
+    "list": {
+      "title": "Établissements",
+      "add": "Ajouter",
+      "count_one": "{{count}} établissement",
+      "count_other": "{{count}} établissements",
+      "searchPlaceholder": "Rechercher un établissement…",
+      "noImage": "Aucune image",
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "empty": {
+        "title": "Aucun établissement",
+        "createFirst": "Ajouter le premier"
+      },
+      "deleteDialog": {
+        "title": "Supprimer cet établissement ?",
+        "description": "Cette action est irréversible. L'établissement sera définitivement supprimé.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer"
+      },
+      "viewMode": {
+        "list": "Vue liste",
+        "grid": "Vue mosaïque"
+      }
+    },
+    "form": {
+      "titleCreate": "Nouvel établissement",
+      "titleEdit": "Modifier l'établissement",
+      "fields": {
+        "name": "Nom",
+        "namePlaceholder": "Ex : Mairie principale",
+        "type": "Type",
+        "address": "Adresse",
+        "addressPlaceholder": "Ex : 1 Place du Général de Gaulle",
+        "hours": "Horaires",
+        "hoursPlaceholder": "Ex : Lun-Ven 8h-17h",
+        "phone": "Téléphone",
+        "phonePlaceholder": "Ex : 04 93 32 80 00",
+        "image": "Image",
+        "imageAlt": "Image de l'établissement",
+        "imageChoose": "Choisir une image",
+        "imageChange": "Changer l'image"
+      },
+      "discardDialog": {
+        "title": "Abandonner les modifications ?",
+        "description": "Les modifications non sauvegardées seront perdues.",
+        "cancel": "Continuer l'édition",
+        "confirm": "Abandonner"
+      },
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "back": "Retour"
+    },
+    "types": {
+      "all": "Tous les types",
+      "town_hall": "Mairie",
+      "education": "Éducation",
+      "culture": "Culture",
+      "sport": "Sport"
+    }
+  },
   "sidebar": {
     "sections": {
       "townHall": "Town Hall",
@@ -310,5 +373,52 @@
       "Violet": "Violet"
     },
     "newTileTitle": "Nouveau"
+  },
+  "reports": {
+    "title": "Signalements",
+    "export": "Exporter",
+    "stats": {
+      "total": "Total",
+      "pending": "En attente",
+      "inProgress": "En cours",
+      "resolved": "Résolu"
+    },
+    "tabs": {
+      "pending": "Signalements en cours",
+      "history": "Historique"
+    },
+    "view": {
+      "table": "Vue tableau",
+      "map": "Vue carte"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Titre",
+      "category": "Catégorie",
+      "location": "Localisation",
+      "date": "Date",
+      "status": "Statut",
+      "author": "Auteur",
+      "resolvedBy": "Traité par",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "En attente",
+      "progress": "En cours",
+      "resolved": "Résolu",
+      "cancelled": "Annulé"
+    },
+    "map": {
+      "placeholder": "Vue carte interactive — {{count}} signalement(s)"
+    },
+    "actions": {
+      "detail": "Détail"
+    },
+    "detail": {
+      "description": "Description",
+      "resolvedAt": "Résolu le"
+    },
+    "empty": "Aucun signalement",
+    "error": "Impossible de charger les signalements"
   }
 }

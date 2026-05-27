@@ -10,11 +10,13 @@ import { DrizzleCityRepository } from '@/modules/city/repository/city.drizzle.re
 import { InMemoryCityRepository } from '@/modules/city/repository/city.inmemory.repository';
 import type { IConfigRepository } from '@/modules/config/repository/config.repository.interface';
 import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
+import { InMemoryEstablishmentRepository } from "@/modules/establishment/repository/establishment.inmemory.repository";
+import { IEstablishmentRepository } from "@/modules/establishment/repository/establishment.repository.interface";
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
 import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
-import type { IReportRepository } from '@/modules/report/report.repository.interface';
-import { InMemoryReportRepository } from '@/modules/report/report.repository';
+import { InMemoryReportRepository } from '@/modules/report/repository/report.inmemory.repository';
+import type { IReportRepository } from '@/modules/report/repository/report.repository.interface';
 import type { IUserRepository } from '@/modules/users/repository/user.repository.interface';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
@@ -92,4 +94,9 @@ export function createConfigRepository(): IConfigRepository {
 
 export function createReportRepository(): IReportRepository {
   return isInMemoryMode() ? sharedReportRepository() : new InMemoryReportRepository();
+}
+
+// TODO : Create the real repository
+export function createEstablishmentRepository(): IEstablishmentRepository {
+  return new InMemoryEstablishmentRepository();
 }

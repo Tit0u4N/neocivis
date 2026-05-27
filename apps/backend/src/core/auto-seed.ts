@@ -8,6 +8,8 @@ import type { ICityRepository } from '@/modules/city/repository/city.repository.
 import { CitySeeder } from '@/modules/city/seed/city.seeder';
 import type { IConfigRepository } from '@/modules/config/repository/config.repository.interface';
 import { ConfigSeeder } from '@/modules/config/seed/config.seeder';
+import type { IEstablishmentRepository } from '@/modules/establishment/repository/establishment.repository.interface';
+import { EstablishmentSeeder } from '@/modules/establishment/seed/establishment.seeder';
 import type { IAMService } from '@/modules/iam/iam.service';
 import type { IMediaBlobService } from '@/modules/media/media-blob.service';
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
@@ -21,6 +23,7 @@ export type AutoSeedDeps = {
   userService: UserService;
   articleRepository: IArticleRepository;
   cityRepository: ICityRepository;
+  establishmentRepository: IEstablishmentRepository;
   iamService: IAMService;
   accessService: AccessService;
   mediaRepository?: IMediaRepository;
@@ -60,6 +63,7 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     new UserSeeder(deps.userService),
     new CitySeeder(deps.cityRepository, cityService, deps.userService),
     new AccessSeeder(deps.accessService, cityService),
+    new EstablishmentSeeder(deps.establishmentRepository),
   ];
 
   if (deps.mediaRepository && deps.mediaBlobService) {

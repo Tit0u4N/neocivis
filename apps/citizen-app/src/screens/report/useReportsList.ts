@@ -1,9 +1,7 @@
 import type { Report } from '@repo/contracts/report';
-import { ReportService } from '@repo/frontend-services/report';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
-import { useCityStore } from '@/stores/city.store';
+import { useCallback, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
 import type { ReportStatus } from './report.types';
 
 export type FilterOption = 'all' | ReportStatus;
@@ -16,9 +14,7 @@ export const FILTER_OPTIONS: { id: FilterOption; labelKey: string }[] = [
 ];
 
 export function useReportsList() {
-  const api = useApi();
-  const { cityId } = useCityStore();
-  const reportService = useMemo(() => new ReportService(api, cityId), [api, cityId]);
+  const { reportService } = useServices();
 
   const [filter, setFilter] = useState<FilterOption>('all');
   const [reports, setReports] = useState<Report[]>([]);

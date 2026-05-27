@@ -1,13 +1,13 @@
 'use client';
 
-import { Button } from 'apps/town-hall-web/src/components/ui/button';
-import { Input } from 'apps/town-hall-web/src/components/ui/input';
-import { Label } from 'apps/town-hall-web/src/components/ui/label';
-import { Separator } from 'apps/town-hall-web/src/components/ui/separator';
-import { cn } from 'apps/town-hall-web/src/lib/utils';
-import { useConfigStore } from 'apps/town-hall-web/src/stores/config.store';
 import { Save, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import { useConfigStore } from '@/stores/config.store';
 import { LinkPicker } from '../LinkPicker';
 import { LocaleManager } from '../LocaleManager';
 import { IconPickerModal } from './IconPickerModal';

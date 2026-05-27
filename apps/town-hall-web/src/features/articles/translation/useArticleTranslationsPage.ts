@@ -1,9 +1,9 @@
 'use client';
 
 import type { AddTranslationInput, Article, ArticleLocale } from '@repo/contracts/article';
-import { useServices } from 'apps/town-hall-web/src/providers/ServicesProvider';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
 
 const ALL_LOCALES: ArticleLocale[] = ['fr', 'en', 'de', 'it'];
 

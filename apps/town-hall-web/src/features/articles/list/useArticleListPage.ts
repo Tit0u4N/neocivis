@@ -1,10 +1,10 @@
 'use client';
 
 import type { Article, ArticleStatus } from '@repo/contracts/article';
-import { useArticlePreview } from 'apps/town-hall-web/src/features/articles/preview/useArticlePreview';
-import { useServices } from 'apps/town-hall-web/src/providers/ServicesProvider';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useArticlePreview } from '@/features/articles/preview/useArticlePreview';
+import { useServices } from '@/providers/ServicesProvider';
 
 type StatusFilter = ArticleStatus | 'all';
 

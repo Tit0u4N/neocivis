@@ -1,9 +1,9 @@
 'use client';
 
 import type { Establishment, EstablishmentType } from '@repo/contracts/establishment';
-import { useServices } from 'apps/town-hall-web/src/providers/ServicesProvider';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
 
 export type ViewMode = 'list' | 'grid';
 

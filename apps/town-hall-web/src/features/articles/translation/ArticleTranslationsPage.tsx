@@ -1,25 +1,19 @@
 'use client';
 
 import type { ArticleLocale } from '@repo/contracts/article';
-import { PlateEditor } from 'apps/town-hall-web/src/components/plate-editor/PlateEditor';
-import { BackButton } from 'apps/town-hall-web/src/components/ui/back-button';
-import { Badge } from 'apps/town-hall-web/src/components/ui/badge';
-import { Button } from 'apps/town-hall-web/src/components/ui/button';
-import { Input } from 'apps/town-hall-web/src/components/ui/input';
-import { Label } from 'apps/town-hall-web/src/components/ui/label';
-import { PageLayout } from 'apps/town-hall-web/src/components/ui/page-layout';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'apps/town-hall-web/src/components/ui/select';
-import { Skeleton } from 'apps/town-hall-web/src/components/ui/skeleton';
-import { Textarea } from 'apps/town-hall-web/src/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipTrigger } from 'apps/town-hall-web/src/components/ui/tooltip';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PlateEditor } from '@/components/plate-editor/PlateEditor';
+import { BackButton } from '@/components/ui/back-button';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { PageLayout } from '@/components/ui/page-layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { useArticleTranslationsPage } from './useArticleTranslationsPage';
 
 type Props = ReturnType<typeof useArticleTranslationsPage>;

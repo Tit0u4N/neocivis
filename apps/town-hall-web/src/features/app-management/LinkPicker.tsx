@@ -2,6 +2,8 @@
 
 import type { Article } from '@repo/contracts/article';
 import { ArticleService } from '@repo/frontend-services/article';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Combobox,
   ComboboxContent,
@@ -9,9 +11,9 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-} from 'apps/town-hall-web/src/components/ui/combobox';
-import { Input } from 'apps/town-hall-web/src/components/ui/input';
-import { Label } from 'apps/town-hall-web/src/components/ui/label';
+} from '@/components/ui/combobox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -20,10 +22,8 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from 'apps/town-hall-web/src/components/ui/select';
-import { useApi } from 'apps/town-hall-web/src/providers/ApiProvider';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+} from '@/components/ui/select';
+import { useApi } from '@/providers/ApiProvider';
 
 export type TileLinkType =
   | 'General'

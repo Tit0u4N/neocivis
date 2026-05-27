@@ -1,11 +1,11 @@
 'use client';
 
-import { Button } from 'apps/town-hall-web/src/components/ui/button';
-import { cn } from 'apps/town-hall-web/src/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Plus, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { AppTile, MovePreview, ResizeHandle } from './useCategoryLayoutTab';
 import { tintFrom } from './useCategoryLayoutTab';
 

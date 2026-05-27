@@ -1,19 +1,6 @@
 'use client';
 
 import type { ArticleLocale } from '@repo/contracts/article';
-import { PlateEditor } from 'apps/town-hall-web/src/components/plate-editor/PlateEditor';
-import { BackButton } from 'apps/town-hall-web/src/components/ui/back-button';
-import { Badge } from 'apps/town-hall-web/src/components/ui/badge';
-import { Button } from 'apps/town-hall-web/src/components/ui/button';
-import { PageLayout } from 'apps/town-hall-web/src/components/ui/page-layout';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'apps/town-hall-web/src/components/ui/select';
-import { cn } from 'apps/town-hall-web/src/lib/utils';
 import {
   BarChart3,
   Battery,
@@ -27,6 +14,13 @@ import {
   User,
   Wifi,
 } from 'lucide-react';
+import { PlateEditor } from '@/components/plate-editor/PlateEditor';
+import { BackButton } from '@/components/ui/back-button';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PageLayout } from '@/components/ui/page-layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import type { useArticlePreview } from './useArticlePreview';
 
 const LOCALE_LABELS: Record<ArticleLocale, string> = {

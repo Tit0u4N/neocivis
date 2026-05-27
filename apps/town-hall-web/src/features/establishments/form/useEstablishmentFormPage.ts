@@ -3,9 +3,9 @@
 import type { EstablishmentType } from '@repo/contracts/establishment';
 import { CreateEstablishmentInput } from '@repo/contracts/establishment';
 import type { MediaImage } from '@repo/contracts/media';
-import { useServices } from 'apps/town-hall-web/src/providers/ServicesProvider';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
 
 type FormState = {
   name: string;

@@ -1,6 +1,8 @@
 'use client';
 
 import type { Article } from '@repo/contracts/article';
+import { MoreHorizontal, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,29 +12,21 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from 'apps/town-hall-web/src/components/ui/alert-dialog';
-import { Badge } from 'apps/town-hall-web/src/components/ui/badge';
-import { Button } from 'apps/town-hall-web/src/components/ui/button';
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from 'apps/town-hall-web/src/components/ui/dropdown-menu';
-import { Input } from 'apps/town-hall-web/src/components/ui/input';
-import { PageLayout } from 'apps/town-hall-web/src/components/ui/page-layout';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'apps/town-hall-web/src/components/ui/select';
-import { Skeleton } from 'apps/town-hall-web/src/components/ui/skeleton';
-import { ArticlePreview } from 'apps/town-hall-web/src/features/articles/preview/ArticlePreview';
-import { MoreHorizontal, Plus } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { PageLayout } from '@/components/ui/page-layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArticlePreview } from '@/features/articles/preview/ArticlePreview';
 import type { useArticleListPage } from './useArticleListPage';
 
 type Props = ReturnType<typeof useArticleListPage>;

@@ -1,14 +1,14 @@
 'use client';
 
 import { Dialog } from '@base-ui/react/dialog';
-import { Input } from 'apps/town-hall-web/src/components/ui/input';
-import { Label } from 'apps/town-hall-web/src/components/ui/label';
-import { cn } from 'apps/town-hall-web/src/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Search, X } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 // Icons are React.forwardRef objects (not functions) — filter by PascalCase + no Icon suffix alias
 const ALL_ICON_NAMES: string[] = Object.keys(LucideIcons).filter(

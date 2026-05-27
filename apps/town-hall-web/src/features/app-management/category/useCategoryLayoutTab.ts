@@ -1,10 +1,10 @@
 'use client';
 
 import type { Category, CategoryTranslation } from '@repo/contracts/config';
-import { useServices } from 'apps/town-hall-web/src/providers/ServicesProvider';
-import { type Locale, useConfigStore } from 'apps/town-hall-web/src/stores/config.store';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useServices } from '@/providers/ServicesProvider';
+import { type Locale, useConfigStore } from '@/stores/config.store';
 
 export type { LinkGroupId, TileLinkType } from '../LinkPicker';
 export { LINK_GROUPS } from '../LinkPicker';

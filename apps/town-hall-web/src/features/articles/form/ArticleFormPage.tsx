@@ -1,6 +1,8 @@
 'use client';
 
-import { PlateEditor } from 'apps/town-hall-web/src/components/plate-editor/PlateEditor';
+import { ImageIcon, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { PlateEditor } from '@/components/plate-editor/PlateEditor';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,24 +12,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from 'apps/town-hall-web/src/components/ui/alert-dialog';
-import { BackButton } from 'apps/town-hall-web/src/components/ui/back-button';
-import { Button } from 'apps/town-hall-web/src/components/ui/button';
-import { Input } from 'apps/town-hall-web/src/components/ui/input';
-import { Label } from 'apps/town-hall-web/src/components/ui/label';
-import { PageLayout } from 'apps/town-hall-web/src/components/ui/page-layout';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'apps/town-hall-web/src/components/ui/select';
-import { Skeleton } from 'apps/town-hall-web/src/components/ui/skeleton';
-import { Textarea } from 'apps/town-hall-web/src/components/ui/textarea';
-import { MediaGallery } from 'apps/town-hall-web/src/features/media-gallery/MediaGallery';
-import { ImageIcon, Loader2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+} from '@/components/ui/alert-dialog';
+import { BackButton } from '@/components/ui/back-button';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { PageLayout } from '@/components/ui/page-layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import { MediaGallery } from '@/features/media-gallery/MediaGallery';
 import type { useArticleFormPage } from './useArticleFormPage';
 
 type Props = ReturnType<typeof useArticleFormPage>;

@@ -102,6 +102,17 @@
       "status": "Statut"
     }
   },
+  "selectCity": {
+    "title": "Choisis ta ville",
+    "subtitle": "Découvre les actualités, signalements et discussions près de chez toi.",
+    "searchPlaceholder": "Rechercher une ville...",
+    "empty": "Aucune ville trouvée",
+    "emptyHelper": "Essaie un autre mot-clé.",
+    "allCities": "Toutes les villes",
+    "results": "Résultats",
+    "cityCount_one": "{{count}} ville",
+    "cityCount_other": "{{count}} villes"
+  },
   "forum": {
     "title": "Forum"
   },

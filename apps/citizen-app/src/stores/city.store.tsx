@@ -9,7 +9,7 @@ type CityStore = {
 const CityContext = createContext<CityStore | undefined>(undefined);
 
 export function CityProvider({ children }: { children: ReactNode }) {
-  const [cityId, setCityId] = useState('CITY_TEST_ID');
+  const [cityId, setCityId] = useState('');
 
   return <CityContext.Provider value={{ cityId, setCityId }}>{children}</CityContext.Provider>;
 }

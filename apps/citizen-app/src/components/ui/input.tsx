@@ -89,7 +89,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                     return {
                         ...baseStyle,
                         borderWidth: 1,
-                        borderColor: error ? danger : cardColor,
+                        borderColor: error ? danger : isFocused ? primary : borderColor,
                         backgroundColor: disabled ? `${muted}20` : cardColor,
                     };
             }

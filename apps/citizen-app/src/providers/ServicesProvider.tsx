@@ -1,4 +1,6 @@
 import { ArticleService } from '@repo/frontend-services/article';
+import { AuthService } from '@repo/frontend-services/auth';
+import { CityService } from '@repo/frontend-services/city';
 import { ConfigService } from '@repo/frontend-services/config';
 import { ReportService } from '@repo/frontend-services/report';
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
@@ -6,6 +8,8 @@ import { useApi } from '@/providers/ApiProvider';
 import { useCityStore } from '@/stores/city.store';
 
 type ServicesContextValue = {
+  authService: AuthService;
+  cityService: CityService;
   articleService: ArticleService;
   configService: ConfigService;
   reportService: ReportService;
@@ -19,6 +23,8 @@ export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>
 
   const services = useMemo<ServicesContextValue>(
     () => ({
+      authService: new AuthService(api),
+      cityService: new CityService(api),
       articleService: new ArticleService(api, cityId),
       configService: new ConfigService(api, cityId),
       reportService: new ReportService(api, cityId),

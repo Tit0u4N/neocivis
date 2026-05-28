@@ -30,6 +30,7 @@
   "exports": {
     "./report": "./dist/report.js",
     "./auth": "./dist/auth.js",
+    "./city": "./dist/city.js",
     "./config": "./dist/config.js",
     "./permission": "./dist/permission.js",
     "./article": "./dist/article.js",

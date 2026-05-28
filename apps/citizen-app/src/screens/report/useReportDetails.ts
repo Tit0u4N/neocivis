@@ -3,10 +3,12 @@ import { ReportService } from '@repo/frontend-services/report';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useApi } from '@/providers/ApiProvider';
+import { useCityStore } from '@/stores/city.store';
 
 export function useReportDetails(id: string) {
   const api = useApi();
-  const reportService = useMemo(() => new ReportService(api), [api]);
+  const { cityId } = useCityStore();
+  const reportService = useMemo(() => new ReportService(api, cityId), [api, cityId]);
 
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(false);

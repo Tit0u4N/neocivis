@@ -139,6 +139,69 @@
       }
     }
   },
+  "establishment": {
+    "list": {
+      "title": "Establishments",
+      "add": "Add",
+      "count_one": "{{count}} establishment",
+      "count_other": "{{count}} establishments",
+      "searchPlaceholder": "Search an establishment…",
+      "noImage": "No image",
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "empty": {
+        "title": "No establishments",
+        "createFirst": "Add the first one"
+      },
+      "deleteDialog": {
+        "title": "Delete this establishment?",
+        "description": "This action is irreversible. The establishment will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "viewMode": {
+        "list": "List view",
+        "grid": "Grid view"
+      }
+    },
+    "form": {
+      "titleCreate": "New establishment",
+      "titleEdit": "Edit establishment",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "E.g. Main Town Hall",
+        "type": "Type",
+        "address": "Address",
+        "addressPlaceholder": "E.g. 1 Place du Général de Gaulle",
+        "hours": "Opening hours",
+        "hoursPlaceholder": "E.g. Mon-Fri 8am-5pm",
+        "phone": "Phone",
+        "phonePlaceholder": "E.g. 04 93 32 80 00",
+        "image": "Image",
+        "imageAlt": "Establishment image",
+        "imageChoose": "Choose an image",
+        "imageChange": "Change image"
+      },
+      "discardDialog": {
+        "title": "Discard changes?",
+        "description": "Unsaved changes will be lost.",
+        "cancel": "Continue editing",
+        "confirm": "Discard"
+      },
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back"
+    },
+    "types": {
+      "all": "All types",
+      "town_hall": "Town Hall",
+      "education": "Education",
+      "culture": "Culture",
+      "sport": "Sport"
+    }
+  },
   "sidebar": {
     "sections": {
       "townHall": "Town Hall",
@@ -310,5 +373,52 @@
       "Violet": "Purple"
     },
     "newTileTitle": "New"
+  },
+  "reports": {
+    "title": "Reports",
+    "export": "Export",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "resolved": "Resolved"
+    },
+    "tabs": {
+      "pending": "Pending reports",
+      "history": "History"
+    },
+    "view": {
+      "table": "Table view",
+      "map": "Map view"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Title",
+      "category": "Category",
+      "location": "Location",
+      "date": "Date",
+      "status": "Status",
+      "author": "Author",
+      "resolvedBy": "Resolved by",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "progress": "In progress",
+      "resolved": "Resolved",
+      "cancelled": "Cancelled"
+    },
+    "map": {
+      "placeholder": "Interactive map view — {{count}} report(s)"
+    },
+    "actions": {
+      "detail": "Detail"
+    },
+    "detail": {
+      "description": "Description",
+      "resolvedAt": "Resolved on"
+    },
+    "empty": "No reports",
+    "error": "Unable to load reports"
   }
 }

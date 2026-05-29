@@ -11,13 +11,12 @@ import { useSelectCity } from '@/screens/select-city/useSelectCity';
 
 export default function SelectCityScreen() {
   const { t } = useTranslation();
-  const { cities, loading, error, query, setQuery, onSelect, joiningId } = useSelectCity();
+  const { cities, loading, query, setQuery, onSelect, joiningId } = useSelectCity();
   const inputRef = useRef<TextInput>(null);
 
   const primaryColor = useColor('primary');
   const mutedColor = useColor('textMuted');
   const borderColor = useColor('border');
-  const errorColor = useColor('red');
   const mutedBg = useColor('muted');
   const cardBg = useColor('card');
   const textColor = useColor('text');
@@ -63,8 +62,6 @@ export default function SelectCityScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {error ? <Text style={[styles.errorText, { color: errorColor }]}>{error}</Text> : null}
-
           <View style={styles.sectionRow}>
             <Text style={[styles.sectionLabel, { color: mutedColor }]}>
               {query ? t('selectCity.results') : t('selectCity.allCities')}
@@ -168,7 +165,6 @@ const styles = StyleSheet.create({
   searchWrap: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 },
   scroll: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 32, gap: 8 },
-  errorText: { fontSize: 13 },
   sectionRow: {
     flexDirection: 'row',
     alignItems: 'baseline',

@@ -21,6 +21,7 @@ import { ProfileProvider, useProfile } from '@/stores/profile.store';
 import { Colors } from '@/theme/colors';
 import { ThemeProvider } from '@/theme/theme-provider';
 import 'react-native-reanimated';
+import { ToastProvider } from '@/components/ui/toast';
 
 type GlobalErrorHandler = (error: unknown, isFatal?: boolean) => void;
 
@@ -239,20 +240,22 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: bgColor }}>
       <LanguageProvider>
         <ThemeProvider>
-          <AuthProvider>
-            <ApiProvider>
-              <CityProvider>
-                <ServicesProvider>
-                  <ArticlesProvider>
-                    <ProfileProvider>
-                      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-                      <InitialLayout />
-                    </ProfileProvider>
-                  </ArticlesProvider>
-                </ServicesProvider>
-              </CityProvider>
-            </ApiProvider>
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <ApiProvider>
+                <CityProvider>
+                  <ServicesProvider>
+                    <ArticlesProvider>
+                      <ProfileProvider>
+                        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+                        <InitialLayout />
+                      </ProfileProvider>
+                    </ArticlesProvider>
+                  </ServicesProvider>
+                </CityProvider>
+              </ApiProvider>
+            </AuthProvider>
+          </ToastProvider>
         </ThemeProvider>
       </LanguageProvider>
     </GestureHandlerRootView>

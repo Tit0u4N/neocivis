@@ -15,6 +15,7 @@ import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ApiProvider } from '@/providers/ApiProvider';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { ServicesProvider } from '@/providers/ServicesProvider';
+import { ArticlesProvider } from '@/stores/articles.store';
 import { CityProvider, useCityStore } from '@/stores/city.store';
 import { ProfileProvider, useProfile } from '@/stores/profile.store';
 import { Colors } from '@/theme/colors';
@@ -58,7 +59,7 @@ function InitialLayout() {
   useColorScheme() || 'light';
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { profile, isLoading: profileLoading } = useProfile();
-  const { cityId, setCityId } = useCityStore();
+  const { cityId, setCityId, setCity } = useCityStore();
   const segments = useSegments();
   const router = useRouter();
 
@@ -96,9 +97,10 @@ function InitialLayout() {
         }
       } else {
         // Citoyen avec au moins une ville → auto-sélectionner la 1ère
-        const firstCity = profile.memberships[0].id;
-        if (cityId !== firstCity) {
-          setCityId(firstCity);
+        const firstCity = profile.memberships[0];
+        if (cityId !== firstCity.id) {
+          setCityId(firstCity.id);
+          setCity(firstCity);
         }
         if (!inTabsGroup) {
           router.replace('/(tabs)/(city)');
@@ -114,6 +116,7 @@ function InitialLayout() {
     profile,
     cityId,
     setCityId,
+    setCity,
     segments,
     rootNavigationState?.key,
     router.replace,
@@ -240,10 +243,12 @@ export default function RootLayout() {
             <ApiProvider>
               <CityProvider>
                 <ServicesProvider>
-                  <ProfileProvider>
-                    <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-                    <InitialLayout />
-                  </ProfileProvider>
+                  <ArticlesProvider>
+                    <ProfileProvider>
+                      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+                      <InitialLayout />
+                    </ProfileProvider>
+                  </ArticlesProvider>
                 </ServicesProvider>
               </CityProvider>
             </ApiProvider>

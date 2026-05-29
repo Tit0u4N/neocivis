@@ -17,7 +17,7 @@ type SelectCityViewModel = {
 
 export function useSelectCity(): SelectCityViewModel {
   const { cityService } = useServices();
-  const { setCityId } = useCityStore();
+  const { setCityId, setCity } = useCityStore();
   const { refresh } = useProfile();
   const router = useRouter();
 
@@ -70,6 +70,7 @@ export function useSelectCity(): SelectCityViewModel {
     try {
       await cityService.joinCity(city.id);
       setCityId(city.id);
+      setCity(city);
       void refresh();
       router.replace('/(tabs)/(city)');
     } catch (err) {

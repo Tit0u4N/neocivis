@@ -111,7 +111,13 @@
     "allCities": "Toutes les villes",
     "results": "Résultats",
     "cityCount_one": "{{count}} ville",
-    "cityCount_other": "{{count}} villes"
+    "cityCount_other": "{{count}} villes",
+    "errors": {
+      "loadTitle": "Erreur de chargement",
+      "loadDesc": "Impossible de charger les villes",
+      "joinTitle": "Impossible de rejoindre",
+      "joinDesc": "Impossible de rejoindre {{name}}"
+    }
   },
   "forum": {
     "title": "Forum"

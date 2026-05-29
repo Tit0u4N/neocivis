@@ -1,6 +1,7 @@
 import type { CityPublicDto } from '@repo/contracts';
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/toast';
 import { useServices } from '@/providers/ServicesProvider';
 import { useCityStore } from '@/stores/city.store';
@@ -20,6 +21,7 @@ export function useSelectCity(): SelectCityViewModel {
   const { setCityId, setCity } = useCityStore();
   const { refresh } = useProfile();
   const router = useRouter();
+  const { t } = useTranslation();
   const { error: toastError } = useToast();
 
   const [allCities, setAllCities] = useState<CityPublicDto[]>([]);
@@ -27,6 +29,7 @@ export function useSelectCity(): SelectCityViewModel {
   const [query, setQuery] = useState('');
   const [joiningId, setJoiningId] = useState<string | null>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: t et toastError sont stables (react-i18next garantit la stabilité de t)
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -39,7 +42,10 @@ export function useSelectCity(): SelectCityViewModel {
       })
       .catch((err) => {
         if (!cancelled) {
-          toastError('Erreur de chargement', err instanceof Error ? err.message : 'Impossible de charger les villes');
+          toastError(
+            t('selectCity.errors.loadTitle'),
+            err instanceof Error ? err.message : t('selectCity.errors.loadDesc'),
+          );
         }
       })
       .finally(() => {
@@ -50,7 +56,7 @@ export function useSelectCity(): SelectCityViewModel {
     return () => {
       cancelled = true;
     };
-  }, [cityService, toastError]);
+  }, [cityService]);
 
   const cities = useMemo(() => {
     if (!query.trim()) {
@@ -73,8 +79,8 @@ export function useSelectCity(): SelectCityViewModel {
       router.replace('/(tabs)/(city)');
     } catch (err) {
       toastError(
-        'Impossible de rejoindre',
-        err instanceof Error ? err.message : `Impossible de rejoindre ${city.name}`,
+        t('selectCity.errors.joinTitle'),
+        err instanceof Error ? err.message : t('selectCity.errors.joinDesc', { name: city.name }),
       );
       setJoiningId(null);
     }

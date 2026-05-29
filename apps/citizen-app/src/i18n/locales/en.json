@@ -111,7 +111,13 @@
     "allCities": "All cities",
     "results": "Results",
     "cityCount_one": "{{count}} city",
-    "cityCount_other": "{{count}} cities"
+    "cityCount_other": "{{count}} cities",
+    "errors": {
+      "loadTitle": "Loading error",
+      "loadDesc": "Unable to load cities",
+      "joinTitle": "Unable to join",
+      "joinDesc": "Unable to join {{name}}"
+    }
   },
   "forum": {
     "title": "Forum"

@@ -2,7 +2,7 @@ import type { Container, CosmosClient, Database } from '@azure/cosmos';
 import { optionalEnv } from '@/infrastructure/env';
 
 /** Containers sharing database-level throughput (no per-container RU/s). */
-export const COSMOS_CONTAINER_IDS = ['articles', 'media'] as const;
+export const COSMOS_CONTAINER_IDS = ['articles', 'media', 'config'] as const;
 
 export type CosmosContainerId = (typeof COSMOS_CONTAINER_IDS)[number];
 

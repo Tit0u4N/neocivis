@@ -1,42 +1,42 @@
 // biome-ignore-all lint/suspicious/useAwait: mock file
 
 import type { CarouselItem, Category } from '@repo/contracts/config';
-import { getMockCarouselItems, getMockCategories } from '../seed/config.seed';
+import { getMockCategories } from '../seed/config.seed';
 import type { IConfigRepository } from './config.repository.interface';
 
 export class InMemoryConfigRepository implements IConfigRepository {
-  private seeded = false;
-  private carouselItems: CarouselItem[] = [];
-  private categories: Category[] = [];
+  private seededCityIds = new Set<string>();
+  private carouselItemsByCityId = new Map<string, CarouselItem[]>();
+  private categoriesByCityId = new Map<string, Category[]>();
 
-  private ensureSeeded(): void {
-    if (this.seeded) {
+  private ensureSeeded(cityId: string): void {
+    if (this.seededCityIds.has(cityId)) {
       return;
     }
-    this.carouselItems = getMockCarouselItems();
-    this.categories = getMockCategories();
-    this.seeded = true;
+    this.carouselItemsByCityId.set(cityId, []);
+    this.categoriesByCityId.set(cityId, getMockCategories());
+    this.seededCityIds.add(cityId);
   }
 
-  async getCarouselItems(): Promise<CarouselItem[]> {
-    this.ensureSeeded();
-    return this.carouselItems;
+  async getCarouselItems(cityId: string): Promise<CarouselItem[]> {
+    this.ensureSeeded(cityId);
+    return this.carouselItemsByCityId.get(cityId) ?? [];
   }
 
-  async getCategories(): Promise<Category[]> {
-    this.ensureSeeded();
-    return this.categories;
+  async getCategories(cityId: string): Promise<Category[]> {
+    this.ensureSeeded(cityId);
+    return this.categoriesByCityId.get(cityId) ?? [];
   }
 
-  async setCategories(categories: Category[]): Promise<Category[]> {
-    this.ensureSeeded();
-    this.categories = categories;
-    return this.categories;
+  async setCategories(cityId: string, categories: Category[]): Promise<Category[]> {
+    this.ensureSeeded(cityId);
+    this.categoriesByCityId.set(cityId, categories);
+    return this.categoriesByCityId.get(cityId) ?? [];
   }
 
-  async setCarouselItems(items: CarouselItem[]): Promise<CarouselItem[]> {
-    this.ensureSeeded();
-    this.carouselItems = items;
-    return this.carouselItems;
+  async setCarouselItems(cityId: string, items: CarouselItem[]): Promise<CarouselItem[]> {
+    this.ensureSeeded(cityId);
+    this.carouselItemsByCityId.set(cityId, items);
+    return this.carouselItemsByCityId.get(cityId) ?? [];
   }
 }

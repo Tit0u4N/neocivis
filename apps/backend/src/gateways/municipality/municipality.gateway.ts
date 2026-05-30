@@ -59,7 +59,7 @@ const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const configService = new ConfigService(configRepository, mediaRepository);
 const mediaService = new MediaService(mediaRepository, mediaBlobService);
-const establishmentService = new EstablishmentService(establishmentRepository);
+const establishmentService = new EstablishmentService(establishmentRepository, mediaLinkService);
 const reportService = new ReportService(reportRepository);
 
 // Import controllers

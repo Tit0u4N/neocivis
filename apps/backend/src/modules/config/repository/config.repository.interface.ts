@@ -1,8 +1,8 @@
 import type { CarouselItem, Category } from '@repo/contracts/config';
 
 export interface IConfigRepository {
-  getCarouselItems(): Promise<CarouselItem[]>;
-  getCategories(): Promise<Category[]>;
-  setCategories(categories: Category[]): Promise<Category[]>;
-  setCarouselItems(items: CarouselItem[]): Promise<CarouselItem[]>;
+  getCarouselItems(cityId: string): Promise<CarouselItem[]>;
+  getCategories(cityId: string): Promise<Category[]>;
+  setCategories(cityId: string, categories: Category[]): Promise<Category[]>;
+  setCarouselItems(cityId: string, items: CarouselItem[]): Promise<CarouselItem[]>;
 }

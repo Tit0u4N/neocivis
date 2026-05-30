@@ -4,9 +4,9 @@ import {
   createArticleRepository,
   createCityRepository,
   createConfigRepository,
+  createEstablishmentRepository,
   createReportRepository,
   createUserRepository,
-  createEstablishmentRepository
 } from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
@@ -28,9 +28,9 @@ import { UserService } from '@/modules/users/service/user.service';
 import { ArticleController } from './controllers/article.controller';
 import { CityController } from './controllers/city.controller';
 import { ConfigController } from './controllers/config.controller';
+import { EstablishmentController } from './controllers/establishment.controller';
 import { ReportController } from './controllers/report.controller';
 import { UserController } from './controllers/user.controller';
-import { EstablishmentController } from './controllers/establishment.controller';
 
 // Import repositories
 const userRepository = createUserRepository();

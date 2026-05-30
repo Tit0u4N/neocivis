@@ -6,10 +6,10 @@ import {
   createArticleRepository,
   createCityRepository,
   createConfigRepository,
+  createEstablishmentRepository,
   createMediaRepository,
   createReportRepository,
   createUserRepository,
-  createEstablishmentRepository
 } from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
 import { applyDbMiddleware } from '@/infrastructure/db/db.middleware';
@@ -57,7 +57,7 @@ const mediaLinkService = new MediaLinkService(mediaRepository);
 const articleService = new ArticleService(articleRepository, mediaLinkService);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
-const configService = new ConfigService(configRepository);
+const configService = new ConfigService(configRepository, mediaRepository);
 const mediaService = new MediaService(mediaRepository, mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository);
 const reportService = new ReportService(reportRepository);

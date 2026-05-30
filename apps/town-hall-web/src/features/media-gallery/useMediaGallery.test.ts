@@ -1,7 +1,7 @@
 'use client';
 
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks
@@ -23,7 +23,7 @@ const mockMediaService = {
   getAll: mockGetAll,
   upload: mockUpload,
   delete: mockDelete,
-}
+};
 vi.mock('@/providers/ServicesProvider', () => ({
   useServices: () => ({ mediaService: mockMediaService }),
 }));
@@ -122,7 +122,7 @@ describe('useMediaGallery', () => {
       const err = Object.assign(new Error('Forbidden'), { response: apiResponse });
       mockGetAll.mockRejectedValue(err);
 
-      const hook = renderHook(() => useMediaGallery({}));
+      renderHook(() => useMediaGallery({}));
       await act(async () => {});
 
       expect(mockToastError).toHaveBeenCalledWith(
@@ -338,7 +338,11 @@ describe('useMediaGallery', () => {
 
     it('should set isUploading to true while upload is pending', async () => {
       let resolveUpload!: (m: MediaImage) => void;
-      mockUpload.mockReturnValue(new Promise<MediaImage>((res) => { resolveUpload = res; }));
+      mockUpload.mockReturnValue(
+        new Promise<MediaImage>((res) => {
+          resolveUpload = res;
+        }),
+      );
       const { result } = await setup();
       const file = new File(['x'], 'photo.jpg', { type: 'image/jpeg' });
 
@@ -348,7 +352,10 @@ describe('useMediaGallery', () => {
       expect(result.current.isUploading).toBe(true);
 
       const newMedia = makeMedia('00000000-0000-0000-0000-000000000099');
-      await act(async () => { resolveUpload(newMedia); });
+      // biome-ignore lint/suspicious/useAwait: tests
+      await act(async () => {
+        resolveUpload(newMedia);
+      });
 
       expect(result.current.isUploading).toBe(false);
     });
@@ -420,7 +427,11 @@ describe('useMediaGallery', () => {
 
     it('should set isDeleting to true while delete is pending', async () => {
       let resolveDelete!: () => void;
-      mockDelete.mockReturnValue(new Promise<void>((res) => { resolveDelete = res; }));
+      mockDelete.mockReturnValue(
+        new Promise<void>((res) => {
+          resolveDelete = res;
+        }),
+      );
       const { result } = await setup();
 
       act(() => result.current.openDeleteDialog(media1));
@@ -428,7 +439,10 @@ describe('useMediaGallery', () => {
 
       expect(result.current.isDeleting).toBe(true);
 
-      await act(async () => { resolveDelete(); });
+      // biome-ignore lint/suspicious/useAwait: tests
+      await act(async () => {
+        resolveDelete();
+      });
 
       expect(result.current.isDeleting).toBe(false);
     });

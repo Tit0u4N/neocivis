@@ -44,12 +44,11 @@ import { Plate, PlateElement, type PlateElementProps, usePlateEditor } from 'pla
 import { useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { MediaGallery } from '@/features/media-gallery/MediaGallery';
-
 import { Editor, EditorContainer } from '@/components/ui/editor';
 import { FixedToolbar } from '@/components/ui/fixed-toolbar';
 import { MarkToolbarButton } from '@/components/ui/mark-toolbar-button';
 import { ToolbarButton, ToolbarGroup } from '@/components/ui/toolbar';
+import { MediaGallery } from '@/features/media-gallery/MediaGallery';
 import { cn } from '@/lib/utils';
 import { autoformatPlugin } from './autoformat-plugin';
 import { BlockContextMenu } from './BlockContextMenu';

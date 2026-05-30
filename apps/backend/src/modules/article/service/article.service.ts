@@ -185,7 +185,47 @@ export class ArticleService {
     preferredLocale: ArticleLocale,
   ): Promise<PaginatedArticlesResponse> {
     const all = await this.repository.findAllPublished();
-    const sorted = [...all].sort((a, b) => {
+    return this.paginatePublished(all, page, limit, preferredLocale);
+  }
+
+  async getPublishedByCityPaginated(
+    cityId: string,
+    page: number,
+    limit: number,
+    preferredLocale: ArticleLocale,
+  ): Promise<PaginatedArticlesResponse> {
+    const all = await this.repository.findAllByCityId(cityId);
+    const published = all.filter((a) => a.status === 'published');
+    return this.paginatePublished(published, page, limit, preferredLocale);
+  }
+
+  async getArticleByIdResolved(id: string, preferredLocale: ArticleLocale): Promise<ArticleWithResolvedTranslation> {
+    const article = await this.repository.findById(id);
+    if (!article) {
+      throw new Error(`Article not found: ${id}`);
+    }
+    return this.resolveArticle(article, preferredLocale);
+  }
+
+  async getPublishedArticleByIdAndCity(
+    cityId: string,
+    id: string,
+    preferredLocale: ArticleLocale,
+  ): Promise<ArticleWithResolvedTranslation> {
+    const article = await this.repository.findByIdAndCityId(id, cityId);
+    if (!article || article.status !== 'published') {
+      throw new Error(`Article not found: ${id}`);
+    }
+    return this.resolveArticle(article, preferredLocale);
+  }
+
+  private paginatePublished(
+    articles: Article[],
+    page: number,
+    limit: number,
+    preferredLocale: ArticleLocale,
+  ): PaginatedArticlesResponse {
+    const sorted = [...articles].sort((a, b) => {
       const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
       const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
       return dateB - dateA;
@@ -195,13 +235,5 @@ export class ArticleService {
     const offset = (page - 1) * limit;
     const data = sorted.slice(offset, offset + limit).map((a) => this.resolveArticle(a, preferredLocale));
     return { data, total, page, limit, totalPages };
-  }
-
-  async getArticleByIdResolved(id: string, preferredLocale: ArticleLocale): Promise<ArticleWithResolvedTranslation> {
-    const article = await this.repository.findById(id);
-    if (!article) {
-      throw new Error(`Article not found: ${id}`);
-    }
-    return this.resolveArticle(article, preferredLocale);
   }
 }

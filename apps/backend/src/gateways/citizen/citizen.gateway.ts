@@ -70,12 +70,8 @@ app = applyRoleMiddleware(app, ['CITIZEN', 'ADMIN', 'EMPLOYEE']);
 // Register routes from controllers
 app.route('/user', userController.getRoutes());
 app.route('/cities', cityController.getRoutes());
-app.route('/articles', articleController.getRoutes());
-app.route('/establishment', establishmentController.getRoutes());
-app.route('/reports', reportController.getRoutes());
-app.route('/config', configController.getRoutes());
 
-// City-scoped routes (new) — keep old routes temporarily.
+// City-scoped routes
 const cityScoped = new Hono();
 applyCityAccessMiddleware(cityScoped, 'citizen', cityService, userService);
 cityScoped.route('/articles', articleController.getRoutes());

@@ -13,11 +13,14 @@ const mockSuccess: OperationSuccessDto = { success: true };
 
 function makeKy(): KyInstance {
   const json = vi.fn();
-  return {
+  const base = {
     get: vi.fn().mockReturnValue({ json }),
     post: vi.fn().mockReturnValue({ json }),
     delete: vi.fn().mockReturnValue({ json }),
-  } as unknown as KyInstance;
+    extend: vi.fn(),
+  };
+  (base.extend as ReturnType<typeof vi.fn>).mockReturnValue(base);
+  return base as unknown as KyInstance;
 }
 
 describe('CityService', () => {
@@ -36,7 +39,7 @@ describe('CityService', () => {
 
       const result = await service.listCities();
 
-      expect(ky.get).toHaveBeenCalledWith('cities');
+      expect(ky.get).toHaveBeenCalledWith('');
       expect(result).toEqual([mockCity]);
     });
   });
@@ -48,7 +51,7 @@ describe('CityService', () => {
 
       const result = await service.joinCity('NIC_06000');
 
-      expect(ky.post).toHaveBeenCalledWith('cities/NIC_06000/join');
+      expect(ky.post).toHaveBeenCalledWith('NIC_06000/join');
       expect(result).toEqual(mockSuccess);
     });
   });
@@ -60,7 +63,7 @@ describe('CityService', () => {
 
       const result = await service.leaveCity('NIC_06000');
 
-      expect(ky.delete).toHaveBeenCalledWith('cities/NIC_06000/leave');
+      expect(ky.delete).toHaveBeenCalledWith('NIC_06000/leave');
       expect(result).toEqual(mockSuccess);
     });
   });

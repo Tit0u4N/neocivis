@@ -84,7 +84,6 @@ applyRoleMiddleware(app, ['EMPLOYEE', 'ADMIN']);
 app.route('/user', userController.getRoutes());
 app.route('/permissions', accessController.getCatalogRoutes());
 app.route('/config', municipalityConfigController.getRoutes());
-
 app.route('/establishment', establishmentController.getRoutes());
 
 // Permission gate for PATCH /cities/:cityId — DOIT être déclaré AVANT

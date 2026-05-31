@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReportService } from './report.service';
 
 const CITY_ID = 'city-1';
-const BASE = `cities/${CITY_ID}/reports`;
 
 const mockReport: Report = {
   id: 'report-1',
@@ -35,7 +34,7 @@ function makeKy(overrides: Partial<Record<string, unknown>> = {}): KyInstance {
     extend: vi.fn(),
     ...overrides,
   };
-  // extend retourne une instance avec post
+  // extend retourne une instance avec les mêmes méthodes (le prefix est validé via AbstractService)
   (base.extend as ReturnType<typeof vi.fn>).mockReturnValue(base);
   return base as unknown as KyInstance;
 }
@@ -50,13 +49,13 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('getMine', () => {
-    it('appelle GET cities/:cityId/reports/me et retourne la réponse paginée', async () => {
+    it('appelle GET me et retourne la réponse paginée', async () => {
       const json = vi.fn().mockResolvedValue(mockPaginated);
       (ky.get as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
       const result = await service.getMine();
 
-      expect(ky.get).toHaveBeenCalledWith(`${BASE}/me`, expect.objectContaining({ searchParams: {} }));
+      expect(ky.get).toHaveBeenCalledWith('me', expect.objectContaining({ searchParams: {} }));
       expect(result).toEqual(mockPaginated);
     });
 
@@ -66,40 +65,37 @@ describe('ReportService (frontend)', () => {
 
       await service.getMine({ page: 2, limit: 5 });
 
-      expect(ky.get).toHaveBeenCalledWith(
-        `${BASE}/me`,
-        expect.objectContaining({ searchParams: { page: 2, limit: 5 } }),
-      );
+      expect(ky.get).toHaveBeenCalledWith('me', expect.objectContaining({ searchParams: { page: 2, limit: 5 } }));
     });
   });
 
   describe('getById', () => {
-    it('appelle GET cities/:cityId/reports/:id et retourne le signalement', async () => {
+    it('appelle GET :id et retourne le signalement', async () => {
       const json = vi.fn().mockResolvedValue(mockReport);
       (ky.get as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
       const result = await service.getById('report-1');
 
-      expect(ky.get).toHaveBeenCalledWith(`${BASE}/report-1`);
+      expect(ky.get).toHaveBeenCalledWith('report-1');
       expect(result).toEqual(mockReport);
     });
   });
 
   describe('cancel', () => {
-    it('appelle PATCH cities/:cityId/reports/:id/cancel et retourne le signalement mis à jour', async () => {
+    it('appelle PATCH :id/cancel et retourne le signalement mis à jour', async () => {
       const cancelled = { ...mockReport, status: 'cancelled' as const };
       const json = vi.fn().mockResolvedValue(cancelled);
       (ky.patch as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
       const result = await service.cancel('report-1');
 
-      expect(ky.patch).toHaveBeenCalledWith(`${BASE}/report-1/cancel`);
+      expect(ky.patch).toHaveBeenCalledWith('report-1/cancel');
       expect(result.status).toBe('cancelled');
     });
   });
 
   describe('create', () => {
-    it('appelle POST cities/:cityId/reports avec FormData et retourne le signalement créé', async () => {
+    it('appelle POST (root) avec FormData et retourne le signalement créé', async () => {
       const json = vi.fn().mockResolvedValue(mockReport);
       const postMock = vi.fn().mockReturnValue({ json });
       const extendedKy = { post: postMock };
@@ -111,7 +107,7 @@ describe('ReportService (frontend)', () => {
       });
 
       expect(ky.extend).toHaveBeenCalledWith({ headers: { 'Content-Type': undefined } });
-      expect(postMock).toHaveBeenCalledWith(BASE, expect.objectContaining({ body: expect.any(FormData) }));
+      expect(postMock).toHaveBeenCalledWith('', expect.objectContaining({ body: expect.any(FormData) }));
       expect(result).toEqual(mockReport);
     });
 
@@ -149,26 +145,26 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('getAll', () => {
-    it('appelle GET cities/:cityId/reports et retourne la réponse paginée', async () => {
+    it('appelle GET (root) et retourne la réponse paginée', async () => {
       const json = vi.fn().mockResolvedValue(mockPaginated);
       (ky.get as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
       const result = await service.getAll();
 
-      expect(ky.get).toHaveBeenCalledWith(BASE);
+      expect(ky.get).toHaveBeenCalledWith('');
       expect(result).toEqual(mockPaginated);
     });
   });
 
   describe('updateStatus', () => {
-    it('appelle PATCH cities/:cityId/reports/:id/status avec le nouveau statut', async () => {
+    it('appelle PATCH :id/status avec le nouveau statut', async () => {
       const updated = { ...mockReport, status: 'progress' as const };
       const json = vi.fn().mockResolvedValue(updated);
       (ky.patch as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
       const result = await service.updateStatus('report-1', 'progress');
 
-      expect(ky.patch).toHaveBeenCalledWith(`${BASE}/report-1/status`, { json: { status: 'progress' } });
+      expect(ky.patch).toHaveBeenCalledWith('report-1/status', { json: { status: 'progress' } });
       expect(result.status).toBe('progress');
     });
   });

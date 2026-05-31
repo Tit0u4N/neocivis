@@ -3,7 +3,7 @@ import AbstractService from '../AbstractService';
 
 export class UploadService extends AbstractService {
   constructor(kyInstance: KyInstance) {
-    super(kyInstance, '');
+    super(kyInstance, { cityScoped: false });
   }
 
   async uploadImage(file: File): Promise<string> {

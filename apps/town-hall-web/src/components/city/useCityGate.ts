@@ -24,8 +24,6 @@ export function useCityGate(): CityGateState {
   const initializedRef = useRef(false);
   const [isReady, setIsReady] = useState(cityId !== null);
 
-  console.log('In the city gate state');
-
   useEffect(() => {
     if (cityId !== null) {
       setIsReady(true);
@@ -40,9 +38,7 @@ export function useCityGate(): CityGateState {
     authService
       .getMe()
       .then((me) => {
-        console.log('Call me');
         const id = me.city?.id;
-        console.log(me);
         if (!id) {
           router.replace('/no-city');
           return;

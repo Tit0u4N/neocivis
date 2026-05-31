@@ -5,7 +5,7 @@ meta {
 }
 
 put {
-  url: {{url}}/api/municipality/config/city/{{cityNiceId}}/carousel
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/config/carousel
   body: json
   auth: none
 }
@@ -38,7 +38,7 @@ script:pre-request {
     throw new Error('Missing carouselItem2Id or carouselMedia2Url from previous steps.');
   }
 
-  req.setUrl(`${baseUrl}/api/municipality/config/city/${cityId}/carousel`);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/config/carousel`);
   req.setBody(
     JSON.stringify([
       {

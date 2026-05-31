@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{url}}/api/municipality/config/city/{{cityNiceId}}/all
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/config/all
   body: none
   auth: none
 }
@@ -27,7 +27,7 @@ script:pre-request {
     throw new Error('Admin has no city in /user/me');
   }
   bru.setVar('cityNiceId', cityId);
-  req.setUrl(`${baseUrl}/api/municipality/config/city/${cityId}/all`);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/config/all`);
 }
 
 tests {

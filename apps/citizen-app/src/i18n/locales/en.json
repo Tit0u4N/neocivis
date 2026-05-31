@@ -102,6 +102,23 @@
       "status": "Status"
     }
   },
+  "selectCity": {
+    "title": "Choose your city",
+    "subtitle": "Discover local news, reports and discussions near you.",
+    "searchPlaceholder": "Search for a city...",
+    "empty": "No city found",
+    "emptyHelper": "Try another keyword.",
+    "allCities": "All cities",
+    "results": "Results",
+    "cityCount_one": "{{count}} city",
+    "cityCount_other": "{{count}} cities",
+    "errors": {
+      "loadTitle": "Loading error",
+      "loadDesc": "Unable to load cities",
+      "joinTitle": "Unable to join",
+      "joinDesc": "Unable to join {{name}}"
+    }
+  },
   "forum": {
     "title": "Forum"
   },

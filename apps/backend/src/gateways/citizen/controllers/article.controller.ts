@@ -23,6 +23,7 @@ export class ArticleController {
   }
 
   private async listPublishedArticles(c: Context): Promise<ControllerJson<PaginatedArticlesResponse>> {
+    const cityId = c.req.param('cityId');
     const result = ArticlesListQuery.safeParse({
       preferredLocale: c.req.query('preferredLocale'),
       page: c.req.query('page'),
@@ -35,7 +36,8 @@ export class ArticleController {
 
     const { preferredLocale, page, limit } = result.data;
 
-    const body: PaginatedArticlesResponse = await this.articleService.getPublishedArticlesPaginated(
+    const body: PaginatedArticlesResponse = await this.articleService.getPublishedByCityPaginated(
+      cityId,
       page,
       limit,
       preferredLocale,
@@ -44,6 +46,7 @@ export class ArticleController {
   }
 
   private async getPublishedArticleById(c: Context): Promise<ControllerJson<ArticleWithResolvedTranslation>> {
+    const cityId = c.req.param('cityId');
     const localeResult = z
       .object({ preferredLocale: ArticleLocale.optional().default('fr') })
       .safeParse({ preferredLocale: c.req.query('preferredLocale') });
@@ -51,10 +54,11 @@ export class ArticleController {
     const preferredLocale = localeResult.success ? localeResult.data.preferredLocale : 'fr';
 
     try {
-      const article = await this.articleService.getArticleByIdResolved(c.req.param('id'), preferredLocale);
-      if (article.status !== 'published') {
-        return c.json({ error: 'Article not found' } satisfies ApiErrorDto, 404);
-      }
+      const article = await this.articleService.getPublishedArticleByIdAndCity(
+        cityId,
+        c.req.param('id'),
+        preferredLocale,
+      );
       const body: ArticleWithResolvedTranslation = article;
       return c.json(body, 200);
     } catch {

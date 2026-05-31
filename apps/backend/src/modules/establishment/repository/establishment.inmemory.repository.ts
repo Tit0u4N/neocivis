@@ -1,38 +1,46 @@
-import type { Establishment } from '@repo/contracts/establishment';
+// biome-ignore-all lint/suspicious/useAwait: mock file
+
+import type { EstablishmentEntity } from '../establishment.types';
 import type { IEstablishmentRepository } from './establishment.repository.interface';
 
 export class InMemoryEstablishmentRepository implements IEstablishmentRepository {
-  private establishments: Establishment[] = [];
+  private establishments: EstablishmentEntity[] = [];
 
-  list(): Promise<Establishment[]> {
-    return Promise.resolve(this.establishments);
+  async listByCityId(cityId: string): Promise<EstablishmentEntity[]> {
+    return this.establishments.filter((e) => e.cityId === cityId);
   }
 
-  getById(id: string): Promise<Establishment | undefined> {
-    return Promise.resolve(this.establishments.find((e) => e.id === id));
+  async getByIdAndCityId(id: string, cityId: string): Promise<EstablishmentEntity | undefined> {
+    return this.establishments.find((e) => e.id === id && e.cityId === cityId);
   }
 
-  create(data: Omit<Establishment, 'id'>): Promise<Establishment> {
-    const establishment: Establishment = { ...data, id: crypto.randomUUID() };
-    this.establishments.push(establishment);
-    return Promise.resolve(establishment);
+  async create(data: EstablishmentEntity): Promise<EstablishmentEntity> {
+    this.establishments.push(data);
+    return data;
   }
 
-  update(id: string, data: Partial<Omit<Establishment, 'id'>>): Promise<Establishment | undefined> {
+  async update(
+    id: string,
+    data: Partial<Omit<EstablishmentEntity, 'id' | 'cityId'>>,
+  ): Promise<EstablishmentEntity | undefined> {
     const index = this.establishments.findIndex((e) => e.id === id);
     if (index === -1) {
-      return Promise.resolve(undefined);
+      return undefined;
     }
     this.establishments[index] = { ...this.establishments[index], ...data };
-    return Promise.resolve(this.establishments[index]);
+    return this.establishments[index];
   }
 
-  delete(id: string): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const index = this.establishments.findIndex((e) => e.id === id);
     if (index === -1) {
-      return Promise.resolve(false);
+      return false;
     }
     this.establishments.splice(index, 1);
-    return Promise.resolve(true);
+    return true;
+  }
+
+  async deleteAll(): Promise<void> {
+    this.establishments = [];
   }
 }

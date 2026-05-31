@@ -11,6 +11,7 @@ import type { ICityRepository } from '@/modules/city/repository/city.repository.
 import { CosmosConfigRepository } from '@/modules/config/repository/config.cosmos.repository';
 import { InMemoryConfigRepository } from '@/modules/config/repository/config.inmemory.repository';
 import type { IConfigRepository } from '@/modules/config/repository/config.repository.interface';
+import { DrizzleEstablishmentRepository } from '@/modules/establishment/repository/establishment.drizzle.repository';
 import { InMemoryEstablishmentRepository } from '@/modules/establishment/repository/establishment.inmemory.repository';
 import type { IEstablishmentRepository } from '@/modules/establishment/repository/establishment.repository.interface';
 import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
@@ -33,6 +34,7 @@ let accessRepository: InMemoryAccessRepository | undefined;
 let mediaRepository: InMemoryMediaRepository | undefined;
 let configRepository: InMemoryConfigRepository | undefined;
 let reportRepository: InMemoryReportRepository | undefined;
+let establishmentRepository: InMemoryEstablishmentRepository | undefined;
 
 function sharedUserRepository(): InMemoryUserRepository {
   userRepository ??= new InMemoryUserRepository();
@@ -69,6 +71,11 @@ function sharedReportRepository(): InMemoryReportRepository {
   return reportRepository;
 }
 
+function sharedEstablishmentRepository(): InMemoryEstablishmentRepository {
+  establishmentRepository ??= new InMemoryEstablishmentRepository();
+  return establishmentRepository;
+}
+
 export function createUserRepository(): IUserRepository {
   return isInMemoryMode() ? sharedUserRepository() : new DrizzleUserRepository();
 }
@@ -97,7 +104,6 @@ export function createReportRepository(): IReportRepository {
   return isInMemoryMode() ? sharedReportRepository() : new InMemoryReportRepository();
 }
 
-// TODO : Create the real repository
 export function createEstablishmentRepository(): IEstablishmentRepository {
-  return new InMemoryEstablishmentRepository();
+  return isInMemoryMode() ? sharedEstablishmentRepository() : new DrizzleEstablishmentRepository();
 }

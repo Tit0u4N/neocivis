@@ -1,17 +1,14 @@
 import type { ArticleWithResolvedTranslation } from '@repo/contracts/article';
-import { ArticleService } from '@repo/frontend-services/article';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useApi } from '@/providers/ApiProvider';
+import { useServices } from '@/providers/ServicesProvider';
 
 export function useArticleDetail(id: string) {
-  const api = useApi();
+  const { articleService } = useServices();
   const { language } = useLanguage();
   const [article, setArticle] = useState<ArticleWithResolvedTranslation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const articleService = useMemo(() => new ArticleService(api), [api]);
 
   useEffect(() => {
     setLoading(true);

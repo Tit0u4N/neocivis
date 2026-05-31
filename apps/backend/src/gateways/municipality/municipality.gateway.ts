@@ -59,7 +59,7 @@ const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const configService = new ConfigService(configRepository, mediaRepository);
 const mediaService = new MediaService(mediaRepository, mediaBlobService);
-const establishmentService = new EstablishmentService(establishmentRepository);
+const establishmentService = new EstablishmentService(establishmentRepository, mediaLinkService);
 const reportService = new ReportService(reportRepository);
 
 // Import controllers
@@ -83,9 +83,6 @@ applyRoleMiddleware(app, ['EMPLOYEE', 'ADMIN']);
 // Register routes from controllers
 app.route('/user', userController.getRoutes());
 app.route('/permissions', accessController.getCatalogRoutes());
-app.route('/config', municipalityConfigController.getRoutes());
-
-app.route('/establishment', establishmentController.getRoutes());
 
 // Permission gate for PATCH /cities/:cityId — DOIT être déclaré AVANT
 // `app.route('/cities', cityController.getRoutes())` pour s'appliquer.
@@ -158,6 +155,8 @@ cityScoped.route('/articles', articleController.getRoutes());
 cityScoped.route('/establishment', establishmentController.getRoutes());
 cityScoped.route('/reports', reportController.getRoutes());
 cityScoped.route('/media', mediaController.getRoutes());
+
+cityScoped.route('/config', municipalityConfigController.getRoutes());
 
 // Routes ADMIN-only (CRUD roles + assignations) sous /cities/:cityId.
 cityScoped.route('/', accessController.getCityScopedRoutes());

@@ -17,11 +17,8 @@ export interface CreateReportPayload {
  * All routes hang off the shared city-scoped router `cities/:cityId/reports`.
  */
 export class ReportService extends AbstractService {
-  private readonly basePath: string;
-
   constructor(kyInstance: KyInstance, cityId: string) {
-    super(kyInstance, '');
-    this.basePath = `cities/${cityId}/reports`;
+    super(kyInstance, { cityId, prefix: '/reports' });
   }
 
   // --- Citizen ---
@@ -43,7 +40,7 @@ export class ReportService extends AbstractService {
     } as unknown as Blob);
     return await this.http
       .extend({ headers: { 'Content-Type': undefined } })
-      .post(this.basePath, { body: formData })
+      .post('', { body: formData })
       .json<Report>();
   }
 
@@ -55,24 +52,24 @@ export class ReportService extends AbstractService {
     if (query.limit !== undefined) {
       searchParams.limit = query.limit;
     }
-    return await this.http.get(`${this.basePath}/me`, { searchParams }).json<PaginatedReportsResponse>();
+    return await this.http.get('me', { searchParams }).json<PaginatedReportsResponse>();
   }
 
   async getById(id: string): Promise<Report> {
-    return await this.http.get(`${this.basePath}/${id}`).json<Report>();
+    return await this.http.get(id).json<Report>();
   }
 
   async cancel(id: string): Promise<Report> {
-    return await this.http.patch(`${this.basePath}/${id}/cancel`).json<Report>();
+    return await this.http.patch(`${id}/cancel`).json<Report>();
   }
 
   // --- Municipality ---
 
   async getAll(): Promise<PaginatedReportsResponse> {
-    return await this.http.get(this.basePath).json<PaginatedReportsResponse>();
+    return await this.http.get('').json<PaginatedReportsResponse>();
   }
 
   async updateStatus(id: string, status: ReportStatus): Promise<Report> {
-    return await this.http.patch(`${this.basePath}/${id}/status`, { json: { status } }).json<Report>();
+    return await this.http.patch(`${id}/status`, { json: { status } }).json<Report>();
   }
 }

@@ -63,12 +63,14 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
     new UserSeeder(deps.userService),
     new CitySeeder(deps.cityRepository, cityService, deps.userService),
     new AccessSeeder(deps.accessService, cityService),
-    new EstablishmentSeeder(deps.establishmentRepository),
   ];
 
   if (deps.mediaRepository && deps.mediaBlobService) {
     seederList.push(new MediaSeeder(deps.mediaRepository, cityService, deps.mediaBlobService));
   }
+
+  // Establishment seeder runs after media so it can resolve media URLs and sync links.
+  seederList.push(new EstablishmentSeeder(deps.establishmentRepository, cityService, deps.mediaRepository));
 
   if (deps.configRepository && deps.mediaRepository) {
     seederList.push(new ConfigSeeder(deps.configRepository, deps.mediaRepository, cityService));

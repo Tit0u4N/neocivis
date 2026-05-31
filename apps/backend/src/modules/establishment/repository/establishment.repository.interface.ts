@@ -1,9 +1,13 @@
-import type { Establishment } from '@repo/contracts/establishment';
+import type { EstablishmentEntity } from '../establishment.types';
 
 export interface IEstablishmentRepository {
-  list(): Promise<Establishment[]>;
-  getById(id: string): Promise<Establishment | undefined>;
-  create(data: Omit<Establishment, 'id'>): Promise<Establishment>;
-  update(id: string, data: Partial<Omit<Establishment, 'id'>>): Promise<Establishment | undefined>;
+  listByCityId(cityId: string): Promise<EstablishmentEntity[]>;
+  getByIdAndCityId(id: string, cityId: string): Promise<EstablishmentEntity | undefined>;
+  create(data: EstablishmentEntity): Promise<EstablishmentEntity>;
+  update(
+    id: string,
+    data: Partial<Omit<EstablishmentEntity, 'id' | 'cityId'>>,
+  ): Promise<EstablishmentEntity | undefined>;
   delete(id: string): Promise<boolean>;
+  deleteAll(): Promise<void>;
 }

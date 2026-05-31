@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{url}}/api/citizen/config/city/{{cityNiceId}}/fr
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/config/fr
   body: none
   auth: none
 }
@@ -22,7 +22,7 @@ script:pre-request {
   // Reuse cityNiceId from admin, or refresh via /cities list if missing.
   const cityId = bru.getVar('cityNiceId') ?? bru.getEnvVar('cityNiceId');
   if (cityId) {
-    req.setUrl(`${baseUrl}/api/citizen/config/city/${cityId}/fr`);
+    req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/config/fr`);
     return;
   }
 
@@ -34,7 +34,7 @@ script:pre-request {
     throw new Error('Could not find Nice in /api/citizen/cities');
   }
   bru.setVar('cityNiceId', nice.id);
-  req.setUrl(`${baseUrl}/api/citizen/config/city/${nice.id}/fr`);
+  req.setUrl(`${baseUrl}/api/citizen/cities/${nice.id}/config/fr`);
 }
 
 tests {
@@ -60,4 +60,3 @@ settings {
   encodeUrl: true
   timeout: 0
 }
-

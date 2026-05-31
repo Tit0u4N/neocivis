@@ -8,10 +8,10 @@ const CITY_ID = 'city-1';
 const mockReport: Report = {
   id: 'report-1',
   authorId: 'user-1',
-  title: 'Lampadaire défectueux',
-  type: 'Éclairage public',
+  title: 'Broken street lamp',
+  type: 'Public lighting',
   status: 'pending',
-  desc: 'Le lampadaire au coin de la rue clignote.',
+  desc: 'The street lamp on the corner flickers.',
   photoUrl: 'https://example.com/photo.jpg',
   createdAt: '2026-04-12T10:00:00.000Z',
   updatedAt: '2026-04-12T10:00:00.000Z',
@@ -34,12 +34,11 @@ function makeKy(overrides: Partial<Record<string, unknown>> = {}): KyInstance {
     extend: vi.fn(),
     ...overrides,
   };
-  // extend retourne une instance avec les mêmes méthodes (le prefix est validé via AbstractService)
   (base.extend as ReturnType<typeof vi.fn>).mockReturnValue(base);
   return base as unknown as KyInstance;
 }
 
-describe('ReportService (frontend)', () => {
+describe('ReportService', () => {
   let ky: ReturnType<typeof makeKy>;
   let service: ReportService;
 
@@ -49,7 +48,7 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('getMine', () => {
-    it('appelle GET me et retourne la réponse paginée', async () => {
+    it('calls GET me and returns the paginated response', async () => {
       const json = vi.fn().mockResolvedValue(mockPaginated);
       (ky.get as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
@@ -59,7 +58,7 @@ describe('ReportService (frontend)', () => {
       expect(result).toEqual(mockPaginated);
     });
 
-    it('transmet page et limit en searchParams', async () => {
+    it('forwards page and limit as searchParams', async () => {
       const json = vi.fn().mockResolvedValue(mockPaginated);
       (ky.get as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
@@ -70,7 +69,7 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('getById', () => {
-    it('appelle GET :id et retourne le signalement', async () => {
+    it('calls GET :id and returns the report', async () => {
       const json = vi.fn().mockResolvedValue(mockReport);
       (ky.get as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
@@ -82,7 +81,7 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('cancel', () => {
-    it('appelle PATCH :id/cancel et retourne le signalement mis à jour', async () => {
+    it('calls PATCH :id/cancel and returns the updated report', async () => {
       const cancelled = { ...mockReport, status: 'cancelled' as const };
       const json = vi.fn().mockResolvedValue(cancelled);
       (ky.patch as ReturnType<typeof vi.fn>).mockReturnValue({ json });
@@ -95,14 +94,14 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('create', () => {
-    it('appelle POST (root) avec FormData et retourne le signalement créé', async () => {
+    it('calls POST (root) with FormData and returns the created report', async () => {
       const json = vi.fn().mockResolvedValue(mockReport);
       const postMock = vi.fn().mockReturnValue({ json });
       const extendedKy = { post: postMock };
       (ky.extend as ReturnType<typeof vi.fn>).mockReturnValue(extendedKy);
 
       const result = await service.create({
-        desc: 'Le lampadaire au coin de la rue clignote.',
+        desc: 'The street lamp on the corner flickers.',
         photo: { uri: 'file:///photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' },
       });
 
@@ -111,13 +110,13 @@ describe('ReportService (frontend)', () => {
       expect(result).toEqual(mockReport);
     });
 
-    it('ajoute latitude et longitude si fournis', async () => {
+    it('includes latitude and longitude in FormData when provided', async () => {
       const json = vi.fn().mockResolvedValue(mockReport);
       const postMock = vi.fn().mockReturnValue({ json });
       (ky.extend as ReturnType<typeof vi.fn>).mockReturnValue({ post: postMock });
 
       await service.create({
-        desc: 'Voirie abîmée',
+        desc: 'Damaged road',
         latitude: 43.2965,
         longitude: 5.3698,
         photo: { uri: 'file:///photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' },
@@ -128,13 +127,13 @@ describe('ReportService (frontend)', () => {
       expect(formData.get('longitude')).toBe('5.3698');
     });
 
-    it("n'ajoute pas latitude/longitude si absents", async () => {
+    it('omits latitude and longitude from FormData when not provided', async () => {
       const json = vi.fn().mockResolvedValue(mockReport);
       const postMock = vi.fn().mockReturnValue({ json });
       (ky.extend as ReturnType<typeof vi.fn>).mockReturnValue({ post: postMock });
 
       await service.create({
-        desc: 'Tag sur mur',
+        desc: 'Graffiti on wall',
         photo: { uri: 'file:///photo.jpg', fileName: 'photo.jpg', mimeType: 'image/jpeg' },
       });
 
@@ -145,7 +144,7 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('getAll', () => {
-    it('appelle GET (root) et retourne la réponse paginée', async () => {
+    it('calls GET (root) and returns the paginated response', async () => {
       const json = vi.fn().mockResolvedValue(mockPaginated);
       (ky.get as ReturnType<typeof vi.fn>).mockReturnValue({ json });
 
@@ -157,7 +156,7 @@ describe('ReportService (frontend)', () => {
   });
 
   describe('updateStatus', () => {
-    it('appelle PATCH :id/status avec le nouveau statut', async () => {
+    it('calls PATCH :id/status with the new status', async () => {
       const updated = { ...mockReport, status: 'progress' as const };
       const json = vi.fn().mockResolvedValue(updated);
       (ky.patch as ReturnType<typeof vi.fn>).mockReturnValue({ json });

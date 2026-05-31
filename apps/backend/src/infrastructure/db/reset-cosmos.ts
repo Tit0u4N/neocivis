@@ -33,6 +33,27 @@ function getCosmosStatusCode(err: unknown): number | undefined {
   return undefined;
 }
 
+const RETRY_DELAYS_MS = [3000, 5000, 10000, 15000, 20000];
+
+async function ensureWithRetry(client: CosmosClient): Promise<void> {
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+    try {
+      await ensureCosmosDatabaseAndContainers(client);
+      return;
+    } catch (err: unknown) {
+      const statusCode = getCosmosStatusCode(err);
+      // 409 ContainerBeingDeleted: server-side deletion is async, wait and retry
+      if (statusCode !== 409 || attempt === RETRY_DELAYS_MS.length) {
+        throw err;
+      }
+      const delay = RETRY_DELAYS_MS[attempt] as number;
+      // biome-ignore lint/suspicious/noConsole: script CLI
+      console.info(`[db:reset:cosmos] containers still deleting, retrying in ${delay / 1000}s… (attempt ${attempt + 1}/${RETRY_DELAYS_MS.length})`);
+      await new Promise<void>((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 export async function resetCosmos(client: CosmosClient): Promise<void> {
   const databaseId = getCosmosDatabaseId();
 
@@ -47,7 +68,7 @@ export async function resetCosmos(client: CosmosClient): Promise<void> {
     }
   }
 
-  await ensureCosmosDatabaseAndContainers(client);
+  await ensureWithRetry(client);
   // biome-ignore lint/suspicious/noConsole: script CLI
   console.info(
     `[db:reset:cosmos] cosmos database ensured (db=${databaseId}, containers=${COSMOS_CONTAINER_IDS.join(', ')})`,

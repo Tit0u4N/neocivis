@@ -9,6 +9,7 @@ import {
   createEstablishmentRepository,
   createMediaRepository,
   createReportRepository,
+  createThreadRepository,
   createUserRepository,
 } from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
@@ -29,6 +30,7 @@ import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/m
 import { MediaService } from '@/modules/media/service/media.service';
 import { MediaLinkService } from '@/modules/media/service/media-link.service';
 import { ReportService } from '@/modules/report/service/report.service';
+import { ThreadService } from '@/modules/thread/service/thread.service';
 import { UserService } from '@/modules/users/service/user.service';
 import { AccessController } from './controllers/access.controller';
 import { ArticleController } from './controllers/article.controller';
@@ -37,6 +39,7 @@ import { MunicipalityConfigController } from './controllers/config.controller';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { MediaController } from './controllers/media.controller';
 import { ReportController } from './controllers/report.controller';
+import { ThreadController } from './controllers/thread.controller';
 import { UserController } from './controllers/user.controller';
 
 // Import repositories
@@ -49,6 +52,7 @@ const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new A
 const establishmentRepository = createEstablishmentRepository();
 const mediaRepository = createMediaRepository();
 const reportRepository = createReportRepository();
+const threadRepository = createThreadRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
@@ -61,6 +65,7 @@ const configService = new ConfigService(configRepository, mediaRepository);
 const mediaService = new MediaService(mediaRepository, mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository, mediaLinkService);
 const reportService = new ReportService(reportRepository);
+const threadService = new ThreadService(threadRepository);
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
@@ -69,6 +74,7 @@ const establishmentController = new EstablishmentController(establishmentService
 const municipalityConfigController = new MunicipalityConfigController(configService);
 const mediaController = new MediaController(mediaService);
 const reportController = new ReportController(reportService);
+const threadController = new ThreadController(threadService);
 const cityController = new CityController(cityService, userService);
 const accessController = new AccessController(accessService, cityService, userService);
 
@@ -144,6 +150,61 @@ const reportPermissionGate = createMiddleware(async (c, next) => {
   }
   return requirePermission(perm, accessService, userService)(c, next);
 });
+// Forum thread permission gate:
+// GET requests are open (staff members can always read threads).
+// Mute/unmute are gated under FORUM_THREAD_MODIFY_PERMISSION (no dedicated mute key exists).
+// Reactions (POST/DELETE .../reactions) are gated under CREATE (participation, not moderation).
+// Archive/unarchive are gated under MODIFY.
+const threadPermissionGate = createMiddleware(async (c, next) => {
+  const method = c.req.method;
+  const path = c.req.path;
+
+  if (method === 'GET') {
+    await next();
+    return;
+  }
+
+  let perm: PermissionKey | undefined;
+
+  if (path.includes('/moderation/users/')) {
+    if (path.endsWith('/ban')) {
+      perm = 'FORUM_THREAD_BAN_USER_PERMISSION';
+    } else if (path.endsWith('/unban')) {
+      perm = 'FORUM_THREAD_UNBAN_USER_PERMISSION';
+    } else {
+      // mute / unmute
+      perm = 'FORUM_THREAD_MODIFY_PERMISSION';
+    }
+  } else if (path.includes('/reactions')) {
+    // POST add reaction, DELETE remove reaction — both treated as participation
+    perm = 'FORUM_THREAD_CREATE_PERMISSION';
+  } else if (path.endsWith('/archive') || path.endsWith('/unarchive')) {
+    perm = 'FORUM_THREAD_MODIFY_PERMISSION';
+  } else if (path.includes('/messages/') && path.endsWith('/restore')) {
+    perm = 'FORUM_THREAD_DELETE_MESSAGE_PERMISSION';
+  } else if (path.includes('/messages/') && method === 'DELETE') {
+    perm = 'FORUM_THREAD_DELETE_MESSAGE_PERMISSION';
+  } else if (path.includes('/messages')) {
+    perm = 'FORUM_THREAD_CREATE_PERMISSION';
+  } else if (path.endsWith('/restore')) {
+    perm = 'FORUM_THREAD_DELETE_PERMISSION';
+  } else if (method === 'DELETE') {
+    perm = 'FORUM_THREAD_DELETE_PERMISSION';
+  } else if (method === 'PUT') {
+    perm = 'FORUM_THREAD_MODIFY_PERMISSION';
+  } else if (method === 'POST') {
+    perm = 'FORUM_THREAD_CREATE_PERMISSION';
+  }
+
+  if (!perm) {
+    await next();
+    return;
+  }
+  return requirePermission(perm, accessService, userService)(c, next);
+});
+
+cityScoped.use('/threads', threadPermissionGate);
+cityScoped.use('/threads/*', threadPermissionGate);
 cityScoped.use('/articles', articlePermissionGate);
 cityScoped.use('/articles/*', articlePermissionGate);
 cityScoped.use('/establishment', establishmentPermissionGate);
@@ -151,6 +212,7 @@ cityScoped.use('/establishment/*', establishmentPermissionGate);
 cityScoped.use('/reports', reportPermissionGate);
 cityScoped.use('/reports/*', reportPermissionGate);
 
+cityScoped.route('/threads', threadController.getRoutes());
 cityScoped.route('/articles', articleController.getRoutes());
 cityScoped.route('/establishment', establishmentController.getRoutes());
 cityScoped.route('/reports', reportController.getRoutes());

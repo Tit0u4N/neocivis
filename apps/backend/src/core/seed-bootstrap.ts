@@ -6,6 +6,7 @@ import {
   createConfigRepository,
   createEstablishmentRepository,
   createMediaRepository,
+  createThreadRepository,
   createUserRepository,
 } from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
@@ -28,6 +29,7 @@ async function bootstrapAutoSeed(): Promise<void> {
   const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
   const mediaRepository = createMediaRepository();
   const establishmentRepository = createEstablishmentRepository();
+  const threadRepository = createThreadRepository();
 
   const iamService = new KeycloakIAMService();
   const userService = new UserService(userRepository, iamService);
@@ -41,6 +43,7 @@ async function bootstrapAutoSeed(): Promise<void> {
     iamService,
     accessService,
     establishmentRepository,
+    threadRepository,
     mediaRepository,
     mediaBlobService,
     configRepository,

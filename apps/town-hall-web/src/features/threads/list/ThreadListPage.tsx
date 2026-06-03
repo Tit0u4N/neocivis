@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: SPEC */
 'use client';
 
 import type { ThreadCategory, ThreadSummary } from '@repo/contracts/thread';
@@ -106,6 +107,8 @@ export function ThreadListPage(props: Props) {
     threads,
     activeCategoryId,
     isLoading,
+    isLoadingMore,
+    hasMore,
     error,
     showNewThreadModal,
     mutedCount,
@@ -114,6 +117,7 @@ export function ThreadListPage(props: Props) {
     handleOpenNewThread,
     handleCloseNewThread,
     handleThreadCreated,
+    handleLoadMore,
     navigateToThread,
   } = props;
 
@@ -191,6 +195,15 @@ export function ThreadListPage(props: Props) {
               onClick={() => navigateToThread(thread.id)}
             />
           ))}
+
+        {/* Load more */}
+        {!isLoading && hasMore && (
+          <div className="flex justify-center pt-2">
+            <Button variant="outline" size="sm" onClick={() => void handleLoadMore()} disabled={isLoadingMore}>
+              {isLoadingMore ? t('common.loading') : t('threads.list.loadMore')}
+            </Button>
+          </div>
+        )}
       </div>
 
       <NewThreadModal

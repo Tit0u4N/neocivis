@@ -4,11 +4,11 @@ import type {
   CreateThreadCategoryInput,
   CreateThreadInput,
   ForumUserModeration,
+  PaginatedThreadsResponse,
   Thread,
   ThreadCategory,
   ThreadDetail,
   ThreadMessage,
-  ThreadSummary,
   UpdateThreadCategoryInput,
   UpdateThreadInput,
 } from '@repo/contracts/thread';
@@ -40,12 +40,18 @@ export class ThreadService extends AbstractService {
 
   // ── Threads ──────────────────────────────────────────────────────────────────
 
-  async getAll(categoryId?: string): Promise<ThreadSummary[]> {
-    const searchParams: Record<string, string> = {};
-    if (categoryId) {
-      searchParams.categoryId = categoryId;
+  async getAll(query: { categoryId?: string; page?: number; limit?: number } = {}): Promise<PaginatedThreadsResponse> {
+    const searchParams: Record<string, string | number> = {};
+    if (query.categoryId) {
+      searchParams.categoryId = query.categoryId;
     }
-    return await this.http.get('threads', { searchParams }).json<ThreadSummary[]>();
+    if (query.page !== undefined) {
+      searchParams.page = query.page;
+    }
+    if (query.limit !== undefined) {
+      searchParams.limit = query.limit;
+    }
+    return await this.http.get('threads', { searchParams }).json<PaginatedThreadsResponse>();
   }
 
   async getById(id: string): Promise<ThreadDetail> {

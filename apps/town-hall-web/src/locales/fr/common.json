@@ -433,7 +433,8 @@
       "mutedCount_one": "{{count}} muet",
       "mutedCount_other": "{{count}} muets",
       "bannedCount_one": "{{count}} banni",
-      "bannedCount_other": "{{count}} bannis"
+      "bannedCount_other": "{{count}} bannis",
+      "loadMore": "Charger plus"
     },
     "card": {
       "replies_one": "{{count}} réponse",
@@ -478,6 +479,11 @@
       "statusMuted": "Muet",
       "statusBanned": "Banni",
       "deletedAt": "supprimé · {{date}}"
+    },
+    "emojiPicker": {
+      "searchPlaceholder": "Rechercher…",
+      "loading": "Chargement…",
+      "empty": "Aucun résultat"
     },
     "categories": {
       "manageTitle": "Gérer les catégories",

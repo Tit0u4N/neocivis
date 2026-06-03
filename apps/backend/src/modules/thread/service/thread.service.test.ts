@@ -93,10 +93,11 @@ describe('ThreadService', () => {
       const thread2 = await service.createThread(CITY_ID, { title: 'Thread 2', categoryId, body: 'body' }, AUTHOR_ID);
       await service.softDeleteThread(CITY_ID, thread2.id);
 
-      const list = await service.listThreads(CITY_ID);
-      expect(list).toHaveLength(1);
-      expect(list[0].title).toBe('Thread 1');
-      expect(list[0].replyCount).toBe(0);
+      const result = await service.listThreads(CITY_ID);
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].title).toBe('Thread 1');
+      expect(result.data[0].replyCount).toBe(0);
+      expect(result.total).toBe(1);
     });
 
     it('filters threads by category', async () => {
@@ -104,9 +105,24 @@ describe('ThreadService', () => {
       await service.createThread(CITY_ID, { title: 'Sport thread', categoryId, body: 'body' }, AUTHOR_ID);
       await service.createThread(CITY_ID, { title: 'Culture thread', categoryId: cat2.id, body: 'body' }, AUTHOR_ID);
 
-      const sportThreads = await service.listThreads(CITY_ID, categoryId);
-      expect(sportThreads).toHaveLength(1);
-      expect(sportThreads[0].title).toBe('Sport thread');
+      const result = await service.listThreads(CITY_ID, categoryId);
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].title).toBe('Sport thread');
+    });
+
+    it('paginates threads correctly', async () => {
+      for (let i = 1; i <= 5; i++) {
+        await service.createThread(CITY_ID, { title: `Thread ${i}`, categoryId, body: 'body' }, AUTHOR_ID);
+      }
+      const page1 = await service.listThreads(CITY_ID, undefined, 1, 2);
+      expect(page1.data).toHaveLength(2);
+      expect(page1.total).toBe(5);
+      expect(page1.totalPages).toBe(3);
+      expect(page1.page).toBe(1);
+      expect(page1.limit).toBe(2);
+
+      const page3 = await service.listThreads(CITY_ID, undefined, 3, 2);
+      expect(page3.data).toHaveLength(1);
     });
 
     it('soft-deletes and restores a thread', async () => {
@@ -128,20 +144,21 @@ describe('ThreadService', () => {
       expect(archived.archivedAt).toBeDefined();
 
       const listAfterArchive = await service.listThreads(CITY_ID);
-      expect(listAfterArchive).toHaveLength(0);
+      expect(listAfterArchive.data).toHaveLength(0);
+      expect(listAfterArchive.total).toBe(0);
 
       const unarchived = await service.unarchiveThread(CITY_ID, thread.id);
       expect(unarchived.archived).toBe(false);
       expect(unarchived.archivedAt).toBeUndefined();
 
       const listAfterUnarchive = await service.listThreads(CITY_ID);
-      expect(listAfterUnarchive).toHaveLength(1);
+      expect(listAfterUnarchive.data).toHaveLength(1);
     });
 
     it('scopes threads to city', async () => {
       await service.createThread(CITY_ID, { title: 'Thread', categoryId, body: 'body' }, AUTHOR_ID);
-      const list = await service.listThreads('other-city');
-      expect(list).toHaveLength(0);
+      const result = await service.listThreads('other-city');
+      expect(result.data).toHaveLength(0);
     });
 
     it('rejects create when category not in city', async () => {
@@ -179,8 +196,8 @@ describe('ThreadService', () => {
       const msg2 = await service.addMessage(CITY_ID, threadId, { body: 'Reply 2' }, AUTHOR_ID);
       await service.softDeleteMessage(CITY_ID, threadId, msg2.id);
 
-      const [summary] = await service.listThreads(CITY_ID);
-      expect(summary.replyCount).toBe(1);
+      const { data } = await service.listThreads(CITY_ID);
+      expect(data[0].replyCount).toBe(1);
     });
 
     it('soft-deletes and restores a message', async () => {

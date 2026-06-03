@@ -3,11 +3,20 @@
 import type { ThreadCategory, ThreadMessage, ThreadReaction } from '@repo/contracts/thread';
 import { ChevronDown, RotateCcw, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
 import { PageLayout } from '@/components/ui/page-layout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { CategoryBadge } from '@/features/threads/components/CategoryBadge';
+import { EmojiPickerPopover } from '@/features/threads/components/EmojiPickerPopover';
 import type { ModMenuItem } from '@/features/threads/components/ModMenu';
 import { ModMenu } from '@/features/threads/components/ModMenu';
 import { getInitials, ThreadAvatar } from '@/features/threads/components/ThreadAvatar';
@@ -16,7 +25,8 @@ import type { useThreadDetailPage } from './useThreadDetailPage';
 
 type Props = ReturnType<typeof useThreadDetailPage>;
 
-const PRESET_EMOJIS = ['👍', '❤️', '😄', '🎉'];
+const QUICK_EMOJIS = ['👍', '❤️', '😄'];
+const CONTEXT_MENU_EMOJIS = ['👍', '❤️', '😄', '🎉'];
 
 function formatRelative(isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();
@@ -44,7 +54,9 @@ type ReactionChipsProps = {
 };
 
 function ReactionChips({ reactions, currentUserId, onToggle }: ReactionChipsProps) {
-  const { t } = useTranslation();
+  if (reactions.length === 0) {
+    return null;
+  }
   return (
     <div className="mt-2 flex flex-wrap items-center gap-1.5">
       {reactions.map((r) => {
@@ -65,18 +77,34 @@ function ReactionChips({ reactions, currentUserId, onToggle }: ReactionChipsProp
           </button>
         );
       })}
-      {/* Preset emoji add shortcuts */}
-      {PRESET_EMOJIS.filter((e) => !reactions.some((r) => r.emoji === e)).map((e) => (
+    </div>
+  );
+}
+
+// ── HoverActionBar ────────────────────────────────────────────────────────────
+// Shown only on group hover; contains quick emojis, full picker, and … menu
+
+type HoverActionBarProps = {
+  modItems: ModMenuItem[];
+  onToggleReaction: (emoji: string) => void;
+};
+
+function HoverActionBar({ modItems, onToggleReaction }: HoverActionBarProps) {
+  return (
+    <div className="-top-4 absolute right-2 flex items-center gap-0.5 rounded-full border border-border bg-popover px-1.5 py-1 opacity-0 shadow-sm transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+      {QUICK_EMOJIS.map((e) => (
         <button
           key={e}
           type="button"
-          onClick={() => onToggle(e)}
-          title={t('threads.detail.addReaction')}
-          className="flex items-center gap-1 rounded-full border border-border border-dashed px-2 py-0.5 text-muted-foreground text-xs opacity-50 transition-colors hover:border-border hover:opacity-100"
+          onClick={() => onToggleReaction(e)}
+          className="flex size-7 items-center justify-center rounded-full text-base transition-colors hover:bg-muted"
         >
           {e}
         </button>
       ))}
+      <div className="mx-0.5 h-4 w-px bg-border" />
+      <EmojiPickerPopover onSelect={onToggleReaction} />
+      <ModMenu items={modItems} />
     </div>
   );
 }
@@ -127,22 +155,56 @@ function MessageRow({
   ];
 
   return (
-    <div className="rounded-lg border border-border bg-card p-3.5">
-      <div className="mb-2 flex items-center gap-2">
-        <ThreadAvatar initials={initials} size="sm" />
-        {/* TODO: resolve display name via users API */}
-        <span className="font-mono font-semibold text-muted-foreground text-xs">{message.authorId}</span>
-        <UserStatusBadge muted={muted} banned={banned} />
-        <span className="ml-auto text-muted-foreground text-xs">
-          {formatTime(message.createdAt)} · {formatRelative(message.createdAt)}
-        </span>
-        <ModMenu items={modItems} />
-      </div>
-      <p className={`text-sm leading-relaxed ${banned ? 'text-muted-foreground' : 'text-foreground'}`}>
-        {message.body}
-      </p>
-      <ReactionChips reactions={message.reactions} currentUserId={currentUserId} onToggle={onToggleReaction} />
-    </div>
+    <ContextMenu>
+      <ContextMenuTrigger className="group relative block rounded-lg border border-border bg-card p-3.5">
+        <HoverActionBar modItems={modItems} onToggleReaction={onToggleReaction} />
+        <div className="mb-2 flex items-center gap-2">
+          <ThreadAvatar initials={initials} size="sm" />
+          {/* TODO: resolve display name via users API */}
+          <span className="font-mono font-semibold text-muted-foreground text-xs">{message.authorId}</span>
+          <UserStatusBadge muted={muted} banned={banned} />
+          <span className="ml-auto text-muted-foreground text-xs">
+            {formatTime(message.createdAt)} · {formatRelative(message.createdAt)}
+          </span>
+        </div>
+        <p className={`text-sm leading-relaxed ${banned ? 'text-muted-foreground' : 'text-foreground'}`}>
+          {message.body}
+        </p>
+        <ReactionChips reactions={message.reactions} currentUserId={currentUserId} onToggle={onToggleReaction} />
+      </ContextMenuTrigger>
+
+      <ContextMenuContent>
+        {/* Quick reactions row */}
+        <div className="flex gap-1 px-1 py-1.5">
+          {CONTEXT_MENU_EMOJIS.map((e) => (
+            <button
+              key={e}
+              type="button"
+              onClick={() => onToggleReaction(e)}
+              className={`flex size-8 items-center justify-center rounded-md text-base transition-colors hover:bg-accent ${
+                message.reactions.find((r) => r.emoji === e)?.userIds.includes(currentUserId)
+                  ? 'bg-primary/10 text-primary'
+                  : ''
+              }`}
+            >
+              {e}
+            </button>
+          ))}
+        </div>
+        <ContextMenuSeparator />
+        {/* Moderation actions */}
+        <ContextMenuItem variant="destructive" onClick={onDelete}>
+          {t('threads.moderation.deleteMessage')}
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem onClick={onToggleMute}>
+          {muted ? t('threads.moderation.unmute') : t('threads.moderation.mute')}
+        </ContextMenuItem>
+        <ContextMenuItem variant="destructive" onClick={onToggleBan}>
+          {banned ? t('threads.moderation.unban') : t('threads.moderation.ban')}
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
 
@@ -198,6 +260,7 @@ export function ThreadDetailPage(props: Props) {
     handleToggleReaction,
     handleSubmitReply,
     toggleShowDeletedMessages,
+    handleBack,
   } = props;
 
   const categoryMap = new Map<string, ThreadCategory>(categories.map((c) => [c.id, c]));
@@ -254,6 +317,11 @@ export function ThreadDetailPage(props: Props) {
   return (
     <PageLayout title={t('threads.list.title')}>
       <div className="mx-auto w-full max-w-3xl">
+        {/* Back button */}
+        <div className="mb-2">
+          <BackButton onClick={handleBack}>{t('threads.detail.backToThreads')}</BackButton>
+        </div>
+
         {/* Archived banner */}
         {thread.archived && (
           <div className="mb-4 flex items-center gap-4 rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 dark:border-amber-900 dark:bg-amber-950/30">
@@ -316,7 +384,7 @@ export function ThreadDetailPage(props: Props) {
               }),
             })}
           </h3>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-4">
             {visibleMessages.map((msg) => {
               const msgMod = getModerationForUser(msg.authorId);
               return (

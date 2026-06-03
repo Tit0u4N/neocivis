@@ -4,60 +4,118 @@ import type { ThreadCategory, ThreadSummary } from '@repo/contracts/thread';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useServices } from '@/providers/ServicesProvider';
+import { useThreadStore } from '@/stores/thread.store';
+
+const PAGE_LIMIT = 20;
+
+function categoryKey(categoryId: string | undefined): string {
+  return categoryId ?? 'all';
+}
 
 export function useThreadListPage() {
   const router = useRouter();
   const { threadService } = useServices();
 
-  const [categories, setCategories] = useState<ThreadCategory[]>([]);
-  const [threads, setThreads] = useState<ThreadSummary[]>([]);
+  // Stable action selectors — Zustand guarantees same function ref across renders
+  const setCategories = useThreadStore((s) => s.setCategories);
+  const setModeration = useThreadStore((s) => s.setModeration);
+  const setPage = useThreadStore((s) => s.setPage);
+  const appendPage = useThreadStore((s) => s.appendPage);
+  const invalidate = useThreadStore((s) => s.invalidate);
+
+  // Data selectors — only re-render when this slice changes
+  const categories: ThreadCategory[] = useThreadStore((s) => s.categories);
+  const moderation = useThreadStore((s) => s.moderation);
+
   const [activeCategoryId, setActiveCategoryId] = useState<string | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showNewThreadModal, setShowNewThreadModal] = useState(false);
-  const [mutedCount, setMutedCount] = useState(0);
-  const [bannedCount, setBannedCount] = useState(0);
+
+  const key = categoryKey(activeCategoryId);
+  const cache = useThreadStore((s) => s.pages[key]);
+  const threads: ThreadSummary[] = cache?.threads ?? [];
+  const hasMore = cache?.hasMore ?? false;
+  const currentPage = cache?.page ?? 0;
+
+  const mutedCount = moderation.filter((m) => m.muted).length;
+  const bannedCount = moderation.filter((m) => m.banned).length;
 
   const fetchCategories = useCallback(async () => {
+    // Read current state without adding to deps — avoids cascade re-runs
+    if (useThreadStore.getState().categories.length > 0) {
+      return;
+    }
     try {
       const data = await threadService.getCategories();
       setCategories(data);
     } catch {
       // Non-blocking; category filter won't show but threads still work
     }
-  }, [threadService.getCategories]);
-
-  const fetchThreads = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await threadService.getAll(activeCategoryId);
-      setThreads(data);
-    } catch {
-      setError('threads.list.error');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [threadService.getAll, activeCategoryId]);
+  }, [threadService.getCategories, setCategories]);
 
   const fetchModeration = useCallback(async () => {
     try {
       const data = await threadService.getModeration();
-      setMutedCount(data.filter((m) => m.muted).length);
-      setBannedCount(data.filter((m) => m.banned).length);
+      setModeration(data);
     } catch {
       // Non-blocking
     }
-  }, [threadService.getModeration]);
+  }, [threadService.getModeration, setModeration]);
+
+  const fetchPage1 = useCallback(
+    async (force = false) => {
+      const cacheKey = categoryKey(activeCategoryId);
+      if (!force && useThreadStore.getState().pages[cacheKey]) {
+        return;
+      }
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await threadService.getAll({ categoryId: activeCategoryId, page: 1, limit: PAGE_LIMIT });
+        setPage(cacheKey, response);
+      } catch {
+        setError('threads.list.error');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [threadService.getAll, activeCategoryId, setPage],
+  );
+
+  const handleLoadMore = useCallback(async () => {
+    const cacheKey = categoryKey(activeCategoryId);
+    const pageCache = useThreadStore.getState().pages[cacheKey];
+    if (!pageCache?.hasMore || isLoadingMore) {
+      return;
+    }
+    setIsLoadingMore(true);
+    try {
+      const response = await threadService.getAll({
+        categoryId: activeCategoryId,
+        page: pageCache.page + 1,
+        limit: PAGE_LIMIT,
+      });
+      appendPage(cacheKey, response);
+    } catch {
+      // TODO add user feedback; user can retry
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [threadService.getAll, activeCategoryId, appendPage, isLoadingMore]);
 
   useEffect(() => {
     void fetchCategories();
-    void fetchModeration();
-  }, [fetchCategories, fetchModeration]);
+  }, [fetchCategories]);
 
   useEffect(() => {
-    void fetchThreads();
-  }, [fetchThreads]);
+    void fetchModeration();
+  }, [fetchModeration]);
+
+  useEffect(() => {
+    void fetchPage1();
+  }, [fetchPage1]);
 
   const handleSelectCategory = useCallback((id: string | undefined) => {
     setActiveCategoryId(id);
@@ -73,9 +131,10 @@ export function useThreadListPage() {
 
   const handleThreadCreated = useCallback(async () => {
     setShowNewThreadModal(false);
-    await fetchThreads();
+    invalidate();
+    await fetchPage1(true);
     await fetchModeration();
-  }, [fetchThreads, fetchModeration]);
+  }, [invalidate, fetchPage1, fetchModeration]);
 
   const navigateToThread = useCallback(
     (id: string) => {
@@ -89,6 +148,9 @@ export function useThreadListPage() {
     threads,
     activeCategoryId,
     isLoading,
+    isLoadingMore,
+    hasMore,
+    currentPage,
     error,
     showNewThreadModal,
     mutedCount,
@@ -97,6 +159,7 @@ export function useThreadListPage() {
     handleOpenNewThread,
     handleCloseNewThread,
     handleThreadCreated,
+    handleLoadMore,
     navigateToThread,
   };
 }

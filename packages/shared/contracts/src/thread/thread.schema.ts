@@ -89,8 +89,19 @@ export type AddReactionInput = z.infer<typeof AddReactionInput>;
 
 export const ThreadsListQuery = z.object({
   categoryId: z.string().uuid().optional(),
+  page: z.coerce.number().int().positive().optional().default(1),
+  limit: z.coerce.number().int().positive().max(100).optional().default(20),
 });
 export type ThreadsListQuery = z.infer<typeof ThreadsListQuery>;
+
+export const PaginatedThreadsResponse = z.object({
+  data: z.array(ThreadSummary),
+  total: z.number().int().nonnegative(),
+  page: z.number().int().positive(),
+  limit: z.number().int().positive(),
+  totalPages: z.number().int().nonnegative(),
+});
+export type PaginatedThreadsResponse = z.infer<typeof PaginatedThreadsResponse>;
 
 export const ForumUserModeration = z.object({
   cityId: CityId,

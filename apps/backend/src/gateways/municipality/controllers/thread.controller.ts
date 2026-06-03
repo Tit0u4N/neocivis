@@ -5,11 +5,11 @@ import {
   CreateThreadCategoryInput,
   CreateThreadInput,
   type ForumUserModeration,
+  type PaginatedThreadsResponse,
   type Thread,
   type ThreadCategory,
   type ThreadDetail,
   type ThreadMessage,
-  type ThreadSummary,
   ThreadsListQuery,
   UpdateThreadCategoryInput,
   UpdateThreadInput,
@@ -155,11 +155,14 @@ export class ThreadController {
 
   // ── Threads ──────────────────────────────────────────────────────────────────
 
-  private async listThreads(c: Context): Promise<ControllerJson<ThreadSummary[], 200, readonly []>> {
+  private async listThreads(c: Context): Promise<ControllerJson<PaginatedThreadsResponse, 200, [400]>> {
     const cityId = this.getCityId(c);
     const queryParsed = ThreadsListQuery.safeParse(Object.fromEntries(new URL(c.req.url).searchParams));
-    const categoryId = queryParsed.success ? queryParsed.data.categoryId : undefined;
-    const body: ThreadSummary[] = await this.threadService.listThreads(cityId, categoryId);
+    if (!queryParsed.success) {
+      return c.json({ error: 'Invalid query parameters' } satisfies ApiErrorDto, 400);
+    }
+    const { categoryId, page, limit } = queryParsed.data;
+    const body: PaginatedThreadsResponse = await this.threadService.listThreads(cityId, categoryId, page, limit);
     return c.json(body, 200);
   }
 

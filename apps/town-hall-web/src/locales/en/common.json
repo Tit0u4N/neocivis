@@ -433,7 +433,8 @@
       "mutedCount_one": "{{count}} muted",
       "mutedCount_other": "{{count}} muted",
       "bannedCount_one": "{{count}} banned",
-      "bannedCount_other": "{{count}} banned"
+      "bannedCount_other": "{{count}} banned",
+      "loadMore": "Load more"
     },
     "card": {
       "replies_one": "{{count}} reply",
@@ -478,6 +479,11 @@
       "statusMuted": "Muted",
       "statusBanned": "Banned",
       "deletedAt": "deleted · {{date}}"
+    },
+    "emojiPicker": {
+      "searchPlaceholder": "Search…",
+      "loading": "Loading…",
+      "empty": "No results"
     },
     "categories": {
       "manageTitle": "Manage categories",

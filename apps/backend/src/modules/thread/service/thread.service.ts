@@ -5,6 +5,7 @@ import type {
   CreateThreadCategoryInput,
   CreateThreadInput,
   ForumUserModeration,
+  PaginatedThreadsResponse,
   Thread,
   ThreadCategory,
   ThreadDetail,
@@ -61,20 +62,23 @@ export class ThreadService {
 
   // ── Threads ──────────────────────────────────────────────────────────────────
 
-  async listThreads(cityId: string, categoryId?: string): Promise<ThreadSummary[]> {
+  async listThreads(cityId: string, categoryId?: string, page = 1, limit = 20): Promise<PaginatedThreadsResponse> {
     const threads = await this.repository.findThreadsByCityId(cityId);
     // Exclude soft-deleted and archived threads from the active list
     const visible = threads.filter((t) => !(t.deleted || t.archived));
     const filtered = categoryId ? visible.filter((t) => t.categoryId === categoryId) : visible;
     const sorted = filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    const summaries = await Promise.all(
-      sorted.map(async (t) => {
+    const total = sorted.length;
+    const start = (page - 1) * limit;
+    const slice = sorted.slice(start, start + limit);
+    const data = await Promise.all(
+      slice.map(async (t) => {
         const messages = await this.repository.findMessagesByThreadId(t.id);
         const replyCount = messages.filter((m) => !m.deleted).length;
-        return { ...t, replyCount };
+        return { ...t, replyCount } satisfies ThreadSummary;
       }),
     );
-    return summaries;
+    return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   async getThreadById(cityId: string, id: string): Promise<Thread> {

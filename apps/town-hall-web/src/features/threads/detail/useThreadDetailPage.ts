@@ -1,18 +1,27 @@
 'use client';
 
-import type { ForumUserModeration, ThreadCategory, ThreadDetail } from '@repo/contracts/thread';
+import type { ForumUserModeration, ThreadDetail } from '@repo/contracts/thread';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuthentication } from '@/hooks/useAuthentication';
 import { useServices } from '@/providers/ServicesProvider';
+import { useThreadStore } from '@/stores/thread.store';
 
 export function useThreadDetailPage(threadId: string) {
+  const router = useRouter();
   const { threadService } = useServices();
   const { user } = useAuthentication();
   const currentUserId = user?.profile.sub ?? '';
 
+  // Stable action selectors — Zustand guarantees same function ref across renders
+  const setCategories = useThreadStore((s) => s.setCategories);
+  const setModeration = useThreadStore((s) => s.setModeration);
+
+  // Data selectors
+  const categories = useThreadStore((s) => s.categories);
+  const moderation = useThreadStore((s) => s.moderation);
+
   const [thread, setThread] = useState<ThreadDetail | null>(null);
-  const [categories, setCategories] = useState<ThreadCategory[]>([]);
-  const [moderation, setModeration] = useState<ForumUserModeration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [replyBody, setReplyBody] = useState('');
@@ -33,13 +42,16 @@ export function useThreadDetailPage(threadId: string) {
   }, [threadService.getById, threadId]);
 
   const fetchCategories = useCallback(async () => {
+    if (useThreadStore.getState().categories.length > 0) {
+      return;
+    }
     try {
       const data = await threadService.getCategories();
       setCategories(data);
     } catch {
       // Non-blocking
     }
-  }, [threadService.getCategories]);
+  }, [threadService.getCategories, setCategories]);
 
   const fetchModeration = useCallback(async () => {
     try {
@@ -48,7 +60,7 @@ export function useThreadDetailPage(threadId: string) {
     } catch {
       // Non-blocking
     }
-  }, [threadService.getModeration]);
+  }, [threadService.getModeration, setModeration]);
 
   useEffect(() => {
     void fetchThread();
@@ -67,7 +79,7 @@ export function useThreadDetailPage(threadId: string) {
         await threadService.softDeleteMessage(threadId, messageId);
         await fetchThread();
       } catch {
-        // Silently fail; UI state unchanged
+        // TODO add user feedback; UI state unchanged
       }
     },
     [threadService.softDeleteMessage, threadId, fetchThread],
@@ -79,7 +91,7 @@ export function useThreadDetailPage(threadId: string) {
         await threadService.restoreMessage(threadId, messageId);
         await fetchThread();
       } catch {
-        // Silently fail
+        // TODO add user feedback
       }
     },
     [threadService.restoreMessage, threadId, fetchThread],
@@ -90,7 +102,7 @@ export function useThreadDetailPage(threadId: string) {
       await threadService.softDelete(threadId);
       await fetchThread();
     } catch {
-      // Silently fail
+      // TODO add user feedback
     }
   }, [threadService.softDelete, threadId, fetchThread]);
 
@@ -99,7 +111,7 @@ export function useThreadDetailPage(threadId: string) {
       await threadService.restore(threadId);
       await fetchThread();
     } catch {
-      // Silently fail
+      // TODO add user feedback
     }
   }, [threadService.restore, threadId, fetchThread]);
 
@@ -108,7 +120,7 @@ export function useThreadDetailPage(threadId: string) {
       await threadService.archive(threadId);
       await fetchThread();
     } catch {
-      // Silently fail
+      // TODO add user feedback
     }
   }, [threadService.archive, threadId, fetchThread]);
 
@@ -117,7 +129,7 @@ export function useThreadDetailPage(threadId: string) {
       await threadService.unarchive(threadId);
       await fetchThread();
     } catch {
-      // Silently fail
+      // TODO add user feedback
     }
   }, [threadService.unarchive, threadId, fetchThread]);
 
@@ -131,7 +143,7 @@ export function useThreadDetailPage(threadId: string) {
         }
         await fetchModeration();
       } catch {
-        // Silently fail
+        // TODO add user feedback
       }
     },
     [threadService.muteUser, threadService.unmuteUser, fetchModeration],
@@ -147,7 +159,7 @@ export function useThreadDetailPage(threadId: string) {
         }
         await fetchModeration();
       } catch {
-        // Silently fail
+        // TODO add user feedback
       }
     },
     [threadService.banUser, threadService.unbanUser, fetchModeration],
@@ -172,7 +184,7 @@ export function useThreadDetailPage(threadId: string) {
         }
         await fetchThread();
       } catch {
-        // Silently fail
+        // TODO add user feedback
       }
     },
     [thread, currentUserId, threadService.addReaction, threadService.removeReaction, threadId, fetchThread],
@@ -189,7 +201,7 @@ export function useThreadDetailPage(threadId: string) {
       setReplyBody('');
       await fetchThread();
     } catch {
-      // Silently fail
+      // TODO add user feedback
     } finally {
       setIsReplying(false);
     }
@@ -198,6 +210,10 @@ export function useThreadDetailPage(threadId: string) {
   const toggleShowDeletedMessages = useCallback(() => {
     setShowDeletedMessages((prev) => !prev);
   }, []);
+
+  const handleBack = useCallback(() => {
+    router.push('/dashboard/threads');
+  }, [router]);
 
   return {
     thread,
@@ -221,5 +237,6 @@ export function useThreadDetailPage(threadId: string) {
     handleToggleReaction,
     handleSubmitReply,
     toggleShowDeletedMessages,
+    handleBack,
   };
 }

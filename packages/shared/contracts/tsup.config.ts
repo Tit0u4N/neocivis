@@ -14,6 +14,7 @@ export default defineConfig((options: Options) => ({
     role: 'src/role/role.schema.ts',
     upload: 'src/upload/upload.dto.ts',
     user: 'src/user/user.dto.ts',
+    'user-schema': 'src/user/user.schema.ts',
   },
   clean: true,
   format: ['cjs', 'esm'],

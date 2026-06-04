@@ -1,0 +1,49 @@
+meta {
+  name: Scenario - Patch citizen profile
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{url}}/api/citizen/user/me
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "firstName": "AccountE2e",
+    "lastName": "Updated"
+  }
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  bru.setVar('accountE2eFirstName', 'AccountE2e');
+  bru.setVar('accountE2eLastName', 'Updated');
+}
+
+tests {
+  test("Profile update returns 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Body has success flag", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('success', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

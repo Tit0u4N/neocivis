@@ -11,3 +11,4 @@ export * from './report/report.schema';
 export * from './role/role.schema';
 export * from './upload/upload.dto';
 export * from './user/user.dto';
+export * from './user/user.schema';

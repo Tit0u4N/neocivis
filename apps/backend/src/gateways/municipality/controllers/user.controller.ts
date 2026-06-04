@@ -1,4 +1,5 @@
-import type { ApiErrorDto, PermissionKey, RoleSummaryDto, UserMeDto, UserPublicDto } from '@repo/contracts';
+import type { ApiErrorDto, OperationSuccessDto, PermissionKey, RoleSummaryDto, UserMeDto, UserPublicDto } from '@repo/contracts';
+import { UpdateAccountInput } from '@repo/contracts/user-schema';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
 import type { AccessService } from '@/modules/access/access.service';
@@ -17,9 +18,44 @@ export class UserController {
     const app = new Hono();
 
     app.get('/me', (c) => this.getMe(c));
+    app.patch('/me', (c) => this.updateMe(c));
+    app.post('/me/change-password', (c) => this.changePassword(c));
     app.get('/by-ids', (c) => this.getUsersByIds(c));
 
     return app;
+  }
+
+  private async updateMe(c: Context): Promise<ControllerJson<OperationSuccessDto>> {
+    const keycloakId = c.req.header('X-User-Id');
+    if (!keycloakId) {
+      return c.json({ error: 'No user information found in headers' } satisfies ApiErrorDto, 400);
+    }
+    const json = await c.req.json().catch(() => null);
+    const parsed = UpdateAccountInput.safeParse(json);
+    if (!parsed.success) {
+      return c.json({ error: 'Invalid body' } satisfies ApiErrorDto, 400);
+    }
+    try {
+      await this.service.updateMyProfile(keycloakId, parsed.data);
+      return c.json({ success: true } satisfies OperationSuccessDto, 200);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Update failed';
+      return c.json({ error: msg } satisfies ApiErrorDto, 409);
+    }
+  }
+
+  private async changePassword(c: Context): Promise<ControllerJson<OperationSuccessDto>> {
+    const keycloakId = c.req.header('X-User-Id');
+    if (!keycloakId) {
+      return c.json({ error: 'No user information found in headers' } satisfies ApiErrorDto, 400);
+    }
+    try {
+      await this.service.sendPasswordResetEmail(keycloakId, 'neocivis-townhall-app');
+      return c.json({ success: true } satisfies OperationSuccessDto, 200);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Password reset failed';
+      return c.json({ error: msg } satisfies ApiErrorDto, 409);
+    }
   }
 
   private async getUsersByIds(c: Context): Promise<ControllerJson<UserPublicDto[]>> {

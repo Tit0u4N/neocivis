@@ -56,4 +56,18 @@ export interface IAMService {
    * Retourne `true` si IAM non configuré (impossible de vérifier).
    */
   isUserAbsentFromKeycloak(userId: string, username?: string): Promise<boolean>;
+
+  /**
+   * Met à jour le profil d'un utilisateur dans Keycloak (Admin API).
+   * Seuls les champs fournis (non `undefined`) sont mis à jour.
+   * Throw si non configuré / échec Keycloak.
+   */
+  updateUserProfile(userId: string, input: Partial<IamUserProfile>): Promise<void>;
+
+  /**
+   * Envoie un e-mail `UPDATE_PASSWORD` à l'utilisateur via Keycloak.
+   * `clientId` détermine la variable `client` dans le template FTL (branding citizen vs town-hall).
+   * Throw si non configuré / échec Keycloak.
+   */
+  sendPasswordResetEmail(userId: string, clientId: string): Promise<void>;
 }

@@ -1,3 +1,4 @@
+import type { UpdateAccountInput } from '@repo/contracts';
 import type { IAMService, IamUser, IamUserProfile } from '@/modules/iam/iam.service';
 import type {
   InsertSeededUserInput,
@@ -77,6 +78,38 @@ export class UserService {
       return;
     }
     await this.repository.updateFromHeaders(input);
+  }
+
+  /**
+   * Met à jour le profil de l'utilisateur courant dans Keycloak, puis en DB.
+   * La DB est mise à jour directement sans attendre le webhook access.UPDATE.
+   */
+  async updateMyProfile(keycloakId: string, input: UpdateAccountInput): Promise<void> {
+    await this.iamService.updateUserProfile(keycloakId, {
+      username: input.username,
+      email: input.email,
+      firstName: input.firstName,
+      lastName: input.lastName,
+    });
+
+    const existing = await this.repository.getByKeycloakId(keycloakId);
+    if (existing) {
+      await this.repository.updateProfile({
+        keycloakId,
+        username: input.username ?? existing.username,
+        email: input.email ?? existing.email,
+        firstName: input.firstName ?? existing.firstName,
+        lastName: input.lastName ?? existing.lastName,
+      });
+    }
+  }
+
+  /**
+   * Déclenche l'envoi d'un e-mail UPDATE_PASSWORD via Keycloak.
+   * `clientId` est passé à Keycloak pour que le template FTL puisse brancher sur le bon style.
+   */
+  async sendPasswordResetEmail(keycloakId: string, clientId: string): Promise<void> {
+    await this.iamService.sendPasswordResetEmail(keycloakId, clientId);
   }
 
   async deleteAll(): Promise<void> {

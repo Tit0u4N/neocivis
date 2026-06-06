@@ -493,5 +493,59 @@
       "deleteConfirm": "Delete this category?",
       "error": "Unable to load categories."
     }
+  },
+  "forumUsers": {
+    "title": "User management",
+    "tabs": {
+      "active": "Active accounts",
+      "banned": "Banned accounts"
+    },
+    "search": "Enter username",
+    "table": {
+      "username": "Username",
+      "contributions": "Contributions thread",
+      "status": "Account status",
+      "dateBan": "Date Ban"
+    },
+    "status": {
+      "active": "Active",
+      "banned": "Banned"
+    },
+    "actions": {
+      "ban": "Ban",
+      "unban": "Unban",
+      "more": "More"
+    },
+    "banModal": {
+      "title": "Ban user",
+      "reasonLabel": "Explain the reason of the ban",
+      "reasonPlaceholder": "The users insulted another user...",
+      "informUser": "Inform user",
+      "sendEmail": "Send an e-mail",
+      "sendPush": "Send a push notification",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "unbanModal": {
+      "title": "Unban user",
+      "reasonLabel": "Explain the reason of the unban",
+      "reasonPlaceholder": "The user ....",
+      "informUser": "Inform user",
+      "sendEmail": "Send an e-mail",
+      "sendPush": "Send a push notification",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "infoModal": {
+      "title": "User information",
+      "profilePicture": "Profil picture",
+      "username": "Username",
+      "lastConnection": "Last connexion",
+      "banSince": "Ban since",
+      "memberSince": "Member since",
+      "close": "Close"
+    },
+    "empty": "No users",
+    "error": "Unable to load users"
   }
 }

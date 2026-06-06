@@ -493,5 +493,59 @@
       "deleteConfirm": "Supprimer cette catégorie ?",
       "error": "Impossible de charger les catégories."
     }
+  },
+  "forumUsers": {
+    "title": "Gestion des utilisateurs",
+    "tabs": {
+      "active": "Comptes actifs",
+      "banned": "Comptes bannis"
+    },
+    "search": "Saisir un nom d'utilisateur",
+    "table": {
+      "username": "Nom d'utilisateur",
+      "contributions": "Contributions au forum",
+      "status": "Statut du compte",
+      "dateBan": "Date du ban"
+    },
+    "status": {
+      "active": "Actif",
+      "banned": "Banni"
+    },
+    "actions": {
+      "ban": "Bannir",
+      "unban": "Débannir",
+      "more": "Plus"
+    },
+    "banModal": {
+      "title": "Bannir l'utilisateur",
+      "reasonLabel": "Expliquer la raison du bannissement",
+      "reasonPlaceholder": "L'utilisateur a insulté un autre utilisateur...",
+      "informUser": "Informer l'utilisateur",
+      "sendEmail": "Envoyer un e-mail",
+      "sendPush": "Envoyer une notification push",
+      "cancel": "Annuler",
+      "confirm": "Confirmer"
+    },
+    "unbanModal": {
+      "title": "Débannir l'utilisateur",
+      "reasonLabel": "Expliquer la raison du débannissement",
+      "reasonPlaceholder": "L'utilisateur ...",
+      "informUser": "Informer l'utilisateur",
+      "sendEmail": "Envoyer un e-mail",
+      "sendPush": "Envoyer une notification push",
+      "cancel": "Annuler",
+      "confirm": "Confirmer"
+    },
+    "infoModal": {
+      "title": "Informations utilisateur",
+      "profilePicture": "Photo de profil",
+      "username": "Nom d'utilisateur",
+      "lastConnection": "Dernière connexion",
+      "banSince": "Banni depuis",
+      "memberSince": "Membre depuis",
+      "close": "Fermer"
+    },
+    "empty": "Aucun utilisateur",
+    "error": "Impossible de charger les utilisateurs"
   }
 }

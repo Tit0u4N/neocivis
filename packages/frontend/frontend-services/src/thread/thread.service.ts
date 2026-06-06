@@ -117,25 +117,25 @@ export class ThreadService extends AbstractService {
   }
 
   private async moderationAction(
-    userId: string,
+    userId: number,
     action: 'mute' | 'unmute' | 'ban' | 'unban',
   ): Promise<ForumUserModeration> {
     return await this.http.post(`threads/moderation/users/${userId}/${action}`).json<ForumUserModeration>();
   }
 
-  async muteUser(userId: string): Promise<ForumUserModeration> {
+  async muteUser(userId: number): Promise<ForumUserModeration> {
     return await this.moderationAction(userId, 'mute');
   }
 
-  async unmuteUser(userId: string): Promise<ForumUserModeration> {
+  async unmuteUser(userId: number): Promise<ForumUserModeration> {
     return await this.moderationAction(userId, 'unmute');
   }
 
-  async banUser(userId: string): Promise<ForumUserModeration> {
+  async banUser(userId: number): Promise<ForumUserModeration> {
     return await this.moderationAction(userId, 'ban');
   }
 
-  async unbanUser(userId: string): Promise<ForumUserModeration> {
+  async unbanUser(userId: number): Promise<ForumUserModeration> {
     return await this.moderationAction(userId, 'unban');
   }
 }

@@ -22,7 +22,7 @@ export type UpdateThreadCategoryInput = z.infer<typeof UpdateThreadCategoryInput
 
 export const ThreadReaction = z.object({
   emoji: z.string().min(1).max(8),
-  userIds: z.array(z.string()),
+  userIds: z.array(z.number().int()),
 });
 export type ThreadReaction = z.infer<typeof ThreadReaction>;
 
@@ -30,7 +30,7 @@ export const ThreadMessage = z.object({
   id: z.string().uuid(),
   threadId: z.string().uuid(),
   cityId: CityId,
-  authorId: z.string(),
+  authorId: z.number().int(),
   body: z.string().min(1),
   reactions: z.array(ThreadReaction),
   createdAt: z.string().datetime(),
@@ -44,7 +44,7 @@ export const Thread = z.object({
   id: z.string().uuid(),
   cityId: CityId,
   categoryId: z.string().uuid(),
-  authorId: z.string(),
+  authorId: z.number().int(),
   title: z.string().min(1).max(200),
   body: z.string().min(1),
   likes: z.number().int().nonnegative(),
@@ -105,7 +105,7 @@ export type PaginatedThreadsResponse = z.infer<typeof PaginatedThreadsResponse>;
 
 export const ForumUserModeration = z.object({
   cityId: CityId,
-  userId: z.string(),
+  userId: z.number().int(),
   muted: z.boolean(),
   banned: z.boolean(),
 });

@@ -38,6 +38,7 @@
     "./establishment": "./dist/establishment.js",
     "./upload": "./dist/upload.js",
     "./media": "./dist/media.js",
+    "./user": "./dist/user.js",
     "./testing": "./dist/testing.js"
   }
 }

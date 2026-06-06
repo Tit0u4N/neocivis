@@ -10,6 +10,7 @@ export default defineConfig((options: Options) => ({
     establishment: 'src/establishment/establishment.service.ts',
     permission: 'src/permission/permission.service.ts',
     thread: 'src/thread/thread.service.ts',
+    user: 'src/user/user.service.ts',
     report: 'src/report/report.service.ts',
     upload: 'src/upload/upload.service.ts',
     media: 'src/media/media.service.ts',

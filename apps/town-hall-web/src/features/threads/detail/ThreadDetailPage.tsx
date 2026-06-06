@@ -1,5 +1,6 @@
 'use client';
 
+import type { UserPublicDto } from '@repo/contracts';
 import type { ThreadCategory, ThreadMessage, ThreadReaction } from '@repo/contracts/thread';
 import { ChevronDown, RotateCcw, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +26,14 @@ import type { useThreadDetailPage } from './useThreadDetailPage';
 
 type Props = ReturnType<typeof useThreadDetailPage>;
 
+function displayName(user: UserPublicDto | undefined, fallback: number): string {
+  if (!user) {
+    return `#${fallback}`;
+  }
+  const full = `${user.firstName} ${user.lastName}`.trim();
+  return full || user.username;
+}
+
 const QUICK_EMOJIS = ['👍', '❤️', '😄'];
 const CONTEXT_MENU_EMOJIS = ['👍', '❤️', '😄', '🎉'];
 
@@ -49,7 +58,7 @@ function formatTime(isoDate: string): string {
 
 type ReactionChipsProps = {
   reactions: ThreadReaction[];
-  currentUserId: string;
+  currentUserId: number;
   onToggle: (emoji: string) => void;
 };
 
@@ -113,7 +122,8 @@ function HoverActionBar({ modItems, onToggleReaction }: HoverActionBarProps) {
 
 type MessageRowProps = {
   message: ThreadMessage;
-  currentUserId: string;
+  author: UserPublicDto | undefined;
+  currentUserId: number;
   onDelete: () => void;
   onToggleMute: () => void;
   onToggleBan: () => void;
@@ -124,6 +134,7 @@ type MessageRowProps = {
 
 function MessageRow({
   message,
+  author,
   currentUserId,
   onDelete,
   onToggleMute,
@@ -133,8 +144,8 @@ function MessageRow({
   banned,
 }: MessageRowProps) {
   const { t } = useTranslation();
-  // TODO: resolve display name via users API
-  const initials = getInitials(message.authorId);
+  const name = displayName(author, message.authorId);
+  const initials = getInitials(name);
 
   const modItems: ModMenuItem[] = [
     {
@@ -160,8 +171,7 @@ function MessageRow({
         <HoverActionBar modItems={modItems} onToggleReaction={onToggleReaction} />
         <div className="mb-2 flex items-center gap-2">
           <ThreadAvatar initials={initials} size="sm" />
-          {/* TODO: resolve display name via users API */}
-          <span className="font-mono font-semibold text-muted-foreground text-xs">{message.authorId}</span>
+          <span className="font-semibold text-muted-foreground text-xs">{name}</span>
           <UserStatusBadge muted={muted} banned={banned} />
           <span className="ml-auto text-muted-foreground text-xs">
             {formatTime(message.createdAt)} · {formatRelative(message.createdAt)}
@@ -210,14 +220,21 @@ function MessageRow({
 
 // ── DeletedMessageRow ─────────────────────────────────────────────────────────
 
-function DeletedMessageRow({ message, onRestore }: { message: ThreadMessage; onRestore: () => void }) {
+function DeletedMessageRow({
+  message,
+  author,
+  onRestore,
+}: {
+  message: ThreadMessage;
+  author: UserPublicDto | undefined;
+  onRestore: () => void;
+}) {
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border border-dashed bg-muted/30 p-3">
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center gap-2">
-          {/* TODO: resolve display name via users API */}
-          <span className="font-mono font-semibold text-muted-foreground text-xs">{message.authorId}</span>
+          <span className="font-semibold text-muted-foreground text-xs">{displayName(author, message.authorId)}</span>
           <span className="text-[10px] text-muted-foreground">
             {t('threads.moderation.deletedAt', {
               date: message.deletedAt ? formatRelative(message.deletedAt) : 'maintenant',
@@ -249,6 +266,7 @@ export function ThreadDetailPage(props: Props) {
     isReplying,
     showDeletedMessages,
     getModerationForUser,
+    resolveUser,
     handleDeleteMessage,
     handleRestoreMessage,
     handleDeleteThread,
@@ -353,11 +371,12 @@ export function ThreadDetailPage(props: Props) {
         ) : (
           <div className="mb-5 rounded-xl border border-border bg-card p-6">
             <div className="mb-3 flex items-center gap-2">
-              {/* TODO: resolve display name via users API */}
-              <ThreadAvatar initials={getInitials(thread.authorId)} />
+              <ThreadAvatar initials={getInitials(displayName(resolveUser(thread.authorId), thread.authorId))} />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold font-mono text-muted-foreground text-xs">{thread.authorId}</span>
+                  <span className="font-bold text-muted-foreground text-xs">
+                    {displayName(resolveUser(thread.authorId), thread.authorId)}
+                  </span>
                   <UserStatusBadge muted={threadMod?.muted ?? false} banned={threadMod?.banned ?? false} />
                 </div>
                 <div className="mt-0.5 flex items-center gap-2">
@@ -391,6 +410,7 @@ export function ThreadDetailPage(props: Props) {
                 <MessageRow
                   key={msg.id}
                   message={msg}
+                  author={resolveUser(msg.authorId)}
                   currentUserId={currentUserId}
                   muted={msgMod?.muted ?? false}
                   banned={msgMod?.banned ?? false}
@@ -424,7 +444,12 @@ export function ThreadDetailPage(props: Props) {
             {showDeletedMessages && (
               <div className="flex flex-col gap-2">
                 {deletedMessages.map((msg) => (
-                  <DeletedMessageRow key={msg.id} message={msg} onRestore={() => void handleRestoreMessage(msg.id)} />
+                  <DeletedMessageRow
+                    key={msg.id}
+                    message={msg}
+                    author={resolveUser(msg.authorId)}
+                    onRestore={() => void handleRestoreMessage(msg.id)}
+                  />
                 ))}
               </div>
             )}

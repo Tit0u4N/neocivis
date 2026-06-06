@@ -63,8 +63,8 @@ export class ThreadController {
     return c.req.param('cityId');
   }
 
-  private getUserId(c: Context): string {
-    return c.var.user?.keycloakId ?? 'unknown';
+  private getUserId(c: Context): number {
+    return c.var.user?.id ?? 0;
   }
 
   // ── Categories ──────────────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ export class ThreadController {
 
   private async muteUser(c: Context): Promise<ControllerJson<ForumUserModeration>> {
     const cityId = this.getCityId(c);
-    const userId = c.req.param('userId');
+    const userId = Number(c.req.param('userId'));
     const record = await this.threadService.muteUser(cityId, userId);
     const body: ForumUserModeration = record;
     return c.json(body, 200);
@@ -131,7 +131,7 @@ export class ThreadController {
 
   private async unmuteUser(c: Context): Promise<ControllerJson<ForumUserModeration>> {
     const cityId = this.getCityId(c);
-    const userId = c.req.param('userId');
+    const userId = Number(c.req.param('userId'));
     const record = await this.threadService.unmuteUser(cityId, userId);
     const body: ForumUserModeration = record;
     return c.json(body, 200);
@@ -139,7 +139,7 @@ export class ThreadController {
 
   private async banUser(c: Context): Promise<ControllerJson<ForumUserModeration>> {
     const cityId = this.getCityId(c);
-    const userId = c.req.param('userId');
+    const userId = Number(c.req.param('userId'));
     const record = await this.threadService.banUser(cityId, userId);
     const body: ForumUserModeration = record;
     return c.json(body, 200);
@@ -147,7 +147,7 @@ export class ThreadController {
 
   private async unbanUser(c: Context): Promise<ControllerJson<ForumUserModeration>> {
     const cityId = this.getCityId(c);
-    const userId = c.req.param('userId');
+    const userId = Number(c.req.param('userId'));
     const record = await this.threadService.unbanUser(cityId, userId);
     const body: ForumUserModeration = record;
     return c.json(body, 200);

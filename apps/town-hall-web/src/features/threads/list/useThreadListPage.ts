@@ -1,10 +1,12 @@
 'use client';
 
+import type { UserPublicDto } from '@repo/contracts';
 import type { ThreadCategory, ThreadSummary } from '@repo/contracts/thread';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useServices } from '@/providers/ServicesProvider';
 import { useThreadStore } from '@/stores/thread.store';
+import { useUserStore } from '@/stores/user.store';
 
 const PAGE_LIMIT = 20;
 
@@ -14,7 +16,7 @@ function categoryKey(categoryId: string | undefined): string {
 
 export function useThreadListPage() {
   const router = useRouter();
-  const { threadService } = useServices();
+  const { threadService, userService } = useServices();
 
   // Stable action selectors — Zustand guarantees same function ref across renders
   const setCategories = useThreadStore((s) => s.setCategories);
@@ -22,10 +24,13 @@ export function useThreadListPage() {
   const setPage = useThreadStore((s) => s.setPage);
   const appendPage = useThreadStore((s) => s.appendPage);
   const invalidate = useThreadStore((s) => s.invalidate);
+  const mergeUsers = useUserStore((s) => s.mergeUsers);
+  const getMissingIds = useUserStore((s) => s.getMissingIds);
 
   // Data selectors — only re-render when this slice changes
   const categories: ThreadCategory[] = useThreadStore((s) => s.categories);
   const moderation = useThreadStore((s) => s.moderation);
+  const users = useUserStore((s) => s.users);
 
   const [activeCategoryId, setActiveCategoryId] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +69,22 @@ export function useThreadListPage() {
     }
   }, [threadService.getModeration, setModeration]);
 
+  const resolveAuthors = useCallback(
+    async (threads: ThreadSummary[]) => {
+      const missing = getMissingIds(Array.from(new Set(threads.map((t) => t.authorId))));
+      if (missing.length === 0) {
+        return;
+      }
+      try {
+        const fetched = await userService.getByIds(missing);
+        mergeUsers(fetched);
+      } catch {
+        // Non-blocking — display fallback if resolution fails
+      }
+    },
+    [userService.getByIds, getMissingIds, mergeUsers],
+  );
+
   const fetchPage1 = useCallback(
     async (force = false) => {
       const cacheKey = categoryKey(activeCategoryId);
@@ -75,13 +96,14 @@ export function useThreadListPage() {
       try {
         const response = await threadService.getAll({ categoryId: activeCategoryId, page: 1, limit: PAGE_LIMIT });
         setPage(cacheKey, response);
+        void resolveAuthors(response.data);
       } catch {
         setError('threads.list.error');
       } finally {
         setIsLoading(false);
       }
     },
-    [threadService.getAll, activeCategoryId, setPage],
+    [threadService.getAll, activeCategoryId, setPage, resolveAuthors],
   );
 
   const handleLoadMore = useCallback(async () => {
@@ -98,12 +120,13 @@ export function useThreadListPage() {
         limit: PAGE_LIMIT,
       });
       appendPage(cacheKey, response);
+      void resolveAuthors(response.data);
     } catch {
       // TODO add user feedback; user can retry
     } finally {
       setIsLoadingMore(false);
     }
-  }, [threadService.getAll, activeCategoryId, appendPage, isLoadingMore]);
+  }, [threadService.getAll, activeCategoryId, appendPage, isLoadingMore, resolveAuthors]);
 
   useEffect(() => {
     void fetchCategories();
@@ -143,6 +166,8 @@ export function useThreadListPage() {
     [router],
   );
 
+  const resolveUser = useCallback((authorId: number): UserPublicDto | undefined => users[authorId], [users]);
+
   return {
     categories,
     threads,
@@ -161,5 +186,6 @@ export function useThreadListPage() {
     handleThreadCreated,
     handleLoadMore,
     navigateToThread,
+    resolveUser,
   };
 }

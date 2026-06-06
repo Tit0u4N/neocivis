@@ -24,7 +24,7 @@ export interface IThreadRepository {
     input: CreateThreadInput & {
       id: string;
       cityId: string;
-      authorId: string;
+      authorId: number;
       likes: number;
       createdAt: string;
       updatedAt: string;
@@ -42,7 +42,7 @@ export interface IThreadRepository {
       id: string;
       threadId: string;
       cityId: string;
-      authorId: string;
+      authorId: number;
       reactions: [];
       createdAt: string;
       updatedAt: string;
@@ -53,6 +53,6 @@ export interface IThreadRepository {
 
   // Moderation
   findModerationsByCityId(cityId: string): Promise<ForumUserModeration[]>;
-  findModeration(cityId: string, userId: string): Promise<ForumUserModeration | undefined>;
+  findModeration(cityId: string, userId: number): Promise<ForumUserModeration | undefined>;
   upsertModeration(record: ForumUserModeration): Promise<ForumUserModeration>;
 }

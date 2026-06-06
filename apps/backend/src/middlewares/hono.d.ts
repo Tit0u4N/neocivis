@@ -1,6 +1,7 @@
 import type { BaseUserRole } from '@/modules/users/user.types';
 
 export type RequestUser = {
+  id?: number;
   keycloakId: string;
   roles: string[];
   baseRole: BaseUserRole;
@@ -15,4 +16,3 @@ declare module 'hono' {
     user?: RequestUser;
   }
 }
-

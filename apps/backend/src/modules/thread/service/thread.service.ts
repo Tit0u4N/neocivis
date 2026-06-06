@@ -96,7 +96,7 @@ export class ThreadService {
     return { ...thread, messages: sorted };
   }
 
-  async createThread(cityId: string, input: CreateThreadInput, authorId: string): Promise<Thread> {
+  async createThread(cityId: string, input: CreateThreadInput, authorId: number): Promise<Thread> {
     // Verify category exists in this city
     await this.getCategoryById(cityId, input.categoryId);
     return await this.repository.createThread({
@@ -191,7 +191,7 @@ export class ThreadService {
     cityId: string,
     threadId: string,
     input: CreateMessageInput,
-    authorId: string,
+    authorId: number,
   ): Promise<ThreadMessage> {
     // Verify thread exists (soft-deleted threads can still receive replies for restore purposes)
     const thread = await this.repository.findThreadByIdAndCityId(threadId, cityId);
@@ -248,7 +248,7 @@ export class ThreadService {
     threadId: string,
     messageId: string,
     input: AddReactionInput,
-    userId: string,
+    userId: number,
   ): Promise<ThreadMessage> {
     const message = await this.repository.findMessageByIdAndThreadId(messageId, threadId);
     if (!message || message.cityId !== cityId) {
@@ -282,7 +282,7 @@ export class ThreadService {
     threadId: string,
     messageId: string,
     emoji: string,
-    userId: string,
+    userId: number,
   ): Promise<ThreadMessage> {
     const message = await this.repository.findMessageByIdAndThreadId(messageId, threadId);
     if (!message || message.cityId !== cityId) {
@@ -309,7 +309,7 @@ export class ThreadService {
     return all.filter((m) => m.muted || m.banned);
   }
 
-  private async getOrCreateModeration(cityId: string, userId: string): Promise<ForumUserModeration> {
+  private async getOrCreateModeration(cityId: string, userId: number): Promise<ForumUserModeration> {
     const existing = await this.repository.findModeration(cityId, userId);
     if (existing) {
       return existing;
@@ -317,22 +317,22 @@ export class ThreadService {
     return { cityId, userId, muted: false, banned: false };
   }
 
-  async muteUser(cityId: string, userId: string): Promise<ForumUserModeration> {
+  async muteUser(cityId: string, userId: number): Promise<ForumUserModeration> {
     const record = await this.getOrCreateModeration(cityId, userId);
     return await this.repository.upsertModeration({ ...record, muted: true });
   }
 
-  async unmuteUser(cityId: string, userId: string): Promise<ForumUserModeration> {
+  async unmuteUser(cityId: string, userId: number): Promise<ForumUserModeration> {
     const record = await this.getOrCreateModeration(cityId, userId);
     return await this.repository.upsertModeration({ ...record, muted: false });
   }
 
-  async banUser(cityId: string, userId: string): Promise<ForumUserModeration> {
+  async banUser(cityId: string, userId: number): Promise<ForumUserModeration> {
     const record = await this.getOrCreateModeration(cityId, userId);
     return await this.repository.upsertModeration({ ...record, banned: true });
   }
 
-  async unbanUser(cityId: string, userId: string): Promise<ForumUserModeration> {
+  async unbanUser(cityId: string, userId: number): Promise<ForumUserModeration> {
     const record = await this.getOrCreateModeration(cityId, userId);
     return await this.repository.upsertModeration({ ...record, banned: false });
   }

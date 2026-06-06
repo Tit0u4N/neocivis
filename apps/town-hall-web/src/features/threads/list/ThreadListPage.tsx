@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: SPEC */
 'use client';
 
+import type { UserPublicDto } from '@repo/contracts';
 import type { ThreadCategory, ThreadSummary } from '@repo/contracts/thread';
 import { MessageSquare, Plus, ThumbsUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -35,14 +36,28 @@ function CategoryFilterButton({
   );
 }
 
+function displayName(user: UserPublicDto | undefined, fallback: number): string {
+  if (!user) {
+    return `#${fallback}`;
+  }
+  const full = `${user.firstName} ${user.lastName}`.trim();
+  return full || user.username;
+}
+
 function ThreadCard({
   thread,
   category,
+  author,
   onClick,
-}: Readonly<{ thread: ThreadSummary; category: ThreadCategory | undefined; onClick: () => void }>) {
+}: Readonly<{
+  thread: ThreadSummary;
+  category: ThreadCategory | undefined;
+  author: UserPublicDto | undefined;
+  onClick: () => void;
+}>) {
   const { t } = useTranslation();
-  // TODO: resolve display name via users API
-  const initials = getInitials(thread.authorId);
+  const name = displayName(author, thread.authorId);
+  const initials = getInitials(name);
   const relativeDate = formatRelative(thread.createdAt);
 
   return (
@@ -58,8 +73,7 @@ function ThreadCard({
         <ThreadAvatar initials={initials} />
         <div className="min-w-0 flex-1">
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
-            {/* TODO: resolve display name via users API */}
-            <span className="font-mono text-muted-foreground text-xs">{thread.authorId}</span>
+            <span className="text-muted-foreground text-xs">{name}</span>
             {category && <CategoryBadge category={category} />}
             <span className="ml-auto shrink-0 text-muted-foreground text-xs">{relativeDate}</span>
           </div>
@@ -119,6 +133,7 @@ export function ThreadListPage(props: Props) {
     handleThreadCreated,
     handleLoadMore,
     navigateToThread,
+    resolveUser,
   } = props;
 
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
@@ -192,6 +207,7 @@ export function ThreadListPage(props: Props) {
               key={thread.id}
               thread={thread}
               category={categoryMap.get(thread.categoryId)}
+              author={resolveUser(thread.authorId)}
               onClick={() => navigateToThread(thread.id)}
             />
           ))}

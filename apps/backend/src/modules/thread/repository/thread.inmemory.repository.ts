@@ -71,7 +71,7 @@ export class InMemoryThreadRepository implements IThreadRepository {
     input: CreateThreadInput & {
       id: string;
       cityId: string;
-      authorId: string;
+      authorId: number;
       likes: number;
       createdAt: string;
       updatedAt: string;
@@ -121,7 +121,7 @@ export class InMemoryThreadRepository implements IThreadRepository {
       id: string;
       threadId: string;
       cityId: string;
-      authorId: string;
+      authorId: number;
       reactions: [];
       createdAt: string;
       updatedAt: string;
@@ -159,7 +159,7 @@ export class InMemoryThreadRepository implements IThreadRepository {
     return Promise.resolve(this.moderations.filter((m) => m.cityId === cityId));
   }
 
-  findModeration(cityId: string, userId: string): Promise<ForumUserModeration | undefined> {
+  findModeration(cityId: string, userId: number): Promise<ForumUserModeration | undefined> {
     return Promise.resolve(this.moderations.find((m) => m.cityId === cityId && m.userId === userId));
   }
 

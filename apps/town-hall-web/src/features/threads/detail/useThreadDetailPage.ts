@@ -1,25 +1,27 @@
 'use client';
 
+import type { UserPublicDto } from '@repo/contracts';
 import type { ForumUserModeration, ThreadDetail } from '@repo/contracts/thread';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAuthentication } from '@/hooks/useAuthentication';
 import { useServices } from '@/providers/ServicesProvider';
 import { useThreadStore } from '@/stores/thread.store';
+import { useUserStore } from '@/stores/user.store';
 
 export function useThreadDetailPage(threadId: string) {
   const router = useRouter();
-  const { threadService } = useServices();
-  const { user } = useAuthentication();
-  const currentUserId = user?.profile.sub ?? '';
+  const { threadService, userService } = useServices();
 
   // Stable action selectors — Zustand guarantees same function ref across renders
   const setCategories = useThreadStore((s) => s.setCategories);
   const setModeration = useThreadStore((s) => s.setModeration);
+  const mergeUsers = useUserStore((s) => s.mergeUsers);
+  const getMissingIds = useUserStore((s) => s.getMissingIds);
 
   // Data selectors
   const categories = useThreadStore((s) => s.categories);
   const moderation = useThreadStore((s) => s.moderation);
+  const users = useUserStore((s) => s.users);
 
   const [thread, setThread] = useState<ThreadDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +30,14 @@ export function useThreadDetailPage(threadId: string) {
   const [replyBody, setReplyBody] = useState('');
   const [isReplying, setIsReplying] = useState(false);
   const [showDeletedMessages, setShowDeletedMessages] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+
+  useEffect(() => {
+    userService
+      .getMe()
+      .then((me) => setCurrentUserId(me.id))
+      .catch(() => {});
+  }, [userService.getMe]);
 
   const fetchThread = useCallback(async () => {
     if (!initialLoadDone.current) {
@@ -38,12 +48,20 @@ export function useThreadDetailPage(threadId: string) {
       const data = await threadService.getById(threadId);
       setThread(data);
       initialLoadDone.current = true;
+
+      const allAuthorIds = [data.authorId, ...data.messages.map((m) => m.authorId)];
+      const unique = Array.from(new Set(allAuthorIds));
+      const missing = getMissingIds(unique);
+      if (missing.length > 0) {
+        const fetched = await userService.getByIds(missing);
+        mergeUsers(fetched);
+      }
     } catch {
       setError('threads.detail.error');
     } finally {
       setIsLoading(false);
     }
-  }, [threadService.getById, threadId]);
+  }, [threadService.getById, threadId, userService.getByIds, getMissingIds, mergeUsers]);
 
   const fetchCategories = useCallback(async () => {
     if (useThreadStore.getState().categories.length > 0) {
@@ -73,9 +91,11 @@ export function useThreadDetailPage(threadId: string) {
   }, [fetchThread, fetchCategories, fetchModeration]);
 
   const getModerationForUser = useCallback(
-    (userId: string): ForumUserModeration | undefined => moderation.find((m) => m.userId === userId),
+    (userId: number): ForumUserModeration | undefined => moderation.find((m) => m.userId === userId),
     [moderation],
   );
+
+  const resolveUser = useCallback((authorId: number): UserPublicDto | undefined => users[authorId], [users]);
 
   const handleDeleteMessage = useCallback(
     async (messageId: string) => {
@@ -138,7 +158,7 @@ export function useThreadDetailPage(threadId: string) {
   }, [threadService.unarchive, threadId, fetchThread]);
 
   const handleToggleMute = useCallback(
-    async (userId: string, currentlyMuted: boolean) => {
+    async (userId: number, currentlyMuted: boolean) => {
       try {
         if (currentlyMuted) {
           await threadService.unmuteUser(userId);
@@ -154,7 +174,7 @@ export function useThreadDetailPage(threadId: string) {
   );
 
   const handleToggleBan = useCallback(
-    async (userId: string, currentlyBanned: boolean) => {
+    async (userId: number, currentlyBanned: boolean) => {
       try {
         if (currentlyBanned) {
           await threadService.unbanUser(userId);
@@ -230,6 +250,7 @@ export function useThreadDetailPage(threadId: string) {
     isReplying,
     showDeletedMessages,
     getModerationForUser,
+    resolveUser,
     handleDeleteMessage,
     handleRestoreMessage,
     handleDeleteThread,

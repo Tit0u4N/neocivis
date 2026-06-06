@@ -32,6 +32,7 @@
     "./media": "./src/media/media.schema.ts",
     "./thread": "./src/thread/thread.schema.ts",
     "./upload": "./src/upload/upload.dto.ts",
-    "./user": "./src/user/user.dto.ts"
+    "./user": "./src/user/user.dto.ts",
+    "./user-schema": "./src/user/user.schema.ts"
   }
 }

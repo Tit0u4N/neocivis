@@ -1,0 +1,46 @@
+meta {
+  name: Scenario - Verify profile updated via GET me
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/api/citizen/user/me
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+}
+
+tests {
+  test("GET me returns 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("firstName is updated", function() {
+    const body = res.getBody();
+    const expected = bru.getVar('accountE2eFirstName');
+    if (expected) {
+      expect(body.firstName).to.equal(expected);
+    }
+  });
+
+  test("lastName is updated", function() {
+    const body = res.getBody();
+    const expected = bru.getVar('accountE2eLastName');
+    if (expected) {
+      expect(body.lastName).to.equal(expected);
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

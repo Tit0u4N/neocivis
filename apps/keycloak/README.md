@@ -7,7 +7,7 @@
 ```bash
 cd apps/keycloak
 npm install
-npm run build-keycloack-theme
+npm run build-keycloak-theme
 ```
 
 ### Deploy the theme

@@ -13,6 +13,7 @@ type KeycloakEnv = Readonly<{
   clientSecret: string;
   passwordSetupClientId: string;
   passwordSetupRedirectUri: string | undefined;
+  citizenPasswordSetupRedirectUri: string | undefined;
 }>;
 
 function loadKeycloakEnv(): KeycloakEnv | null {
@@ -32,6 +33,7 @@ function loadKeycloakEnv(): KeycloakEnv | null {
     clientSecret,
     passwordSetupClientId: optionalEnv('KEYCLOAK_PASSWORD_SETUP_CLIENT_ID') ?? 'neocivis-townhall-app',
     passwordSetupRedirectUri: optionalEnv('KEYCLOAK_PASSWORD_SETUP_REDIRECT_URI'),
+    citizenPasswordSetupRedirectUri: optionalEnv('KEYCLOAK_CITIZEN_PASSWORD_SETUP_REDIRECT_URI'),
   };
 }
 
@@ -188,13 +190,51 @@ export class KeycloakIAMService implements IAMService {
     return json as Record<string, unknown>;
   }
 
-  private async sendPasswordSetupEmail(env: KeycloakEnv, token: string, userId: string): Promise<void> {
+  private async setUserEmailThemeAttribute(env: KeycloakEnv, token: string, userId: string, theme: 'townhall' | 'citizen'): Promise<void> {
+    const url = `${env.baseUrl}admin/realms/${encodeURIComponent(env.realm)}/users/${encodeURIComponent(userId)}`;
+    // biome-ignore lint/style/useNamingConvention: HTTP header name
+    const getRes = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!getRes.ok) return;
+    const u = (await getRes.json()) as Record<string, unknown>;
+    const currentAttrs = (u.attributes as Record<string, string[]> | undefined) ?? {};
+    // Only send writable fields — spreading the full GET response causes Keycloak 24 to reject
+    // read-only fields (access, disableableCredentialTypes, etc.) with a silent 400.
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      // biome-ignore lint/style/useNamingConvention: HTTP header name
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: u.username,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        email: u.email,
+        enabled: u.enabled,
+        emailVerified: u.emailVerified,
+        requiredActions: u.requiredActions,
+        attributes: { ...currentAttrs, emailTheme: [theme] },
+      }),
+    });
+    if (!putRes.ok) {
+      const text = await putRes.text();
+      console.warn(`[email-theme] Keycloak attribute update failed: HTTP ${putRes.status}\n${text}`);
+    }
+  }
+
+  private async sendPasswordSetupEmail(env: KeycloakEnv, token: string, userId: string, clientId?: string): Promise<void> {
+    const effectiveClientId = clientId ?? env.passwordSetupClientId;
+
+    const emailTheme = effectiveClientId === 'neocivis-townhall-app' ? 'townhall' : 'citizen';
+    await this.setUserEmailThemeAttribute(env, token, userId, emailTheme);
+
     const url = new URL(
       `${env.baseUrl}admin/realms/${encodeURIComponent(env.realm)}/users/${encodeURIComponent(userId)}/execute-actions-email`,
     );
-    url.searchParams.set('client_id', env.passwordSetupClientId);
-    if (env.passwordSetupRedirectUri) {
-      url.searchParams.set('redirect_uri', env.passwordSetupRedirectUri);
+    url.searchParams.set('client_id', effectiveClientId);
+    const redirectUri = effectiveClientId === 'neocivis-citizen-app'
+      ? env.citizenPasswordSetupRedirectUri
+      : env.passwordSetupRedirectUri;
+    if (redirectUri) {
+      url.searchParams.set('redirect_uri', redirectUri);
     }
 
     const res = await fetch(url, {
@@ -348,6 +388,38 @@ export class KeycloakIAMService implements IAMService {
     });
 
     return res.status === 404;
+  }
+
+  async updateUserProfile(userId: string, input: Partial<IamUserProfile>): Promise<void> {
+    const env = this.getEnv();
+    if (!env) {
+      throw new Error('Keycloak is not configured');
+    }
+    const token = await this.getAdminToken(env);
+    const url = `${env.baseUrl}admin/realms/${encodeURIComponent(env.realm)}/users/${encodeURIComponent(userId)}`;
+
+    const payload = Object.fromEntries(Object.entries(input).filter(([, v]) => v !== undefined));
+
+    const res = await fetch(url, {
+      method: 'PUT',
+      // biome-ignore lint/style/useNamingConvention: HTTP header name
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Keycloak user update failed: HTTP ${res.status} ${res.statusText}\n${text}`);
+    }
+  }
+
+  async sendPasswordResetEmail(userId: string, clientId: string): Promise<void> {
+    const env = this.getEnv();
+    if (!env) {
+      throw new Error('Keycloak is not configured');
+    }
+    const token = await this.getAdminToken(env);
+    await this.sendPasswordSetupEmail(env, token, userId, clientId);
   }
 
   async deleteUser(userId: string): Promise<void> {

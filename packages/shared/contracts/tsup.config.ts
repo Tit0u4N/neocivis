@@ -12,6 +12,7 @@ export default defineConfig((options: Options) => ({
     permission: 'src/permission/permission.schema.ts',
     report: 'src/report/report.schema.ts',
     role: 'src/role/role.schema.ts',
+    thread: 'src/thread/thread.schema.ts',
     upload: 'src/upload/upload.dto.ts',
     user: 'src/user/user.dto.ts',
   },

@@ -420,5 +420,78 @@
     },
     "empty": "No reports",
     "error": "Unable to load reports"
+  },
+  "threads": {
+    "list": {
+      "title": "Forum",
+      "subtitle": "City threads",
+      "newThread": "New thread",
+      "filterAll": "All",
+      "lastComments": "Last comments",
+      "empty": "No threads in this category.",
+      "error": "Unable to load threads.",
+      "mutedCount_one": "{{count}} muted",
+      "mutedCount_other": "{{count}} muted",
+      "bannedCount_one": "{{count}} banned",
+      "bannedCount_other": "{{count}} banned",
+      "loadMore": "Load more"
+    },
+    "card": {
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "likes": "{{count}} likes"
+    },
+    "detail": {
+      "backToThreads": "Back to threads",
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "noVisibleReplies": "No visible replies.",
+      "replyPlaceholder": "Write a reply…",
+      "replyButton": "Reply",
+      "deletedMessages": "Deleted messages ({{count}})",
+      "deletedSubject": "Subject deleted by moderation",
+      "archivedSubject": "Thread archived — not visible to citizens",
+      "restore": "Restore",
+      "unarchive": "Unarchive",
+      "addReaction": "Add a reaction",
+      "error": "Unable to load thread."
+    },
+    "newThreadModal": {
+      "title": "New thread",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Thread title…",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "messageLabel": "Message",
+      "cancel": "Cancel",
+      "submit": "Post"
+    },
+    "moderation": {
+      "menuLabel": "Moderation",
+      "deleteMessage": "Delete message",
+      "deleteThread": "Delete subject",
+      "archive": "Archive thread",
+      "unarchive": "Unarchive thread",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "ban": "Ban from forum",
+      "unban": "Unban",
+      "statusMuted": "Muted",
+      "statusBanned": "Banned",
+      "deletedAt": "deleted · {{date}}"
+    },
+    "emojiPicker": {
+      "searchPlaceholder": "Search…",
+      "loading": "Loading…",
+      "empty": "No results"
+    },
+    "categories": {
+      "manageTitle": "Manage categories",
+      "addCategory": "Add category",
+      "emojiLabel": "Emoji",
+      "labelLabel": "Label",
+      "deleteConfirm": "Delete this category?",
+      "error": "Unable to load categories."
+    }
   }
 }

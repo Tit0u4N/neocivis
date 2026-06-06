@@ -14,6 +14,8 @@ import type { IAMService } from '@/modules/iam/iam.service';
 import type { IMediaBlobService } from '@/modules/media/media-blob.service';
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { MediaSeeder } from '@/modules/media/seed/media.seeder';
+import type { IThreadRepository } from '@/modules/thread/repository/thread.repository.interface';
+import { ThreadSeeder } from '@/modules/thread/seed/thread.seeder';
 import { UserSeeder } from '@/modules/users/seed/user.seeder';
 import type { UserService } from '@/modules/users/service/user.service';
 import type { AutoSeedMode } from './runtime-config';
@@ -24,6 +26,7 @@ export type AutoSeedDeps = {
   articleRepository: IArticleRepository;
   cityRepository: ICityRepository;
   establishmentRepository: IEstablishmentRepository;
+  threadRepository: IThreadRepository;
   iamService: IAMService;
   accessService: AccessService;
   mediaRepository?: IMediaRepository;
@@ -77,6 +80,7 @@ export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promis
   }
 
   seederList.push(new ArticleSeeder(deps.articleRepository, cityService, deps.mediaRepository));
+  seederList.push(new ThreadSeeder(deps.threadRepository, cityService));
 
   if (mode === 'RESET_DATA') {
     const deleteOrder = [...seederList].reverse();

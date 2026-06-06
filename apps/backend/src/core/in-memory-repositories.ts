@@ -19,6 +19,8 @@ import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemo
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { InMemoryReportRepository } from '@/modules/report/repository/report.inmemory.repository';
 import type { IReportRepository } from '@/modules/report/repository/report.repository.interface';
+import { InMemoryThreadRepository } from '@/modules/thread/repository/thread.inmemory.repository';
+import type { IThreadRepository } from '@/modules/thread/repository/thread.repository.interface';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { InMemoryUserRepository } from '@/modules/users/repository/user.inmemory.repository';
 import type { IUserRepository } from '@/modules/users/repository/user.repository.interface';
@@ -35,6 +37,7 @@ let mediaRepository: InMemoryMediaRepository | undefined;
 let configRepository: InMemoryConfigRepository | undefined;
 let reportRepository: InMemoryReportRepository | undefined;
 let establishmentRepository: InMemoryEstablishmentRepository | undefined;
+let threadRepository: InMemoryThreadRepository | undefined;
 
 function sharedUserRepository(): InMemoryUserRepository {
   userRepository ??= new InMemoryUserRepository();
@@ -76,6 +79,11 @@ function sharedEstablishmentRepository(): InMemoryEstablishmentRepository {
   return establishmentRepository;
 }
 
+function sharedThreadRepository(): InMemoryThreadRepository {
+  threadRepository ??= new InMemoryThreadRepository();
+  return threadRepository;
+}
+
 export function createUserRepository(): IUserRepository {
   return isInMemoryMode() ? sharedUserRepository() : new DrizzleUserRepository();
 }
@@ -106,4 +114,9 @@ export function createReportRepository(): IReportRepository {
 
 export function createEstablishmentRepository(): IEstablishmentRepository {
   return isInMemoryMode() ? sharedEstablishmentRepository() : new DrizzleEstablishmentRepository();
+}
+
+export function createThreadRepository(): IThreadRepository {
+  // Thread module is in-memory only (no production persistence implementation yet)
+  return sharedThreadRepository();
 }

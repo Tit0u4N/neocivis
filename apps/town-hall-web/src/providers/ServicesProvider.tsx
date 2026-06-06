@@ -5,6 +5,8 @@ import { ConfigService } from '@repo/frontend-services/config';
 import { EstablishmentService } from '@repo/frontend-services/establishment';
 import { MediaService } from '@repo/frontend-services/media';
 import { ReportService } from '@repo/frontend-services/report';
+import { ThreadService } from '@repo/frontend-services/thread';
+import { UserService } from '@repo/frontend-services/user';
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
 import { useApi } from '@/providers/ApiProvider';
 import { useCityStore } from '@/stores/city.store';
@@ -20,6 +22,8 @@ type ServicesContextValue = {
   establishmentService: EstablishmentService;
   mediaService: MediaService;
   reportService: ReportService;
+  threadService: ThreadService;
+  userService: UserService;
 };
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(undefined);
@@ -43,6 +47,8 @@ export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>
       establishmentService: new EstablishmentService(api, cityId),
       mediaService: new MediaService(api, cityId),
       reportService: new ReportService(api, cityId),
+      threadService: new ThreadService(api, cityId),
+      userService: new UserService(api),
     }),
     [api, cityId],
   );

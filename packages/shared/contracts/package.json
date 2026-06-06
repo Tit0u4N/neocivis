@@ -30,6 +30,7 @@
     "./report": "./src/report/report.schema.ts",
     "./role": "./src/role/role.schema.ts",
     "./media": "./src/media/media.schema.ts",
+    "./thread": "./src/thread/thread.schema.ts",
     "./upload": "./src/upload/upload.dto.ts",
     "./user": "./src/user/user.dto.ts"
   }

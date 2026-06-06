@@ -9,5 +9,6 @@ export * from './media/media.schema';
 export * from './permission/permission.schema';
 export * from './report/report.schema';
 export * from './role/role.schema';
+export * from './thread/thread.schema';
 export * from './upload/upload.dto';
 export * from './user/user.dto';

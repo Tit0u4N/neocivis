@@ -58,7 +58,7 @@ export class ArticleController {
     if (!parsed.success) {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
-    const authorId = c.var.user?.keycloakId ?? 'unknown';
+    const authorId = c.var.user?.id ?? 'unknown';
     const article = await this.articleService.createArticle(cityId, parsed.data, authorId);
     const body: Article = article;
     return c.json(body, 201);

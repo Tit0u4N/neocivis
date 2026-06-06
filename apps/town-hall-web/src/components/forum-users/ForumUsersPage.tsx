@@ -547,7 +547,7 @@ export function ForumUsersPage(vm: ForumUsersPageViewModel) {
   return (
     <PageLayout title={t('forumUsers.title')}>
       {/* Tabs */}
-      <div className="flex border-b border-border">
+      <div className="flex border-border border-b">
         {TABS.map((t_) => (
           <button
             key={t_.id}

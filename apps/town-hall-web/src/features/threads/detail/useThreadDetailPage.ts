@@ -2,7 +2,7 @@
 
 import type { ForumUserModeration, ThreadDetail } from '@repo/contracts/thread';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuthentication } from '@/hooks/useAuthentication';
 import { useServices } from '@/providers/ServicesProvider';
 import { useThreadStore } from '@/stores/thread.store';
@@ -24,16 +24,20 @@ export function useThreadDetailPage(threadId: string) {
   const [thread, setThread] = useState<ThreadDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const initialLoadDone = useRef(false);
   const [replyBody, setReplyBody] = useState('');
   const [isReplying, setIsReplying] = useState(false);
   const [showDeletedMessages, setShowDeletedMessages] = useState(false);
 
   const fetchThread = useCallback(async () => {
-    setIsLoading(true);
+    if (!initialLoadDone.current) {
+      setIsLoading(true);
+    }
     setError(null);
     try {
       const data = await threadService.getById(threadId);
       setThread(data);
+      initialLoadDone.current = true;
     } catch {
       setError('threads.detail.error');
     } finally {

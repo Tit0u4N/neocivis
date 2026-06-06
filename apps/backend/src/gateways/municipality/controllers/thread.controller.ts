@@ -64,7 +64,7 @@ export class ThreadController {
   }
 
   private getUserId(c: Context): string {
-    return (c.get('userId') as string) ?? 'unknown';
+    return c.var.user?.keycloakId ?? 'unknown';
   }
 
   // ── Categories ──────────────────────────────────────────────────────────────

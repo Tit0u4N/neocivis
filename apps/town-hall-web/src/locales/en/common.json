@@ -421,6 +421,42 @@
     "empty": "No reports",
     "error": "Unable to load reports"
   },
+  "account": {
+    "profile": {
+      "title": "Personal information",
+      "fields": {
+        "firstName": "First name",
+        "firstNamePlaceholder": "Your first name",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Your last name",
+        "username": "Username",
+        "usernamePlaceholder": "e.g. jean.dupont",
+        "email": "Email address",
+        "emailPlaceholder": "e.g. jean.dupont@townhall.fr"
+      },
+      "editAria": "Edit {{field}}",
+      "fieldHints": {
+        "firstName": "Your first name as it appears in the application. Between 1 and 100 characters.",
+        "lastName": "Your last name as it appears in the application. Between 1 and 100 characters.",
+        "username": "Unique identifier used to recognize you in the system. Between 3 and 50 characters, no spaces.",
+        "email": "Email address linked to your account. Used for notifications and password reset."
+      }
+    },
+    "password": {
+      "title": "Password",
+      "description": "To change your password, we will send you a reset email.",
+      "button": "Change password"
+    },
+    "passwordDialog": {
+      "title": "Change password?",
+      "description": "A password reset email will be sent to {{email}}. Do you want to continue?",
+      "cancel": "Cancel",
+      "confirm": "Send email"
+    },
+    "session": {
+      "title": "Session"
+    }
+  },
   "threads": {
     "list": {
       "title": "Forum",

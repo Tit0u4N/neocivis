@@ -46,6 +46,7 @@ export class InMemoryUserRepository implements IUserRepository {
       updatedAt: now,
       role: input.role,
       deletedAt: null,
+      profilePictureUrl: null,
     };
     this.users.push(user);
   }
@@ -77,6 +78,7 @@ export class InMemoryUserRepository implements IUserRepository {
       updatedAt: now,
       role: 'CITIZEN',
       deletedAt: null,
+      profilePictureUrl: null,
     };
     this.users.push(user);
   }
@@ -102,6 +104,15 @@ export class InMemoryUserRepository implements IUserRepository {
     existing.updatedAt = new Date();
   }
 
+  async updateProfilePictureUrl(keycloakId: string, url: string | null): Promise<void> {
+    const existing = await this.getByKeycloakId(keycloakId);
+    if (!existing) {
+      return;
+    }
+    existing.profilePictureUrl = url;
+    existing.updatedAt = new Date();
+  }
+
   async insertSeeded(input: InsertSeededUserInput): Promise<void> {
     const now = new Date();
     const user: User = {
@@ -115,6 +126,7 @@ export class InMemoryUserRepository implements IUserRepository {
       updatedAt: now,
       role: input.role,
       deletedAt: null,
+      profilePictureUrl: input.profilePictureUrl ?? null,
     };
     this.users.push(user);
     this.autoId = Math.max(this.autoId, input.id + 1);

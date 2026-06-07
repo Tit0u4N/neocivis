@@ -36,6 +36,13 @@
       "when": 1780153811935,
       "tag": "0004_busy_puff_adder",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1749254400000,
+      "tag": "0005_profile_picture",
+      "breakpoints": true
     }
   ]
 }

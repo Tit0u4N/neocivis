@@ -73,6 +73,8 @@ export class ReportController {
     return c.json(body, 201);
   }
 
+  /*Comment to commit*/
+
   private async listMyReports(c: Context): Promise<ControllerJson<PaginatedReportsResponse>> {
     const keycloakId = c.req.header('X-User-Id');
     if (!keycloakId) {

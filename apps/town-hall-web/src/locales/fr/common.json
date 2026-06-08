@@ -421,6 +421,42 @@
     "empty": "Aucun signalement",
     "error": "Impossible de charger les signalements"
   },
+  "account": {
+    "profile": {
+      "title": "Informations personnelles",
+      "fields": {
+        "firstName": "Prénom",
+        "firstNamePlaceholder": "Votre prénom",
+        "lastName": "Nom",
+        "lastNamePlaceholder": "Votre nom",
+        "username": "Nom d'utilisateur",
+        "usernamePlaceholder": "ex. jean.dupont",
+        "email": "Adresse e-mail",
+        "emailPlaceholder": "ex. jean.dupont@mairie.fr"
+      },
+      "editAria": "Modifier {{field}}",
+      "fieldHints": {
+        "firstName": "Votre prénom tel qu'il apparaît dans l'application. Entre 1 et 100 caractères.",
+        "lastName": "Votre nom de famille tel qu'il apparaît dans l'application. Entre 1 et 100 caractères.",
+        "username": "Identifiant unique utilisé pour vous reconnaître dans le système. Entre 3 et 50 caractères, sans espaces.",
+        "email": "Adresse e-mail associée à votre compte. Utilisée pour les notifications et la réinitialisation du mot de passe."
+      }
+    },
+    "password": {
+      "title": "Mot de passe",
+      "description": "Pour modifier votre mot de passe, nous vous enverrons un e-mail de réinitialisation.",
+      "button": "Changer le mot de passe"
+    },
+    "passwordDialog": {
+      "title": "Changer le mot de passe ?",
+      "description": "Un e-mail de réinitialisation du mot de passe sera envoyé à {{email}}. Souhaitez-vous continuer ?",
+      "cancel": "Annuler",
+      "confirm": "Envoyer l'e-mail"
+    },
+    "session": {
+      "title": "Session"
+    }
+  },
   "threads": {
     "list": {
       "title": "Forum",

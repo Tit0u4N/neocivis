@@ -76,7 +76,7 @@ export class ReportController {
 
   private async listMyReports(c: Context): Promise<ControllerJson<PaginatedReportsResponse>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
-    const user = (c as any).user;
+    const user = (c as any).var.user;
     if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
@@ -96,7 +96,7 @@ export class ReportController {
 
   private async getReportById(c: Context): Promise<ControllerJson<Report>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
-    const user = (c as any).user;
+    const user = (c as any).var.user;
     if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
@@ -112,7 +112,7 @@ export class ReportController {
 
   private async cancelReport(c: Context): Promise<ControllerJson<Report>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
-    const user = (c as any).user;
+    const user = (c as any).var.user;
     if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }

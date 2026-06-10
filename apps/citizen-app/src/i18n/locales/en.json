@@ -120,7 +120,20 @@
     }
   },
   "forum": {
-    "title": "Forum"
+    "title": "Forum",
+    "allCategories": "All",
+    "loading": "Loading...",
+    "loadMore": "Load more",
+    "error": "Unable to load forum",
+    "empty": "No discussions yet",
+    "thread": {
+      "headerTitle": "Thread",
+      "error": "Thread not found",
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "noReplies": "Be the first to reply!",
+      "replyPlaceholder": "Write a reply..."
+    }
   },
   "news": {
     "title": "News"

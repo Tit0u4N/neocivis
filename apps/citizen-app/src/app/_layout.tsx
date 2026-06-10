@@ -18,6 +18,7 @@ import { ServicesProvider } from '@/providers/ServicesProvider';
 import { ArticlesProvider } from '@/stores/articles.store';
 import { CityProvider, useCityStore } from '@/stores/city.store';
 import { ProfileProvider, useProfile } from '@/stores/profile.store';
+import { UserProvider } from '@/stores/user.store';
 import { Colors } from '@/theme/colors';
 import { ThemeProvider } from '@/theme/theme-provider';
 import 'react-native-reanimated';
@@ -245,12 +246,14 @@ export default function RootLayout() {
               <ApiProvider>
                 <CityProvider>
                   <ServicesProvider>
-                    <ArticlesProvider>
-                      <ProfileProvider>
-                        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-                        <InitialLayout />
-                      </ProfileProvider>
-                    </ArticlesProvider>
+                    <UserProvider>
+                      <ArticlesProvider>
+                        <ProfileProvider>
+                          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+                          <InitialLayout />
+                        </ProfileProvider>
+                      </ArticlesProvider>
+                    </UserProvider>
                   </ServicesProvider>
                 </CityProvider>
               </ApiProvider>

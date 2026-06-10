@@ -15,6 +15,7 @@ import { DrizzleEstablishmentRepository } from '@/modules/establishment/reposito
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService } from '@/modules/media/media-blob.service';
 import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
+import { InMemoryThreadRepository } from '@/modules/thread/repository/thread.inmemory.repository';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
 import { UserService } from '@/modules/users/service/user.service';
 
@@ -51,6 +52,7 @@ async function main(): Promise<void> {
   const mediaBlobService = new AzureMediaBlobService();
   const configRepository = new CosmosConfigRepository();
   const establishmentRepository = new DrizzleEstablishmentRepository();
+  const threadRepository = new InMemoryThreadRepository();
   const iamService = new KeycloakIAMService();
   const userService = new UserService(userRepository, iamService);
   const cityService = new CityService(cityRepository, userService, iamService);
@@ -67,6 +69,7 @@ async function main(): Promise<void> {
       mediaBlobService,
       configRepository,
       establishmentRepository,
+      threadRepository,
     },
     mode,
   );

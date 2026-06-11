@@ -31,8 +31,9 @@ export class ReportController {
   }
 
   private async createReport(c: Context): Promise<ControllerJson<Report, 201>> {
-    const keycloakId = c.req.header('X-User-Id');
-    if (!keycloakId) {
+    // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
+    const user = (c as any).user;
+    if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
 
@@ -65,7 +66,7 @@ export class ReportController {
 
     const report = await this.reports.createReport({
       desc: fields.data.desc,
-      authorId: keycloakId,
+      authorId: user.id,
       location,
       photoUrl,
     });
@@ -73,11 +74,10 @@ export class ReportController {
     return c.json(body, 201);
   }
 
-  /*Comment to commit*/
-
   private async listMyReports(c: Context): Promise<ControllerJson<PaginatedReportsResponse>> {
-    const keycloakId = c.req.header('X-User-Id');
-    if (!keycloakId) {
+    // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
+    const user = (c as any).var.user;
+    if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
 
@@ -90,18 +90,19 @@ export class ReportController {
     }
 
     const { page, limit } = result.data;
-    const body: PaginatedReportsResponse = await this.reports.getMyReports(keycloakId, page, limit);
+    const body: PaginatedReportsResponse = await this.reports.getMyReports(user.id, page, limit);
     return c.json(body, 200);
   }
 
   private async getReportById(c: Context): Promise<ControllerJson<Report>> {
-    const keycloakId = c.req.header('X-User-Id');
-    if (!keycloakId) {
+    // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
+    const user = (c as any).var.user;
+    if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
 
     try {
-      const report = await this.reports.getReportByIdForUser(c.req.param('id'), keycloakId);
+      const report = await this.reports.getReportByIdForUser(c.req.param('id'), user.id);
       const body: Report = report;
       return c.json(body, 200);
     } catch {
@@ -110,13 +111,14 @@ export class ReportController {
   }
 
   private async cancelReport(c: Context): Promise<ControllerJson<Report>> {
-    const keycloakId = c.req.header('X-User-Id');
-    if (!keycloakId) {
+    // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
+    const user = (c as any).var.user;
+    if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
 
     try {
-      const report = await this.reports.cancelReport(c.req.param('id'), keycloakId);
+      const report = await this.reports.cancelReport(c.req.param('id'), user.id);
       const body: Report = report;
       return c.json(body, 200);
     } catch (err) {

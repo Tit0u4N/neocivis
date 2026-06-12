@@ -22,6 +22,7 @@ function mapRowToUser(r: typeof users.$inferSelect): User {
     updatedAt: r.updatedAt,
     role: r.role,
     deletedAt: r.deletedAt,
+    profilePictureUrl: r.profilePictureUrl ?? null,
   };
 }
 
@@ -118,9 +119,17 @@ export class DrizzleUserRepository implements IUserRepository {
       .where(eq(users.keycloakId, keycloakId));
   }
 
+  async updateProfilePictureUrl(keycloakId: string, url: string | null): Promise<void> {
+    const db = getDb();
+    await db
+      .update(users)
+      .set({ profilePictureUrl: url, updatedAt: sql`now()` })
+      .where(eq(users.keycloakId, keycloakId));
+  }
+
   async insertSeeded(input: InsertSeededUserInput): Promise<void> {
     const db = getDb();
-    const { id, keycloakId, role, username, email, firstName, lastName } = input;
+    const { id, keycloakId, role, username, email, firstName, lastName, profilePictureUrl } = input;
     await db.insert(users).values({
       id,
       keycloakId,
@@ -129,6 +138,7 @@ export class DrizzleUserRepository implements IUserRepository {
       email: email ?? '',
       firstName: firstName ?? '',
       lastName: lastName ?? '',
+      profilePictureUrl: profilePictureUrl ?? null,
     });
   }
 

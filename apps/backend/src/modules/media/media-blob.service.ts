@@ -7,6 +7,8 @@ export type UploadedBlob = {
   storagePath: string;
 };
 
+export const PROFILE_PICTURE_PLACEHOLDER_PATH = 'profile-pictures/placeholder.jpg';
+
 export interface IMediaBlobService {
   uploadImage(buffer: ArrayBuffer | Buffer, filename: string, mimeType: string, cityId: string): Promise<UploadedBlob>;
   uploadImageFromScope(
@@ -17,6 +19,7 @@ export interface IMediaBlobService {
   ): Promise<UploadedBlob>;
   uploadToStoragePath(buffer: ArrayBuffer | Buffer, mimeType: string, storagePath: string): Promise<UploadedBlob>;
   deleteByStoragePath(storagePath: string): Promise<void>;
+  getProfilePicturePlaceholderUrl(): string;
 }
 
 export class AzureMediaBlobService implements IMediaBlobService {
@@ -83,6 +86,10 @@ export class AzureMediaBlobService implements IMediaBlobService {
     const container = service.getContainerClient(containerName);
     await container.getBlockBlobClient(storagePath).deleteIfExists();
   }
+
+  getProfilePicturePlaceholderUrl(): string {
+    return getPublicBlobUrl(PROFILE_PICTURE_PLACEHOLDER_PATH);
+  }
 }
 
 export class PicsumMediaBlobService implements IMediaBlobService {
@@ -118,5 +125,10 @@ export class PicsumMediaBlobService implements IMediaBlobService {
 
   deleteByStoragePath(_storagePath: string): Promise<void> {
     return Promise.resolve();
+  }
+
+  getProfilePicturePlaceholderUrl(): string {
+    const seed = PROFILE_PICTURE_PLACEHOLDER_PATH.replace(/[^a-z0-9]/gi, '-');
+    return `https://picsum.photos/seed/${seed}/800/500`;
   }
 }

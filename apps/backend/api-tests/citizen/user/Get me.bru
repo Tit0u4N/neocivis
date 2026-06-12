@@ -31,11 +31,17 @@ script:post-response {
       expect(body).to.have.property('firstName');
       expect(body).to.have.property('lastName');
       expect(body).to.have.property('role');
+      expect(body).to.have.property('profilePictureUrl');
     });
-    test("User is a citizen", function(){ 
+    test("User is a citizen", function(){
       const body = res.getBody();
       expect(body.role).to.be.equal('CITIZEN');
-    })
+    });
+    test("profilePictureUrl is string or null", function() {
+      const body = res.getBody();
+      const url = body.profilePictureUrl;
+      expect(url === null || typeof url === 'string').to.be.true;
+    });
   }
 }
 

@@ -17,6 +17,7 @@ describe('UserService Keycloak webhooks', () => {
       updateFromHeaders: vi.fn(async () => {}),
       insertCitizenFromKeycloak: vi.fn(async () => {}),
       updateProfile: vi.fn(async () => {}),
+      updateProfilePictureUrl: vi.fn(async () => {}),
       markDeletedByKeycloakId: vi.fn(async () => {}),
       insertSeeded: vi.fn(async () => {}),
       deleteAll: vi.fn(async () => {}),
@@ -163,24 +164,30 @@ describe('UserService Keycloak webhooks', () => {
   });
 
   it('toUserPublicDtoForCitizen masks deleted users', () => {
-    const dto = toUserPublicDtoForCitizen({
-      id: 42,
-      keycloakId: 'kc',
-      username: 'real',
-      email: 'r@x.com',
-      firstName: 'Real',
-      lastName: 'User',
-      role: 'EMPLOYEE',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: new Date(),
-    });
+    const placeholder = 'https://example.com/placeholder.jpg';
+    const dto = toUserPublicDtoForCitizen(
+      {
+        id: 42,
+        keycloakId: 'kc',
+        username: 'real',
+        email: 'r@x.com',
+        firstName: 'Real',
+        lastName: 'User',
+        role: 'EMPLOYEE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: new Date(),
+        profilePictureUrl: null,
+      },
+      placeholder,
+    );
 
     expect(dto).toEqual({
       id: 42,
       username: USER_DELETED_PLACEHOLDER,
       firstName: USER_DELETED_PLACEHOLDER,
       lastName: USER_DELETED_PLACEHOLDER,
+      profilePictureUrl: placeholder,
     });
   });
 });

@@ -69,6 +69,10 @@
         "drafts": "Brouillons",
         "searchPlaceholder": "Rechercher…"
       },
+      "viewMode": {
+        "list": "Liste",
+        "grid": "Grille"
+      },
       "table": {
         "title": "Titre",
         "status": "Statut",

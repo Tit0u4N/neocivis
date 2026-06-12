@@ -1,7 +1,7 @@
 'use client';
 
 import type { Article } from '@repo/contracts/article';
-import { MoreHorizontal, Plus } from 'lucide-react';
+import { LayoutGrid, List, MoreHorizontal, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ArticlePreview } from '@/components/articles/preview/ArticlePreview';
 import {
@@ -118,6 +118,84 @@ function ArticleRow({
   );
 }
 
+function ArticleCard({
+  article,
+  onSelect,
+  onEdit,
+  onTranslations,
+  onToggleStatus,
+  onDeleteRequest,
+}: Readonly<{
+  article: Article;
+  onSelect: () => void;
+  onEdit: () => void;
+  onTranslations: () => void;
+  onToggleStatus: () => void;
+  onDeleteRequest: () => void;
+}>) {
+  const { t } = useTranslation();
+  // biome-ignore lint/nursery/noShadow:Let him cook
+  const frTranslation = article.translations.find((t) => t.locale === 'fr');
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/30">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 overflow-hidden">
+          <p className="cursor-pointer truncate font-medium text-sm hover:underline" onClick={onSelect}>
+            {frTranslation?.title ?? '—'}
+          </p>
+          {frTranslation?.description && (
+            <p className="mt-0.5 line-clamp-2 text-muted-foreground text-xs">{frTranslation.description}</p>
+          )}
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={(props) => (
+              <Button variant="ghost" size="sm" className="h-8 w-8 shrink-0 p-0" {...props}>
+                <MoreHorizontal className="size-4" />
+                <span className="sr-only">{t('articles.list.actions.label')}</span>
+              </Button>
+            )}
+          />
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onSelect}>Consulter</DropdownMenuItem>
+            <DropdownMenuItem onClick={onEdit}>{t('common.edit')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={onTranslations}>
+              {t('articles.list.actions.manageTranslations')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onToggleStatus}>
+              {article.status === 'published'
+                ? t('articles.list.actions.unpublish')
+                : t('articles.list.actions.publish')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onDeleteRequest} className="text-destructive">
+              {t('common.delete')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="flex items-center justify-between">
+        <Badge variant={article.status === 'published' ? 'default' : 'secondary'}>
+          {article.status === 'published' ? t('articles.list.status.published') : t('articles.list.status.draft')}
+        </Badge>
+        <div className="flex gap-1">
+          {article.translations.map((translation) => (
+            <Badge key={translation.locale} variant="outline" className="text-xs uppercase">
+              {translation.locale}
+            </Badge>
+          ))}
+        </div>
+      </div>
+      <p className="text-muted-foreground text-xs">
+        {article.publishedAt
+          ? new Date(article.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+          : '—'}
+      </p>
+    </div>
+  );
+}
+
 export function ArticleListPage(props: Props) {
   const { t } = useTranslation();
   const {
@@ -139,6 +217,8 @@ export function ArticleListPage(props: Props) {
     handleSelectArticle,
     handleClosePreview,
     preview,
+    viewMode,
+    setViewMode,
   } = props;
 
   if (selectedArticle) {
@@ -181,6 +261,25 @@ export function ArticleListPage(props: Props) {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-xs"
         />
+        <Select value={viewMode} onValueChange={(v) => setViewMode(v as typeof viewMode)}>
+          <SelectTrigger className="ml-auto w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="list">
+              <span className="flex items-center gap-2">
+                <List className="size-4" />
+                {t('articles.list.viewMode.list')}
+              </span>
+            </SelectItem>
+            <SelectItem value="grid">
+              <span className="flex items-center gap-2">
+                <LayoutGrid className="size-4" />
+                {t('articles.list.viewMode.grid')}
+              </span>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {error && (
@@ -189,53 +288,90 @@ export function ArticleListPage(props: Props) {
         </div>
       )}
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-lg border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                {t('articles.list.table.title')}
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                {t('articles.list.table.status')}
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                {t('articles.list.table.publishedAt')}
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                {t('articles.list.table.updatedAt')}
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                {t('articles.list.table.languages')}
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground" />
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading &&
-              Array.from({ length: 4 }).map((_, i) => (
-                <tr key={i} className="border-b">
-                  <td className="px-4 py-3" colSpan={6}>
-                    <Skeleton className="h-8 w-full" />
+      {/* List view */}
+      {viewMode === 'list' && (
+        <div className="overflow-hidden rounded-lg border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  {t('articles.list.table.title')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  {t('articles.list.table.status')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  {t('articles.list.table.publishedAt')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  {t('articles.list.table.updatedAt')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  {t('articles.list.table.languages')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground" />
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading &&
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i} className="border-b">
+                    <td className="px-4 py-3" colSpan={6}>
+                      <Skeleton className="h-8 w-full" />
+                    </td>
+                  </tr>
+                ))}
+
+              {!isLoading && articles.length === 0 && (
+                <tr>
+                  <td className="px-4 py-10 text-center text-muted-foreground" colSpan={6}>
+                    <p className="font-medium">{t('articles.list.empty.title')}</p>
+                    <Button variant="link" className="mt-1" onClick={navigateToCreate}>
+                      {t('articles.list.empty.createFirst')}
+                    </Button>
                   </td>
                 </tr>
+              )}
+
+              {!isLoading &&
+                articles.map((article) => (
+                  <ArticleRow
+                    key={article.id}
+                    article={article}
+                    onSelect={() => handleSelectArticle(article)}
+                    onEdit={() => navigateToEdit(article.id)}
+                    onTranslations={() => navigateToTranslations(article.id)}
+                    onToggleStatus={() => void handleToggleStatus(article)}
+                    onDeleteRequest={() => setConfirmDeleteId(article.id)}
+                  />
+                ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Grid view */}
+      {viewMode === 'grid' && (
+        <>
+          {isLoading && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-40 w-full rounded-lg" />
               ))}
-
-            {!isLoading && articles.length === 0 && (
-              <tr>
-                <td className="px-4 py-10 text-center text-muted-foreground" colSpan={6}>
-                  <p className="font-medium">{t('articles.list.empty.title')}</p>
-                  <Button variant="link" className="mt-1" onClick={navigateToCreate}>
-                    {t('articles.list.empty.createFirst')}
-                  </Button>
-                </td>
-              </tr>
-            )}
-
-            {!isLoading &&
-              articles.map((article) => (
-                <ArticleRow
+            </div>
+          )}
+          {!isLoading && articles.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <p className="font-medium">{t('articles.list.empty.title')}</p>
+              <Button variant="link" className="mt-1" onClick={navigateToCreate}>
+                {t('articles.list.empty.createFirst')}
+              </Button>
+            </div>
+          )}
+          {!isLoading && articles.length > 0 && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {articles.map((article) => (
+                <ArticleCard
                   key={article.id}
                   article={article}
                   onSelect={() => handleSelectArticle(article)}
@@ -245,9 +381,10 @@ export function ArticleListPage(props: Props) {
                   onDeleteRequest={() => setConfirmDeleteId(article.id)}
                 />
               ))}
-          </tbody>
-        </table>
-      </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={confirmDeleteId !== null} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>

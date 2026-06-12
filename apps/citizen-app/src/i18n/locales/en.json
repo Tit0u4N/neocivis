@@ -121,6 +121,7 @@
   },
   "forum": {
     "title": "Forum",
+    "categories": "Category",
     "allCategories": "All",
     "loading": "Loading...",
     "loadMore": "Load more",

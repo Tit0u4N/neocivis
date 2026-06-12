@@ -51,47 +51,51 @@ export default function ForumListScreen() {
   return (
     <View style={styles.root}>
       {categories.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesContainer}
-          style={[styles.categoriesRow, { borderBottomColor: borderColor }]}
-        >
-          <TouchableOpacity
-            style={[
-              styles.chip,
-              {
-                backgroundColor: selectedCategoryId === undefined ? primaryColor : mutedBgColor,
-              },
-            ]}
-            onPress={() => {
-              selectCategory(undefined);
-            }}
+        <View style={[styles.categoriesSection, { borderBottomColor: borderColor }]}>
+          <Text style={[styles.categoriesTitle, { color: mutedColor }]}>{t('forum.categories')}</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesContainer}
           >
-            <Text style={[styles.chipText, { color: selectedCategoryId === undefined ? primaryFgColor : mutedColor }]}>
-              {t('forum.allCategories')}
-            </Text>
-          </TouchableOpacity>
-          {categories.map((cat) => (
             <TouchableOpacity
-              key={cat.id}
               style={[
                 styles.chip,
                 {
-                  backgroundColor: selectedCategoryId === cat.id ? primaryColor : mutedBgColor,
+                  backgroundColor: selectedCategoryId === undefined ? primaryColor : mutedBgColor,
                 },
               ]}
               onPress={() => {
-                selectCategory(cat.id);
+                selectCategory(undefined);
               }}
             >
-              <Text style={styles.chipEmoji}>{cat.emoji}</Text>
-              <Text style={[styles.chipText, { color: selectedCategoryId === cat.id ? primaryFgColor : mutedColor }]}>
-                {cat.label}
+              <Text
+                style={[styles.chipText, { color: selectedCategoryId === undefined ? primaryFgColor : mutedColor }]}
+              >
+                {t('forum.allCategories')}
               </Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+            {categories.map((cat) => (
+              <TouchableOpacity
+                key={cat.id}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: selectedCategoryId === cat.id ? primaryColor : mutedBgColor,
+                  },
+                ]}
+                onPress={() => {
+                  selectCategory(cat.id);
+                }}
+              >
+                <Text style={styles.chipEmoji}>{cat.emoji}</Text>
+                <Text style={[styles.chipText, { color: selectedCategoryId === cat.id ? primaryFgColor : mutedColor }]}>
+                  {cat.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       )}
       <FlatList
         data={threads}
@@ -140,28 +144,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  categoriesRow: {
+  categoriesSection: {
     borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  categoriesTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    paddingHorizontal: 16,
+    marginBottom: 8,
   },
   categoriesContainer: {
     flexDirection: 'row',
     gap: 8,
     paddingHorizontal: 16,
-    paddingVertical: 10,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 14,
-    paddingVertical: 7,
+    height: 32,
     borderRadius: CORNERS,
   },
   chipEmoji: {
     fontSize: 13,
+    lineHeight: 18,
   },
   chipText: {
     fontSize: 13,
+    lineHeight: 18,
     fontWeight: '600',
   },
   list: {

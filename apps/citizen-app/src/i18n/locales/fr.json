@@ -121,6 +121,7 @@
   },
   "forum": {
     "title": "Forum",
+    "categories": "Catégorie",
     "allCategories": "Tout",
     "loading": "Chargement...",
     "loadMore": "Charger plus",

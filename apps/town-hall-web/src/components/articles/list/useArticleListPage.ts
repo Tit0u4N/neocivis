@@ -11,7 +11,7 @@ type ViewMode = 'list' | 'grid';
 
 export function useArticleListPage() {
   const router = useRouter();
-  const { articleService: articleService } = useServices();
+  const { articleService } = useServices();
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

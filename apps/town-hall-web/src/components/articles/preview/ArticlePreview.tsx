@@ -191,7 +191,9 @@ export function ArticlePreview({
           onClick={() => setViewMode('web')}
           className={cn(
             '-mb-px border-b-2 px-5 py-2 font-medium text-sm transition-colors',
-            viewMode === 'web' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground',
+            viewMode === 'web'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           )}
         >
           <span className="flex items-center gap-2">
@@ -204,7 +206,9 @@ export function ArticlePreview({
           onClick={() => setViewMode('mobile')}
           className={cn(
             '-mb-px border-b-2 px-5 py-2 font-medium text-sm transition-colors',
-            viewMode === 'mobile' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground',
+            viewMode === 'mobile'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           )}
         >
           <span className="flex items-center gap-2">

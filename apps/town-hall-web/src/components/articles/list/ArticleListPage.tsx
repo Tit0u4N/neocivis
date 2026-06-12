@@ -189,7 +189,11 @@ function ArticleCard({
       </div>
       <p className="text-muted-foreground text-xs">
         {article.publishedAt
-          ? new Date(article.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+          ? new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })
           : '—'}
       </p>
     </div>

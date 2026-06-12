@@ -1,0 +1,38 @@
+meta {
+  name: 11 - Cleanup admin deletes category
+  type: http
+  seq: 981
+}
+
+delete {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/categories/{{e2eThreadCategoryId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  const categoryId = bru.getVar('e2eThreadCategoryId');
+  if (!cityId || !categoryId) {
+    throw new Error('Missing cityNiceId or e2eThreadCategoryId — run step 01 first.');
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/categories/${categoryId}`);
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

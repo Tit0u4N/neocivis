@@ -11,19 +11,7 @@ export class ThreadSeeder implements ISeeder {
   ) {}
 
   async deleteAll(): Promise<void> {
-    // No bulk-delete in the interface; iterate per city
-    const cities = await this.cityService.listPublicCities();
-    for (const city of cities) {
-      const categories = await this.repository.findCategoriesByCityId(city.id);
-      for (const cat of categories) {
-        await this.repository.deleteCategory(cat.id, city.id);
-      }
-      const threads = await this.repository.findThreadsByCityId(city.id);
-      for (const thread of threads) {
-        // Soft-delete to cover moderation state; in-memory reset handles the rest
-        await this.repository.updateThread(thread.id, { deleted: true });
-      }
-    }
+    await this.repository.deleteAll();
   }
 
   async seed(): Promise<void> {

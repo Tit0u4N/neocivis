@@ -19,6 +19,7 @@ import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemo
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { InMemoryReportRepository } from '@/modules/report/repository/report.inmemory.repository';
 import type { IReportRepository } from '@/modules/report/repository/report.repository.interface';
+import { DrizzleThreadRepository } from '@/modules/thread/repository/thread.drizzle.repository';
 import { InMemoryThreadRepository } from '@/modules/thread/repository/thread.inmemory.repository';
 import type { IThreadRepository } from '@/modules/thread/repository/thread.repository.interface';
 import { DrizzleUserRepository } from '@/modules/users/repository/user.drizzle.repository';
@@ -117,6 +118,5 @@ export function createEstablishmentRepository(): IEstablishmentRepository {
 }
 
 export function createThreadRepository(): IThreadRepository {
-  // Thread module is in-memory only (no production persistence implementation yet)
-  return sharedThreadRepository();
+  return isInMemoryMode() ? sharedThreadRepository() : new DrizzleThreadRepository();
 }

@@ -4,7 +4,7 @@ import AbstractService from '../AbstractService';
 
 export class MediaService extends AbstractService {
   constructor(kyInstance: KyInstance, cityId: string) {
-    super(kyInstance, `/cities/${cityId}`);
+    super(kyInstance, { cityId });
   }
 
   async getAll(): Promise<MediaImage[]> {

@@ -29,6 +29,20 @@
       "when": 1779010327618,
       "tag": "0003_dapper_dracula",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780153811935,
+      "tag": "0004_busy_puff_adder",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1749254400000,
+      "tag": "0005_profile_picture",
+      "breakpoints": true
     }
   ]
 }

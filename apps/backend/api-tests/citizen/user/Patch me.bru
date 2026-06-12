@@ -1,0 +1,47 @@
+meta {
+  name: Patch me
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{url}}/api/citizen/user/me
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "firstName": "CitizenPatched"
+  }
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+}
+
+script:post-response {
+  test("Status is 200 or 409", function() {
+    expect([200, 409]).to.include(res.getStatus());
+  });
+
+  if (res.getStatus() === 200) {
+    test("Body has success flag", function() {
+      const body = res.getBody();
+      expect(body).to.have.property('success', true);
+    });
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

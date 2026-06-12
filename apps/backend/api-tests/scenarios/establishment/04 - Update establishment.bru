@@ -1,0 +1,53 @@
+meta {
+  name: 04 - Update establishment
+  type: http
+  seq: 964
+}
+
+put {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/establishment/{{e2eEstablishmentId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Piscine municipale E2E (updated)",
+    "hours": "Lun-Dim 6h-22h"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const cityId = bru.getVar('cityNiceId');
+  const establishmentId = bru.getVar('e2eEstablishmentId');
+  if (!cityId || !establishmentId) {
+    throw new Error('Missing cityNiceId or e2eEstablishmentId — run previous steps first.');
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/establishment/${establishmentId}`);
+}
+
+script:post-response {
+  test('Status is 200', function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test('Name and hours updated', function () {
+    const body = res.getBody();
+    expect(body.name).to.equal('Piscine municipale E2E (updated)');
+    expect(body.hours).to.equal('Lun-Dim 6h-22h');
+    expect(body).to.not.have.property('cityId');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

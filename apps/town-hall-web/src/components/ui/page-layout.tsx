@@ -11,13 +11,15 @@ import { cn } from '@/lib/utils';
 
 type PageLayoutProps = {
   title: string;
+  metadataTitle?: string;
   children?: ReactNode;
   className?: string;
 };
 
-export function PageLayout({ title, children, className }: PageLayoutProps) {
+export function PageLayout({ title, metadataTitle, children, className }: PageLayoutProps) {
   return (
     <>
+      <title>{metadataTitle ?? title}</title>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-1 px-2">
           <SidebarTrigger size="lg" className="-ml-1 cursor-pointer" />

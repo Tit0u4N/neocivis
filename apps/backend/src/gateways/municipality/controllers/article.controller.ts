@@ -34,6 +34,11 @@ export class ArticleController {
     return c.req.param('cityId');
   }
 
+  //todo verify il the userID is an INT
+  private getUserId(c: Context): number {
+    return c.var.user?.id ?? 0;
+  }
+
   private async listAll(c: Context): Promise<ControllerJson<Article[], 200, readonly []>> {
     const cityId = this.getCityId(c);
     const body: Article[] = await this.articleService.getAllArticles(cityId);
@@ -58,8 +63,8 @@ export class ArticleController {
     if (!parsed.success) {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
-    const authorId = (c.get('userId') as string) ?? 'unknown';
-    const article = await this.articleService.createArticle(cityId, parsed.data, authorId);
+    const authorId = this.getUserId(c);
+    const article = await this.articleService.createArticle(cityId, parsed.data, authorId.toString());
     const body: Article = article;
     return c.json(body, 201);
   }

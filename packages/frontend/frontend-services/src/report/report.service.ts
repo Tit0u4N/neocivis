@@ -1,4 +1,4 @@
-import type { PaginatedReportsResponse, Report, ReportsListQuery } from '@repo/contracts/report';
+import type { PaginatedReportsResponse, Report, ReportStatus, ReportsListQuery } from '@repo/contracts/report';
 import type { KyInstance } from 'ky';
 import AbstractService from '../AbstractService';
 
@@ -9,10 +9,19 @@ export interface CreateReportPayload {
   photo: { uri: string; fileName: string; mimeType?: string };
 }
 
+/**
+ * City-scoped reports service shared by both audiences:
+ * - citizen app: `create` / `getMine` / `getById` / `cancel`
+ * - town-hall portal: `getAll` / `updateStatus`
+ *
+ * All routes hang off the shared city-scoped router `cities/:cityId/reports`.
+ */
 export class ReportService extends AbstractService {
-  constructor(kyInstance: KyInstance) {
-    super(kyInstance, '');
+  constructor(kyInstance: KyInstance, cityId: string) {
+    super(kyInstance, { cityId, prefix: '/reports' });
   }
+
+  // --- Citizen ---
 
   async create(payload: CreateReportPayload): Promise<Report> {
     const formData = new FormData();
@@ -31,7 +40,7 @@ export class ReportService extends AbstractService {
     } as unknown as Blob);
     return await this.http
       .extend({ headers: { 'Content-Type': undefined } })
-      .post('reports', { body: formData })
+      .post('', { body: formData })
       .json<Report>();
   }
 
@@ -43,14 +52,24 @@ export class ReportService extends AbstractService {
     if (query.limit !== undefined) {
       searchParams.limit = query.limit;
     }
-    return await this.http.get('reports/me', { searchParams }).json<PaginatedReportsResponse>();
+    return await this.http.get('me', { searchParams }).json<PaginatedReportsResponse>();
   }
 
   async getById(id: string): Promise<Report> {
-    return await this.http.get(`reports/${id}`).json<Report>();
+    return await this.http.get(id).json<Report>();
   }
 
   async cancel(id: string): Promise<Report> {
-    return await this.http.patch(`reports/${id}/cancel`).json<Report>();
+    return await this.http.patch(`${id}/cancel`).json<Report>();
+  }
+
+  // --- Municipality ---
+
+  async getAll(): Promise<PaginatedReportsResponse> {
+    return await this.http.get('').json<PaginatedReportsResponse>();
+  }
+
+  async updateStatus(id: string, status: ReportStatus): Promise<Report> {
+    return await this.http.patch(`${id}/status`, { json: { status } }).json<Report>();
   }
 }

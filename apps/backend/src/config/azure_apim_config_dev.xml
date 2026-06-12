@@ -2,15 +2,7 @@
     <!-- Throttle, authorize, validate, cache, or transform the requests -->
     <inbound>
         <base />
-        <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized - Token missing or exipred" require-scheme="Bearer" output-token-variable-name="jwtToken">
-            <openid-config url="https://auth.neocivis.cloud/realms/neocivis-dev/.well-known/openid-configuration" />
-            <audiences>
-                <audience>neocivis-api</audience>
-            </audiences>
-            <issuers>
-                <issuer>https://auth.neocivis.cloud/realms/neocivis-dev</issuer>
-            </issuers>
-        </validate-jwt>
+        
         <cors allow-credentials="true">
             <allowed-origins>
                 <origin>https://citizen-app-dev.neocivis.cloud</origin>
@@ -24,7 +16,20 @@
                 <method>OPTIONS</method>
                 <method>PATCH</method>
             </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
         </cors>
+
+        <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized - Token missing or exipred" require-scheme="Bearer" output-token-variable-name="jwtToken">
+            <openid-config url="https://auth.neocivis.cloud/realms/neocivis-dev/.well-known/openid-configuration" />
+            <audiences>
+                <audience>neocivis-api</audience>
+            </audiences>
+            <issuers>
+                <issuer>https://auth.neocivis.cloud/realms/neocivis-dev</issuer>
+            </issuers>
+        </validate-jwt>
 
         <!-- X-User-Id -->
         <set-header name="X-User-Id" exists-action="override">

@@ -1,0 +1,50 @@
+meta {
+  name: 01 - Get municipality config (Nice)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/config/all
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city in /user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/config/all`);
+}
+
+tests {
+  test('Status is 200', function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test('Body has categories + carousel arrays', function () {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.categories).to.be.an('array');
+    expect(body.carousel).to.be.an('array');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

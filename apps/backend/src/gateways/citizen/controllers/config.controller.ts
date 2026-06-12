@@ -10,13 +10,14 @@ export class ConfigController {
   public getRoutes(): Hono {
     const app = new Hono();
 
-    app.get('/city/:cityId/:locale', (c) => this.getConfig(c));
+    app.get('/:locale', (c) => this.getConfig(c));
 
     return app;
   }
 
   private async getConfig(c: Context): Promise<ControllerJson<CitizenConfigResponse>> {
-    const { cityId, locale } = c.req.param();
+    const cityId = c.req.param('cityId');
+    const { locale } = c.req.param();
     const result = ConfigQuery.safeParse({ locale });
 
     if (!result.success) {

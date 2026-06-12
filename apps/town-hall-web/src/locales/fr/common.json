@@ -143,6 +143,69 @@
       }
     }
   },
+  "establishment": {
+    "list": {
+      "title": "Établissements",
+      "add": "Ajouter",
+      "count_one": "{{count}} établissement",
+      "count_other": "{{count}} établissements",
+      "searchPlaceholder": "Rechercher un établissement…",
+      "noImage": "Aucune image",
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "empty": {
+        "title": "Aucun établissement",
+        "createFirst": "Ajouter le premier"
+      },
+      "deleteDialog": {
+        "title": "Supprimer cet établissement ?",
+        "description": "Cette action est irréversible. L'établissement sera définitivement supprimé.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer"
+      },
+      "viewMode": {
+        "list": "Vue liste",
+        "grid": "Vue mosaïque"
+      }
+    },
+    "form": {
+      "titleCreate": "Nouvel établissement",
+      "titleEdit": "Modifier l'établissement",
+      "fields": {
+        "name": "Nom",
+        "namePlaceholder": "Ex : Mairie principale",
+        "type": "Type",
+        "address": "Adresse",
+        "addressPlaceholder": "Ex : 1 Place du Général de Gaulle",
+        "hours": "Horaires",
+        "hoursPlaceholder": "Ex : Lun-Ven 8h-17h",
+        "phone": "Téléphone",
+        "phonePlaceholder": "Ex : 04 93 32 80 00",
+        "image": "Image",
+        "imageAlt": "Image de l'établissement",
+        "imageChoose": "Choisir une image",
+        "imageChange": "Changer l'image"
+      },
+      "discardDialog": {
+        "title": "Abandonner les modifications ?",
+        "description": "Les modifications non sauvegardées seront perdues.",
+        "cancel": "Continuer l'édition",
+        "confirm": "Abandonner"
+      },
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "back": "Retour"
+    },
+    "types": {
+      "all": "Tous les types",
+      "town_hall": "Mairie",
+      "education": "Éducation",
+      "culture": "Culture",
+      "sport": "Sport"
+    }
+  },
   "sidebar": {
     "sections": {
       "townHall": "Town Hall",
@@ -314,5 +377,161 @@
       "Violet": "Violet"
     },
     "newTileTitle": "Nouveau"
+  },
+  "reports": {
+    "title": "Signalements",
+    "export": "Exporter",
+    "stats": {
+      "total": "Total",
+      "pending": "En attente",
+      "inProgress": "En cours",
+      "resolved": "Résolu"
+    },
+    "tabs": {
+      "pending": "Signalements en cours",
+      "history": "Historique"
+    },
+    "view": {
+      "table": "Vue tableau",
+      "map": "Vue carte"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Titre",
+      "category": "Catégorie",
+      "location": "Localisation",
+      "date": "Date",
+      "status": "Statut",
+      "author": "Auteur",
+      "resolvedBy": "Traité par",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "En attente",
+      "progress": "En cours",
+      "resolved": "Résolu",
+      "cancelled": "Annulé"
+    },
+    "map": {
+      "placeholder": "Vue carte interactive — {{count}} signalement(s)"
+    },
+    "actions": {
+      "detail": "Détail"
+    },
+    "detail": {
+      "description": "Description",
+      "resolvedAt": "Résolu le"
+    },
+    "empty": "Aucun signalement",
+    "error": "Impossible de charger les signalements"
+  },
+  "account": {
+    "profile": {
+      "title": "Informations personnelles",
+      "fields": {
+        "firstName": "Prénom",
+        "firstNamePlaceholder": "Votre prénom",
+        "lastName": "Nom",
+        "lastNamePlaceholder": "Votre nom",
+        "username": "Nom d'utilisateur",
+        "usernamePlaceholder": "ex. jean.dupont",
+        "email": "Adresse e-mail",
+        "emailPlaceholder": "ex. jean.dupont@mairie.fr"
+      },
+      "editAria": "Modifier {{field}}",
+      "fieldHints": {
+        "firstName": "Votre prénom tel qu'il apparaît dans l'application. Entre 1 et 100 caractères.",
+        "lastName": "Votre nom de famille tel qu'il apparaît dans l'application. Entre 1 et 100 caractères.",
+        "username": "Identifiant unique utilisé pour vous reconnaître dans le système. Entre 3 et 50 caractères, sans espaces.",
+        "email": "Adresse e-mail associée à votre compte. Utilisée pour les notifications et la réinitialisation du mot de passe."
+      }
+    },
+    "password": {
+      "title": "Mot de passe",
+      "description": "Pour modifier votre mot de passe, nous vous enverrons un e-mail de réinitialisation.",
+      "button": "Changer le mot de passe"
+    },
+    "passwordDialog": {
+      "title": "Changer le mot de passe ?",
+      "description": "Un e-mail de réinitialisation du mot de passe sera envoyé à {{email}}. Souhaitez-vous continuer ?",
+      "cancel": "Annuler",
+      "confirm": "Envoyer l'e-mail"
+    },
+    "session": {
+      "title": "Session"
+    }
+  },
+  "threads": {
+    "list": {
+      "title": "Forum",
+      "subtitle": "Fils de discussion",
+      "newThread": "Nouveau fil",
+      "filterAll": "Tous",
+      "lastComments": "Derniers commentaires",
+      "empty": "Aucun fil de discussion pour cette catégorie.",
+      "error": "Impossible de charger les fils de discussion.",
+      "mutedCount_one": "{{count}} muet",
+      "mutedCount_other": "{{count}} muets",
+      "bannedCount_one": "{{count}} banni",
+      "bannedCount_other": "{{count}} bannis",
+      "loadMore": "Charger plus"
+    },
+    "card": {
+      "replies_one": "{{count}} réponse",
+      "replies_other": "{{count}} réponses",
+      "likes": "{{count}} j'aime"
+    },
+    "detail": {
+      "backToThreads": "Retour aux fils",
+      "replies_one": "{{count}} réponse",
+      "replies_other": "{{count}} réponses",
+      "noVisibleReplies": "Aucune réponse visible.",
+      "replyPlaceholder": "Écrire une réponse…",
+      "replyButton": "Répondre",
+      "deletedMessages": "Messages supprimés ({{count}})",
+      "deletedSubject": "Sujet supprimé par la modération",
+      "archivedSubject": "Fil archivé — non visible des citoyens",
+      "restore": "Restaurer",
+      "unarchive": "Désarchiver",
+      "addReaction": "Ajouter une réaction",
+      "error": "Impossible de charger le fil de discussion."
+    },
+    "newThreadModal": {
+      "title": "Nouveau fil de discussion",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Titre du sujet…",
+      "categoryLabel": "Catégorie",
+      "categoryPlaceholder": "Choisir une catégorie",
+      "messageLabel": "Message",
+      "cancel": "Annuler",
+      "submit": "Publier"
+    },
+    "moderation": {
+      "menuLabel": "Modération",
+      "deleteMessage": "Supprimer le message",
+      "deleteThread": "Supprimer le sujet",
+      "archive": "Archiver le fil",
+      "unarchive": "Désarchiver le fil",
+      "mute": "Rendre muet",
+      "unmute": "Réactiver la parole",
+      "ban": "Bannir du forum",
+      "unban": "Lever le bannissement",
+      "statusMuted": "Muet",
+      "statusBanned": "Banni",
+      "deletedAt": "supprimé · {{date}}"
+    },
+    "emojiPicker": {
+      "searchPlaceholder": "Rechercher…",
+      "loading": "Chargement…",
+      "empty": "Aucun résultat"
+    },
+    "categories": {
+      "manageTitle": "Gérer les catégories",
+      "addCategory": "Ajouter une catégorie",
+      "emojiLabel": "Emoji",
+      "labelLabel": "Libellé",
+      "deleteConfirm": "Supprimer cette catégorie ?",
+      "error": "Impossible de charger les catégories."
+    }
   }
 }

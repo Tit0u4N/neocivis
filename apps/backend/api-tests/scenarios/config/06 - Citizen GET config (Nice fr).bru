@@ -1,0 +1,62 @@
+meta {
+  name: 06 - Citizen GET config (Nice fr)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/config/fr
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  // Reuse cityNiceId from admin, or refresh via /cities list if missing.
+  const cityId = bru.getVar('cityNiceId') ?? bru.getEnvVar('cityNiceId');
+  if (cityId) {
+    req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/config/fr`);
+    return;
+  }
+
+  const cities = await axios.get(`${baseUrl}/api/citizen/cities`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const nice = cities.data?.find((c) => c.name === 'Nice');
+  if (!nice?.id) {
+    throw new Error('Could not find Nice in /api/citizen/cities');
+  }
+  bru.setVar('cityNiceId', nice.id);
+  req.setUrl(`${baseUrl}/api/citizen/cities/${nice.id}/config/fr`);
+}
+
+tests {
+  test('Status is 200', function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test('Body has resolved carousel/categories', function () {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.carousel).to.be.an('array');
+    expect(body.categories).to.be.an('array');
+    if (body.carousel.length > 0) {
+      expect(body.carousel[0]).to.have.property('title');
+    }
+    if (body.categories.length > 0) {
+      expect(body.categories[0]).to.have.property('name');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

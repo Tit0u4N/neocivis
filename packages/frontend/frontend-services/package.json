@@ -28,13 +28,17 @@
     "ky": "^1.14.1"
   },
   "exports": {
+    "./thread": "./dist/thread.js",
     "./report": "./dist/report.js",
     "./auth": "./dist/auth.js",
+    "./city": "./dist/city.js",
     "./config": "./dist/config.js",
     "./permission": "./dist/permission.js",
     "./article": "./dist/article.js",
+    "./establishment": "./dist/establishment.js",
     "./upload": "./dist/upload.js",
     "./media": "./dist/media.js",
+    "./user": "./dist/user.js",
     "./testing": "./dist/testing.js"
   }
 }

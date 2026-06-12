@@ -1,13 +1,12 @@
 import type { ArticleWithResolvedTranslation } from '@repo/contracts/article';
-import { ArticleService } from '@repo/frontend-services/article';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useApi } from '@/providers/ApiProvider';
+import { useServices } from '@/providers/ServicesProvider';
 
 const PAGE_LIMIT = 10;
 
 export function useArticlesList() {
-  const api = useApi();
+  const { articleService } = useServices();
   const { language } = useLanguage();
   const [articles, setArticles] = useState<ArticleWithResolvedTranslation[]>([]);
   const [loading, setLoading] = useState(false);
@@ -15,8 +14,6 @@ export function useArticlesList() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-
-  const articleService = useMemo(() => new ArticleService(api), [api]);
 
   useEffect(() => {
     setLoading(true);

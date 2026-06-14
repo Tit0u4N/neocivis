@@ -17,6 +17,7 @@ import type { IEstablishmentRepository } from '@/modules/establishment/repositor
 import { CosmosMediaRepository } from '@/modules/media/repository/media.cosmos.repository';
 import { InMemoryMediaRepository } from '@/modules/media/repository/media.inmemory.repository';
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
+import { CosmosReportRepository } from '@/modules/report/report.cosmos.repository';
 import { InMemoryReportRepository } from '@/modules/report/repository/report.inmemory.repository';
 import type { IReportRepository } from '@/modules/report/repository/report.repository.interface';
 import { InMemoryThreadRepository } from '@/modules/thread/repository/thread.inmemory.repository';
@@ -109,7 +110,7 @@ export function createConfigRepository(): IConfigRepository {
 }
 
 export function createReportRepository(): IReportRepository {
-  return isInMemoryMode() ? sharedReportRepository() : new InMemoryReportRepository();
+  return isInMemoryMode() ? sharedReportRepository() : new CosmosReportRepository();
 }
 
 export function createEstablishmentRepository(): IEstablishmentRepository {

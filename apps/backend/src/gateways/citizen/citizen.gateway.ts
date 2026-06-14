@@ -22,6 +22,7 @@ import { ConfigService } from '@/modules/config/service/config.service';
 import { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
+import { QwenService } from '@/modules/report/qwen.service';
 import { ReportService } from '@/modules/report/service/report.service';
 import { AzureBlobUploadService } from '@/modules/upload/upload.service';
 import { UserService } from '@/modules/users/service/user.service';
@@ -50,11 +51,12 @@ const reportRepository = createReportRepository();
 const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
 const uploadService = new AzureBlobUploadService(mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository);
+const qwenService = new QwenService();
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);
 const articleController = new ArticleController(articleService);
-const reportController = new ReportController(new ReportService(reportRepository), uploadService);
+const reportController = new ReportController(new ReportService(reportRepository), uploadService, qwenService);
 const configController = new ConfigController(new ConfigService(configRepository));
 const establishmentController = new EstablishmentController(establishmentService);
 const cityController = new CityController(cityService, userService);

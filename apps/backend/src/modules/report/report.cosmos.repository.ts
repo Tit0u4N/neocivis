@@ -2,7 +2,7 @@ import type { Container } from '@azure/cosmos';
 import type { Report } from '@repo/contracts/report';
 import { getCosmosClient } from '@/infrastructure/azure/cosmos.client';
 import { optionalEnv } from '@/infrastructure/env';
-import type { IReportRepository } from './report.types';
+import type { IReportRepository } from './repository/report.repository.interface';
 
 export function isReportCosmosConfigured(): boolean {
   return Boolean(optionalEnv('COSMOS_ENDPOINT') && optionalEnv('COSMOS_KEY'));
@@ -75,6 +75,28 @@ export class CosmosReportRepository implements IReportRepository {
     const container = await this.getContainer();
     await container.items.create(report);
     return report;
+  }
+
+  async findAll(page: number, limit: number): Promise<{ items: Report[]; total: number }> {
+    const container = await this.getContainer();
+
+    const { resources: countRes } = await container.items
+      .query<{ count: number }>({ query: 'SELECT VALUE COUNT(1) FROM c' })
+      .fetchAll();
+    const total = countRes[0]?.count ?? 0;
+
+    const offset = (page - 1) * limit;
+    const { resources } = await container.items
+      .query<Report>({
+        query: 'SELECT * FROM c ORDER BY c.createdAt DESC OFFSET @offset LIMIT @limit',
+        parameters: [
+          { name: '@offset', value: offset },
+          { name: '@limit', value: limit },
+        ],
+      })
+      .fetchAll();
+
+    return { items: resources, total };
   }
 
   async update(id: string, patch: Partial<Report>): Promise<Report> {

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { GpsLocation, PaginatedReportsResponse, Report, ReportStatus } from '@repo/contracts/report';
+import type { GpsLocation, PaginatedReportsResponse, Report, ReportStatus, ReportType } from '@repo/contracts/report';
 import type { IReportRepository } from '../repository/report.repository.interface';
 
 function deriveTitle(desc: string, maxLen = 60): string {
@@ -15,13 +15,13 @@ function deriveTitle(desc: string, maxLen = 60): string {
 export class ReportService {
   constructor(private readonly repo: IReportRepository) {}
 
-  createReport(input: { desc: string; authorId: string; location?: GpsLocation; photoUrl: string }): Promise<Report> {
+  createReport(input: { desc: string; authorId: string; location?: GpsLocation; photoUrl: string; type?: ReportType }): Promise<Report> {
     const now = new Date().toISOString();
     return this.repo.create({
       id: randomUUID(),
       authorId: input.authorId,
       title: deriveTitle(input.desc),
-      type: 'Autre',
+      type: input.type ?? 'Autre',
       status: 'pending',
       desc: input.desc,
       photoUrl: input.photoUrl,

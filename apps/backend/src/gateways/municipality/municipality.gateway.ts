@@ -56,7 +56,7 @@ const threadRepository = createThreadRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
-const userService = new UserService(userRepository, iamService);
+const userService = new UserService(userRepository, iamService, mediaBlobService);
 const mediaLinkService = new MediaLinkService(mediaRepository);
 const articleService = new ArticleService(articleRepository, mediaLinkService);
 const cityService = new CityService(cityRepository, userService, iamService);

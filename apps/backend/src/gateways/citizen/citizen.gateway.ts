@@ -46,12 +46,12 @@ const threadRepository = createThreadRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
-const userService = new UserService(userRepository, iamService);
+const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
+const userService = new UserService(userRepository, iamService, mediaBlobService);
 const articleService = new ArticleService(articleRepository);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const reportRepository = createReportRepository();
-const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
 const uploadService = new AzureBlobUploadService(mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository);
 

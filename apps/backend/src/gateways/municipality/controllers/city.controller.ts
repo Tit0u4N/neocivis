@@ -4,7 +4,6 @@ import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
-import { toUserPublicDto } from '@/modules/users/user.types';
 
 export class CityController {
   constructor(
@@ -42,7 +41,7 @@ export class CityController {
     const cityId = c.req.param('cityId');
     const ids = await this.cityService.listCitizens(cityId);
     const users = await this.userService.getByIds(ids);
-    const body: UserPublicDto[] = users.map(toUserPublicDto);
+    const body: UserPublicDto[] = users.map((u) => this.userService.toPublicDto(u));
     return c.json(body, 200);
   }
 
@@ -50,7 +49,7 @@ export class CityController {
     const cityId = c.req.param('cityId');
     const ids = await this.cityService.listEmployees(cityId);
     const users = await this.userService.getByIds(ids);
-    const body: UserPublicDto[] = users.map(toUserPublicDto);
+    const body: UserPublicDto[] = users.map((u) => this.userService.toPublicDto(u));
     return c.json(body, 200);
   }
 

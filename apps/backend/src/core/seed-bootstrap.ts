@@ -32,7 +32,7 @@ async function bootstrapAutoSeed(): Promise<void> {
   const threadRepository = createThreadRepository();
 
   const iamService = new KeycloakIAMService();
-  const userService = new UserService(userRepository, iamService);
+  const userService = new UserService(userRepository, iamService, mediaBlobService);
   const cityService = new CityService(cityRepository, userService, iamService);
   const accessService = new AccessService(accessRepository, cityService, userService);
 

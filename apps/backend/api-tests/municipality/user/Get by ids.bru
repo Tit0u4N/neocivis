@@ -32,6 +32,7 @@ script:post-response {
         expect(user).to.have.property('username');
         expect(user).to.have.property('firstName');
         expect(user).to.have.property('lastName');
+        expect(user).to.have.property('profilePictureUrl');
         expect(user).to.not.have.property('email');
         expect(user).to.not.have.property('role');
         expect(user).to.not.have.property('keycloakId');

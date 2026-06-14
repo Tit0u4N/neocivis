@@ -1,0 +1,52 @@
+meta {
+  name: 04 - Citizen creates thread
+  type: http
+  seq: 974
+}
+
+post {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/threads
+  body: json
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  const categoryId = bru.getVar('e2eThreadCategoryId');
+  if (!cityId || !categoryId) {
+    throw new Error('Missing cityNiceId or e2eThreadCategoryId — run step 01 first.');
+  }
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/threads`);
+  req.setBody(JSON.stringify({
+    title: 'Thread E2E Bruno',
+    body: 'Contenu du thread de test créé par le scénario Bruno.',
+    categoryId,
+  }));
+}
+
+script:post-response {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("Thread created with correct fields", function() {
+    const body = res.getBody();
+    expect(body.id).to.be.a('string');
+    expect(body.title).to.equal('Thread E2E Bruno');
+    expect(body.deleted).to.equal(false);
+    expect(body.archived).to.equal(false);
+    bru.setVar('e2eThreadId', body.id);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

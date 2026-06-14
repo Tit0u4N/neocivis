@@ -55,4 +55,7 @@ export interface IThreadRepository {
   findModerationsByCityId(cityId: string): Promise<ForumUserModeration[]>;
   findModeration(cityId: string, userId: number): Promise<ForumUserModeration | undefined>;
   upsertModeration(record: ForumUserModeration): Promise<ForumUserModeration>;
+
+  // Bulk
+  deleteAll(): Promise<void>;
 }

@@ -120,7 +120,21 @@
     }
   },
   "forum": {
-    "title": "Forum"
+    "title": "Forum",
+    "categories": "Catégorie",
+    "allCategories": "Tout",
+    "loading": "Chargement...",
+    "loadMore": "Charger plus",
+    "error": "Impossible de charger le forum",
+    "empty": "Aucune discussion pour l'instant",
+    "thread": {
+      "headerTitle": "Discussion",
+      "error": "Discussion introuvable",
+      "replies_one": "{{count}} réponse",
+      "replies_other": "{{count}} réponses",
+      "noReplies": "Sois le premier à répondre !",
+      "replyPlaceholder": "Écrire une réponse..."
+    }
   },
   "news": {
     "title": "Actualités"

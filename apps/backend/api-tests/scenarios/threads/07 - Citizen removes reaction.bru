@@ -1,0 +1,46 @@
+meta {
+  name: 07 - Citizen removes reaction
+  type: http
+  seq: 977
+}
+
+delete {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/threads/{{e2eThreadId}}/messages/{{e2eMessageId}}/reactions/%F0%9F%91%8D
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  const threadId = bru.getVar('e2eThreadId');
+  const messageId = bru.getVar('e2eMessageId');
+  if (!cityId || !threadId || !messageId) {
+    throw new Error('Missing required vars — run steps 04-05 first.');
+  }
+  const emoji = encodeURIComponent('👍');
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/threads/${threadId}/messages/${messageId}/reactions/${emoji}`);
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Reaction 👍 is removed", function() {
+    const reactions = res.getBody().reactions;
+    const thumbsUp = reactions.find((r) => r.emoji === '👍');
+    expect(thumbsUp).to.be.undefined;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

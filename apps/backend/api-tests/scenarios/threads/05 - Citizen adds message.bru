@@ -1,0 +1,52 @@
+meta {
+  name: 05 - Citizen adds message
+  type: http
+  seq: 975
+}
+
+post {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/threads/{{e2eThreadId}}/messages
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "body": "Réponse E2E au thread de test."
+  }
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  const threadId = bru.getVar('e2eThreadId');
+  if (!cityId || !threadId) {
+    throw new Error('Missing cityNiceId or e2eThreadId — run step 04 first.');
+  }
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/threads/${threadId}/messages`);
+}
+
+script:post-response {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("Message created", function() {
+    const body = res.getBody();
+    expect(body.id).to.be.a('string');
+    expect(body.body).to.equal('Réponse E2E au thread de test.');
+    expect(body.reactions).to.deep.equal([]);
+    bru.setVar('e2eMessageId', body.id);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

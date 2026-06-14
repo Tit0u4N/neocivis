@@ -1,0 +1,58 @@
+meta {
+  name: 01 - Admin creates category
+  type: http
+  seq: 971
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/categories
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "emoji": "🎉",
+    "label": "Événements E2E",
+    "order": 99
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city in /user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/categories`);
+}
+
+script:post-response {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("Category created with correct fields", function() {
+    const body = res.getBody();
+    expect(body.id).to.be.a('string');
+    expect(body.emoji).to.equal('🎉');
+    expect(body.label).to.equal('Événements E2E');
+    bru.setVar('e2eThreadCategoryId', body.id);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

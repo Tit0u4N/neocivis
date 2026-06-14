@@ -187,6 +187,14 @@ export class ThreadService {
 
   // ── Messages ─────────────────────────────────────────────────────────────────
 
+  async getMessageById(cityId: string, threadId: string, messageId: string): Promise<ThreadMessage> {
+    const message = await this.repository.findMessageByIdAndThreadId(messageId, threadId);
+    if (!message || message.cityId !== cityId) {
+      throw new Error(`Message not found: ${messageId}`);
+    }
+    return message;
+  }
+
   async addMessage(
     cityId: string,
     threadId: string,

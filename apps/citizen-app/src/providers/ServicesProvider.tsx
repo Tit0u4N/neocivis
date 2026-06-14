@@ -3,6 +3,7 @@ import { AuthService } from '@repo/frontend-services/auth';
 import { CityService } from '@repo/frontend-services/city';
 import { ConfigService } from '@repo/frontend-services/config';
 import { ReportService } from '@repo/frontend-services/report';
+import { ThreadService } from '@repo/frontend-services/thread';
 import { UserService } from '@repo/frontend-services/user';
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
 import { useApi } from '@/providers/ApiProvider';
@@ -14,6 +15,7 @@ type ServicesContextValue = {
   articleService: ArticleService;
   configService: ConfigService;
   reportService: ReportService;
+  threadService: ThreadService;
   userService: UserService;
 };
 
@@ -30,6 +32,7 @@ export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>
       articleService: new ArticleService(api, cityId),
       configService: new ConfigService(api, cityId),
       reportService: new ReportService(api, cityId),
+      threadService: new ThreadService(api, cityId),
       userService: new UserService(api),
     }),
     [api, cityId],

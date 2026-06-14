@@ -70,8 +70,8 @@
         "searchPlaceholder": "Rechercher…"
       },
       "viewMode": {
-        "list": "Liste",
-        "grid": "Grille"
+        "list": "Vue liste",
+        "grid": "Vue mosaïque"
       },
       "table": {
         "title": "Titre",

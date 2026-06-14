@@ -63,7 +63,7 @@ export async function startAutoSeedOnStartup(deps: AutoSeedDeps): Promise<void> 
 export async function runSeeders(deps: AutoSeedDeps, mode: AutoSeedMode): Promise<void> {
   const cityService = new CityService(deps.cityRepository, deps.userService, deps.iamService);
   const seederList: ISeeder[] = [
-    new UserSeeder(deps.userService),
+    new UserSeeder(deps.userService, deps.mediaBlobService),
     new CitySeeder(deps.cityRepository, cityService, deps.userService),
     new AccessSeeder(deps.accessService, cityService),
   ];

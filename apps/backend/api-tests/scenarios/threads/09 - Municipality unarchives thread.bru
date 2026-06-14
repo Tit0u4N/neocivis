@@ -1,0 +1,43 @@
+meta {
+  name: 09 - Municipality unarchives thread
+  type: http
+  seq: 979
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/{{e2eThreadId}}/unarchive
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  const threadId = bru.getVar('e2eThreadId');
+  if (!cityId || !threadId) {
+    throw new Error('Missing cityNiceId or e2eThreadId — run step 04 first.');
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/${threadId}/unarchive`);
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Thread is unarchived", function() {
+    const body = res.getBody();
+    expect(body.archived).to.equal(false);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

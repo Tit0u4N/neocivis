@@ -14,6 +14,7 @@ export const users = pgTable(
     firstName: text('first_name').notNull().default(''),
     lastName: text('last_name').notNull().default(''),
     role: userRole('role').notNull(),
+    profilePictureUrl: text('profile_picture_url'),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),

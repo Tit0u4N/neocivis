@@ -172,4 +172,12 @@ export class InMemoryThreadRepository implements IThreadRepository {
     }
     return Promise.resolve(record);
   }
+
+  deleteAll(): Promise<void> {
+    this.categories = [];
+    this.threads = [];
+    this.messages = [];
+    this.moderations = [];
+    return Promise.resolve();
+  }
 }

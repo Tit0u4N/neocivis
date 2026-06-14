@@ -10,6 +10,7 @@ export type UserPublicDto = {
   username: string;
   firstName: string;
   lastName: string;
+  profilePictureUrl: string | null;
 };
 
 /** Profil courant authentifié (ex. `/user/me`) — plus de champs que `UserPublicDto`. */
@@ -20,6 +21,7 @@ export type UserMeDto = {
   firstName: string;
   lastName: string;
   role: BaseUserRole;
+  profilePictureUrl: string | null;
 
   /**
    * Pour ADMIN / EMPLOYEE: la city unique dont l'utilisateur dépend.

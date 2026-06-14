@@ -1,6 +1,7 @@
 export * from '@/modules/access/repository/access.table';
 export * from '@/modules/city/repository/city.table';
 export * from '@/modules/establishment/repository/establishment.table';
+export * from '@/modules/thread/repository/thread.table';
 export * from '@/modules/users/repository/user.table';
 
 /**

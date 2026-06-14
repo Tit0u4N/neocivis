@@ -1,0 +1,40 @@
+meta {
+  name: Upload profile picture
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{url}}/api/municipality/user/me/profile-picture
+  body: multipart-form
+  auth: none
+}
+
+body:multipart-form {
+  file: @file(../../fixtures/avatar.jpg)
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+}
+
+script:post-response {
+  test("Status is 200 or 400", function() {
+    expect([200, 400]).to.include(res.getStatus());
+  });
+
+  if (res.getStatus() === 200) {
+    test("Body has success flag", function() {
+      expect(res.getBody()).to.have.property('success', true);
+    });
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

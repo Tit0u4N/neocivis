@@ -8,4 +8,5 @@ export default defineConfig({
   // treats package.json dependencies as external.
   noExternal: [/^@repo\//],
   external: ['@azure/functions'],
+  loader: { '.jpg': 'base64' },
 });

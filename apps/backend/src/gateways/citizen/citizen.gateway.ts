@@ -6,6 +6,7 @@ import {
   createConfigRepository,
   createEstablishmentRepository,
   createReportRepository,
+  createThreadRepository,
   createUserRepository,
 } from '@/core/in-memory-repositories';
 import { isInMemoryMode } from '@/core/runtime-config';
@@ -24,6 +25,7 @@ import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
 import { QwenService } from '@/modules/report/qwen.service';
 import { ReportService } from '@/modules/report/service/report.service';
+import { ThreadService } from '@/modules/thread/service/thread.service';
 import { AzureBlobUploadService } from '@/modules/upload/upload.service';
 import { UserService } from '@/modules/users/service/user.service';
 import { ArticleController } from './controllers/article.controller';
@@ -31,6 +33,7 @@ import { CityController } from './controllers/city.controller';
 import { ConfigController } from './controllers/config.controller';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { ReportController } from './controllers/report.controller';
+import { ThreadController } from './controllers/thread.controller';
 import { UserController } from './controllers/user.controller';
 
 // Import repositories
@@ -40,15 +43,16 @@ const cityRepository = createCityRepository();
 const accessRepository = createAccessRepository();
 const configRepository = createConfigRepository();
 const establishmentRepository = createEstablishmentRepository();
+const threadRepository = createThreadRepository();
 
 // Import services
 const iamService = new KeycloakIAMService();
-const userService = new UserService(userRepository, iamService);
+const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
+const userService = new UserService(userRepository, iamService, mediaBlobService);
 const articleService = new ArticleService(articleRepository);
 const cityService = new CityService(cityRepository, userService, iamService);
 const accessService = new AccessService(accessRepository, cityService, userService);
 const reportRepository = createReportRepository();
-const mediaBlobService = isInMemoryMode() ? new PicsumMediaBlobService() : new AzureMediaBlobService();
 const uploadService = new AzureBlobUploadService(mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository);
 const qwenService = new QwenService();
@@ -60,6 +64,7 @@ const reportController = new ReportController(new ReportService(reportRepository
 const configController = new ConfigController(new ConfigService(configRepository));
 const establishmentController = new EstablishmentController(establishmentService);
 const cityController = new CityController(cityService, userService);
+const threadController = new ThreadController(new ThreadService(threadRepository));
 
 let app = new Hono().basePath('/api/citizen');
 
@@ -80,6 +85,7 @@ cityScoped.route('/articles', articleController.getRoutes());
 cityScoped.route('/establishment', establishmentController.getRoutes());
 cityScoped.route('/reports', reportController.getRoutes());
 cityScoped.route('/config', configController.getRoutes());
+cityScoped.route('/threads', threadController.getRoutes());
 app.route('/cities/:cityId', cityScoped);
 
 export default app;

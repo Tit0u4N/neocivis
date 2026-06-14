@@ -18,6 +18,7 @@ export type SeededUser = Readonly<{
   lastName: string;
   role: BaseUserRole;
   realmRoles: string[];
+  profilePictureUrl: string;
 }>;
 
 function pickBaseRole(realmRoles: string[]): BaseUserRole {
@@ -130,14 +131,16 @@ export function loadSeededUsersFromRealmConfigDev(): SeededUser[] {
       continue;
     }
     const realmRoles = Array.isArray(u.realmRoles) ? u.realmRoles.filter((r) => typeof r === 'string') : [];
+    const seedId = seeded.length + 1;
     seeded.push({
-      seedId: seeded.length + 1,
+      seedId,
       username,
       email: typeof u.email === 'string' ? u.email : '',
       firstName: typeof u.firstName === 'string' ? u.firstName : '',
       lastName: typeof u.lastName === 'string' ? u.lastName : '',
       role: pickBaseRole(realmRoles),
       realmRoles,
+      profilePictureUrl: `https://i.pravatar.cc/150?u=${username}`,
     });
   }
 

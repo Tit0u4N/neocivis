@@ -5,7 +5,6 @@ export function getMockCategories(): Category[] {
   return [
     {
       id: 'alaune',
-      attachedPageId: 'page-1',
       icon: 'Star',
       color: '#F42500',
       row: 0,
@@ -18,12 +17,11 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'In primo piano' },
       ],
       link: {
-        type: "General"
-      }
+        type: 'General',
+      },
     },
     {
       id: 'pratique',
-      attachedPageId: 'page-2',
       icon: 'Info',
       color: '#0C8CE9',
       row: 0,
@@ -35,12 +33,11 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Pratico' },
       ],
       link: {
-        type: "General"
-      }
+        type: 'General',
+      },
     },
     {
       id: 'urgence',
-      attachedPageId: 'page-3',
       icon: 'TriangleAlert',
       color: '#D97706',
       row: 1,
@@ -52,8 +49,8 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Emergenza' },
       ],
       link: {
-        type: "General"
-      }
+        type: 'General',
+      },
     },
     {
       id: 'travaux',
@@ -69,8 +66,8 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Lavori' },
       ],
       link: {
-        type: "General"
-      }
+        type: 'General',
+      },
     },
     {
       id: 'sondage',
@@ -85,9 +82,9 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Sondaggio' },
       ],
       link: {
-        type: "ExternalURL",
-        value: 'https://example.com/sondage'
-      }
+        type: 'ExternalURL',
+        value: 'https://example.com/sondage',
+      },
     },
     {
       id: 'divers',
@@ -102,9 +99,9 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Varie' },
       ],
       link: {
-        type: "ArticlePage",
-        value: '22222222-2222-2222-2222-222222222222'
-      }
+        type: 'ArticlePage',
+        value: '22222222-2222-2222-2222-222222222222',
+      },
     },
   ];
 }

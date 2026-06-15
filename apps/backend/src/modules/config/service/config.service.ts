@@ -7,10 +7,10 @@ import type {
   ConfigLocale,
   MunicipalityConfigResponse,
 } from '@repo/contracts/config';
-import type { IConfigRepository } from '../repository/config.repository.interface';
+import type { MediaImageLink } from '@repo/contracts/media';
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { appendMediaLink } from '@/modules/media/repository/media.repository.interface';
-import type { MediaImageLink } from '@repo/contracts/media';
+import type { IConfigRepository } from '../repository/config.repository.interface';
 
 export class ConfigService {
   constructor(
@@ -182,7 +182,7 @@ export class ConfigService {
     const t = this.pickLocale(cat.translations, locale);
     return {
       id: cat.id,
-      attachedPageId: cat.attachedPageId,
+      link: cat.link,
       icon: cat.icon,
       color: cat.color,
       row: cat.row,

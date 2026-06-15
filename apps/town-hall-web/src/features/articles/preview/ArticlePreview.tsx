@@ -185,32 +185,36 @@ export function ArticlePreview({
       </div>
 
       {/* Toggle vue */}
-      <div className="flex w-full gap-4">
+      <div className="flex border-border border-b">
         <button
           type="button"
           onClick={() => setViewMode('web')}
           className={cn(
-            'flex flex-1 items-center justify-center gap-3 rounded-2xl border px-10 py-4 font-medium text-lg transition-all',
+            '-mb-px border-b-2 px-5 py-2 font-medium text-sm transition-colors',
             viewMode === 'web'
-              ? 'border-primary/30 bg-background text-foreground shadow-md'
-              : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           )}
         >
-          <Monitor className="size-6" />
-          Vue web
+          <span className="flex items-center gap-2">
+            <Monitor className="size-4" />
+            Vue web
+          </span>
         </button>
         <button
           type="button"
           onClick={() => setViewMode('mobile')}
           className={cn(
-            'flex flex-1 items-center justify-center gap-3 rounded-2xl border px-10 py-4 font-medium text-lg transition-all',
+            '-mb-px border-b-2 px-5 py-2 font-medium text-sm transition-colors',
             viewMode === 'mobile'
-              ? 'border-primary/30 bg-background text-foreground shadow-md'
-              : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           )}
         >
-          <Smartphone className="size-6" />
-          Vue mobile
+          <span className="flex items-center gap-2">
+            <Smartphone className="size-4" />
+            Vue mobile
+          </span>
         </button>
       </div>
 

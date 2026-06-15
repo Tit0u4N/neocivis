@@ -69,6 +69,10 @@
         "drafts": "Drafts",
         "searchPlaceholder": "Search…"
       },
+      "viewMode": {
+        "list": "List view",
+        "grid": "Mosaic view"
+      },
       "table": {
         "title": "Title",
         "status": "Status",

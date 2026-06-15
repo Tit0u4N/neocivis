@@ -7,6 +7,7 @@ import { useArticlePreview } from '@/features/articles/preview/useArticlePreview
 import { useServices } from '@/providers/ServicesProvider';
 
 type StatusFilter = ArticleStatus | 'all';
+type ViewMode = 'list' | 'grid';
 
 export function useArticleListPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export function useArticleListPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   const handleSelectArticle = useCallback((article: Article) => {
     setSelectedArticle((prev) => (prev?.id === article.id ? null : article));
@@ -121,5 +123,7 @@ export function useArticleListPage() {
     handleSelectArticle,
     handleClosePreview,
     preview,
+    viewMode,
+    setViewMode,
   };
 }

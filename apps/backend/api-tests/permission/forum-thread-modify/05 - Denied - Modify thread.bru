@@ -1,0 +1,76 @@
+meta {
+  name: forum-thread-modify - 05 - Denied - Modify thread
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/{{permThreadId}}
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "title": "Devrait échouer — rôle retiré",
+    "body": "Test 403 FORUM_THREAD_MODIFY_PERMISSION"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  const adminAuth = `Bearer ${adminToken}`;
+
+  let cityId = bru.getVar('cityNiceId');
+  let roleId = bru.getVar('permRoleId');
+  let employeeId = bru.getVar('permEmployeeId');
+
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+  if (!roleId) {
+    const list = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/roles`, { headers: { Authorization: adminAuth } });
+    const role = (list.data || []).find((r) => r.name === 'perm-forum-thread-modify');
+    if (!role) throw new Error('perm-forum-thread-modify not found');
+    roleId = role.id;
+    bru.setVar('permRoleId', roleId);
+  }
+  if (!employeeId) {
+    const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, { headers: { Authorization: adminAuth } });
+    const emp = (employees.data || []).find((u) => u.username === 'employee-nice1');
+    if (!emp) throw new Error('employee-nice1 not found');
+    employeeId = String(emp.id);
+    bru.setVar('permEmployeeId', employeeId);
+  }
+
+  await axios.delete(`${baseUrl}/api/municipality/cities/${cityId}/employees/${employeeId}/roles/${roleId}`, { headers: { Authorization: adminAuth } });
+
+  const threadId = bru.getVar('permThreadId');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/${threadId || '00000000-0000-0000-0000-000000000000'}`);
+}
+
+tests {
+  test("Status is 403 — role removed", function() {
+    expect(res.getStatus()).to.equal(403);
+  });
+  test("Error mentions FORUM_THREAD_MODIFY_PERMISSION", function() {
+    expect(res.getBody()).to.have.property('error').that.includes('FORUM_THREAD_MODIFY_PERMISSION');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

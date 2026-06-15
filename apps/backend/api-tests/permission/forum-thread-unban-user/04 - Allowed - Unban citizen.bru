@@ -1,0 +1,40 @@
+meta {
+  name: forum-thread-unban-user - 04 - Allowed - Unban citizen
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/moderation/users/{{permCitizenId}}/unban
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  const citizenId = bru.getVar('permCitizenId');
+  if (!citizenId) throw new Error('permCitizenId not set — run step 02 first');
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/moderation/users/${citizenId}/unban`);
+}
+
+tests {
+  test("Status is 200 — employee has FORUM_THREAD_UNBAN_USER_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

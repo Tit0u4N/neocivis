@@ -1,0 +1,45 @@
+meta {
+  name: config-modify - 03 - Allowed - Modify config categories
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/config/categories
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  []
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/config/categories`);
+}
+
+tests {
+  test("Status is 200 — employee has PAGE_CITY_HALL_MODIFY_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

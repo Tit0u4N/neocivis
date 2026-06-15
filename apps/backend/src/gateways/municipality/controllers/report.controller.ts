@@ -3,6 +3,7 @@ import { type PaginatedReportsResponse, type Report, ReportStatus, ReportsListQu
 import { type Context, Hono } from 'hono';
 import { z } from 'zod';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { PermissionGuard } from '@/middlewares/permission.guard';
 import type { ReportService } from '@/modules/report/service/report.service';
 
 const UpdateReportStatusBody = z.object({ status: ReportStatus });
@@ -12,13 +13,16 @@ const UpdateReportStatusBody = z.object({ status: ReportStatus });
  * and status updates for municipal staff. Mounted under `/cities/:cityId/reports`.
  */
 export class ReportController {
-  constructor(private reports: ReportService) {}
+  constructor(
+    private reports: ReportService,
+    private guard: PermissionGuard,
+  ) {}
 
   public getRoutes(): Hono {
     const app = new Hono();
 
-    app.get('/', (c) => this.listReports(c));
-    app.patch('/:id/status', (c) => this.updateStatus(c));
+    app.get('/', this.guard.require('SIGNAL_VIEW_PERMISSION'), (c) => this.listReports(c));
+    app.patch('/:id/status', this.guard.require('SIGNAL_MODIFY_PERMISSION'), (c) => this.updateStatus(c));
 
     return app;
   }

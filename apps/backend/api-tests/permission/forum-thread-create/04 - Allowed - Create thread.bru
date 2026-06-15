@@ -1,0 +1,61 @@
+meta {
+  name: forum-thread-create - 04 - Allowed - Create thread
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "title": "Thread perm-test",
+    "categoryId": "{{permCategoryId}}",
+    "body": "Créé pour le test FORUM_THREAD_CREATE_PERMISSION"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  const categoryId = bru.getVar('permCategoryId');
+  if (!categoryId) throw new Error('permCategoryId not set — run step 02 first');
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads`);
+  req.setBody(JSON.stringify({ title: 'Thread perm-test', categoryId, body: 'Créé pour le test FORUM_THREAD_CREATE_PERMISSION' }));
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.id) bru.setVar('permThreadId', body.id);
+}
+
+tests {
+  test("Status is 201 — employee has FORUM_THREAD_CREATE_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  test("Thread created with id", function() {
+    expect(res.getBody()).to.have.property('id');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

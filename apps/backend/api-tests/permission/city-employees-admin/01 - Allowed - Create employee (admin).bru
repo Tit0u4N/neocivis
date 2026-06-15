@@ -1,0 +1,79 @@
+meta {
+  name: city-employees-admin - 01 - Allowed - Create employee (admin)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "username": "perm-test-emp",
+    "email": "perm-test-emp@neocivis.cloud",
+    "firstName": "Perm",
+    "lastName": "Test"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  const adminAuth = `Bearer ${adminToken}`;
+  req.setHeader('Authorization', adminAuth);
+
+  let cityId = bru.getVar('cityNiceId');
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+    cityId = me.data?.city?.id;
+    if (!cityId) throw new Error('Admin has no city context');
+    bru.setVar('cityNiceId', cityId);
+  }
+
+  // Idempotence: if employee already exists from a previous run, unassign first.
+  const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, { headers: { Authorization: adminAuth } });
+  const existing = (employees.data || []).find((u) => u.username === 'perm-test-emp');
+  if (existing) {
+    try { await axios.delete(`${baseUrl}/api/municipality/cities/${cityId}/employees/${existing.id}`, { headers: { Authorization: adminAuth } }); } catch (_) {}
+  }
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees`);
+}
+
+script:post-response {
+  // Resolve the new employee's DB id from the employees list so step 03 can unassign them.
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  const cityId = bru.getVar('cityNiceId');
+  if (res.getStatus() === 200 && adminToken && cityId) {
+    try {
+      const list = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, { headers: { Authorization: `Bearer ${adminToken}` } });
+      const emp = (list.data || []).find((u) => u.username === 'perm-test-emp');
+      if (emp) bru.setVar('permNewEmployeeId', String(emp.id));
+    } catch (_) {}
+  }
+}
+
+tests {
+  test("Status is 200 — admin can create and assign employee", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Returns success", function() {
+    expect(res.getBody()).to.have.property('success', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

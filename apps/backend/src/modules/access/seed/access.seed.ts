@@ -38,10 +38,8 @@ export const accessRoleSeedsByCityName: ReadonlyMap<string, readonly AccessRoleS
         description: 'Publie et modifie les annonces et articles de la mairie.',
         permissions: [
           'PAGE_CITY_HALL_MODIFY_PERMISSION',
-          'PAGE_CITY_HALL_ANNOUNCE_PERMISSION',
           'ARTICLE_PUBLISH_PERMISSION',
           'ARTICLE_MODIFY_PERMISSION',
-          'NOTIFICATION_SEND_PERMISSION',
         ],
       },
       {
@@ -62,12 +60,12 @@ export const accessRoleSeedsByCityName: ReadonlyMap<string, readonly AccessRoleS
       {
         name: 'Référent Signalements',
         description: 'Référent unique des signalements de la ville de Biot.',
-        permissions: ['SIGNAL_VIEW_PERMISSION', 'SIGNAL_CREATE_PERMISSION', 'SIGNAL_MODIFY_PERMISSION'],
+        permissions: ['SIGNAL_VIEW_PERMISSION', 'SIGNAL_MODIFY_PERMISSION'],
       },
       {
         name: 'Webmestre',
-        description: 'Configure les webhooks et la page mairie.',
-        permissions: ['WEBHOOK_PERMISSION', 'PAGE_CITY_HALL_MODIFY_PERMISSION'],
+        description: 'Configure la page mairie et les médias.',
+        permissions: ['PAGE_CITY_HALL_MODIFY_PERMISSION', 'MEDIA_UPLOAD_PERMISSION', 'MEDIA_DELETE_PERMISSION'],
       },
     ],
   ],
@@ -89,19 +87,13 @@ export const accessRoleSeedsByCityName: ReadonlyMap<string, readonly AccessRoleS
         permissions: [
           'ARTICLE_PUBLISH_PERMISSION',
           'ARTICLE_MODIFY_PERMISSION',
-          'PAGE_CITY_HALL_ANNOUNCE_PERMISSION',
-          'NOTIFICATION_SEND_PERMISSION',
+          'PAGE_CITY_HALL_MODIFY_PERMISSION',
         ],
       },
       {
         name: 'Modérateur Signalements',
         description: 'Voit, traite et clôture les signalements.',
         permissions: ['SIGNAL_VIEW_PERMISSION', 'SIGNAL_MODIFY_PERMISSION'],
-      },
-      {
-        name: 'Intégrations',
-        description: "Gestion des webhooks d'intégration tierce.",
-        permissions: ['WEBHOOK_PERMISSION'],
       },
     ],
   ],

@@ -1,9 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import type { Category } from '@/screens/city/useHomeScreen';
+import { getCategoryLinkAction } from '@/utils/categoryLink.util';
 import { hexToGradient } from '@/utils/color.util';
 import { resolveIcon } from '@/utils/icon.util';
 import { useCategoryLayout } from './useCategoryLayout';
@@ -22,15 +22,7 @@ function CategoryTile({ category }: CategoryTileProps) {
   const [gradStart, gradEnd] = hexToGradient(category.color);
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      style={styles.tileTouchable}
-      onPress={
-        category.attachedPageId
-          ? () => router.push({ pathname: '/(tabs)/(city)/page/[id]', params: { id: `${category.attachedPageId}` } })
-          : undefined
-      }
-    >
+    <TouchableOpacity activeOpacity={0.8} style={styles.tileTouchable} onPress={getCategoryLinkAction(category.link)}>
       <LinearGradient colors={[gradStart, gradEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.tile}>
         <View style={[styles.iconWrapper, { backgroundColor: 'rgba(255,255,255,0.7)' }]}>
           <IconComponent color={category.color} size={20} strokeWidth={1.8} />

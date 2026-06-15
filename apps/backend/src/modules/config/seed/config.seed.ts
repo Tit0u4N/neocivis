@@ -33,7 +33,7 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Pratico' },
       ],
       link: {
-        type: 'General',
+        type: 'Forum',
       },
     },
     {
@@ -49,7 +49,7 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Emergenza' },
       ],
       link: {
-        type: 'General',
+        type: 'Reports',
       },
     },
     {
@@ -66,7 +66,7 @@ export function getMockCategories(): Category[] {
         { locale: 'it', name: 'Lavori' },
       ],
       link: {
-        type: 'General',
+        type: 'Articles',
       },
     },
     {

@@ -1,88 +1,190 @@
 'use client';
 
-import { act, renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
-}));
+vi.mock('@/providers/ServicesProvider');
+vi.mock('@/stores/city.store');
 
+import { useServices } from '@/providers/ServicesProvider';
+import { useCityStore } from '@/stores/city.store';
 import { useUserListPage } from './useUserListPage';
 
-afterEach(() => vi.clearAllMocks());
+const CITY_ID = 'NCE_06000';
+const alice = { id: 1, username: 'alice', firstName: 'Alice', lastName: 'Martin', profilePictureUrl: null };
+const bob = { id: 2, username: 'bob', firstName: 'Bob', lastName: 'Dupont', profilePictureUrl: null };
+const mockRole = { id: 'r1', name: 'Modérateur', description: '', permissions: [] };
+
+function buildServices(overrides: Record<string, unknown> = {}) {
+  return {
+    cityService: {
+      listEmployees: vi.fn().mockResolvedValue([alice, bob]),
+      createAndAssignEmployee: vi.fn().mockResolvedValue({ ok: true }),
+      unassignEmployee: vi.fn().mockResolvedValue({ ok: true }),
+      ...overrides,
+    },
+    accessService: {
+      listRoles: vi.fn().mockResolvedValue([mockRole]),
+      listEmployeeRoles: vi.fn().mockResolvedValue({ userId: 1, cityId: CITY_ID, roles: [mockRole] }),
+      assignRole: vi.fn().mockResolvedValue({ ok: true }),
+      unassignRole: vi.fn().mockResolvedValue({ ok: true }),
+    },
+  };
+}
+
+beforeEach(() => {
+  vi.resetAllMocks();
+  const services = buildServices();
+  vi.mocked(useServices).mockReturnValue(services as ReturnType<typeof useServices>);
+  vi.mocked(useCityStore).mockImplementation((sel: (s: { cityId: string | null }) => unknown) =>
+    sel({ cityId: CITY_ID }),
+  );
+});
 
 describe('useUserListPage', () => {
-  it('starts with all 4 mock users and not loading', () => {
+  it('loads employees and roles on mount', async () => {
     const { result } = renderHook(() => useUserListPage());
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.users).toHaveLength(4);
+    expect(result.current.isLoading).toBe(true);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.users).toHaveLength(2);
+    expect(result.current.roles).toHaveLength(1);
     expect(result.current.error).toBeNull();
   });
 
-  it('filters by role ADMIN', () => {
+  it('filters users by search query (case-insensitive)', async () => {
     const { result } = renderHook(() => useUserListPage());
-    act(() => result.current.setRoleFilter('ADMIN'));
-    expect(result.current.users).toHaveLength(1);
-    expect(result.current.users[0].username).toBe('alice.martin');
-  });
-
-  it('filters by role EMPLOYEE', () => {
-    const { result } = renderHook(() => useUserListPage());
-    act(() => result.current.setRoleFilter('EMPLOYEE'));
-    expect(result.current.users).toHaveLength(3);
-  });
-
-  it('filters by search query (case-insensitive)', () => {
-    const { result } = renderHook(() => useUserListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     act(() => result.current.setSearchQuery('ALICE'));
     expect(result.current.users).toHaveLength(1);
-    expect(result.current.users[0].username).toBe('alice.martin');
+    expect(result.current.users[0].username).toBe('alice');
   });
 
-  it('applies both role and search filters', () => {
+  it('shows all users when search query is cleared', async () => {
     const { result } = renderHook(() => useUserListPage());
-    act(() => {
-      result.current.setRoleFilter('EMPLOYEE');
-      result.current.setSearchQuery('bob');
-    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    act(() => result.current.setSearchQuery('alice'));
     expect(result.current.users).toHaveLength(1);
-    expect(result.current.users[0].username).toBe('bob.dupont');
+    act(() => result.current.setSearchQuery(''));
+    expect(result.current.users).toHaveLength(2);
   });
 
-  it('handleDelete removes the user and clears confirmDeleteId', () => {
+  it('sets error when loading fails', async () => {
+    const services = buildServices();
+    (services.cityService.listEmployees as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network'));
+    vi.mocked(useServices).mockReturnValue(services as ReturnType<typeof useServices>);
+
     const { result } = renderHook(() => useUserListPage());
-    act(() => result.current.handleDelete(1));
-    expect(result.current.users.find((u) => u.id === 1)).toBeUndefined();
-    expect(result.current.confirmDeleteId).toBeNull();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toBeTruthy();
+    expect(result.current.users).toHaveLength(0);
   });
 
-  it('openEditDialog sets editingUser and editRole', () => {
+  it('handleCreate validates required fields without calling service', async () => {
+    const services = buildServices();
+    vi.mocked(useServices).mockReturnValue(services as ReturnType<typeof useServices>);
     const { result } = renderHook(() => useUserListPage());
-    const alice = result.current.users[0];
-    act(() => result.current.openEditDialog(alice));
-    expect(result.current.editingUser?.id).toBe(alice.id);
-    expect(result.current.editRole).toBe(alice.role);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.openCreateDialog());
+    await act(async () => result.current.handleCreate());
+
+    expect(services.cityService.createAndAssignEmployee).not.toHaveBeenCalled();
+    expect(result.current.createErrors.firstName).toBeTruthy();
   });
 
-  it('closeEditDialog clears editingUser', () => {
+  it('handleCreate calls service with correct data and refetches', async () => {
+    const services = buildServices();
+    vi.mocked(useServices).mockReturnValue(services as ReturnType<typeof useServices>);
     const { result } = renderHook(() => useUserListPage());
-    const alice = result.current.users[0];
-    act(() => result.current.openEditDialog(alice));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.openCreateDialog());
+    act(() => {
+      result.current.setCreateField('firstName', 'Marie');
+      result.current.setCreateField('lastName', 'Curie');
+      result.current.setCreateField('username', 'marie.curie');
+      result.current.setCreateField('email', 'marie@mairie.fr');
+    });
+    await act(async () => result.current.handleCreate());
+
+    expect(services.cityService.createAndAssignEmployee).toHaveBeenCalledWith(CITY_ID, {
+      firstName: 'Marie',
+      lastName: 'Curie',
+      username: 'marie.curie',
+      email: 'marie@mairie.fr',
+    });
+    expect(result.current.showCreateDialog).toBe(false);
+  });
+
+  it('openEditDialog loads employee roles', async () => {
+    const { result } = renderHook(() => useUserListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => result.current.openEditDialog(alice));
+
+    expect(result.current.editingUser).toEqual(alice);
+    expect(result.current.editRoleIds).toEqual(['r1']);
+    expect(result.current.editInitialRoleIds).toEqual(['r1']);
+  });
+
+  it('toggleEditRole adds and removes role ids', async () => {
+    const { result } = renderHook(() => useUserListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await act(async () => result.current.openEditDialog(alice));
+
+    act(() => result.current.toggleEditRole('r1'));
+    expect(result.current.editRoleIds).toEqual([]);
+
+    act(() => result.current.toggleEditRole('r1'));
+    expect(result.current.editRoleIds).toEqual(['r1']);
+  });
+
+  it('handleFinishEdit calls assignRole / unassignRole for the diff', async () => {
+    const services = buildServices();
+    vi.mocked(useServices).mockReturnValue(services as ReturnType<typeof useServices>);
+    const { result } = renderHook(() => useUserListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => result.current.openEditDialog(alice));
+    act(() => result.current.toggleEditRole('r1'));
+    await act(async () => result.current.handleFinishEdit());
+
+    expect(services.accessService.unassignRole).toHaveBeenCalledWith(alice.id, 'r1');
+    expect(services.accessService.assignRole).not.toHaveBeenCalled();
+    expect(result.current.editingUser).toBeNull();
+  });
+
+  it('handleFinishEdit closes dialog without network call when no changes', async () => {
+    const services = buildServices();
+    vi.mocked(useServices).mockReturnValue(services as ReturnType<typeof useServices>);
+    const { result } = renderHook(() => useUserListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => result.current.openEditDialog(alice));
+    await act(async () => result.current.handleFinishEdit());
+
+    expect(services.accessService.assignRole).not.toHaveBeenCalled();
+    expect(services.accessService.unassignRole).not.toHaveBeenCalled();
+    expect(result.current.editingUser).toBeNull();
+  });
+
+  it('closeEditDialog clears editingUser', async () => {
+    const { result } = renderHook(() => useUserListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await act(async () => result.current.openEditDialog(alice));
     act(() => result.current.closeEditDialog());
     expect(result.current.editingUser).toBeNull();
   });
 
-  it('handleFinishEdit updates the user role in the list', () => {
+  it('handleDelete calls unassignEmployee and refetches', async () => {
+    const services = buildServices();
+    vi.mocked(useServices).mockReturnValue(services as ReturnType<typeof useServices>);
     const { result } = renderHook(() => useUserListPage());
-    const bob = result.current.users.find((u) => u.username === 'bob.dupont');
-    if (!bob) {
-      throw new Error('bob not found');
-    }
-    act(() => result.current.openEditDialog(bob));
-    act(() => result.current.setEditRole('ADMIN'));
-    act(() => result.current.handleFinishEdit());
-    const updated = result.current.users.find((u) => u.id === bob.id);
-    expect(updated?.role).toBe('ADMIN');
-    expect(result.current.editingUser).toBeNull();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => result.current.handleDelete(alice.id));
+
+    expect(services.cityService.unassignEmployee).toHaveBeenCalledWith(CITY_ID, alice.id);
+    expect(result.current.confirmDeleteId).toBeNull();
   });
 });

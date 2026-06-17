@@ -1,118 +1,92 @@
 'use client';
 
-import type { BaseUserRole } from '@repo/contracts/user';
-import { useCallback, useMemo, useState } from 'react';
-
-export type AdminUserDto = {
-  id: number;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: BaseUserRole;
-  lastConnection: string | null;
-};
+import type { RoleDto, UserPublicDto } from '@repo/contracts';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
+import { useCityStore } from '@/stores/city.store';
 
 type CreateForm = {
   firstName: string;
   lastName: string;
   username: string;
   email: string;
-  role: BaseUserRole;
 };
 
 type CreateErrors = Partial<Record<keyof CreateForm, string>>;
 
-const DEFAULT_CREATE_FORM: CreateForm = {
-  firstName: '',
-  lastName: '',
-  username: '',
-  email: '',
-  role: 'EMPLOYEE',
-};
+const DEFAULT_CREATE_FORM: CreateForm = { firstName: '', lastName: '', username: '', email: '' };
 
-const MOCK_USERS: AdminUserDto[] = [
-  {
-    id: 1,
-    username: 'alice.martin',
-    email: 'alice.martin@mairie.fr',
-    firstName: 'Alice',
-    lastName: 'Martin',
-    role: 'ADMIN',
-    lastConnection: '2026-05-10T08:32:00Z',
-  },
-  {
-    id: 2,
-    username: 'bob.dupont',
-    email: 'bob.dupont@mairie.fr',
-    firstName: 'Bob',
-    lastName: 'Dupont',
-    role: 'EMPLOYEE',
-    lastConnection: '2026-05-09T14:15:00Z',
-  },
-  {
-    id: 3,
-    username: 'claire.bernard',
-    email: 'claire.bernard@mairie.fr',
-    firstName: 'Claire',
-    lastName: 'Bernard',
-    role: 'EMPLOYEE',
-    lastConnection: '2026-04-28T09:00:00Z',
-  },
-  {
-    id: 4,
-    username: 'david.moreau',
-    email: 'david.moreau@mairie.fr',
-    firstName: 'David',
-    lastName: 'Moreau',
-    role: 'EMPLOYEE',
-    lastConnection: null,
-  },
-];
+function validateCreate(form: CreateForm): CreateErrors {
+  const e: CreateErrors = {};
+  if (!form.firstName.trim()) {
+    e.firstName = 'Requis';
+  }
+  if (!form.lastName.trim()) {
+    e.lastName = 'Requis';
+  }
+  if (!form.username.trim()) {
+    e.username = 'Requis';
+  }
+  const email = form.email.trim();
+  if (!email) {
+    e.email = 'Requis';
+  } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+    e.email = 'Email invalide';
+  }
+  return e;
+}
 
 export function useUserListPage() {
-  const [users, setUsers] = useState<AdminUserDto[]>(MOCK_USERS);
-  const [isLoading, _setIsLoading] = useState(false);
-  const [error, _setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<BaseUserRole | 'all'>('all');
-  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const { cityService, accessService } = useServices();
+  const cityId = useCityStore((s) => s.cityId);
 
-  const [editingUser, setEditingUser] = useState<AdminUserDto | null>(null);
-  const [editRole, setEditRole] = useState<BaseUserRole>('EMPLOYEE');
+  const [users, setUsers] = useState<UserPublicDto[]>([]);
+  const [roles, setRoles] = useState<RoleDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [createForm, setCreateFormState] = useState<CreateForm>(DEFAULT_CREATE_FORM);
   const [createErrors, setCreateErrors] = useState<CreateErrors>({});
+  const [isSubmittingCreate, setIsSubmittingCreate] = useState(false);
 
-  const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-      const fullName = `${user.firstName} ${user.lastName} ${user.username} ${user.email}`.toLowerCase();
-      const matchesSearch = fullName.includes(searchQuery.toLowerCase());
-      return matchesRole && matchesSearch;
-    });
-  }, [users, roleFilter, searchQuery]);
+  const [editingUser, setEditingUser] = useState<UserPublicDto | null>(null);
+  const [editRoleIds, setEditRoleIds] = useState<string[]>([]);
+  const [editInitialRoleIds, setEditInitialRoleIds] = useState<string[]>([]);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
 
-  const openEditDialog = useCallback((user: AdminUserDto) => {
-    setEditingUser(user);
-    setEditRole(user.role);
-  }, []);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
-  const closeEditDialog = useCallback(() => setEditingUser(null), []);
-
-  const handleFinishEdit = useCallback(() => {
-    if (!editingUser) {
+  const fetchData = useCallback(async () => {
+    if (!cityId) {
       return;
     }
-    setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, role: editRole } : u)));
-    setEditingUser(null);
-  }, [editingUser, editRole]);
+    setIsLoading(true);
+    setError(null);
+    try {
+      const [employees, allRoles] = await Promise.all([cityService.listEmployees(cityId), accessService.listRoles()]);
+      setUsers(employees);
+      setRoles(allRoles);
+    } catch {
+      setError('Impossible de charger les utilisateurs.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [cityId, cityService, accessService]);
 
-  const handleDelete = useCallback((id: number) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id));
-    setConfirmDeleteId(null);
-  }, []);
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  const filteredUsers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      return users;
+    }
+    return users.filter((u) => `${u.firstName} ${u.lastName} ${u.username}`.toLowerCase().includes(q));
+  }, [users, searchQuery]);
 
   const openCreateDialog = useCallback(() => {
     setCreateFormState(DEFAULT_CREATE_FORM);
@@ -127,56 +101,126 @@ export function useUserListPage() {
     setCreateErrors((prev) => ({ ...prev, [key]: undefined }));
   }, []);
 
-  const handleCreate = useCallback(() => {
-    const errors: CreateErrors = {};
-    if (!createForm.firstName.trim()) {
-      errors.firstName = 'Requis';
-    }
-    if (!createForm.lastName.trim()) {
-      errors.lastName = 'Requis';
-    }
-    if (!createForm.username.trim()) {
-      errors.username = 'Requis';
-    }
-    if (!createForm.email.trim()) {
-      errors.email = 'Requis';
-    }
-    if (Object.keys(errors).length > 0) {
-      setCreateErrors(errors);
+  const handleCreate = useCallback(async () => {
+    if (!cityId) {
       return;
     }
-    const newUser: AdminUserDto = {
-      id: Math.max(...users.map((u) => u.id)) + 1,
-      ...createForm,
-      lastConnection: null,
-    };
-    setUsers((prev) => [...prev, newUser]);
-    setShowCreateDialog(false);
-  }, [createForm, users]);
+    const errs = validateCreate(createForm);
+    if (Object.keys(errs).length > 0) {
+      setCreateErrors(errs);
+      return;
+    }
+    setIsSubmittingCreate(true);
+    try {
+      await cityService.createAndAssignEmployee(cityId, {
+        firstName: createForm.firstName.trim(),
+        lastName: createForm.lastName.trim(),
+        username: createForm.username.trim(),
+        email: createForm.email.trim(),
+      });
+      await fetchData();
+      setShowCreateDialog(false);
+    } catch {
+      setCreateErrors({ username: "Création impossible. Vérifiez que le nom d'utilisateur ou l'email ne sont pas déjà utilisés." });
+    } finally {
+      setIsSubmittingCreate(false);
+    }
+  }, [cityId, createForm, cityService, fetchData]);
+
+  const openEditDialog = useCallback(
+    async (user: UserPublicDto) => {
+      setEditingUser(user);
+      setEditRoleIds([]);
+      setEditInitialRoleIds([]);
+      setIsEditLoading(true);
+      try {
+        const res = await accessService.listEmployeeRoles(user.id);
+        const ids = res.roles.map((r) => r.id);
+        setEditRoleIds(ids);
+        setEditInitialRoleIds(ids);
+      } catch {
+        setError("Impossible de charger les rôles de cet employé.");
+        setEditingUser(null);
+      } finally {
+        setIsEditLoading(false);
+      }
+    },
+    [accessService],
+  );
+
+  const closeEditDialog = useCallback(() => setEditingUser(null), []);
+
+  const toggleEditRole = useCallback((roleId: string) => {
+    setEditRoleIds((prev) => (prev.includes(roleId) ? prev.filter((r) => r !== roleId) : [...prev, roleId]));
+  }, []);
+
+  const handleFinishEdit = useCallback(async () => {
+    if (!editingUser) {
+      return;
+    }
+    const added = editRoleIds.filter((r) => !editInitialRoleIds.includes(r));
+    const removed = editInitialRoleIds.filter((r) => !editRoleIds.includes(r));
+    if (added.length === 0 && removed.length === 0) {
+      setEditingUser(null);
+      return;
+    }
+    setIsSubmittingEdit(true);
+    try {
+      await Promise.all([
+        ...added.map((r) => accessService.assignRole(editingUser.id, r)),
+        ...removed.map((r) => accessService.unassignRole(editingUser.id, r)),
+      ]);
+      setEditingUser(null);
+    } catch {
+      setError("Impossible de mettre à jour les rôles de cet employé.");
+    } finally {
+      setIsSubmittingEdit(false);
+    }
+  }, [editingUser, editRoleIds, editInitialRoleIds, accessService]);
+
+  const handleDelete = useCallback(
+    async (userId: number) => {
+      if (!cityId) {
+        return;
+      }
+      try {
+        await cityService.unassignEmployee(cityId, userId);
+        await fetchData();
+        setConfirmDeleteId(null);
+      } catch {
+        setError("Impossible de retirer cet employé.");
+        setConfirmDeleteId(null);
+      }
+    },
+    [cityId, cityService, fetchData],
+  );
 
   return {
     users: filteredUsers,
+    roles,
     isLoading,
     error,
     searchQuery,
     setSearchQuery,
-    roleFilter,
-    setRoleFilter,
-    confirmDeleteId,
-    setConfirmDeleteId,
-    handleDelete,
-    editingUser,
-    editRole,
-    setEditRole,
-    openEditDialog,
-    closeEditDialog,
-    handleFinishEdit,
     showCreateDialog,
     createForm,
     createErrors,
+    isSubmittingCreate,
     openCreateDialog,
     closeCreateDialog,
     setCreateField,
     handleCreate,
+    editingUser,
+    editRoleIds,
+    editInitialRoleIds,
+    isEditLoading,
+    isSubmittingEdit,
+    openEditDialog,
+    closeEditDialog,
+    toggleEditRole,
+    handleFinishEdit,
+    confirmDeleteId,
+    setConfirmDeleteId,
+    handleDelete,
   };
 }

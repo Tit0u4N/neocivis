@@ -579,5 +579,86 @@
     },
     "empty": "Aucun utilisateur",
     "error": "Impossible de charger les utilisateurs"
+  },
+  "roles": {
+    "list": {
+      "title": "Gestion des rôles",
+      "count": "rôle(s)",
+      "create": "Créer un rôle",
+      "searchPlaceholder": "Rechercher un rôle…",
+      "columnName": "Nom",
+      "columnDescription": "Description",
+      "columnPermissions": "Permissions",
+      "actionEdit": "Modifier",
+      "actionDelete": "Supprimer",
+      "empty": "Aucun rôle trouvé.",
+      "error": "Impossible de charger les rôles."
+    },
+    "form": {
+      "createTitle": "Créer un rôle",
+      "createSubtitle": "Définissez un rôle et ses permissions associées.",
+      "editTitle": "Modifier le rôle",
+      "nameLabel": "Nom",
+      "namePlaceholder": "ex. Modérateur Forum",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Décrivez les responsabilités de ce rôle…",
+      "permissionsLabel": "Permissions",
+      "createAction": "Créer",
+      "editAction": "Enregistrer"
+    },
+    "delete": {
+      "title": "Supprimer ce rôle ?",
+      "description": "Cette action est irréversible. Le rôle sera retiré de tous les employés qui le possèdent.",
+      "confirm": "Supprimer"
+    },
+    "errors": {
+      "duplicateName": "Ce nom est déjà utilisé par un autre rôle."
+    },
+    "permissions": {
+      "SIGNAL_VIEW_PERMISSION": "Consulter les signalements",
+      "SIGNAL_MODIFY_PERMISSION": "Modifier les signalements",
+      "FORUM_THREAD_CREATE_PERMISSION": "Créer des fils de discussion",
+      "FORUM_THREAD_DELETE_PERMISSION": "Supprimer des fils de discussion",
+      "FORUM_THREAD_MODIFY_PERMISSION": "Modifier des fils de discussion",
+      "FORUM_THREAD_DELETE_MESSAGE_PERMISSION": "Supprimer des messages du forum",
+      "FORUM_THREAD_BAN_USER_PERMISSION": "Bannir des utilisateurs du forum",
+      "FORUM_THREAD_UNBAN_USER_PERMISSION": "Débannir des utilisateurs du forum",
+      "PAGE_CITY_HALL_MODIFY_PERMISSION": "Modifier la page mairie",
+      "ARTICLE_PUBLISH_PERMISSION": "Publier des articles",
+      "ARTICLE_MODIFY_PERMISSION": "Modifier des articles",
+      "ARTICLE_DELETE_PERMISSION": "Supprimer des articles",
+      "ESTABLISHMENT_CREATE_PERMISSION": "Créer des établissements",
+      "ESTABLISHMENT_MODIFY_PERMISSION": "Modifier des établissements",
+      "ESTABLISHMENT_DELETE_PERMISSION": "Supprimer des établissements",
+      "MEDIA_UPLOAD_PERMISSION": "Télécharger des médias",
+      "MEDIA_DELETE_PERMISSION": "Supprimer des médias",
+      "groups": {
+        "SIGNAL": "Signalements",
+        "FORUM_THREAD": "Forum",
+        "PAGE_CITY_HALL": "Page mairie",
+        "ARTICLE": "Articles",
+        "ESTABLISHMENT": "Établissements",
+        "MEDIA": "Médias"
+      },
+      "descriptions": {
+        "SIGNAL_VIEW_PERMISSION": "Consulter la liste et le détail des signalements citoyens.",
+        "SIGNAL_MODIFY_PERMISSION": "Mettre à jour le statut et les informations d'un signalement.",
+        "FORUM_THREAD_CREATE_PERMISSION": "Créer de nouveaux fils de discussion sur le forum.",
+        "FORUM_THREAD_DELETE_PERMISSION": "Supprimer définitivement un fil de discussion.",
+        "FORUM_THREAD_MODIFY_PERMISSION": "Modifier le titre ou le contenu d'un fil de discussion.",
+        "FORUM_THREAD_DELETE_MESSAGE_PERMISSION": "Supprimer des messages individuels dans un fil.",
+        "FORUM_THREAD_BAN_USER_PERMISSION": "Empêcher un utilisateur de poster sur le forum.",
+        "FORUM_THREAD_UNBAN_USER_PERMISSION": "Lever le bannissement d'un utilisateur du forum.",
+        "PAGE_CITY_HALL_MODIFY_PERMISSION": "Modifier le contenu de la page de présentation de la mairie.",
+        "ARTICLE_PUBLISH_PERMISSION": "Publier de nouveaux articles sur le portail municipal.",
+        "ARTICLE_MODIFY_PERMISSION": "Modifier le contenu d'articles existants.",
+        "ARTICLE_DELETE_PERMISSION": "Supprimer des articles publiés.",
+        "ESTABLISHMENT_CREATE_PERMISSION": "Référencer un nouvel établissement municipal.",
+        "ESTABLISHMENT_MODIFY_PERMISSION": "Mettre à jour les informations d'un établissement.",
+        "ESTABLISHMENT_DELETE_PERMISSION": "Retirer un établissement du catalogue.",
+        "MEDIA_UPLOAD_PERMISSION": "Téléverser des images, vidéos et documents dans la bibliothèque.",
+        "MEDIA_DELETE_PERMISSION": "Supprimer des médias de la bibliothèque."
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import type { BaseUserRole } from '@repo/contracts/user';
+import type { RoleDto, UserPublicDto } from '@repo/contracts';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -13,8 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -26,39 +25,61 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { AdminUserDto, useUserListPage } from './useUserListPage';
+import type { useUserListPage } from './useUserListPage';
 
 type Props = ReturnType<typeof useUserListPage>;
 
-const ROLE_LABELS: Record<BaseUserRole, string> = {
-  // biome-ignore lint/style/useNamingConvention: matches BaseUserRole enum
-  ADMIN: 'Administrateur',
-  // biome-ignore lint/style/useNamingConvention: matches BaseUserRole enum
-  EMPLOYEE: 'Employé',
-  // biome-ignore lint/style/useNamingConvention: matches BaseUserRole enum
-  CITIZEN: 'Citoyen',
-};
-
-const ROLE_VARIANTS: Record<BaseUserRole, 'default' | 'secondary' | 'outline'> = {
-  // biome-ignore lint/style/useNamingConvention: matches BaseUserRole enum
-  ADMIN: 'default',
-  // biome-ignore lint/style/useNamingConvention: matches BaseUserRole enum
-  EMPLOYEE: 'secondary',
-  // biome-ignore lint/style/useNamingConvention: matches BaseUserRole enum
-  CITIZEN: 'outline',
-};
-
-function getInitials(user: AdminUserDto) {
+function getInitials(user: UserPublicDto) {
   return `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
 }
 
-function formatLastConnection(date: string | null): string {
-  if (!date) {
-    return 'Jamais';
+function RolePicker({
+  roles,
+  selected,
+  onToggle,
+  isLoading,
+}: Readonly<{
+  roles: RoleDto[];
+  selected: string[];
+  onToggle: (roleId: string) => void;
+  isLoading: boolean;
+}>) {
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+      </div>
+    );
   }
-  return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(date));
+
+  if (roles.length === 0) {
+    return (
+      <p className="rounded-md border px-4 py-3 text-muted-foreground text-sm">
+        Aucun rôle configuré — créez des rôles dans la section Rôles.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-1 rounded-md border p-2">
+      {roles.map((role) => (
+        <label key={role.id} className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/50">
+          <input
+            type="checkbox"
+            className="size-4 accent-primary"
+            checked={selected.includes(role.id)}
+            onChange={() => onToggle(role.id)}
+          />
+          <div className="flex-1">
+            <p className="font-medium text-sm">{role.name}</p>
+            {role.description && <p className="text-muted-foreground text-xs">{role.description}</p>}
+          </div>
+        </label>
+      ))}
+    </div>
+  );
 }
 
 function UserRow({
@@ -66,7 +87,7 @@ function UserRow({
   onEdit,
   onDeleteRequest,
 }: Readonly<{
-  user: AdminUserDto;
+  user: UserPublicDto;
   onEdit: () => void;
   onDeleteRequest: () => void;
 }>) {
@@ -77,6 +98,7 @@ function UserRow({
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <Avatar>
+            {user.profilePictureUrl && <AvatarImage src={user.profilePictureUrl} alt={`${user.firstName} ${user.lastName}`} />}
             <AvatarFallback className="bg-primary/10 font-semibold text-primary text-xs">
               {getInitials(user)}
             </AvatarFallback>
@@ -85,30 +107,25 @@ function UserRow({
             <p className="font-medium text-sm">
               {user.firstName} {user.lastName}
             </p>
-            <p className="mt-0.5 text-muted-foreground text-xs">{user.username}</p>
+            <p className="mt-0.5 text-muted-foreground text-xs">@{user.username}</p>
           </div>
         </div>
       </td>
-      <td className="px-4 py-3 text-muted-foreground text-sm">{user.email}</td>
-      <td className="px-4 py-3">
-        <Badge variant={ROLE_VARIANTS[user.role]}>{ROLE_LABELS[user.role]}</Badge>
-      </td>
-      <td className="px-4 py-3 text-muted-foreground text-sm">{formatLastConnection(user.lastConnection)}</td>
       <td className="w-px px-4 py-3 text-right">
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={(props) => (
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" {...props}>
+            render={(p) => (
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" {...p}>
                 <MoreHorizontal className="size-4" />
                 <span className="sr-only">{t('common.actions')}</span>
               </Button>
             )}
           />
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onEdit}>Modifier</DropdownMenuItem>
+            <DropdownMenuItem onClick={onEdit}>Modifier les rôles</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDeleteRequest} className="text-destructive">
-              Supprimer
+              Retirer de la mairie
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -121,24 +138,26 @@ export function UserListPage(props: Props) {
   const { t } = useTranslation();
   const {
     users,
+    roles,
     isLoading,
     error,
     searchQuery,
     setSearchQuery,
-    roleFilter,
-    setRoleFilter,
     confirmDeleteId,
     setConfirmDeleteId,
     handleDelete,
     editingUser,
-    editRole,
-    setEditRole,
+    editRoleIds,
+    isEditLoading,
+    isSubmittingEdit,
     openEditDialog,
     closeEditDialog,
+    toggleEditRole,
     handleFinishEdit,
     showCreateDialog,
     createForm,
     createErrors,
+    isSubmittingCreate,
     openCreateDialog,
     closeCreateDialog,
     setCreateField,
@@ -146,26 +165,16 @@ export function UserListPage(props: Props) {
   } = props;
 
   return (
-    <PageLayout title="Gestion des utilisateurs">
+    <PageLayout title="Gestion des employés">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{users.length} utilisateur(s)</p>
+        <p className="text-muted-foreground text-sm">{users.length} employé(s)</p>
         <Button onClick={openCreateDialog}>
           <Plus className="mr-2 size-4" />
-          Créer un utilisateur
+          Ajouter un employé
         </Button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as typeof roleFilter)}>
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder="Tous les rôles" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous les rôles</SelectItem>
-            <SelectItem value="ADMIN">Administrateur</SelectItem>
-            <SelectItem value="EMPLOYEE">Employé</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex items-center gap-3">
         <Input
           placeholder="Rechercher un utilisateur..."
           value={searchQuery}
@@ -184,10 +193,7 @@ export function UserListPage(props: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Nom</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Rôle</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Dernière connexion</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Utilisateur</th>
               <th className="w-px px-4 py-3" />
             </tr>
           </thead>
@@ -195,7 +201,7 @@ export function UserListPage(props: Props) {
             {isLoading &&
               Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className="border-b">
-                  <td className="px-4 py-3" colSpan={5}>
+                  <td className="px-4 py-3" colSpan={2}>
                     <Skeleton className="h-8 w-full" />
                   </td>
                 </tr>
@@ -203,7 +209,7 @@ export function UserListPage(props: Props) {
 
             {!isLoading && users.length === 0 && (
               <tr>
-                <td className="px-4 py-10 text-center text-muted-foreground" colSpan={5}>
+                <td className="px-4 py-10 text-center text-muted-foreground" colSpan={2}>
                   <p className="font-medium">Aucun utilisateur trouvé.</p>
                 </td>
               </tr>
@@ -214,7 +220,7 @@ export function UserListPage(props: Props) {
                 <UserRow
                   key={user.id}
                   user={user}
-                  onEdit={() => openEditDialog(user)}
+                  onEdit={() => void openEditDialog(user)}
                   onDeleteRequest={() => setConfirmDeleteId(user.id)}
                 />
               ))}
@@ -236,7 +242,7 @@ export function UserListPage(props: Props) {
               <AlertDialogTitle className="font-semibold text-base">
                 {createForm.firstName || createForm.lastName
                   ? `${createForm.firstName} ${createForm.lastName}`.trim()
-                  : 'Nouvel utilisateur'}
+                  : 'Nouvel employé'}
               </AlertDialogTitle>
               <p className="mt-0.5 text-muted-foreground text-sm">{createForm.username || 'nom.utilisateur'}</p>
             </div>
@@ -284,24 +290,13 @@ export function UserListPage(props: Props) {
               />
               {createErrors.email && <p className="text-destructive text-xs">{createErrors.email}</p>}
             </div>
-
-            <div className="space-y-1.5">
-              <Label className="font-medium text-sm">Rôle</Label>
-              <Select value={createForm.role} onValueChange={(v) => setCreateField('role', v as BaseUserRole)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ADMIN">Administrateur</SelectItem>
-                  <SelectItem value="EMPLOYEE">Employé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
           <AlertDialogFooter className="border-t bg-muted/20 px-6 py-4">
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCreate}>Créer</AlertDialogAction>
+            <AlertDialogAction onClick={() => void handleCreate()} disabled={isSubmittingCreate}>
+              Créer
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -311,6 +306,12 @@ export function UserListPage(props: Props) {
         <AlertDialogContent className="max-w-xl overflow-hidden p-0">
           <div className="flex items-center gap-4 border-b bg-muted/30 px-6 py-5">
             <Avatar size="lg">
+              {editingUser?.profilePictureUrl && (
+                <AvatarImage
+                  src={editingUser.profilePictureUrl}
+                  alt={editingUser ? `${editingUser.firstName} ${editingUser.lastName}` : ''}
+                />
+              )}
               <AvatarFallback className="bg-primary/15 font-bold text-primary text-sm">
                 {editingUser ? getInitials(editingUser) : ''}
               </AvatarFallback>
@@ -319,70 +320,22 @@ export function UserListPage(props: Props) {
               <AlertDialogTitle className="font-semibold text-base">
                 {editingUser ? `${editingUser.firstName} ${editingUser.lastName}` : ''}
               </AlertDialogTitle>
-              <p className="mt-0.5 text-muted-foreground text-sm">{editingUser?.username}</p>
+              <p className="mt-0.5 text-muted-foreground text-sm">@{editingUser?.username}</p>
             </div>
           </div>
 
-          <div className="space-y-6 px-6 py-5">
-            <div className="divide-y rounded-md border text-sm">
-              {[
-                { label: 'Prénom', value: editingUser?.firstName },
-                { label: 'Nom', value: editingUser?.lastName },
-                { label: "Nom d'utilisateur", value: editingUser?.username },
-                { label: 'Email', value: editingUser?.email },
-                { label: 'Dernière connexion', value: formatLastConnection(editingUser?.lastConnection ?? null) },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex items-center gap-4 px-4 py-2.5">
-                  <span className="w-36 shrink-0 text-muted-foreground">{label}</span>
-                  <span className="font-medium">{value}</span>
-                </div>
-              ))}
-            </div>
-
+          <div className="space-y-4 px-6 py-5">
             <div className="space-y-2">
-              <Label className="font-medium text-sm">Rôle</Label>
-              <Select value={editRole} onValueChange={(v) => setEditRole(v as BaseUserRole)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ADMIN">Administrateur</SelectItem>
-                  <SelectItem value="EMPLOYEE">Employé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-3">
-              <Label className="font-medium text-sm">Actions</Label>
-              <div className="grid grid-cols-1 gap-2">
-                <Button
-                  variant="outline"
-                  className="justify-start border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                >
-                  Bloquer l'utilisateur
-                </Button>
-                <Button
-                  variant="outline"
-                  className="justify-start border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  onClick={() => {
-                    if (editingUser) {
-                      setConfirmDeleteId(editingUser.id);
-                    }
-                    closeEditDialog();
-                  }}
-                >
-                  Supprimer l'utilisateur
-                </Button>
-                <Button variant="outline" className="justify-start">
-                  Réinitialiser le mot de passe
-                </Button>
-              </div>
+              <Label className="font-medium text-sm">Rôles assignés</Label>
+              <RolePicker roles={roles} selected={editRoleIds} onToggle={toggleEditRole} isLoading={isEditLoading} />
             </div>
           </div>
 
           <AlertDialogFooter className="border-t bg-muted/20 px-6 py-4">
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleFinishEdit}>Enregistrer</AlertDialogAction>
+            <AlertDialogAction onClick={() => void handleFinishEdit()} disabled={isSubmittingEdit || isEditLoading}>
+              Enregistrer
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -391,18 +344,19 @@ export function UserListPage(props: Props) {
       <AlertDialog open={confirmDeleteId !== null} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>
         <AlertDialogContent className="max-w-xl overflow-hidden p-0">
           <AlertDialogHeader className="px-8 pt-8 pb-6">
-            <AlertDialogTitle className="text-xl">Supprimer cet utilisateur ?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">Retirer cet employé ?</AlertDialogTitle>
             <AlertDialogDescription className="mt-2 text-base">
-              Cette action est irréversible. L'utilisateur sera définitivement supprimé.
+              Cet employé sera retiré de la mairie. Son compte restera actif mais il n'aura plus accès à
+              l'administration.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="border-t bg-muted/20 px-8 py-5">
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => confirmDeleteId !== null && handleDelete(confirmDeleteId)}
+              onClick={() => confirmDeleteId !== null && void handleDelete(confirmDeleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Supprimer
+              Retirer
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

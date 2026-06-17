@@ -31,39 +31,40 @@ afterEach(cleanup);
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeUser(id: number, role: 'ADMIN' | 'EMPLOYEE', firstName: string, lastName: string) {
+function makeUser(id: number, firstName: string, lastName: string) {
   return {
     id,
     username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}`,
-    email: `${firstName.toLowerCase()}@mairie.fr`,
     firstName,
     lastName,
-    role,
-    lastConnection: null,
+    profilePictureUrl: null,
   };
 }
 
 function makeProps(overrides: Partial<Parameters<typeof UserListPage>[0]> = {}) {
   return {
     users: [],
+    roles: [],
     isLoading: false,
     error: null,
     searchQuery: '',
     setSearchQuery: vi.fn(),
-    roleFilter: 'all' as const,
-    setRoleFilter: vi.fn(),
     confirmDeleteId: null,
     setConfirmDeleteId: vi.fn(),
     handleDelete: vi.fn(),
     editingUser: null,
-    editRole: 'EMPLOYEE' as const,
-    setEditRole: vi.fn(),
+    editRoleIds: [],
+    editInitialRoleIds: [],
+    isEditLoading: false,
+    isSubmittingEdit: false,
     openEditDialog: vi.fn(),
     closeEditDialog: vi.fn(),
+    toggleEditRole: vi.fn(),
     handleFinishEdit: vi.fn(),
     showCreateDialog: false,
-    createForm: { firstName: '', lastName: '', username: '', email: '', role: 'EMPLOYEE' as const },
+    createForm: { firstName: '', lastName: '', username: '', email: '' },
     createErrors: {},
+    isSubmittingCreate: false,
     openCreateDialog: vi.fn(),
     closeCreateDialog: vi.fn(),
     setCreateField: vi.fn(),
@@ -89,7 +90,7 @@ describe('UserListPage', () => {
   });
 
   it('renders a row for each user', () => {
-    const users = [makeUser(1, 'ADMIN', 'Alice', 'Martin'), makeUser(2, 'EMPLOYEE', 'Bob', 'Dupont')];
+    const users = [makeUser(1, 'Alice', 'Martin'), makeUser(2, 'Bob', 'Dupont')];
     render(<UserListPage {...makeProps({ users })} />);
     expect(screen.getByText('Alice Martin')).toBeTruthy();
     expect(screen.getByText('Bob Dupont')).toBeTruthy();
@@ -110,13 +111,13 @@ describe('UserListPage', () => {
 
   it('shows the delete confirmation dialog when confirmDeleteId is set', () => {
     render(<UserListPage {...makeProps({ confirmDeleteId: 1 })} />);
-    expect(screen.getByText('Supprimer cet utilisateur ?')).toBeTruthy();
+    expect(screen.getByText('Retirer cet employé ?')).toBeTruthy();
   });
 
   it('calls handleDelete when the delete confirmation is confirmed', () => {
     const handleDelete = vi.fn();
     render(<UserListPage {...makeProps({ confirmDeleteId: 1, handleDelete })} />);
-    fireEvent.click(screen.getByText('Supprimer'));
+    fireEvent.click(screen.getByText('Retirer'));
     expect(handleDelete).toHaveBeenCalledWith(1);
   });
 

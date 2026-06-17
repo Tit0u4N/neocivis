@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import type { SidebarSectionConfig } from '@/components/sidebar/sidebar.config';
 import { SIDEBAR_SECTIONS } from '@/components/sidebar/sidebar.config';
-import { usePermission } from '@/hooks/usePermission';
+import { usePermissions } from '@/providers/PermissionProvider';
 
 export type AppSidebarViewModel = {
   visibleSections: SidebarSectionConfig[];
@@ -12,7 +12,7 @@ export type AppSidebarViewModel = {
 
 export function useAppSidebar(): AppSidebarViewModel {
   const pathname = usePathname();
-  const { hasAnyPermission, isAdmin } = usePermission();
+  const { hasAnyPermission, isAdmin } = usePermissions();
 
   const visibleSections = SIDEBAR_SECTIONS.map((section) => ({
     ...section,

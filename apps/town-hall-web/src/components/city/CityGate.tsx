@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PermissionProvider } from '@/providers/PermissionProvider';
 import { ServicesProvider } from '@/providers/ServicesProvider';
 import { useCityGate } from './useCityGate';
 
@@ -26,5 +27,9 @@ export function CityGate({ children }: Readonly<CityGateProps>) {
     );
   }
 
-  return <ServicesProvider>{children}</ServicesProvider>;
+  return (
+    <ServicesProvider>
+      <PermissionProvider>{children}</PermissionProvider>
+    </ServicesProvider>
+  );
 }

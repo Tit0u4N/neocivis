@@ -7,7 +7,7 @@ import {
 } from '@repo/contracts/report';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
-import type { QwenService } from '@/modules/report/qwen.service';
+import type { GroqService } from '@/modules/report/groq.service';
 import type { ReportService } from '@/modules/report/service/report.service';
 import type { IUploadService } from '@/modules/upload/upload.service';
 
@@ -18,7 +18,7 @@ export class ReportController {
   constructor(
     private reports: ReportService,
     private uploads: IUploadService,
-    private qwen: QwenService,
+    private qwen: GroqService,
   ) {}
 
   public getRoutes(): Hono {
@@ -71,7 +71,7 @@ export class ReportController {
 
     const report = await this.reports.createReport({
       desc: fields.data.desc,
-      authorId: user.keycloakId,
+      authorId: String(user.id),
       location,
       photoUrl,
       type,
@@ -96,7 +96,7 @@ export class ReportController {
     }
 
     const { page, limit } = result.data;
-    const body: PaginatedReportsResponse = await this.reports.getMyReports(user.keycloakId, page, limit);
+    const body: PaginatedReportsResponse = await this.reports.getMyReports(String(user.id), page, limit);
     return c.json(body, 200);
   }
 
@@ -108,7 +108,7 @@ export class ReportController {
     }
 
     try {
-      const report = await this.reports.getReportByIdForUser(c.req.param('id'), user.keycloakId);
+      const report = await this.reports.getReportByIdForUser(c.req.param('id'), String(user.id));
       const body: Report = report;
       return c.json(body, 200);
     } catch {
@@ -124,7 +124,7 @@ export class ReportController {
     }
 
     try {
-      const report = await this.reports.cancelReport(c.req.param('id'), user.keycloakId);
+      const report = await this.reports.cancelReport(c.req.param('id'), String(user.id));
       const body: Report = report;
       return c.json(body, 200);
     } catch (err) {

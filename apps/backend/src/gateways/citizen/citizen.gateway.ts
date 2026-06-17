@@ -23,7 +23,7 @@ import { ConfigService } from '@/modules/config/service/config.service';
 import { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 import { KeycloakIAMService } from '@/modules/iam/keycloak-iam.service';
 import { AzureMediaBlobService, PicsumMediaBlobService } from '@/modules/media/media-blob.service';
-import { QwenService } from '@/modules/report/qwen.service';
+import { GroqService } from '@/modules/report/groq.service';
 import { ReportService } from '@/modules/report/service/report.service';
 import { ThreadService } from '@/modules/thread/service/thread.service';
 import { AzureBlobUploadService } from '@/modules/upload/upload.service';
@@ -55,7 +55,7 @@ const accessService = new AccessService(accessRepository, cityService, userServi
 const reportRepository = createReportRepository();
 const uploadService = new AzureBlobUploadService(mediaBlobService);
 const establishmentService = new EstablishmentService(establishmentRepository);
-const qwenService = new QwenService();
+const qwenService = new GroqService();
 
 // Import controllers
 const userController = new UserController(userService, cityService, accessService);

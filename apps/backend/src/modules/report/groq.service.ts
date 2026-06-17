@@ -2,7 +2,7 @@ import * as process from 'node:process';
 import { REPORT_TYPES, type ReportType } from '@repo/contracts/report';
 import { Groq } from 'groq-sdk';
 
-export class QwenService {
+export class GroqService {
   private groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
   async analyzeReportImage(photoInput: string): Promise<ReportType | undefined> {

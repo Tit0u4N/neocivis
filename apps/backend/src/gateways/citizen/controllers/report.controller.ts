@@ -7,7 +7,7 @@ import {
 } from '@repo/contracts/report';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
-import type { ReportService } from '@/modules/report/report.service';
+import type { ReportService } from '@/modules/report/service/report.service';
 import type { IUploadService } from '@/modules/upload/upload.service';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -76,7 +76,7 @@ export class ReportController {
 
   private async listMyReports(c: Context): Promise<ControllerJson<PaginatedReportsResponse>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
-    const user = (c as any).user;
+    const user = (c as any).var.user;
     if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
@@ -96,7 +96,7 @@ export class ReportController {
 
   private async getReportById(c: Context): Promise<ControllerJson<Report>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
-    const user = (c as any).user;
+    const user = (c as any).var.user;
     if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
@@ -112,7 +112,7 @@ export class ReportController {
 
   private async cancelReport(c: Context): Promise<ControllerJson<Report>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
-    const user = (c as any).user;
+    const user = (c as any).var.user;
     if (!user) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }

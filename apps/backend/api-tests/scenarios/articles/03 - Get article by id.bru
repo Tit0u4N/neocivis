@@ -5,24 +5,34 @@ meta {
 }
 
 get {
-  url: {{url}}/api/municipality/articles/{{articleId}}
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/articles/{{articleId}}
   body: none
   auth: none
 }
 
 script:pre-request {
-  const url = req.getUrl ? req.getUrl() : '';
-  const isCitizen = typeof url === 'string' && url.includes('/api/citizen/');
-  const tokenKey = isCitizen ? 'tokenCitizen' : 'tokenAdmin';
-  const token = bru.getVar(tokenKey);
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
   if (!token) {
-    throw new Error(`Missing ${tokenKey} — collection pre-request did not run.`);
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
   }
   req.setHeader('Authorization', `Bearer ${token}`);
 
-  if (!bru.getVar('articleId')) {
+  const articleId = bru.getVar('articleId');
+  if (!articleId) {
     throw new Error('Missing articleId. Run "01 - Create article" first.');
   }
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city in /user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/articles/${articleId}`);
 }
 
 script:post-response {
@@ -33,6 +43,7 @@ script:post-response {
   test("Body has id", function() {
     const body = res.getBody();
     expect(body).to.have.property('id');
+    expect(body).to.have.property('cityId');
   });
 }
 

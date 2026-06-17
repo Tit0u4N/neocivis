@@ -1,0 +1,40 @@
+meta {
+  name: media-upload - 03 - Allowed - Upload media
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/media/upload
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  if (!cityId) throw new Error('Missing cityNiceId — run step 01 first.');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+
+  // No file body: the permission guard fires before the file check.
+  // 400 (missing file) = guard passed. 403 = guard denied.
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/media/upload`);
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+}
+
+tests {
+  test("Status is 400 not 403 — guard passed, employee has MEDIA_UPLOAD_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+  test("Error is about missing file, not permission", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('error');
+    expect(body.error).to.not.include('MEDIA_UPLOAD_PERMISSION');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

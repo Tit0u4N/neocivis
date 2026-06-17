@@ -20,6 +20,7 @@ function makeUser(overrides: Partial<User> & Pick<User, 'id' | 'role' | 'keycloa
     lastName: '',
     createdAt: now,
     updatedAt: now,
+    deletedAt: null,
     ...overrides,
   };
 }
@@ -101,10 +102,7 @@ describe('AccessService', () => {
       });
       expect(role.id).toBeDefined();
       expect(role.cityId).toBe(NICE);
-      expect(role.permissions).toEqual([
-        'FORUM_THREAD_DELETE_PERMISSION',
-        'FORUM_THREAD_BAN_USER_PERMISSION',
-      ]);
+      expect(role.permissions).toEqual(['FORUM_THREAD_DELETE_PERMISSION', 'FORUM_THREAD_BAN_USER_PERMISSION']);
     });
 
     it('rejects creating a role with an unknown permission', async () => {
@@ -119,9 +117,9 @@ describe('AccessService', () => {
 
     it('rejects duplicate role name within the same city', async () => {
       await service.createRole(NICE, { name: 'Modo', description: '', permissions: [] });
-      await expect(
-        service.createRole(NICE, { name: 'Modo', description: '', permissions: [] }),
-      ).rejects.toThrow(/already exists/);
+      await expect(service.createRole(NICE, { name: 'Modo', description: '', permissions: [] })).rejects.toThrow(
+        /already exists/,
+      );
     });
 
     it('allows the same role name in another city (per-city uniqueness)', async () => {
@@ -143,10 +141,7 @@ describe('AccessService', () => {
       });
       expect(updated.name).toBe('Modo Sénior');
       expect(updated.description).toBe('plus de droits');
-      expect(updated.permissions).toEqual([
-        'FORUM_THREAD_DELETE_PERMISSION',
-        'FORUM_THREAD_BAN_USER_PERMISSION',
-      ]);
+      expect(updated.permissions).toEqual(['FORUM_THREAD_DELETE_PERMISSION', 'FORUM_THREAD_BAN_USER_PERMISSION']);
     });
 
     it('lists roles for a given city only', async () => {
@@ -223,12 +218,12 @@ describe('AccessService', () => {
   describe('userHasPermission', () => {
     it('returns true for ADMIN of the city (bypass)', async () => {
       const admin = usersById.get(10) as User;
-      await expect(service.userHasPermission(admin, NICE, 'NOTIFICATION_SEND_PERMISSION')).resolves.toBe(true);
+      await expect(service.userHasPermission(admin, NICE, 'ARTICLE_PUBLISH_PERMISSION')).resolves.toBe(true);
     });
 
     it('returns false for ADMIN of another city', async () => {
       const admin = usersById.get(10) as User;
-      await expect(service.userHasPermission(admin, BIOT, 'NOTIFICATION_SEND_PERMISSION')).resolves.toBe(false);
+      await expect(service.userHasPermission(admin, BIOT, 'ARTICLE_PUBLISH_PERMISSION')).resolves.toBe(false);
     });
 
     it('returns true for an EMPLOYEE whose role grants the permission in this city', async () => {

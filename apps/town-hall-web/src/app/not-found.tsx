@@ -14,7 +14,7 @@ export default function NotFound() {
         <h1 className="font-semibold text-foreground text-xl">{t('notFound.title')}</h1>
         <p className="text-muted-foreground text-sm">{t('notFound.description')}</p>
       </div>
-      <Button className="uppercase tracking-widest" render={<Link href="/dashboard" />}>
+      <Button className="uppercase tracking-widest" render={<Link href="/dashboard" />} nativeButton={false}>
         {t('notFound.backToDashboard')}
       </Button>
     </div>

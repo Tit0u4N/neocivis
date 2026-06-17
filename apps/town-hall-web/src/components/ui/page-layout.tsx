@@ -7,15 +7,19 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 
 type PageLayoutProps = {
   title: string;
+  metadataTitle?: string;
   children?: ReactNode;
+  className?: string;
 };
 
-export function PageLayout({ title, children }: PageLayoutProps) {
+export function PageLayout({ title, metadataTitle, children, className }: PageLayoutProps) {
   return (
     <>
+      <title>{metadataTitle ?? title}</title>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-1 px-2">
           <SidebarTrigger size="lg" className="-ml-1 cursor-pointer" />
@@ -30,7 +34,7 @@ export function PageLayout({ title, children }: PageLayoutProps) {
         </div>
       </header>
       {children !== undefined && (
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        <div className={cn("flex flex-1 flex-col gap-4 p-4 pt-0", className)}>{children}</div>
       )}
     </>
   );

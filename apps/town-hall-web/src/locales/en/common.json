@@ -37,6 +37,11 @@
     "description": "This page does not exist or has been moved.",
     "backToDashboard": "Back to dashboard"
   },
+  "noCity": {
+    "title": "No city assigned",
+    "description": "Your account is not linked to any city. Please contact your administrator to get access to a town hall workspace.",
+    "logout": "Log out"
+  },
   "settings": {
     "appearance": "Appearance",
     "language": {
@@ -63,6 +68,10 @@
         "published": "Published",
         "drafts": "Drafts",
         "searchPlaceholder": "Search…"
+      },
+      "viewMode": {
+        "list": "List view",
+        "grid": "Mosaic view"
       },
       "table": {
         "title": "Title",
@@ -98,8 +107,10 @@
         "titlePlaceholder": "Article title",
         "description": "Description (optional)",
         "descriptionPlaceholder": "Summary or subtitle",
-        "coverImage": "Cover image (URL, optional)",
+        "coverImage": "Cover image (optional)",
         "coverImageAlt": "Cover preview",
+        "coverImageChoose": "Choose image",
+        "coverImageChange": "Change image",
         "status": "Status",
         "content": "Content",
         "contentPlaceholder": "Start writing your article…"
@@ -132,6 +143,69 @@
       }
     }
   },
+  "establishment": {
+    "list": {
+      "title": "Establishments",
+      "add": "Add",
+      "count_one": "{{count}} establishment",
+      "count_other": "{{count}} establishments",
+      "searchPlaceholder": "Search an establishment…",
+      "noImage": "No image",
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "empty": {
+        "title": "No establishments",
+        "createFirst": "Add the first one"
+      },
+      "deleteDialog": {
+        "title": "Delete this establishment?",
+        "description": "This action is irreversible. The establishment will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "viewMode": {
+        "list": "List view",
+        "grid": "Grid view"
+      }
+    },
+    "form": {
+      "titleCreate": "New establishment",
+      "titleEdit": "Edit establishment",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "E.g. Main Town Hall",
+        "type": "Type",
+        "address": "Address",
+        "addressPlaceholder": "E.g. 1 Place du Général de Gaulle",
+        "hours": "Opening hours",
+        "hoursPlaceholder": "E.g. Mon-Fri 8am-5pm",
+        "phone": "Phone",
+        "phonePlaceholder": "E.g. 04 93 32 80 00",
+        "image": "Image",
+        "imageAlt": "Establishment image",
+        "imageChoose": "Choose an image",
+        "imageChange": "Change image"
+      },
+      "discardDialog": {
+        "title": "Discard changes?",
+        "description": "Unsaved changes will be lost.",
+        "cancel": "Continue editing",
+        "confirm": "Discard"
+      },
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back"
+    },
+    "types": {
+      "all": "All types",
+      "town_hall": "Town Hall",
+      "education": "Education",
+      "culture": "Culture",
+      "sport": "Sport"
+    }
+  },
   "sidebar": {
     "sections": {
       "townHall": "Town Hall",
@@ -148,7 +222,362 @@
       "threads": "Threads",
       "userManagement": "Users",
       "roleManagement": "Roles",
-      "webhook": "Webhook"
+      "webhook": "Webhook",
+      "mediaGallery": "Media gallery"
     }
+  },
+  "media": {
+    "page": {
+      "subtitle": "Manage images used in the application."
+    },
+    "gallery": {
+      "title": "Media gallery",
+      "subtitle": "Choose an image or upload a new one.",
+      "close": "Close",
+      "searchPlaceholder": "Search by title or usage…",
+      "uploading": "Uploading…",
+      "upload": "Upload",
+      "count": "{{filtered}} of {{total}} image(s)",
+      "noResults": "No images match your search.",
+      "unusedBadge": "Unused",
+      "usages": "{{count}} usage(s)",
+      "deleteAria": "Delete"
+    },
+    "upload": {
+      "title": "Upload an image",
+      "subtitle": "JPG, PNG or WebP · max 5 MB",
+      "dropTitle": "Drag an image here",
+      "dropSubtitle": "or click to browse",
+      "previewAlt": "Preview",
+      "titleLabel": "Title",
+      "titleOptional": "(optional)",
+      "titlePlaceholder": "e.g. Town hall facade in summer",
+      "titleHint": "A title helps you quickly find this image via search and identify its use over time.",
+      "cancel": "Cancel",
+      "confirm": "Upload",
+      "error": "Upload failed"
+    },
+    "delete": {
+      "title": "Delete this image?",
+      "description": "\"{{name}}\" will be permanently deleted. This action cannot be undone.",
+      "usedAt": "Used in {{count}} place(s):",
+      "notUsed": "This image is not used anywhere.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "error": "Delete failed"
+    },
+    "filters": {
+      "all": "All media",
+      "unused": "Unused"
+    },
+    "linkTypes": {
+      "carousel": "Carousel",
+      "articles": "Articles",
+      "establishments": "Establishments"
+    }
+  },
+  "appManagement": {
+    "title": "App Management",
+    "hint": "Drag a tile to reposition it. Pull the bottom-right corner to resize. Click to edit.",
+    "loading": "Loading…",
+    "save": "Save",
+    "saving": "Saving…",
+    "tabs": {
+      "layout": "Layout",
+      "carousel": "Carousel"
+    },
+    "carousel": {
+      "hint": "Add slides to the carousel displayed in the citizen app.",
+      "slides": "Slides",
+      "settings": "Slide settings",
+      "add": "Add",
+      "empty": "No slides yet. Click \"Add\" to get started.",
+      "slideLabel": "Slide {{n}}",
+      "untitled": "Untitled slide",
+      "count": "{{count}} slide(s)",
+      "remove": "Remove",
+      "imageUrl": "Image",
+      "chooseImage": "Choose image",
+      "changeImage": "Change image",
+      "imageHint": "16:9 format recommended",
+      "linkUrl": "Link URL",
+      "translations": "Translations",
+      "fieldTitle": "Title",
+      "fieldDescription": "Description",
+      "fieldTag": "Tag"
+    },
+    "grid": {
+      "title": "Categories",
+      "add": "Add",
+      "reset": "Reset",
+      "footer": "{{cols}} columns · {{rows}} rows · {{count}} tile(s)",
+      "tileAria": "Tile: {{title}}",
+      "resizeAria": {
+        "right": "Resize (right)",
+        "bottom": "Resize (bottom)",
+        "br": "Resize (corner)"
+      }
+    },
+    "settings": {
+      "title": "Tile settings",
+      "sizeLabel": "{{w}}×{{h}} cells",
+      "positionLabel": "col {{col}}, row {{row}}",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Tile title",
+      "linkLabel": "Link to",
+      "presetColors": "Preset colors",
+      "customColor": "Custom color",
+      "bgTintHint": "The background tint is automatically generated from the chosen color.",
+      "bgTintTitle": "Background tint (auto-generated)",
+      "translations": "Translations",
+      "translationPlaceholder": "Name in {{locale}}",
+      "addTranslation": "Add a language",
+      "externalUrl": "External URL",
+      "pageId": "Page ID",
+      "article": "Article",
+      "articlePlaceholder": "Search for an article…",
+      "noArticles": "No articles available",
+      "clear": "Clear",
+      "delete": "Delete"
+    },
+    "icon": {
+      "label": "Icon",
+      "none": "None",
+      "noneTitle": "No icon",
+      "modalTitle": "Choose an icon",
+      "searchPlaceholder": "Search for an icon…",
+      "searchResultCount": "{{count}} result(s)",
+      "allCount": "{{count}} icons available",
+      "noResults": "No results for \"{{query}}\"",
+      "searchHint": "Type a name to search all icons"
+    },
+    "linkGroups": {
+      "special": "Special pages",
+      "articlePage": "Article page",
+      "normal": "Standard pages",
+      "external": "External"
+    },
+    "links": {
+      "Link": "Link",
+      "General": "General",
+      "Establishment": "Establishment",
+      "ArticlePage": "Article page",
+      "Forum": "Forum",
+      "Reports": "Reports",
+      "Articles": "Articles",
+      "Events": "Events",
+      "ExternalURL": "External URL"
+    },
+    "colors": {
+      "Corail": "Coral",
+      "Azur": "Azure",
+      "Ambre": "Amber",
+      "Ardoise": "Slate",
+      "Forêt": "Forest",
+      "Violet": "Purple"
+    },
+    "newTileTitle": "New"
+  },
+  "reports": {
+    "title": "Reports",
+    "export": "Export",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "resolved": "Resolved"
+    },
+    "tabs": {
+      "pending": "Pending reports",
+      "history": "History"
+    },
+    "view": {
+      "table": "Table view",
+      "map": "Map view"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Title",
+      "category": "Category",
+      "location": "Location",
+      "date": "Date",
+      "status": "Status",
+      "author": "Author",
+      "resolvedBy": "Resolved by",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "progress": "In progress",
+      "resolved": "Resolved",
+      "cancelled": "Cancelled"
+    },
+    "map": {
+      "placeholder": "Interactive map view — {{count}} report(s)"
+    },
+    "actions": {
+      "detail": "Detail"
+    },
+    "detail": {
+      "description": "Description",
+      "resolvedAt": "Resolved on"
+    },
+    "empty": "No reports",
+    "error": "Unable to load reports"
+  },
+  "account": {
+    "profile": {
+      "title": "Personal information",
+      "fields": {
+        "firstName": "First name",
+        "firstNamePlaceholder": "Your first name",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Your last name",
+        "username": "Username",
+        "usernamePlaceholder": "e.g. jean.dupont",
+        "email": "Email address",
+        "emailPlaceholder": "e.g. jean.dupont@townhall.fr"
+      },
+      "editAria": "Edit {{field}}",
+      "fieldHints": {
+        "firstName": "Your first name as it appears in the application. Between 1 and 100 characters.",
+        "lastName": "Your last name as it appears in the application. Between 1 and 100 characters.",
+        "username": "Unique identifier used to recognize you in the system. Between 3 and 50 characters, no spaces.",
+        "email": "Email address linked to your account. Used for notifications and password reset."
+      }
+    },
+    "password": {
+      "title": "Password",
+      "description": "To change your password, we will send you a reset email.",
+      "button": "Change password"
+    },
+    "passwordDialog": {
+      "title": "Change password?",
+      "description": "A password reset email will be sent to {{email}}. Do you want to continue?",
+      "cancel": "Cancel",
+      "confirm": "Send email"
+    },
+    "session": {
+      "title": "Session"
+    }
+  },
+  "threads": {
+    "list": {
+      "title": "Forum",
+      "subtitle": "City threads",
+      "newThread": "New thread",
+      "filterAll": "All",
+      "lastComments": "Last comments",
+      "empty": "No threads in this category.",
+      "error": "Unable to load threads.",
+      "mutedCount_one": "{{count}} muted",
+      "mutedCount_other": "{{count}} muted",
+      "bannedCount_one": "{{count}} banned",
+      "bannedCount_other": "{{count}} banned",
+      "loadMore": "Load more"
+    },
+    "card": {
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "likes": "{{count}} likes"
+    },
+    "detail": {
+      "backToThreads": "Back to threads",
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "noVisibleReplies": "No visible replies.",
+      "replyPlaceholder": "Write a reply…",
+      "replyButton": "Reply",
+      "deletedMessages": "Deleted messages ({{count}})",
+      "deletedSubject": "Subject deleted by moderation",
+      "archivedSubject": "Thread archived — not visible to citizens",
+      "restore": "Restore",
+      "unarchive": "Unarchive",
+      "addReaction": "Add a reaction",
+      "error": "Unable to load thread."
+    },
+    "newThreadModal": {
+      "title": "New thread",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Thread title…",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "messageLabel": "Message",
+      "cancel": "Cancel",
+      "submit": "Post"
+    },
+    "moderation": {
+      "menuLabel": "Moderation",
+      "deleteMessage": "Delete message",
+      "deleteThread": "Delete subject",
+      "archive": "Archive thread",
+      "unarchive": "Unarchive thread",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "ban": "Ban from forum",
+      "unban": "Unban",
+      "statusMuted": "Muted",
+      "statusBanned": "Banned",
+      "deletedAt": "deleted · {{date}}"
+    },
+    "emojiPicker": {
+      "searchPlaceholder": "Search…",
+      "loading": "Loading…",
+      "empty": "No results"
+    },
+    "categories": {
+      "manageTitle": "Manage categories",
+      "addCategory": "Add category",
+      "emojiLabel": "Emoji",
+      "labelLabel": "Label",
+      "deleteConfirm": "Delete this category?",
+      "error": "Unable to load categories."
+    }
+  },
+  "forumUsers": {
+    "title": "User management",
+    "tabs": {
+      "active": "Active accounts",
+      "banned": "Banned accounts"
+    },
+    "search": "Enter username",
+    "table": {
+      "username": "Username",
+      "contributions": "Contributions thread",
+      "status": "Account status",
+      "dateBan": "Date Ban"
+    },
+    "status": {
+      "active": "Active",
+      "banned": "Banned"
+    },
+    "actions": {
+      "ban": "Ban",
+      "unban": "Unban",
+      "more": "More"
+    },
+    "banModal": {
+      "title": "Ban user",
+      "description": "Are you sure you want to ban {{name}}? This action can be reversed.",
+      "cancel": "Cancel",
+      "confirm": "Ban"
+    },
+    "unbanModal": {
+      "title": "Unban user",
+      "description": "Are you sure you want to unban {{name}}?",
+      "cancel": "Cancel",
+      "confirm": "Unban"
+    },
+    "infoModal": {
+      "title": "User information",
+      "profilePicture": "Profil picture",
+      "username": "Username",
+      "lastConnection": "Last connexion",
+      "banSince": "Ban since",
+      "memberSince": "Member since",
+      "close": "Close"
+    },
+    "empty": "No users",
+    "error": "Unable to load users"
   }
 }

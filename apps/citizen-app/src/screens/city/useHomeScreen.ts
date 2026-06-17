@@ -1,17 +1,15 @@
 import type { ArticleWithResolvedTranslation } from '@repo/contracts/article';
-import type { CarouselItemResolved } from '@repo/contracts/config';
-import { ArticleService } from '@repo/frontend-services/article';
-import { ConfigService } from '@repo/frontend-services/config';
+import type { CarouselItemResolved, CategoryLink } from '@repo/contracts/config';
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useApi } from '@/providers/ApiProvider';
 import { useAuth } from '@/providers/AuthProvider';
+import { useServices } from '@/providers/ServicesProvider';
 
 const HOME_PREVIEW_LIMIT = 3;
 
 export type Category = {
   id: string;
-  attachedPageId?: string;
+  link?: CategoryLink;
   name: string;
   icon: string; // PascalCase Lucide icon name, e.g. 'Star', 'TriangleAlert'
   color: string;
@@ -22,7 +20,7 @@ export type Category = {
 };
 
 export function useHomeScreen() {
-  const api = useApi();
+  const { articleService, configService } = useServices();
   const { language } = useLanguage();
   const { user } = useAuth();
 
@@ -32,9 +30,6 @@ export function useHomeScreen() {
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [carouselLoading, setCarouselLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const articleService = useMemo(() => new ArticleService(api), [api]);
-  const configService = useMemo(() => new ConfigService(api), [api]);
 
   useEffect(() => {
     setArticlesLoading(true);

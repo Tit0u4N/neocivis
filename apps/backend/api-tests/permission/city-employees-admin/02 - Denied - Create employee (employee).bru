@@ -1,0 +1,53 @@
+meta {
+  name: city-employees-admin - 02 - Denied - Create employee (employee)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "username": "should-never-be-created",
+    "email": "blocked@neocivis.cloud",
+    "firstName": "Blocked",
+    "lastName": "Test"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees`);
+}
+
+tests {
+  test("Status is 403 — employee cannot create city employees", function() {
+    expect(res.getStatus()).to.equal(403);
+  });
+  test("Error mentions ADMIN role required", function() {
+    expect(res.getBody()).to.have.property('error').that.includes('ADMIN');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

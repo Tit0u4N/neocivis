@@ -1,3 +1,3 @@
 export enum ContainerName {
-  ARTICLES = 'articles',
+  Media = 'media',
 }

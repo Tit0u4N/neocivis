@@ -1,17 +1,10 @@
-import type {
-  CityId,
-  EmployeeRolesDto,
-  PermissionDto,
-  PermissionKey,
-  RoleDto,
-  RoleSummaryDto,
-} from '@repo/contracts';
+import type { CityId, EmployeeRolesDto, PermissionDto, PermissionKey, RoleDto, RoleSummaryDto } from '@repo/contracts';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
 import type { User } from '@/modules/users/user.types';
-import type { IAccessRepository } from './repository/access.repository.interface';
-import { isValidPermissionKey, PERMISSION_CATALOG } from './permission.catalog';
 import { toRoleDto, toRoleSummaryDto } from './access.types';
+import { isValidPermissionKey, PERMISSION_CATALOG } from './permission.catalog';
+import type { IAccessRepository } from './repository/access.repository.interface';
 
 export type CreateRoleServiceInput = Readonly<{
   name: string;

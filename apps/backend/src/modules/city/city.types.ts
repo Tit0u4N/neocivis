@@ -24,4 +24,3 @@ export type CityCitizenMembership = Readonly<{
 export function toCityPublicDto(city: Pick<City, 'id' | 'name' | 'description'>): CityPublicDto {
   return { id: city.id, name: city.name, description: city.description };
 }
-

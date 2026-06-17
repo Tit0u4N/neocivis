@@ -1,0 +1,66 @@
+meta {
+  name: page-city-hall-modify - 01 - Create role
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/roles
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "name": "perm-city-hall-modify",
+    "description": "Permission test — PAGE_CITY_HALL_MODIFY_PERMISSION only",
+    "permissions": ["PAGE_CITY_HALL_MODIFY_PERMISSION"]
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  const adminAuth = `Bearer ${adminToken}`;
+  req.setHeader('Authorization', adminAuth);
+
+  let cityId = bru.getVar('cityNiceId');
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+    cityId = me.data?.city?.id;
+    if (!cityId) throw new Error('Admin has no city context');
+    bru.setVar('cityNiceId', cityId);
+  }
+
+  const list = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/roles`, { headers: { Authorization: adminAuth } });
+  const dup = (list.data || []).find((r) => r.name === 'perm-city-hall-modify');
+  if (dup) {
+    await axios.delete(`${baseUrl}/api/municipality/cities/${cityId}/roles/${dup.id}`, { headers: { Authorization: adminAuth } });
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/roles`);
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.id) bru.setVar('permRoleId', body.id);
+}
+
+tests {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  test("Role has exactly PAGE_CITY_HALL_MODIFY_PERMISSION", function() {
+    expect(res.getBody().permissions).to.deep.equal(['PAGE_CITY_HALL_MODIFY_PERMISSION']);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

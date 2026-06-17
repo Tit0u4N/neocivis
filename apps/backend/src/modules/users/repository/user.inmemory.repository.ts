@@ -1,7 +1,13 @@
 // biome-ignore-all lint/suspicious/useAwait: mock file
 
 import type { User } from '../user.types';
-import type { InsertSeededUserInput, IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
+import type {
+  InsertCitizenFromKeycloakInput,
+  InsertSeededUserInput,
+  IUserRepository,
+  UpdateUserProfileInput,
+  UpsertUserFromHeadersInput,
+} from './user.repository.interface';
 
 export class InMemoryUserRepository implements IUserRepository {
   private autoId = 1;
@@ -39,6 +45,8 @@ export class InMemoryUserRepository implements IUserRepository {
       createdAt: now,
       updatedAt: now,
       role: input.role,
+      deletedAt: null,
+      profilePictureUrl: null,
     };
     this.users.push(user);
   }
@@ -57,6 +65,54 @@ export class InMemoryUserRepository implements IUserRepository {
     existing.updatedAt = new Date();
   }
 
+  async insertCitizenFromKeycloak(input: InsertCitizenFromKeycloakInput): Promise<void> {
+    const now = new Date();
+    const user: User = {
+      id: this.autoId++,
+      keycloakId: input.keycloakId,
+      username: input.username,
+      email: input.email,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      createdAt: now,
+      updatedAt: now,
+      role: 'CITIZEN',
+      deletedAt: null,
+      profilePictureUrl: null,
+    };
+    this.users.push(user);
+  }
+
+  async updateProfile(input: UpdateUserProfileInput): Promise<void> {
+    const existing = await this.getByKeycloakId(input.keycloakId);
+    if (!existing || existing.deletedAt !== null) {
+      return;
+    }
+    existing.username = input.username;
+    existing.email = input.email;
+    existing.firstName = input.firstName;
+    existing.lastName = input.lastName;
+    existing.updatedAt = new Date();
+  }
+
+  async markDeletedByKeycloakId(keycloakId: string): Promise<void> {
+    const existing = await this.getByKeycloakId(keycloakId);
+    if (!existing) {
+      return;
+    }
+    existing.deletedAt = new Date();
+    existing.updatedAt = new Date();
+  }
+
+  async updateProfilePictureUrl(keycloakId: string, url: string | null): Promise<void> {
+    const existing = await this.getByKeycloakId(keycloakId);
+    if (!existing) {
+      return;
+    }
+    existing.profilePictureUrl = url;
+    existing.updatedAt = new Date();
+  }
+
   async insertSeeded(input: InsertSeededUserInput): Promise<void> {
     const now = new Date();
     const user: User = {
@@ -69,6 +125,8 @@ export class InMemoryUserRepository implements IUserRepository {
       createdAt: now,
       updatedAt: now,
       role: input.role,
+      deletedAt: null,
+      profilePictureUrl: input.profilePictureUrl ?? null,
     };
     this.users.push(user);
     this.autoId = Math.max(this.autoId, input.id + 1);

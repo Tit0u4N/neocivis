@@ -16,7 +16,7 @@ export const citySeeds: CitySeed[] = [
     name: 'Biot',
     adminUsername: 'admin-biot',
     employeeUsernames: ['employee-biot1'],
-    citizenUsernames: ['citizen2', 'citizen3'],
+    citizenUsernames: ['citizen3'],
   },
   {
     name: 'Marseille',
@@ -25,4 +25,3 @@ export const citySeeds: CitySeed[] = [
     citizenUsernames: ['citizen3'],
   },
 ];
-

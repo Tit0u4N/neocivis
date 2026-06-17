@@ -853,7 +853,9 @@ const articleSeedContent = [
  * Source de vérité pour le seed DB des articles en dev.
  * Anciennement `modules/article/article.mock.ts`.
  */
-export function loadSeededArticlesDev(): Article[] {
+export type ArticleSeedTemplate = Omit<Article, 'cityId'>;
+
+export function loadSeededArticlesDev(): ArticleSeedTemplate[] {
   return [
     {
       id: '11111111-1111-1111-1111-111111111111',

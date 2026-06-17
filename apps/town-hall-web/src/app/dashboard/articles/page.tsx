@@ -1,7 +1,7 @@
 'use client';
 
-import { ArticleListPage } from '@/components/articles/list/ArticleListPage';
-import { useArticleListPage } from '@/components/articles/list/useArticleListPage';
+import { ArticleListPage } from '../../../features/articles/list/ArticleListPage';
+import { useArticleListPage } from '../../../features/articles/list/useArticleListPage';
 
 export default function ArticlesPage() {
   const vm = useArticleListPage();

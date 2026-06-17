@@ -56,7 +56,7 @@ export default function CityScreen() {
             <Text style={styles.sectionTitle}>{t('city.news')}</Text>
             <TouchableOpacity
               onPress={() => {
-                router.push('/(tabs)/(city)/articles');
+                router.push('/(tabs)/news');
               }}
             >
               <Text style={[styles.seeAll, { color: mutedColor }]}>{t('city.seeAll')}</Text>

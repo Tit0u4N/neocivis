@@ -3,6 +3,14 @@ import { ArticleLocale } from '../article/article.schema';
 
 export { ArticleLocale as ConfigLocale };
 
+export const SUPPORTED_LOCALES = ['fr', 'en', 'de', 'it'] as const;
+
+export const CategoryLink = z.object({
+  type: z.string(),
+  value: z.string().optional(),
+});
+export type CategoryLink = z.infer<typeof CategoryLink>;
+
 export const CategoryTranslation = z.object({
   locale: ArticleLocale,
   name: z.string().min(1).max(100),
@@ -11,7 +19,7 @@ export type CategoryTranslation = z.infer<typeof CategoryTranslation>;
 
 export const Category = z.object({
   id: z.string(),
-  attachedPageId: z.string().optional(),
+  link: CategoryLink.optional(),
   icon: z.string().min(1),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   row: z.number().int().nonnegative().optional(),
@@ -61,3 +69,15 @@ export const CitizenConfigResponse = z.object({
   categories: z.array(CategoryResolved),
 });
 export type CitizenConfigResponse = z.infer<typeof CitizenConfigResponse>;
+
+export const SetCategoriesInput = z.array(Category);
+export type SetCategoriesInput = z.infer<typeof SetCategoriesInput>;
+
+export const SetCarouselItemsInput = z.array(CarouselItem);
+export type SetCarouselItemsInput = z.infer<typeof SetCarouselItemsInput>;
+
+export const MunicipalityConfigResponse = z.object({
+  categories: z.array(Category),
+  carousel: z.array(CarouselItem),
+});
+export type MunicipalityConfigResponse = z.infer<typeof MunicipalityConfigResponse>;

@@ -1,8 +1,8 @@
 import { and, eq, sql } from 'drizzle-orm';
 import { getDb } from '@/infrastructure/db/client';
-import { cityCitizens, cityEmployees, cities } from './city.table';
-import type { CreateCityInput, ICityRepository } from './city.repository.interface';
 import type { City, CityCitizenMembership, CityEmployee } from '../city.types';
+import type { CreateCityInput, ICityRepository } from './city.repository.interface';
+import { cities, cityCitizens, cityEmployees } from './city.table';
 
 function mapCityRow(r: typeof cities.$inferSelect): City {
   return {
@@ -82,7 +82,10 @@ export class DrizzleCityRepository implements ICityRepository {
 
   async getEmployeeCityIdByUserId(userId: number): Promise<string | null> {
     const db = getDb();
-    const rows = await db.select({ cityId: cityEmployees.cityId }).from(cityEmployees).where(eq(cityEmployees.userId, userId));
+    const rows = await db
+      .select({ cityId: cityEmployees.cityId })
+      .from(cityEmployees)
+      .where(eq(cityEmployees.userId, userId));
     const r = rows[0];
     return r?.cityId ?? null;
   }
@@ -153,4 +156,3 @@ export class DrizzleCityRepository implements ICityRepository {
     await db.delete(cities);
   }
 }
-

@@ -1,10 +1,17 @@
-import type { ApiErrorDto, PermissionKey, RoleSummaryDto, UserMeDto, UserPublicDto } from '@repo/contracts';
+import type {
+  ApiErrorDto,
+  OperationSuccessDto,
+  PermissionKey,
+  RoleSummaryDto,
+  UserMeDto,
+  UserPublicDto,
+} from '@repo/contracts';
+import { UpdateAccountInput } from '@repo/contracts/user-schema';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
 import type { AccessService } from '@/modules/access/access.service';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
-import { toUserMeDto, toUserPublicDto } from '@/modules/users/user.types';
 
 export class UserController {
   constructor(
@@ -17,9 +24,80 @@ export class UserController {
     const app = new Hono();
 
     app.get('/me', (c) => this.getMe(c));
+    app.patch('/me', (c) => this.updateMe(c));
+    app.post('/me/change-password', (c) => this.changePassword(c));
+    app.post('/me/profile-picture', (c) => this.uploadProfilePicture(c));
+    app.delete('/me/profile-picture', (c) => this.deleteProfilePicture(c));
     app.get('/by-ids', (c) => this.getUsersByIds(c));
 
     return app;
+  }
+
+  private async updateMe(c: Context): Promise<ControllerJson<OperationSuccessDto>> {
+    const keycloakId = c.req.header('X-User-Id');
+    if (!keycloakId) {
+      return c.json({ error: 'No user information found in headers' } satisfies ApiErrorDto, 400);
+    }
+    const json = await c.req.json().catch(() => null);
+    const parsed = UpdateAccountInput.safeParse(json);
+    if (!parsed.success) {
+      return c.json({ error: 'Invalid body' } satisfies ApiErrorDto, 400);
+    }
+    try {
+      await this.service.updateMyProfile(keycloakId, parsed.data);
+      return c.json({ success: true } satisfies OperationSuccessDto, 200);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Update failed';
+      return c.json({ error: msg } satisfies ApiErrorDto, 409);
+    }
+  }
+
+  private async changePassword(c: Context): Promise<ControllerJson<OperationSuccessDto>> {
+    const keycloakId = c.req.header('X-User-Id');
+    if (!keycloakId) {
+      return c.json({ error: 'No user information found in headers' } satisfies ApiErrorDto, 400);
+    }
+    try {
+      await this.service.sendPasswordResetEmail(keycloakId, 'neocivis-townhall-app');
+      return c.json({ success: true } satisfies OperationSuccessDto, 200);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Password reset failed';
+      return c.json({ error: msg } satisfies ApiErrorDto, 409);
+    }
+  }
+
+  private async uploadProfilePicture(c: Context): Promise<ControllerJson<OperationSuccessDto>> {
+    const keycloakId = c.req.header('X-User-Id');
+    if (!keycloakId) {
+      return c.json({ error: 'No user information found in headers' } satisfies ApiErrorDto, 400);
+    }
+    const body = await c.req.parseBody().catch(() => null);
+    const file = body?.['file'];
+    if (!(file && file instanceof File)) {
+      return c.json({ error: 'Missing or invalid file field' } satisfies ApiErrorDto, 400);
+    }
+    const buffer = await file.arrayBuffer();
+    try {
+      await this.service.updateProfilePicture(keycloakId, buffer, file.name, file.type);
+      return c.json({ success: true } satisfies OperationSuccessDto, 200);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Upload failed';
+      return c.json({ error: msg } satisfies ApiErrorDto, 400);
+    }
+  }
+
+  private async deleteProfilePicture(c: Context): Promise<ControllerJson<OperationSuccessDto>> {
+    const keycloakId = c.req.header('X-User-Id');
+    if (!keycloakId) {
+      return c.json({ error: 'No user information found in headers' } satisfies ApiErrorDto, 400);
+    }
+    try {
+      await this.service.removeProfilePicture(keycloakId);
+      return c.json({ success: true } satisfies OperationSuccessDto, 200);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Delete failed';
+      return c.json({ error: msg } satisfies ApiErrorDto, 409);
+    }
   }
 
   private async getUsersByIds(c: Context): Promise<ControllerJson<UserPublicDto[]>> {
@@ -39,7 +117,7 @@ export class UserController {
     }
 
     const users = await this.service.getByIds(ids);
-    const body: UserPublicDto[] = users.map(toUserPublicDto);
+    const body: UserPublicDto[] = users.map((u) => this.service.toPublicDto(u));
     return c.json(body, 200);
   }
 
@@ -52,7 +130,7 @@ export class UserController {
     if (!user) {
       return c.json({ error: 'User not found' } satisfies ApiErrorDto, 404);
     }
-    const base: UserMeDto = toUserMeDto(user);
+    const base: UserMeDto = this.service.toMeDto(user);
 
     if (user.role === 'CITIZEN') {
       const memberships = await this.cityService.listCitizenMembershipsPublic(user.id);

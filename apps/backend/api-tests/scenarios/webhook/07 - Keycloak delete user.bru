@@ -1,0 +1,73 @@
+meta {
+  name: Scenario - Keycloak delete user
+  type: http
+  seq: 937
+}
+
+delete {
+  url: {{keycloakAdminUserByIdUrl}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  function getPersisted(name) {
+    const v = bru.getVar(name);
+    if (v !== undefined && v !== null && String(v) !== '') {
+      return v;
+    }
+    const e = bru.getEnvVar(name);
+    if (e !== undefined && e !== null && String(e) !== '') {
+      return e;
+    }
+    return undefined;
+  }
+
+  const axios = require('axios');
+  const baseUrl = getPersisted('keycloakAdminBaseUrl');
+  const realm = getPersisted('keycloakAdminRealm');
+  const keycloakId = getPersisted('webhookE2eKeycloakId');
+  if (!baseUrl || !realm || !keycloakId) {
+    throw new Error('Missing Keycloak vars — run previous scenarios first');
+  }
+
+  const clientId = bru.getEnvVar('keycloak_admin_client_id') || 'hono-backend';
+  const clientSecret = bru.getEnvVar('keycloak_admin_client_secret');
+  const tokenEndpoint = `${baseUrl}realms/${encodeURIComponent(realm)}/protocol/openid-connect/token`;
+  const tokenBody =
+    'grant_type=client_credentials' +
+    `&client_id=${encodeURIComponent(clientId)}` +
+    `&client_secret=${encodeURIComponent(clientSecret)}`;
+  const tokenResp = await axios.post(tokenEndpoint, tokenBody, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+  const adminToken = tokenResp.data?.access_token;
+  if (!adminToken) {
+    throw new Error('Keycloak admin token failed');
+  }
+
+  const userUrl = `${baseUrl}admin/realms/${encodeURIComponent(realm)}/users/${encodeURIComponent(keycloakId)}`;
+  bru.setVar('keycloakAdminUserByIdUrl', userUrl);
+  bru.setEnvVar('keycloakAdminUserByIdUrl', userUrl);
+  req.setUrl(userUrl);
+  req.setHeader('Authorization', `Bearer ${adminToken}`);
+}
+
+script:post-response {
+  // Ne pas throw ici : l'UI Bruno s'arrête. La confirmation 404 est faite au step 08.
+  if (res.getStatus() === 204) {
+    bru.setVar('webhookE2eKeycloakDeleteSent', 'true');
+    bru.setEnvVar('webhookE2eKeycloakDeleteSent', 'true');
+  }
+}
+
+tests {
+  test("User deleted from Keycloak", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

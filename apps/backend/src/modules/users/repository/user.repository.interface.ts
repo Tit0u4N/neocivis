@@ -17,6 +17,23 @@ export type InsertSeededUserInput = {
   email?: string;
   firstName?: string;
   lastName?: string;
+  profilePictureUrl?: string;
+};
+
+export type InsertCitizenFromKeycloakInput = {
+  keycloakId: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+};
+
+export type UpdateUserProfileInput = {
+  keycloakId: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
 };
 
 export interface IUserRepository {
@@ -26,6 +43,10 @@ export interface IUserRepository {
   getByKeycloakId(keycloakId: string): Promise<User | undefined>;
   insertFromHeaders(input: UpsertUserFromHeadersInput): Promise<void>;
   updateFromHeaders(input: UpsertUserFromHeadersInput): Promise<void>;
+  insertCitizenFromKeycloak(input: InsertCitizenFromKeycloakInput): Promise<void>;
+  updateProfile(input: UpdateUserProfileInput): Promise<void>;
+  updateProfilePictureUrl(keycloakId: string, url: string | null): Promise<void>;
+  markDeletedByKeycloakId(keycloakId: string): Promise<void>;
   insertSeeded(input: InsertSeededUserInput): Promise<void>;
   deleteAll(): Promise<void>;
   setNextId(nextId: number): Promise<void>;

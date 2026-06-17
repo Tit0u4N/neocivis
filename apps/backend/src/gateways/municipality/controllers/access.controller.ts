@@ -1,11 +1,14 @@
 import type { ApiErrorDto, EmployeeRolesDto, OperationSuccessDto, PermissionDto, RoleDto } from '@repo/contracts';
-import { CreateRoleInput as CreateRoleInputSchema, UpdateRoleInput as UpdateRoleInputSchema } from '@repo/contracts/role';
+import {
+  CreateRoleInput as CreateRoleInputSchema,
+  UpdateRoleInput as UpdateRoleInputSchema,
+} from '@repo/contracts/role';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import { requireCityAdmin } from '@/middlewares/permission.middleware';
 import type { AccessService, CreateRoleServiceInput } from '@/modules/access/access.service';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
-import { requireCityAdmin } from '@/middlewares/permission.middleware';
 
 export class AccessController {
   constructor(

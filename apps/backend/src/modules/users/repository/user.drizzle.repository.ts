@@ -1,7 +1,13 @@
 import { eq, inArray, sql } from 'drizzle-orm';
 import { getDb } from '@/infrastructure/db/client';
 import type { User } from '../user.types';
-import type { InsertSeededUserInput, IUserRepository, UpsertUserFromHeadersInput } from './user.repository.interface';
+import type {
+  InsertCitizenFromKeycloakInput,
+  InsertSeededUserInput,
+  IUserRepository,
+  UpdateUserProfileInput,
+  UpsertUserFromHeadersInput,
+} from './user.repository.interface';
 import { users } from './user.table';
 
 function mapRowToUser(r: typeof users.$inferSelect): User {
@@ -15,6 +21,8 @@ function mapRowToUser(r: typeof users.$inferSelect): User {
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
     role: r.role,
+    deletedAt: r.deletedAt,
+    profilePictureUrl: r.profilePictureUrl ?? null,
   };
 }
 
@@ -77,9 +85,51 @@ export class DrizzleUserRepository implements IUserRepository {
       .where(eq(users.keycloakId, keycloakId));
   }
 
+  async insertCitizenFromKeycloak(input: InsertCitizenFromKeycloakInput): Promise<void> {
+    const db = getDb();
+    await db.insert(users).values({
+      keycloakId: input.keycloakId,
+      role: 'CITIZEN',
+      username: input.username,
+      email: input.email,
+      firstName: input.firstName,
+      lastName: input.lastName,
+    });
+  }
+
+  async updateProfile(input: UpdateUserProfileInput): Promise<void> {
+    const db = getDb();
+    await db
+      .update(users)
+      .set({
+        username: input.username,
+        email: input.email,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        updatedAt: sql`now()`,
+      })
+      .where(eq(users.keycloakId, input.keycloakId));
+  }
+
+  async markDeletedByKeycloakId(keycloakId: string): Promise<void> {
+    const db = getDb();
+    await db
+      .update(users)
+      .set({ deletedAt: sql`now()`, updatedAt: sql`now()` })
+      .where(eq(users.keycloakId, keycloakId));
+  }
+
+  async updateProfilePictureUrl(keycloakId: string, url: string | null): Promise<void> {
+    const db = getDb();
+    await db
+      .update(users)
+      .set({ profilePictureUrl: url, updatedAt: sql`now()` })
+      .where(eq(users.keycloakId, keycloakId));
+  }
+
   async insertSeeded(input: InsertSeededUserInput): Promise<void> {
     const db = getDb();
-    const { id, keycloakId, role, username, email, firstName, lastName } = input;
+    const { id, keycloakId, role, username, email, firstName, lastName, profilePictureUrl } = input;
     await db.insert(users).values({
       id,
       keycloakId,
@@ -88,6 +138,7 @@ export class DrizzleUserRepository implements IUserRepository {
       email: email ?? '',
       firstName: firstName ?? '',
       lastName: lastName ?? '',
+      profilePictureUrl: profilePictureUrl ?? null,
     });
   }
 

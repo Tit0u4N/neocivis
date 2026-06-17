@@ -1,0 +1,36 @@
+meta {
+  name: Scenario - Verify profile updated via citizen me
+  type: http
+  seq: 936
+}
+
+get {
+  url: {{url}}/api/citizen/user/me
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('webhookE2eCitizenToken');
+  if (!token) {
+    throw new Error('Missing webhookE2eCitizenToken — run scenario 933 first');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("DB profile matches Keycloak update", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('firstName', 'WebhookUpdated');
+    expect(body).to.have.property('lastName', 'CitizenUpdated');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

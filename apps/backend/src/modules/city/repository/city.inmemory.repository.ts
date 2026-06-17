@@ -1,5 +1,5 @@
-import type { CreateCityInput, ICityRepository } from './city.repository.interface';
 import type { City, CityCitizenMembership, CityEmployee } from '../city.types';
+import type { CreateCityInput, ICityRepository } from './city.repository.interface';
 
 export class InMemoryCityRepository implements ICityRepository {
   private cities: City[] = [];
@@ -121,4 +121,3 @@ export class InMemoryCityRepository implements ICityRepository {
     this.cities = [];
   }
 }
-

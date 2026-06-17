@@ -1,16 +1,15 @@
 import type { CityPublicDto } from '@repo/contracts/city';
-import type { User } from '@/modules/users/user.types';
 import type { IAMService } from '@/modules/iam/iam.service';
 import type { UserService } from '@/modules/users/service/user.service';
-import type { ICityRepository } from './repository/city.repository.interface';
+import type { User } from '@/modules/users/user.types';
 import { toCityPublicDto } from './city.types';
+import type { ICityRepository } from './repository/city.repository.interface';
 
 export type CreateEmployeeInput = Readonly<{
   username: string;
   email: string;
   firstName: string;
   lastName: string;
-  password: string;
 }>;
 
 export class CityService {
@@ -67,7 +66,6 @@ export class CityService {
       email: input.email,
       firstName: input.firstName,
       lastName: input.lastName,
-      password: input.password,
       realmRoles: ['EMPLOYEE'],
     });
 
@@ -139,4 +137,3 @@ export class CityService {
     return await this.repository.isEmployeeOfCity(cityId, userId);
   }
 }
-

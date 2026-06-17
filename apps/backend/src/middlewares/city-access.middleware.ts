@@ -1,7 +1,7 @@
 import type { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
-import type { UserService } from '@/modules/users/service/user.service';
 import type { CityService } from '@/modules/city/city.service';
+import type { UserService } from '@/modules/users/service/user.service';
 
 type Mode = 'citizen' | 'staff';
 
@@ -9,7 +9,12 @@ function unauthorizedResponse(c: any) {
   return c.json({ error: 'Unauthorized: No user information found' }, 401);
 }
 
-export function applyCityAccessMiddleware(app: Hono, mode: Mode, cityService: CityService, userService: UserService): Hono {
+export function applyCityAccessMiddleware(
+  app: Hono,
+  mode: Mode,
+  cityService: CityService,
+  userService: UserService,
+): Hono {
   app.use(
     '*',
     createMiddleware(async (c, next) => {
@@ -63,4 +68,3 @@ export function applyCityAccessMiddleware(app: Hono, mode: Mode, cityService: Ci
   );
   return app;
 }
-

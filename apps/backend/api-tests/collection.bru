@@ -10,25 +10,25 @@ script:pre-request {
   //   pre-script pour injecter le bon header `Authorization`.
   //
   // Comportement :
-  //   - Tokens cachés en mémoire (`bru.setVar`) : refetchés une seule
-  //     fois par lancement complet du runner (suffisant : la durée d'un
-  //     run < TTL d'un access_token).
+  //   - Mise en cache (`bru.setVar`) uniquement si `cached` est vrai
+  //     (env `CACHED` dans `.env`, typiquement via `bru run` CLI).
+  //     Sinon chaque requête refetch les tokens (GUI Bruno).
   //   - Si une combinaison user/password est manquante côté env (ex.
   //     password_municipality non set), on lève une erreur explicite
   //     pour ne pas laisser un test passer faussement.
   // -----------------------------------------------------------------------
-
+  
   const axios = require('axios');
-
+  
   const tokenUrl = bru.getEnvVar('tokenUrl');
   const clientId = bru.getEnvVar('clientId');
   if (!tokenUrl || !clientId) {
     throw new Error('Missing env vars: tokenUrl / clientId');
   }
-
+  
   const passwordCitizen = bru.getEnvVar('password_citizen');
   const passwordMunicipality = bru.getEnvVar('password_municipality');
-
+  
   const actors = [
     {
       key: 'tokenAdmin',
@@ -46,7 +46,7 @@ script:pre-request {
       password: passwordCitizen,
     },
   ];
-
+  
   for (const a of actors) {
     if (!a.username || !a.password) {
       throw new Error(
@@ -54,13 +54,18 @@ script:pre-request {
       );
     }
   }
-
-  // Évite de re-fetch si déjà en cache pour ce run.
+  
+  const useCache = ['true', '1', 'yes'].includes(
+    String(bru.getEnvVar('cached') ?? '').toLowerCase(),
+  );
+  
   const fetched = await Promise.all(
     actors.map(async (a) => {
-      const cached = bru.getVar(a.key);
-      if (cached) {
-        return { key: a.key, token: cached };
+      if (useCache) {
+        const cachedToken = bru.getVar(a.key);
+        if (cachedToken) {
+          return { key: a.key, token: cachedToken };
+        }
       }
       const body =
         'grant_type=password' +
@@ -73,7 +78,7 @@ script:pre-request {
       return { key: a.key, token: resp.data.access_token };
     }),
   );
-
+  
   for (const { key, token } of fetched) {
     bru.setVar(key, token);
   }

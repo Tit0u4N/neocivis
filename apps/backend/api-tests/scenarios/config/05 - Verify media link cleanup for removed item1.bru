@@ -1,0 +1,51 @@
+meta {
+  name: 05 - Verify media link cleanup for removed item1
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/media
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const cityId = me.data?.city?.id;
+  if (!cityId) {
+    throw new Error('Admin has no city in /user/me');
+  }
+  bru.setVar('cityNiceId', cityId);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/media`);
+}
+
+tests {
+  test('Status is 200', function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test('Media 001 no longer has carousel link for removed item1', function () {
+    const body = res.getBody();
+    const m = body.find((x) => x.id === 'a1000001-0000-4000-8000-000000000001');
+    expect(m).to.be.an('object');
+    const idLink = bru.getVar('carouselItem1Id');
+    expect(m.links.some((l) => l.type === 'carousel' && l.idLink === idLink)).to.equal(false);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

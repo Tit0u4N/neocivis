@@ -17,4 +17,3 @@ export const UpdateCityInput = z.object({
   description: z.string().min(1).max(2000),
 });
 export type UpdateCityInput = z.infer<typeof UpdateCityInput>;
-

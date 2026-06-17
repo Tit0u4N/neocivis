@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/suspicious/useAwait: <explanation> */
+/** biome-ignore-all lint/suspicious/useAwait: Test file */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { IAMService } from '@/modules/iam/iam.service';
 import type { UserService } from '@/modules/users/service/user.service';
@@ -15,6 +15,7 @@ function makeUser(overrides: Partial<User> & Pick<User, 'id' | 'role' | 'keycloa
     lastName: '',
     createdAt: now,
     updatedAt: now,
+    deletedAt: null,
     ...overrides,
   };
 }
@@ -110,9 +111,7 @@ describe('CityService', () => {
     await repository.createCity({ id: 'NIC_00001', name: 'Nice', description: 'Desc', adminUserId: 1 });
     await repository.createCity({ id: 'BIO_00002', name: 'Biot', description: 'Desc', adminUserId: 2 });
     await repository.addEmployee('NIC_00001', 50);
-    await expect(service.assignEmployee('BIO_00002', 50)).rejects.toThrow(
-      'Employee already assigned to a city',
-    );
+    await expect(service.assignEmployee('BIO_00002', 50)).rejects.toThrow('Employee already assigned to a city');
   });
 
   it('assignEmployee assigns when employee has no assignment', async () => {
@@ -128,7 +127,6 @@ describe('CityService', () => {
       email: 'employee-new@example.com',
       firstName: 'New',
       lastName: 'Employee',
-      password: 'secret123',
     });
     expect(iamMocks.createUser).toHaveBeenCalledWith(
       expect.objectContaining({

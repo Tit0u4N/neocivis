@@ -1,0 +1,75 @@
+meta {
+  name: Scenario - Verify admin sees real profile
+  type: http
+  seq: 940
+}
+
+get {
+  url: {{url}}/api/municipality/user/by-ids?ids={{webhookE2eDbUserId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  function getPersisted(name) {
+    const v = bru.getVar(name);
+    if (v !== undefined && v !== null && String(v) !== '') {
+      return v;
+    }
+    const e = bru.getEnvVar(name);
+    if (e !== undefined && e !== null && String(e) !== '') {
+      return e;
+    }
+    return undefined;
+  }
+
+  const dbUserId = getPersisted('webhookE2eDbUserId');
+  const tokenAdmin = getPersisted('tokenAdmin');
+  if (!dbUserId) {
+    throw new Error('Missing webhookE2eDbUserId — run scenario 933 first');
+  }
+  if (!tokenAdmin) {
+    throw new Error('Missing tokenAdmin — folder or collection pre-request did not run');
+  }
+
+  req.setHeader('Authorization', `Bearer ${tokenAdmin}`);
+  req.setUrl(`${bru.getEnvVar('url')}/api/municipality/user/by-ids?ids=${encodeURIComponent(String(dbUserId))}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Admin still sees real profile (not masked)", async function() {
+    const axios = require('axios');
+    const baseUrl = bru.getEnvVar('url');
+    const dbUserId = bru.getVar('webhookE2eDbUserId') || bru.getEnvVar('webhookE2eDbUserId');
+    const tokenAdmin = bru.getVar('tokenAdmin') || bru.getEnvVar('tokenAdmin');
+    const username = bru.getVar('webhookE2eUsername') || bru.getEnvVar('webhookE2eUsername');
+
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const resp = await axios.get(`${baseUrl}/api/municipality/user/by-ids?ids=${encodeURIComponent(String(dbUserId))}`, {
+        headers: { Authorization: `Bearer ${tokenAdmin}` },
+        validateStatus: () => true,
+      });
+      if (resp.status === 200 && Array.isArray(resp.data) && resp.data.length === 1) {
+        const user = resp.data[0];
+        expect(user).to.have.property('username', username);
+        expect(user).to.have.property('firstName', 'WebhookUpdated');
+        expect(user).to.have.property('lastName', 'CitizenUpdated');
+        expect(user.username).to.not.equal('USER_DELETED');
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    const body = res.getBody();
+    expect(body, `user id=${dbUserId} not found for admin`).to.be.an('array').with.lengthOf(1);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

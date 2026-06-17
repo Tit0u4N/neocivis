@@ -1,6 +1,7 @@
 'use client';
 
 import { ArticleService } from '@repo/frontend-services/article';
+import { CityService } from '@repo/frontend-services/city';
 import { ConfigService } from '@repo/frontend-services/config';
 import { EstablishmentService } from '@repo/frontend-services/establishment';
 import { MediaService } from '@repo/frontend-services/media';
@@ -18,6 +19,7 @@ import { useCityStore } from '@/stores/city.store';
  */
 type ServicesContextValue = {
   articleService: ArticleService;
+  cityService: CityService;
   configService: ConfigService;
   establishmentService: EstablishmentService;
   mediaService: MediaService;
@@ -43,6 +45,7 @@ export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>
   const services = useMemo<ServicesContextValue>(
     () => ({
       articleService: new ArticleService(api, cityId),
+      cityService: new CityService(api),
       configService: new ConfigService(api, cityId),
       establishmentService: new EstablishmentService(api, cityId),
       mediaService: new MediaService(api, cityId),

@@ -533,5 +533,51 @@
       "deleteConfirm": "Delete this category?",
       "error": "Unable to load categories."
     }
+  },
+  "forumUsers": {
+    "title": "User management",
+    "tabs": {
+      "active": "Active accounts",
+      "banned": "Banned accounts"
+    },
+    "search": "Enter username",
+    "table": {
+      "username": "Username",
+      "contributions": "Contributions thread",
+      "status": "Account status",
+      "dateBan": "Date Ban"
+    },
+    "status": {
+      "active": "Active",
+      "banned": "Banned"
+    },
+    "actions": {
+      "ban": "Ban",
+      "unban": "Unban",
+      "more": "More"
+    },
+    "banModal": {
+      "title": "Ban user",
+      "description": "Are you sure you want to ban {{name}}? This action can be reversed.",
+      "cancel": "Cancel",
+      "confirm": "Ban"
+    },
+    "unbanModal": {
+      "title": "Unban user",
+      "description": "Are you sure you want to unban {{name}}?",
+      "cancel": "Cancel",
+      "confirm": "Unban"
+    },
+    "infoModal": {
+      "title": "User information",
+      "profilePicture": "Profil picture",
+      "username": "Username",
+      "lastConnection": "Last connexion",
+      "banSince": "Ban since",
+      "memberSince": "Member since",
+      "close": "Close"
+    },
+    "empty": "No users",
+    "error": "Unable to load users"
   }
 }

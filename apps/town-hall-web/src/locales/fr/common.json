@@ -518,23 +518,15 @@
     },
     "banModal": {
       "title": "Bannir l'utilisateur",
-      "reasonLabel": "Expliquer la raison du bannissement",
-      "reasonPlaceholder": "L'utilisateur a insulté un autre utilisateur...",
-      "informUser": "Informer l'utilisateur",
-      "sendEmail": "Envoyer un e-mail",
-      "sendPush": "Envoyer une notification push",
+      "description": "Voulez-vous vraiment bannir {{name}} ? Cette action peut être annulée.",
       "cancel": "Annuler",
-      "confirm": "Confirmer"
+      "confirm": "Bannir"
     },
     "unbanModal": {
       "title": "Débannir l'utilisateur",
-      "reasonLabel": "Expliquer la raison du débannissement",
-      "reasonPlaceholder": "L'utilisateur ...",
-      "informUser": "Informer l'utilisateur",
-      "sendEmail": "Envoyer un e-mail",
-      "sendPush": "Envoyer une notification push",
+      "description": "Voulez-vous vraiment débannir {{name}} ?",
       "cancel": "Annuler",
-      "confirm": "Confirmer"
+      "confirm": "Débannir"
     },
     "infoModal": {
       "title": "Informations utilisateur",

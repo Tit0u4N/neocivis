@@ -3,6 +3,16 @@
 import { ArrowRight, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PageLayout } from '@/components/ui/page-layout';
@@ -64,176 +74,6 @@ function fmtDateTime(iso: string | null): string {
     minute: '2-digit',
     second: '2-digit',
   });
-}
-
-// --- Ban Modal ---
-
-function BanModal({
-  user,
-  open,
-  onClose,
-  onConfirm,
-}: {
-  user: ForumUserEntry | null;
-  open: boolean;
-  onClose: () => void;
-  onConfirm: (userId: number) => Promise<void>;
-}) {
-  const { t } = useTranslation();
-  const [reason, setReason] = useState('');
-  const [sendEmail, setSendEmail] = useState(true);
-  const [sendPush, setSendPush] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  if (!user) {
-    return null;
-  }
-
-  const handleConfirm = async () => {
-    setLoading(true);
-    await onConfirm(user.userId);
-    setLoading(false);
-    setReason('');
-    onClose();
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl">{t('forumUsers.banModal.title')}</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-6 py-4">
-          <div className="flex flex-col gap-2">
-            <label className="font-semibold text-base text-foreground">{t('forumUsers.banModal.reasonLabel')}</label>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder={t('forumUsers.banModal.reasonPlaceholder')}
-              rows={7}
-              className="w-full resize-none rounded-md border border-border bg-background px-4 py-3 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <span className="font-semibold text-base text-foreground">{t('forumUsers.banModal.informUser')}</span>
-            <div className="flex gap-8">
-              <label className="flex cursor-pointer items-center gap-2.5 whitespace-nowrap text-sm">
-                <input
-                  type="checkbox"
-                  checked={sendEmail}
-                  onChange={(e) => setSendEmail(e.target.checked)}
-                  className="size-4 accent-primary"
-                />
-                {t('forumUsers.banModal.sendEmail')}
-              </label>
-              <label className="flex cursor-pointer items-center gap-2.5 whitespace-nowrap text-sm">
-                <input
-                  type="checkbox"
-                  checked={sendPush}
-                  onChange={(e) => setSendPush(e.target.checked)}
-                  className="size-4 accent-primary"
-                />
-                {t('forumUsers.banModal.sendPush')}
-              </label>
-            </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            {t('forumUsers.banModal.cancel')}
-          </Button>
-          <Button variant="destructive" onClick={handleConfirm} disabled={loading} className="gap-1.5">
-            {t('forumUsers.banModal.confirm')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// --- Unban Modal ---
-
-function UnbanModal({
-  user,
-  open,
-  onClose,
-  onConfirm,
-}: {
-  user: ForumUserEntry | null;
-  open: boolean;
-  onClose: () => void;
-  onConfirm: (userId: number) => Promise<void>;
-}) {
-  const { t } = useTranslation();
-  const [reason, setReason] = useState('');
-  const [sendEmail, setSendEmail] = useState(true);
-  const [sendPush, setSendPush] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  if (!user) {
-    return null;
-  }
-
-  const handleConfirm = async () => {
-    setLoading(true);
-    await onConfirm(user.userId);
-    setLoading(false);
-    setReason('');
-    onClose();
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl">{t('forumUsers.unbanModal.title')}</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-6 py-4">
-          <div className="flex flex-col gap-2">
-            <label className="font-semibold text-base text-foreground">{t('forumUsers.unbanModal.reasonLabel')}</label>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder={t('forumUsers.unbanModal.reasonPlaceholder')}
-              rows={7}
-              className="w-full resize-none rounded-md border border-border bg-background px-4 py-3 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <span className="font-semibold text-base text-foreground">{t('forumUsers.unbanModal.informUser')}</span>
-            <div className="flex gap-8">
-              <label className="flex cursor-pointer items-center gap-2.5 whitespace-nowrap text-sm">
-                <input
-                  type="checkbox"
-                  checked={sendEmail}
-                  onChange={(e) => setSendEmail(e.target.checked)}
-                  className="size-4 accent-primary"
-                />
-                {t('forumUsers.unbanModal.sendEmail')}
-              </label>
-              <label className="flex cursor-pointer items-center gap-2.5 whitespace-nowrap text-sm">
-                <input
-                  type="checkbox"
-                  checked={sendPush}
-                  onChange={(e) => setSendPush(e.target.checked)}
-                  className="size-4 accent-primary"
-                />
-                {t('forumUsers.unbanModal.sendPush')}
-              </label>
-            </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            {t('forumUsers.unbanModal.cancel')}
-          </Button>
-          <Button variant="destructive" onClick={handleConfirm} disabled={loading} className="gap-1.5">
-            {t('forumUsers.unbanModal.confirm')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
 }
 
 // --- User Info Modal ---
@@ -592,25 +432,61 @@ export function ForumUsersPage(vm: ForumUsersPageViewModel) {
         <BannedTable data={bannedUsers} onUnban={setUnbanTarget} onMore={setInfoTarget} />
       )}
 
-      {/* Modals */}
-      <BanModal
-        user={banTarget}
-        open={banTarget !== null}
-        onClose={() => setBanTarget(null)}
-        onConfirm={async (userId) => {
-          await banUser(userId);
-          setBanTarget(null);
-        }}
-      />
-      <UnbanModal
-        user={unbanTarget}
-        open={unbanTarget !== null}
-        onClose={() => setUnbanTarget(null)}
-        onConfirm={async (userId) => {
-          await unbanUser(userId);
-          setUnbanTarget(null);
-        }}
-      />
+      {/* Ban confirmation */}
+      <AlertDialog open={banTarget !== null} onOpenChange={(open) => !open && setBanTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('forumUsers.banModal.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {banTarget
+                ? t('forumUsers.banModal.description', { name: `${banTarget.firstName} ${banTarget.lastName}` })
+                : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('forumUsers.banModal.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (banTarget) {
+                  await banUser(banTarget.userId);
+                  setBanTarget(null);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('forumUsers.banModal.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Unban confirmation */}
+      <AlertDialog open={unbanTarget !== null} onOpenChange={(open) => !open && setUnbanTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('forumUsers.unbanModal.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {unbanTarget
+                ? t('forumUsers.unbanModal.description', { name: `${unbanTarget.firstName} ${unbanTarget.lastName}` })
+                : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('forumUsers.unbanModal.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (unbanTarget) {
+                  await unbanUser(unbanTarget.userId);
+                  setUnbanTarget(null);
+                }
+              }}
+            >
+              {t('forumUsers.unbanModal.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <UserInfoModal user={infoTarget} open={infoTarget !== null} onClose={() => setInfoTarget(null)} />
     </PageLayout>
   );

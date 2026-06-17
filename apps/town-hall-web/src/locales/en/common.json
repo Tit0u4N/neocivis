@@ -518,23 +518,15 @@
     },
     "banModal": {
       "title": "Ban user",
-      "reasonLabel": "Explain the reason of the ban",
-      "reasonPlaceholder": "The users insulted another user...",
-      "informUser": "Inform user",
-      "sendEmail": "Send an e-mail",
-      "sendPush": "Send a push notification",
+      "description": "Are you sure you want to ban {{name}}? This action can be reversed.",
       "cancel": "Cancel",
-      "confirm": "Confirm"
+      "confirm": "Ban"
     },
     "unbanModal": {
       "title": "Unban user",
-      "reasonLabel": "Explain the reason of the unban",
-      "reasonPlaceholder": "The user ....",
-      "informUser": "Inform user",
-      "sendEmail": "Send an e-mail",
-      "sendPush": "Send a push notification",
+      "description": "Are you sure you want to unban {{name}}?",
       "cancel": "Cancel",
-      "confirm": "Confirm"
+      "confirm": "Unban"
     },
     "infoModal": {
       "title": "User information",

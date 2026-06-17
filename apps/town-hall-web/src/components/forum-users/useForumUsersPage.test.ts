@@ -15,19 +15,18 @@ vi.mock('@/stores/city.store', () => ({
   useCityStore: (sel: (s: { cityId: string }) => unknown) => sel({ cityId: storeState.cityId }),
 }));
 
+const mockCityService = {
+  listCitizens: vi.fn(),
+};
+
 const mockThreadService = {
   getModeration: vi.fn(),
   banUser: vi.fn(),
   unbanUser: vi.fn(),
 };
-vi.mock('@/providers/ServicesProvider', () => ({
-  useServices: () => ({ threadService: mockThreadService }),
-}));
 
-const mockApiGet = vi.fn();
-const mockApi = { get: (url: string) => ({ json: () => mockApiGet(url) }) };
-vi.mock('@/providers/ApiProvider', () => ({
-  useApi: () => mockApi,
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ cityService: mockCityService, threadService: mockThreadService }),
 }));
 
 import { useForumUsersPage } from './useForumUsersPage';
@@ -52,7 +51,7 @@ const MODERATION = [{ cityId: 'NIC_00001', userId: 3, muted: false, banned: true
 
 describe('useForumUsersPage', () => {
   it('starts in loading state', () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue(MODERATION);
 
     const { result } = renderHook(() => useForumUsersPage());
@@ -60,7 +59,7 @@ describe('useForumUsersPage', () => {
   });
 
   it('loads and merges citizens with moderation data', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue(MODERATION);
 
     const { result } = renderHook(() => useForumUsersPage());
@@ -71,19 +70,20 @@ describe('useForumUsersPage', () => {
     expect(result.current.bannedUsers[0].username).toBe('paul.martin');
   });
 
-  it('falls back to mock users when the API fails', async () => {
-    mockApiGet.mockRejectedValue(new Error('Network'));
+  it('sets error and returns empty lists when the API fails', async () => {
+    mockCityService.listCitizens.mockRejectedValue(new Error('Network'));
     mockThreadService.getModeration.mockRejectedValue(new Error('Network'));
 
     const { result } = renderHook(() => useForumUsersPage());
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.activeUsers.length).toBeGreaterThan(0);
-    expect(result.current.bannedUsers.length).toBeGreaterThan(0);
+    expect(result.current.error).not.toBeNull();
+    expect(result.current.activeUsers).toHaveLength(0);
+    expect(result.current.bannedUsers).toHaveLength(0);
   });
 
   it('defaults to the active tab', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue(MODERATION);
 
     const { result } = renderHook(() => useForumUsersPage());
@@ -93,7 +93,7 @@ describe('useForumUsersPage', () => {
   });
 
   it('setTab switches between tabs', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue(MODERATION);
 
     const { result } = renderHook(() => useForumUsersPage());
@@ -104,7 +104,7 @@ describe('useForumUsersPage', () => {
   });
 
   it('filters users by search query across username, firstName, lastName', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue(MODERATION);
 
     const { result } = renderHook(() => useForumUsersPage());
@@ -117,7 +117,7 @@ describe('useForumUsersPage', () => {
   });
 
   it('banUser calls the service and moves the user to banned list', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue([]);
     mockThreadService.banUser.mockResolvedValue(undefined);
 
@@ -137,7 +137,7 @@ describe('useForumUsersPage', () => {
   });
 
   it('unbanUser calls the service and moves the user back to active list', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue(MODERATION);
     mockThreadService.unbanUser.mockResolvedValue(undefined);
 
@@ -155,23 +155,27 @@ describe('useForumUsersPage', () => {
     expect(result.current.activeUsers).toHaveLength(3);
   });
 
-  it('banUser updates the user locally even when the service throws', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+  it('banUser sets error and does not update list when service throws', async () => {
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue([]);
     mockThreadService.banUser.mockRejectedValue(new Error('Network'));
 
     const { result } = renderHook(() => useForumUsersPage());
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
+    const activeCountBefore = result.current.activeUsers.length;
+
     await act(async () => {
       await result.current.banUser(2);
     });
 
-    expect(result.current.bannedUsers.find((u) => u.userId === 2)).toBeDefined();
+    expect(result.current.error).not.toBeNull();
+    expect(result.current.activeUsers).toHaveLength(activeCountBefore);
+    expect(result.current.bannedUsers.find((u) => u.userId === 2)).toBeUndefined();
   });
 
-  it('unbanUser updates the user locally even when the service throws', async () => {
-    mockApiGet.mockResolvedValue(CITIZENS);
+  it('unbanUser sets error and does not update list when service throws', async () => {
+    mockCityService.listCitizens.mockResolvedValue(CITIZENS);
     mockThreadService.getModeration.mockResolvedValue(MODERATION);
     mockThreadService.unbanUser.mockRejectedValue(new Error('Network'));
 
@@ -182,6 +186,7 @@ describe('useForumUsersPage', () => {
       await result.current.unbanUser(3);
     });
 
-    expect(result.current.activeUsers.find((u) => u.userId === 3)).toBeDefined();
+    expect(result.current.error).not.toBeNull();
+    expect(result.current.bannedUsers.find((u) => u.userId === 3)).toBeDefined();
   });
 });

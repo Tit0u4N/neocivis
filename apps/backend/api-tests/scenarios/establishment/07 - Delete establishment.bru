@@ -1,0 +1,45 @@
+meta {
+  name: 07 - Delete establishment
+  type: http
+  seq: 967
+}
+
+delete {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/establishment/{{e2eEstablishmentId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const cityId = bru.getVar('cityNiceId');
+  const establishmentId = bru.getVar('e2eEstablishmentId');
+  if (!cityId || !establishmentId) {
+    throw new Error('Missing cityNiceId or e2eEstablishmentId — run previous steps first.');
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/establishment/${establishmentId}`);
+}
+
+script:post-response {
+  test('Status is 200', function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test('Body confirms deletion', function () {
+    const body = res.getBody();
+    expect(body).to.have.property('success');
+    expect(body.success).to.be.true;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

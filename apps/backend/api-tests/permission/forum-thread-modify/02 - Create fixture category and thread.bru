@@ -1,0 +1,70 @@
+meta {
+  name: forum-thread-modify - 02 - Create fixture category and thread
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "title": "Thread perm-modify-test",
+    "categoryId": "{{permCategoryId}}",
+    "body": "Créé pour le test FORUM_THREAD_MODIFY_PERMISSION"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  const adminAuth = `Bearer ${adminToken}`;
+  req.setHeader('Authorization', adminAuth);
+
+  let cityId = bru.getVar('cityNiceId');
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+
+  // Idempotence: clean up category.
+  const cats = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/threads/categories`, { headers: { Authorization: adminAuth } });
+  let cat = (cats.data || []).find((c) => c.label === 'perm-modify-category');
+  if (!cat) {
+    const created = await axios.post(`${baseUrl}/api/municipality/cities/${cityId}/threads/categories`, { emoji: '🧪', label: 'perm-modify-category' }, { headers: { Authorization: adminAuth, 'content-type': 'application/json' } });
+    cat = created.data;
+  }
+  bru.setVar('permCategoryId', cat.id);
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads`);
+  req.setBody(JSON.stringify({ title: 'Thread perm-modify-test', categoryId: cat.id, body: 'Créé pour le test FORUM_THREAD_MODIFY_PERMISSION' }));
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.id) bru.setVar('permThreadId', body.id);
+}
+
+tests {
+  test("Status is 201 — fixture thread created", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  test("Thread id saved", function() {
+    expect(res.getBody()).to.have.property('id');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

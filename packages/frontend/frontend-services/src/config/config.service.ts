@@ -4,7 +4,7 @@ import AbstractService from '../AbstractService';
 
 export class ConfigService extends AbstractService {
   constructor(kyInstance: KyInstance, cityId: string) {
-    super(kyInstance, `/config${AbstractService.createCityPath(cityId)}`);
+    super(kyInstance, { cityId, prefix: '/config' });
   }
 
   async getConfig(locale = 'fr'): Promise<CitizenConfigResponse> {

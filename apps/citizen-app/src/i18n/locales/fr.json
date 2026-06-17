@@ -102,8 +102,39 @@
       "status": "Statut"
     }
   },
+  "selectCity": {
+    "title": "Choisis ta ville",
+    "subtitle": "Découvre les actualités, signalements et discussions près de chez toi.",
+    "searchPlaceholder": "Rechercher une ville...",
+    "empty": "Aucune ville trouvée",
+    "emptyHelper": "Essaie un autre mot-clé.",
+    "allCities": "Toutes les villes",
+    "results": "Résultats",
+    "cityCount_one": "{{count}} ville",
+    "cityCount_other": "{{count}} villes",
+    "errors": {
+      "loadTitle": "Erreur de chargement",
+      "loadDesc": "Impossible de charger les villes",
+      "joinTitle": "Impossible de rejoindre",
+      "joinDesc": "Impossible de rejoindre {{name}}"
+    }
+  },
   "forum": {
-    "title": "Forum"
+    "title": "Forum",
+    "categories": "Catégorie",
+    "allCategories": "Tout",
+    "loading": "Chargement...",
+    "loadMore": "Charger plus",
+    "error": "Impossible de charger le forum",
+    "empty": "Aucune discussion pour l'instant",
+    "thread": {
+      "headerTitle": "Discussion",
+      "error": "Discussion introuvable",
+      "replies_one": "{{count}} réponse",
+      "replies_other": "{{count}} réponses",
+      "noReplies": "Sois le premier à répondre !",
+      "replyPlaceholder": "Écrire une réponse..."
+    }
   },
   "news": {
     "title": "Actualités"
@@ -121,6 +152,35 @@
       "dark": "Sombre",
       "system": "Système"
     },
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "profile": {
+      "title": "Informations personnelles",
+      "fields": {
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "username": "Nom d'utilisateur",
+        "email": "Adresse e-mail"
+      },
+      "editAria": "Modifier {{field}}",
+      "fieldHints": {
+        "firstName": "Votre prénom tel qu'il apparaît dans l'application. Entre 1 et 100 caractères.",
+        "lastName": "Votre nom de famille tel qu'il apparaît dans l'application. Entre 1 et 100 caractères.",
+        "username": "Identifiant unique utilisé pour vous reconnaître dans le système. Entre 3 et 50 caractères, sans espaces.",
+        "email": "Adresse e-mail associée à votre compte. Utilisée pour les notifications et la réinitialisation du mot de passe."
+      }
+    },
+    "password": {
+      "title": "Mot de passe",
+      "description": "Pour modifier votre mot de passe, nous vous enverrons un e-mail de réinitialisation.",
+      "button": "Changer le mot de passe"
+    },
+    "passwordDialog": {
+      "title": "Changer le mot de passe ?",
+      "description": "Un e-mail de réinitialisation sera envoyé à {{email}}. Voulez-vous continuer ?",
+      "cancel": "Annuler",
+      "confirm": "Envoyer l'e-mail"
+    },
+    "save": "Enregistrer",
+    "cancel": "Annuler"
   }
 }

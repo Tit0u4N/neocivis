@@ -1,0 +1,49 @@
+meta {
+  name: 02 - Citizen lists categories
+  type: http
+  seq: 972
+}
+
+get {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/threads/categories
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  if (!cityId) {
+    throw new Error('Missing cityNiceId — run step 01 first.');
+  }
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/threads/categories`);
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Seeded categories are present", function() {
+    const labels = res.getBody().map((c) => c.label);
+    expect(labels).to.include('Sport');
+    expect(labels).to.include('Travaux');
+    expect(labels).to.include('École');
+  });
+
+  test("E2E category is visible to citizen", function() {
+    const labels = res.getBody().map((c) => c.label);
+    expect(labels).to.include('Événements E2E');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

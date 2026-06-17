@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CarouselTab } from '@/components/app-management/carousel/CarouselTab';
-import { CategoryLayoutTab } from '@/components/app-management/category/CategoryLayoutTab';
 import { PageLayout } from '@/components/ui/page-layout';
 import { cn } from '@/lib/utils';
 
 type AppTab = 'layout' | 'carousel';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CarouselTab } from '../../../features/app-management/carousel/CarouselTab';
+import { CategoryLayoutTab } from '../../../features/app-management/category/CategoryLayoutTab';
 
 export default function AppManagementRoute() {
   const { t } = useTranslation();

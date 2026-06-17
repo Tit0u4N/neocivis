@@ -1,12 +1,10 @@
 import type { Report } from '@repo/contracts/report';
-import { ReportService } from '@repo/frontend-services/report';
 import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
+import { useEffect, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
 
 export function useReportDetails(id: string) {
-  const api = useApi();
-  const reportService = useMemo(() => new ReportService(api), [api]);
+  const { reportService } = useServices();
 
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(false);

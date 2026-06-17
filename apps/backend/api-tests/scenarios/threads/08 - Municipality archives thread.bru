@@ -1,0 +1,44 @@
+meta {
+  name: 08 - Municipality archives thread
+  type: http
+  seq: 978
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/{{e2eThreadId}}/archive
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  const threadId = bru.getVar('e2eThreadId');
+  if (!cityId || !threadId) {
+    throw new Error('Missing cityNiceId or e2eThreadId — run step 04 first.');
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/${threadId}/archive`);
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Thread is archived", function() {
+    const body = res.getBody();
+    expect(body.archived).to.equal(true);
+    expect(body.archivedAt).to.be.a('string');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

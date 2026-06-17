@@ -1,6 +1,7 @@
 import type { Container } from '@azure/cosmos';
 import type { Article, ArticleLocale, ArticleTranslation, CreateArticleInput } from '@repo/contracts/article';
 import { getCosmosClient } from '@/infrastructure/azure/cosmos.client';
+import { getCosmosContainer } from '@/infrastructure/azure/cosmos.setup';
 import { optionalEnv } from '@/infrastructure/env';
 import type { IArticleRepository } from './article.repository.interface';
 
@@ -17,14 +18,7 @@ export class CosmosArticleRepository implements IArticleRepository {
     }
 
     const client = getCosmosClient();
-    const databaseId = optionalEnv('COSMOS_DATABASE_ID') ?? 'neocivis';
-    const containerId = 'articles';
-
-    const { database } = await client.databases.createIfNotExists({ id: databaseId });
-    const { container } = await database.containers.createIfNotExists({
-      id: containerId,
-      partitionKey: { paths: ['/id'] },
-    });
+    const container = await getCosmosContainer(client, 'articles');
 
     this.cosmosContainer = container;
     return container;
@@ -33,6 +27,17 @@ export class CosmosArticleRepository implements IArticleRepository {
   async findAll(): Promise<Article[]> {
     const container = await this.getContainer();
     const { resources } = await container.items.query<Article>('SELECT * FROM c').fetchAll();
+    return resources;
+  }
+
+  async findAllByCityId(cityId: string): Promise<Article[]> {
+    const container = await this.getContainer();
+    const { resources } = await container.items
+      .query<Article>({
+        query: 'SELECT * FROM c WHERE c.cityId = @cityId',
+        parameters: [{ name: '@cityId', value: cityId }],
+      })
+      .fetchAll();
     return resources;
   }
 
@@ -56,11 +61,32 @@ export class CosmosArticleRepository implements IArticleRepository {
     return resources[0];
   }
 
+  async findByIdAndCityId(id: string, cityId: string): Promise<Article | undefined> {
+    const container = await this.getContainer();
+    const { resources } = await container.items
+      .query<Article>({
+        query: 'SELECT * FROM c WHERE c.id = @id AND c.cityId = @cityId',
+        parameters: [
+          { name: '@id', value: id },
+          { name: '@cityId', value: cityId },
+        ],
+      })
+      .fetchAll();
+    return resources[0];
+  }
+
   async create(
-    input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
+    input: CreateArticleInput & {
+      id: string;
+      cityId: string;
+      authorId: string;
+      createdAt: string;
+      updatedAt: string;
+    },
   ): Promise<Article> {
     const article: Article = {
       id: input.id,
+      cityId: input.cityId,
       translations: [input.translation],
       coverImageUrl: input.coverImageUrl,
       status: input.status ?? 'draft',

@@ -5,17 +5,21 @@ import {
 } from '@repo/contracts';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { PermissionGuard } from '@/middlewares/permission.guard';
 import type { ConfigService } from '@/modules/config/service/config.service';
 
 export class MunicipalityConfigController {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly guard: PermissionGuard,
+  ) {}
 
   public getRoutes(): Hono {
     const app = new Hono();
 
-    app.get('/city/:cityId/all', (c) => this.getConfig(c));
-    app.put('/city/:cityId/categories', (c) => this.setCategories(c));
-    app.put('/city/:cityId/carousel', (c) => this.setCarouselItems(c));
+    app.get('/all', (c) => this.getConfig(c));
+    app.put('/categories', this.guard.require('PAGE_CITY_HALL_MODIFY_PERMISSION'), (c) => this.setCategories(c));
+    app.put('/carousel', this.guard.require('PAGE_CITY_HALL_MODIFY_PERMISSION'), (c) => this.setCarouselItems(c));
 
     return app;
   }

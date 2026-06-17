@@ -1,0 +1,54 @@
+meta {
+  name: Scenario - Webhook access UPDATE (Bruno as Keycloak)
+  type: http
+  seq: 935
+}
+
+post {
+  url: {{url}}/api/webhook/post
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "time": {{$timestamp}},
+    "realmId": "{{keycloakAdminRealm}}",
+    "uid": "{{$randomUUID}}",
+    "authDetails": {
+      "realmId": "{{keycloakAdminRealm}}",
+      "clientId": "neocivis-townhall-app",
+      "userId": "{{webhookE2eKeycloakId}}",
+      "ipAddress": "127.0.0.1",
+      "username": "{{webhookE2eUsername}}",
+      "sessionId": "{{$randomUUID}}"
+    },
+    "type": "access.UPDATE",
+    "details": {
+      "auth_method": "openid-connect",
+      "username": "{{webhookE2eUsername}}"
+    }
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('webhookE2eKeycloakId')) {
+    throw new Error('Missing webhookE2eKeycloakId — run previous scenarios first');
+  }
+}
+
+tests {
+  test("Webhook accepts UPDATE payload", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('accepted', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -63,13 +63,16 @@ apps/
 │       └── components/
 └── backend/                # Hono + Azure Functions v4 (REST API)
     └── src/
-        ├── index.ts        # Azure Functions entry point (2 HTTP triggers)
-        ├── gateways/       # citizen/ and municipality/ — one Hono app each
+        ├── index.ts        # Azure Functions entry point (3 HTTP triggers)
+        ├── gateways/       # citizen/, municipality/, webhook/ — one Hono app each
         │   ├── citizen/
         │   │   ├── citizen.gateway.ts
         │   │   └── controllers/
-        │   └── municipality/
-        │       ├── municipality.gateway.ts
+        │   ├── municipality/
+        │   │   ├── municipality.gateway.ts
+        │   │   └── controllers/
+        │   └── webhook/
+        │       ├── webhook.gateway.ts
         │       └── controllers/
         ├── modules/        # Business logic par module (voir structure ci-dessous)
         └── middleware/     # Hono middleware (auth, errors, logging, CORS)
@@ -188,7 +191,7 @@ Guidelines:
 - **Seeders**: un `*.seeder.ts` par module si besoin, branché dans l'auto-seed global.
 
 ### Rules
-- **EXACTLY 2 gateways**: `citizen` (`/api/citizen/*`) and `municipality` (`/api/municipality/*`) — never create a 3rd
+- **3 gateways**: `citizen` (`/api/citizen/*`), `municipality` (`/api/municipality/*`), `webhook` (`/api/webhook/*` — Keycloak events, pas d’auth JWT)
 - **Auth**: JWT Bearer tokens via Keycloak — validated in `src/middleware/`, never trust client-sent identity
 - **Validation**: Zod schemas in `packages/shared` — validate all request input in controllers via `safeParse()`
 - **Errors**: All errors returned as JSON to the frontend — error middleware in `src/middleware/`

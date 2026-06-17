@@ -29,13 +29,13 @@
     "@azure/functions": "^4.11.0",
     "@azure/storage-blob": "^12.28.0",
     "@marplex/hono-azurefunc-adapter": "^1.0.1",
-    "@repo/contracts": "*",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.11.6",
     "postgres": "^3.4.9",
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "@repo/contracts": "*",
     "@types/node": "^25.0.10",
     "concurrently": "^9.2.1",
     "dotenv": "^17.2.2",

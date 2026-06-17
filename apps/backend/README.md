@@ -56,8 +56,9 @@ Useful keys (see `local-example.settings.json` and the source):
 | `DATABASE_POOL_MAX` | Max pool size (default `5`). |
 | `COSMOS_ENDPOINT`, `COSMOS_KEY` | Cosmos DB (articles in persisted mode). |
 | `COSMOS_DATABASE_ID` | Optional, defaults to `neocivis`. |
+| `COSMOS_DATABASE_THROUGHPUT` | Shared database RU/s for all containers (default `400`, clamped `400`–`1000`). Use this on accounts capped at 1000 RU/s so `articles` + `media` do not each reserve 400 RU/s. After changing, run `bun run db:reset -- --confirm --cosmos` once to recreate the database with shared throughput. |
 | `KEYCLOAK_*` | Optional at startup but required for real IAM sync (`KEYCLOAK_BASE_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`). |
-| `AZURE_STORAGE_CONNECTION_STRING`, `AZURE_ARTICLES_STORAGE_CONTAINER` | Required for uploads / blobs with the current implementation. |
+| `AZURE_STORAGE_CONNECTION_STRING`, `AZURE_MEDIA_STORAGE_CONTAINER` | Required for media blobs and citizen report uploads. |
 | `AZURE_STORAGE_BASE_URL` | Optional (derived public URLs). |
 
 When **not** in `IN_MEMORY` mode, `assertBackendEnv()` at startup requires at least `DATABASE_URL`, `COSMOS_ENDPOINT`, and `COSMOS_KEY`.
@@ -109,7 +110,7 @@ Run these from `apps/backend`:
 | `bun run db:migrate` | Applies migrations from the `drizzle/` folder to Postgres (`migrate.ts`). Requires `DATABASE_URL`. |
 | `bun run db:push` | Pushes the schema to the database without migration files (`drizzle-kit push`). Handy for local iteration; use with care on real data. |
 | `bun run db:studio` | Opens Drizzle Studio (`drizzle-kit studio`). |
-| `bun run db:reset` | **Destructive**: orchestrated reset of Postgres and/or Cosmos. Requires **`--confirm`**. Targets: `--drizzle` / `--postgres` / `--postgress` (typo alias accepted in code), `--cosmos`, or `--all` / `--both`. With an interactive TTY and no target, the script prompts; without a TTY, the default is both. If Cosmos is not configured (`COSMOS_ENDPOINT` / `COSMOS_KEY`), the Cosmos step is skipped with a log line. Loads `.env.local` / `.env`. Example: `bun run db:reset -- --confirm --all` |
+| `bun run db:reset` | **Destructive**: orchestrated reset of Postgres, Cosmos, and/or Azure Blob. Requires **`--confirm`**. Targets: `--drizzle` / `--postgres` / `--postgress` (typo alias accepted in code), `--cosmos` (also clears the media blob container when `AZURE_STORAGE_CONNECTION_STRING` is set), `--blob` / `--storage` (blob only), or `--all` / `--both` (Postgres + Cosmos + blob). With an interactive TTY and no target, the script prompts; without a TTY, the default is all three. Skips Cosmos or blob steps with a log line when not configured. Loads `.env.local` / `.env`. Example: `bun run db:reset -- --confirm --all` |
 | `bun run db:seeding` | Runs seeders (see Seeding). `--reset` selects `RESET_DATA`. Loads `.env.local` / `.env`. Not compatible with `IN_MEMORY`. |
 
 ---
@@ -126,6 +127,20 @@ bun install
 func start
 ```
 This will start the backend server locally, and you can access the API endpoints at `http://localhost:7071/api`.
+
+### Webhook gateway (Keycloak)
+
+A third Azure Function serves Keycloak event webhooks (no JWT / APIM auth):
+
+| Route | Description |
+|-------|-------------|
+| `POST /api/webhook/post` | Receives Keycloak events (`access.REGISTER`, `access.UPDATE`, `access.DELETE`). Any body is accepted; invalid payloads are ignored with HTTP 200. Syncs the Postgres `users` table (soft delete on `access.DELETE`). |
+
+Configure the webhook URL in Keycloak (see `scripts/setup-keycloak-webhook.ts` and `KEYCLOAK_WEBHOOK_URL`, e.g. `http://localhost:7071/api/webhook/post`).
+
+**Local E2E (Bruno `scenarios/webhook`)** : set `IN_MEMORY` to `false` in `local.settings.json`. Each gateway is a separate Azure Function; in-memory repos are not shared across `citizen`, `municipality`, and `webhook`.
+
+After schema changes, apply migrations: `bun --env-file=.env.local run db:migrate`.
 
 ### Running the backend in watch mode
 To run the backend in watch mode, which automatically restarts the server when file changes are detected, use the following command:

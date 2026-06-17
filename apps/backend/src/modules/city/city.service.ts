@@ -10,7 +10,6 @@ export type CreateEmployeeInput = Readonly<{
   email: string;
   firstName: string;
   lastName: string;
-  password: string;
 }>;
 
 export class CityService {
@@ -67,7 +66,6 @@ export class CityService {
       email: input.email,
       firstName: input.firstName,
       lastName: input.lastName,
-      password: input.password,
       realmRoles: ['EMPLOYEE'],
     });
 

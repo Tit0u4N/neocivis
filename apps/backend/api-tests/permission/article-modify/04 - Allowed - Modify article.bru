@@ -1,0 +1,57 @@
+meta {
+  name: article-modify - 04 - Allowed - Modify article
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/articles/{{permArticleId}}
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "translation": {
+      "locale": "fr",
+      "title": "Article modifié par employee (perm-test)",
+      "description": "Mise à jour via ARTICLE_MODIFY_PERMISSION"
+    },
+    "status": "draft"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  const articleId = bru.getVar('permArticleId');
+  if (!articleId) throw new Error('permArticleId not set — run step 02 first');
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/articles/${articleId}`);
+}
+
+tests {
+  test("Status is 200 — employee has ARTICLE_MODIFY_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Article updated", function() {
+    expect(res.getBody()).to.have.property('id');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

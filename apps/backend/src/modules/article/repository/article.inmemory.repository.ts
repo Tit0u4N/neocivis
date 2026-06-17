@@ -5,7 +5,11 @@ export class InMemoryArticleRepository implements IArticleRepository {
   private articles: Article[] = [];
 
   findAll(): Promise<Article[]> {
-    return Promise.resolve(this.articles);
+    return Promise.resolve([...this.articles]);
+  }
+
+  findAllByCityId(cityId: string): Promise<Article[]> {
+    return Promise.resolve(this.articles.filter((a) => a.cityId === cityId));
   }
 
   findAllPublished(): Promise<Article[]> {
@@ -16,11 +20,22 @@ export class InMemoryArticleRepository implements IArticleRepository {
     return Promise.resolve(this.articles.find((a) => a.id === id));
   }
 
+  findByIdAndCityId(id: string, cityId: string): Promise<Article | undefined> {
+    return Promise.resolve(this.articles.find((a) => a.id === id && a.cityId === cityId));
+  }
+
   create(
-    input: CreateArticleInput & { id: string; authorId: string; createdAt: string; updatedAt: string },
+    input: CreateArticleInput & {
+      id: string;
+      cityId: string;
+      authorId: string;
+      createdAt: string;
+      updatedAt: string;
+    },
   ): Promise<Article> {
     const article: Article = {
       id: input.id,
+      cityId: input.cityId,
       translations: [input.translation],
       coverImageUrl: input.coverImageUrl,
       status: input.status ?? 'draft',

@@ -25,7 +25,9 @@ function buildServices(overrides: Record<string, unknown> = {}) {
     },
     accessService: {
       listRoles: vi.fn().mockResolvedValue([mockRole]),
-      listEmployeeRoles: vi.fn().mockResolvedValue({ userId: 1, cityId: CITY_ID, roles: [mockRole] }),
+      listEmployeeRoles: vi.fn().mockImplementation((userId: number) =>
+        Promise.resolve({ userId, cityId: CITY_ID, roles: userId === alice.id ? [mockRole] : [] }),
+      ),
       assignRole: vi.fn().mockResolvedValue({ ok: true }),
       unassignRole: vi.fn().mockResolvedValue({ ok: true }),
     },
@@ -42,12 +44,14 @@ beforeEach(() => {
 });
 
 describe('useUserListPage', () => {
-  it('loads employees and roles on mount', async () => {
+  it('loads employees, roles and per-employee roles on mount', async () => {
     const { result } = renderHook(() => useUserListPage());
     expect(result.current.isLoading).toBe(true);
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.users).toHaveLength(2);
     expect(result.current.roles).toHaveLength(1);
+    expect(result.current.employeeRoles[alice.id]).toHaveLength(1);
+    expect(result.current.employeeRoles[bob.id]).toHaveLength(0);
     expect(result.current.error).toBeNull();
   });
 

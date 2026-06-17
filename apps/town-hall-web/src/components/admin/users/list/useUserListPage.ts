@@ -42,6 +42,7 @@ export function useUserListPage() {
 
   const [users, setUsers] = useState<UserPublicDto[]>([]);
   const [roles, setRoles] = useState<RoleDto[]>([]);
+  const [employeeRoles, setEmployeeRoles] = useState<Record<number, RoleDto[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,6 +70,12 @@ export function useUserListPage() {
       const [employees, allRoles] = await Promise.all([cityService.listEmployees(cityId), accessService.listRoles()]);
       setUsers(employees);
       setRoles(allRoles);
+      const rolesPerEmployee = await Promise.all(employees.map((e) => accessService.listEmployeeRoles(e.id)));
+      const rolesMap: Record<number, RoleDto[]> = {};
+      for (const entry of rolesPerEmployee) {
+        rolesMap[entry.userId] = entry.roles;
+      }
+      setEmployeeRoles(rolesMap);
     } catch {
       setError('Impossible de charger les utilisateurs.');
     } finally {
@@ -198,6 +205,7 @@ export function useUserListPage() {
   return {
     users: filteredUsers,
     roles,
+    employeeRoles,
     isLoading,
     error,
     searchQuery,

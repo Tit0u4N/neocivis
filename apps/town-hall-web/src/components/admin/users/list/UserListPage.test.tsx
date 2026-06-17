@@ -45,6 +45,7 @@ function makeProps(overrides: Partial<Parameters<typeof UserListPage>[0]> = {}) 
   return {
     users: [],
     roles: [],
+    employeeRoles: {},
     isLoading: false,
     error: null,
     searchQuery: '',

@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -84,10 +85,12 @@ function RolePicker({
 
 function UserRow({
   user,
+  userRoles,
   onEdit,
   onDeleteRequest,
 }: Readonly<{
   user: UserPublicDto;
+  userRoles: RoleDto[];
   onEdit: () => void;
   onDeleteRequest: () => void;
 }>) {
@@ -109,6 +112,19 @@ function UserRow({
             </p>
             <p className="mt-0.5 text-muted-foreground text-xs">@{user.username}</p>
           </div>
+        </div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex flex-wrap gap-1">
+          {userRoles.length === 0 ? (
+            <span className="text-muted-foreground text-xs">—</span>
+          ) : (
+            userRoles.map((r) => (
+              <Badge key={r.id} variant="secondary" className="text-xs">
+                {r.name}
+              </Badge>
+            ))
+          )}
         </div>
       </td>
       <td className="w-px px-4 py-3 text-right">
@@ -139,6 +155,7 @@ export function UserListPage(props: Props) {
   const {
     users,
     roles,
+    employeeRoles,
     isLoading,
     error,
     searchQuery,
@@ -194,6 +211,7 @@ export function UserListPage(props: Props) {
           <thead>
             <tr className="border-b bg-muted/40">
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Utilisateur</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Rôles</th>
               <th className="w-px px-4 py-3" />
             </tr>
           </thead>
@@ -201,7 +219,7 @@ export function UserListPage(props: Props) {
             {isLoading &&
               Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className="border-b">
-                  <td className="px-4 py-3" colSpan={2}>
+                  <td className="px-4 py-3" colSpan={3}>
                     <Skeleton className="h-8 w-full" />
                   </td>
                 </tr>
@@ -209,7 +227,7 @@ export function UserListPage(props: Props) {
 
             {!isLoading && users.length === 0 && (
               <tr>
-                <td className="px-4 py-10 text-center text-muted-foreground" colSpan={2}>
+                <td className="px-4 py-10 text-center text-muted-foreground" colSpan={3}>
                   <p className="font-medium">Aucun utilisateur trouvé.</p>
                 </td>
               </tr>
@@ -220,6 +238,7 @@ export function UserListPage(props: Props) {
                 <UserRow
                   key={user.id}
                   user={user}
+                  userRoles={employeeRoles[user.id] ?? []}
                   onEdit={() => void openEditDialog(user)}
                   onDeleteRequest={() => setConfirmDeleteId(user.id)}
                 />

@@ -1,0 +1,57 @@
+meta {
+  name: signal-modify - 03 - Allowed - Update report status
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/reports/{{permReportId}}/status
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "status": "progress"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  // Fetch first report in the city to get a valid ID.
+  const adminToken = bru.getVar('tokenAdmin');
+  const reports = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/reports`, { headers: { Authorization: `Bearer ${adminToken}` } });
+  const first = (reports.data?.data || [])[0];
+  if (!first) throw new Error('No reports found in city — seed some reports first');
+  bru.setVar('permReportId', first.id);
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/reports/${first.id}/status`);
+}
+
+tests {
+  test("Status is 200 — employee has SIGNAL_MODIFY_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Report status updated", function() {
+    expect(res.getBody()).to.have.property('id');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

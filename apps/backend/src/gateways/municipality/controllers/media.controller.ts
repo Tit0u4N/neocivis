@@ -1,20 +1,24 @@
 import type { ApiErrorDto, MediaImage } from '@repo/contracts';
 import { type Context, Hono, type TypedResponse } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { PermissionGuard } from '@/middlewares/permission.guard';
 import type { MediaService } from '@/modules/media/service/media.service';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 export class MediaController {
-  constructor(private readonly service: MediaService) {}
+  constructor(
+    private readonly service: MediaService,
+    private readonly guard: PermissionGuard,
+  ) {}
 
   getRoutes(): Hono {
     const app = new Hono();
 
     app.get('/', (c) => this.getAll(c));
-    app.post('/upload', (c) => this.upload(c));
-    app.delete('/:id', (c) => this.deleteMedia(c));
+    app.post('/upload', this.guard.require('MEDIA_UPLOAD_PERMISSION'), (c) => this.upload(c));
+    app.delete('/:id', this.guard.require('MEDIA_DELETE_PERMISSION'), (c) => this.deleteMedia(c));
 
     return app;
   }
@@ -30,10 +34,10 @@ export class MediaController {
   }
 
   private async upload(c: Context): Promise<ControllerJson<MediaImage, 201>> {
-    const formData = await c.req.formData();
-    const file = formData.get('file');
+    const formData = await c.req.formData().catch(() => null);
+    const file = formData?.get('file');
 
-    if (!(file && file instanceof File)) {
+    if (!(formData && file && file instanceof File)) {
       return c.json({ error: 'Aucun fichier fourni.' } satisfies ApiErrorDto, 400);
     }
 

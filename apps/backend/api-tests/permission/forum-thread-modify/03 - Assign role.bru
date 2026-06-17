@@ -1,0 +1,57 @@
+meta {
+  name: forum-thread-modify - 03 - Assign role to employee
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees/{{permEmployeeId}}/roles/{{permRoleId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  const adminAuth = `Bearer ${adminToken}`;
+  req.setHeader('Authorization', adminAuth);
+
+  let cityId = bru.getVar('cityNiceId');
+  let roleId = bru.getVar('permRoleId');
+
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+  if (!roleId) {
+    const list = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/roles`, { headers: { Authorization: adminAuth } });
+    const role = (list.data || []).find((r) => r.name === 'perm-forum-thread-modify');
+    if (!role) throw new Error('perm-forum-thread-modify not found — run step 01 first');
+    roleId = role.id;
+    bru.setVar('permRoleId', roleId);
+  }
+
+  const employees = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, { headers: { Authorization: adminAuth } });
+  const emp = (employees.data || []).find((u) => u.username === 'employee-nice1');
+  if (!emp) throw new Error('employee-nice1 not found in city employees');
+  bru.setVar('permEmployeeId', String(emp.id));
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees/${emp.id}/roles/${roleId}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Returns success", function() {
+    expect(res.getBody()).to.have.property('success', true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

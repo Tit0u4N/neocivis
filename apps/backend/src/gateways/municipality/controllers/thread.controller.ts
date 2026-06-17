@@ -16,45 +16,49 @@ import {
 } from '@repo/contracts/thread';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { PermissionGuard } from '@/middlewares/permission.guard';
 import type { ThreadService } from '@/modules/thread/service/thread.service';
 
 export class ThreadController {
-  constructor(private threadService: ThreadService) {}
+  constructor(
+    private threadService: ThreadService,
+    private guard: PermissionGuard,
+  ) {}
 
   public getRoutes(): Hono {
     const app = new Hono();
 
     // Categories
     app.get('/categories', (c) => this.listCategories(c));
-    app.post('/categories', (c) => this.createCategory(c));
-    app.put('/categories/:categoryId', (c) => this.updateCategory(c));
-    app.delete('/categories/:categoryId', (c) => this.deleteCategory(c));
+    app.post('/categories', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.createCategory(c));
+    app.put('/categories/:categoryId', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.updateCategory(c));
+    app.delete('/categories/:categoryId', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.deleteCategory(c));
 
     // Moderation
     app.get('/moderation/users', (c) => this.listModeration(c));
-    app.post('/moderation/users/:userId/mute', (c) => this.muteUser(c));
-    app.post('/moderation/users/:userId/unmute', (c) => this.unmuteUser(c));
-    app.post('/moderation/users/:userId/ban', (c) => this.banUser(c));
-    app.post('/moderation/users/:userId/unban', (c) => this.unbanUser(c));
+    app.post('/moderation/users/:userId/mute', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.muteUser(c));
+    app.post('/moderation/users/:userId/unmute', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.unmuteUser(c));
+    app.post('/moderation/users/:userId/ban', this.guard.require('FORUM_THREAD_BAN_USER_PERMISSION'), (c) => this.banUser(c));
+    app.post('/moderation/users/:userId/unban', this.guard.require('FORUM_THREAD_UNBAN_USER_PERMISSION'), (c) => this.unbanUser(c));
 
     // Threads
     app.get('/', (c) => this.listThreads(c));
-    app.post('/', (c) => this.createThread(c));
+    app.post('/', this.guard.require('FORUM_THREAD_CREATE_PERMISSION'), (c) => this.createThread(c));
     app.get('/:id', (c) => this.getThreadDetail(c));
-    app.put('/:id', (c) => this.updateThread(c));
-    app.delete('/:id', (c) => this.softDeleteThread(c));
-    app.post('/:id/restore', (c) => this.restoreThread(c));
-    app.post('/:id/archive', (c) => this.archiveThread(c));
-    app.post('/:id/unarchive', (c) => this.unarchiveThread(c));
+    app.put('/:id', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.updateThread(c));
+    app.delete('/:id', this.guard.require('FORUM_THREAD_DELETE_PERMISSION'), (c) => this.softDeleteThread(c));
+    app.post('/:id/restore', this.guard.require('FORUM_THREAD_DELETE_PERMISSION'), (c) => this.restoreThread(c));
+    app.post('/:id/archive', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.archiveThread(c));
+    app.post('/:id/unarchive', this.guard.require('FORUM_THREAD_MODIFY_PERMISSION'), (c) => this.unarchiveThread(c));
 
     // Messages
-    app.post('/:id/messages', (c) => this.addMessage(c));
-    app.delete('/:id/messages/:messageId', (c) => this.softDeleteMessage(c));
-    app.post('/:id/messages/:messageId/restore', (c) => this.restoreMessage(c));
+    app.post('/:id/messages', this.guard.require('FORUM_THREAD_CREATE_PERMISSION'), (c) => this.addMessage(c));
+    app.delete('/:id/messages/:messageId', this.guard.require('FORUM_THREAD_DELETE_MESSAGE_PERMISSION'), (c) => this.softDeleteMessage(c));
+    app.post('/:id/messages/:messageId/restore', this.guard.require('FORUM_THREAD_DELETE_MESSAGE_PERMISSION'), (c) => this.restoreMessage(c));
 
     // Reactions
-    app.post('/:id/messages/:messageId/reactions', (c) => this.addReaction(c));
-    app.delete('/:id/messages/:messageId/reactions/:emoji', (c) => this.removeReaction(c));
+    app.post('/:id/messages/:messageId/reactions', this.guard.require('FORUM_THREAD_CREATE_PERMISSION'), (c) => this.addReaction(c));
+    app.delete('/:id/messages/:messageId/reactions/:emoji', this.guard.require('FORUM_THREAD_CREATE_PERMISSION'), (c) => this.removeReaction(c));
 
     return app;
   }

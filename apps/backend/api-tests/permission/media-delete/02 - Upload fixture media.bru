@@ -1,0 +1,40 @@
+meta {
+  name: media-delete - 02 - Set fixture media id
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/media
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  if (!cityId) throw new Error('Missing cityNiceId — run step 01 first.');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+
+  // Use a non-existent UUID: guard fires before the service looks up the media,
+  // so 404 (guard passed) vs 403 (guard denied) is the meaningful distinction.
+  bru.setVar('permMediaId', 'ffffffff-ffff-4fff-8fff-ffffffffffff');
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/media`);
+  req.setHeader('Authorization', `Bearer ${adminToken}`);
+}
+
+tests {
+  test("Media endpoint reachable (200)", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Fixture media id set", function() {
+    expect(bru.getVar('permMediaId')).to.be.a('string').and.not.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

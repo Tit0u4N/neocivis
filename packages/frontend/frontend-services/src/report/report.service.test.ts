@@ -8,6 +8,7 @@ const CITY_ID = 'city-1';
 const mockReport: Report = {
   id: 'report-1',
   authorId: 'user-1',
+  cityId: CITY_ID,
   title: 'Broken street lamp',
   type: 'Éclairage public',
   status: 'pending',

@@ -69,9 +69,11 @@ export class ReportController {
     const { latitude, longitude } = fields.data;
     const location = latitude !== undefined && longitude !== undefined ? { latitude, longitude } : undefined;
 
+    const cityId = c.req.param('cityId') ?? '';
     const report = await this.reports.createReport({
       desc: fields.data.desc,
       authorId: String(user.id),
+      cityId,
       location,
       photoUrl,
       type,

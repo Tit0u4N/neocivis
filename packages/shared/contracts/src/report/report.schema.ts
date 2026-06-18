@@ -26,6 +26,7 @@ export type GpsLocation = z.infer<typeof GpsLocation>;
 export const Report = z.object({
   id: z.string().uuid(),
   authorId: z.string(),
+  cityId: z.string(),
   title: z.string().min(1).max(120),
   type: ReportType,
   status: ReportStatus,

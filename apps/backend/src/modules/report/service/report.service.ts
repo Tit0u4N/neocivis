@@ -15,11 +15,12 @@ function deriveTitle(desc: string, maxLen = 60): string {
 export class ReportService {
   constructor(private readonly repo: IReportRepository) {}
 
-  createReport(input: { desc: string; authorId: string; location?: GpsLocation; photoUrl: string; type?: ReportType }): Promise<Report> {
+  createReport(input: { desc: string; authorId: string; cityId: string; location?: GpsLocation; photoUrl: string; type?: ReportType }): Promise<Report> {
     const now = new Date().toISOString();
     return this.repo.create({
       id: randomUUID(),
       authorId: input.authorId,
+      cityId: input.cityId,
       title: deriveTitle(input.desc),
       type: input.type ?? 'Autre',
       status: 'pending',
@@ -44,8 +45,8 @@ export class ReportService {
 
   // --- Municipality (city-scoped, not author-scoped) ---
 
-  async getCityReports(_cityId: string, page: number, limit: number): Promise<PaginatedReportsResponse> {
-    const { items, total } = await this.repo.findAll(page, limit);
+  async getCityReports(cityId: string, page: number, limit: number): Promise<PaginatedReportsResponse> {
+    const { items, total } = await this.repo.findByCityId(cityId, page, limit);
     return {
       data: items,
       total,
@@ -55,9 +56,9 @@ export class ReportService {
     };
   }
 
-  async updateStatus(_cityId: string, id: string, status: ReportStatus): Promise<Report> {
+  async updateStatus(cityId: string, id: string, status: ReportStatus): Promise<Report> {
     const report = await this.repo.findById(id);
-    if (!report) {
+    if (!report || report.cityId !== cityId) {
       throw new Error('Report not found');
     }
     const now = new Date().toISOString();

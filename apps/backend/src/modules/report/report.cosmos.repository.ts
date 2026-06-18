@@ -77,19 +77,23 @@ export class CosmosReportRepository implements IReportRepository {
     return report;
   }
 
-  async findAll(page: number, limit: number): Promise<{ items: Report[]; total: number }> {
+  async findByCityId(cityId: string, page: number, limit: number): Promise<{ items: Report[]; total: number }> {
     const container = await this.getContainer();
 
     const { resources: countRes } = await container.items
-      .query<{ count: number }>({ query: 'SELECT VALUE COUNT(1) FROM c' })
+      .query<{ count: number }>({
+        query: 'SELECT VALUE COUNT(1) FROM c WHERE c.cityId = @cityId',
+        parameters: [{ name: '@cityId', value: cityId }],
+      })
       .fetchAll();
     const total = countRes[0]?.count ?? 0;
 
     const offset = (page - 1) * limit;
     const { resources } = await container.items
       .query<Report>({
-        query: 'SELECT * FROM c ORDER BY c.createdAt DESC OFFSET @offset LIMIT @limit',
+        query: 'SELECT * FROM c WHERE c.cityId = @cityId ORDER BY c.createdAt DESC OFFSET @offset LIMIT @limit',
         parameters: [
+          { name: '@cityId', value: cityId },
           { name: '@offset', value: offset },
           { name: '@limit', value: limit },
         ],

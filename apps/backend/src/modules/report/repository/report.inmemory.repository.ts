@@ -22,11 +22,12 @@ export class InMemoryReportRepository implements IReportRepository {
     return Promise.resolve({ items: sorted.slice(start, start + limit), total: own.length });
   }
 
-  findAll(page: number, limit: number): Promise<{ items: Report[]; total: number }> {
+  findByCityId(cityId: string, page: number, limit: number): Promise<{ items: Report[]; total: number }> {
     this.ensureSeeded();
-    const sorted = [...this.reports].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const own = this.reports.filter((r) => r.cityId === cityId);
+    const sorted = [...own].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = (page - 1) * limit;
-    return Promise.resolve({ items: sorted.slice(start, start + limit), total: this.reports.length });
+    return Promise.resolve({ items: sorted.slice(start, start + limit), total: own.length });
   }
 
   findById(id: string): Promise<Report | null> {

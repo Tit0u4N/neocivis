@@ -17,8 +17,6 @@ function hasPendingWebRedirect(): boolean {
   return params.has('code') && params.has('state');
 }
 
-WebBrowser.maybeCompleteAuthSession();
-
 export type AuthUser = {
   sub: string;
   name?: string;
@@ -117,16 +115,27 @@ export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthP
     void restoreSession();
   }, []); // mount-only — authority captured via ref
 
-  // Handle auth code exchange after the browser redirects back to the app.
+  // Capture verifier at the moment the response arrives to avoid stale closure
+  // when discovery/request regenerates before the exchange effect fires.
+  const pendingExchangeRef = useRef<{ code: string; codeVerifier: string } | null>(null);
+
   useEffect(() => {
-    if (response?.type !== 'success') {
-      return;
-    }
+    if (response?.type !== 'success') return;
     const code = response.params.code;
     const codeVerifier = request?.codeVerifier;
-    if (!(code && codeVerifier && discovery)) {
-      return;
+    if (code && codeVerifier) {
+      pendingExchangeRef.current = { code, codeVerifier };
     }
+  }, [response, request?.codeVerifier]);
+
+  // Handle auth code exchange after the browser redirects back to the app.
+  useEffect(() => {
+    if (response?.type !== 'success') return;
+    if (!discovery) return;
+
+    const pending = pendingExchangeRef.current;
+    if (!pending) return;
+    pendingExchangeRef.current = null;
 
     setIsLoading(true);
 
@@ -135,9 +144,9 @@ export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthP
         const tokenResponse = await exchangeCodeAsync(
           {
             clientId: authConfig.clientId,
-            code,
+            code: pending.code,
             redirectUri: authConfig.redirectUri,
-            extraParams: { code_verifier: codeVerifier },
+            extraParams: { code_verifier: pending.codeVerifier },
           },
           discovery,
         );
@@ -150,7 +159,8 @@ export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthP
           expiresAt,
         );
         setUser(parseJwtPayload(tokenResponse.accessToken));
-      } catch {
+      } catch (e) {
+        console.log('[Auth] exchange failed:', e);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -158,7 +168,7 @@ export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthP
     };
 
     void exchangeCode();
-  }, [response, request?.codeVerifier, discovery]);
+  }, [response, discovery]);
 
   // Web full-page redirect recovery: useAuthRequest is recreated on reload and loses
   // the original codeVerifier, so we persist it ourselves and complete the exchange here.
@@ -216,14 +226,10 @@ export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthP
   const login = async () => {
     setIsLoading(true);
     try {
-      // On web, persist the PKCE verifier before redirect — the page will reload and
-      // the in-memory request object will be lost.
       if (Platform.OS === 'web' && request?.codeVerifier && request?.state) {
         sessionStorage.setItem(`${PKCE_STORAGE_PREFIX}${request.state}`, request.codeVerifier);
       }
       const result = await promptAsync();
-      // Success is handled by the exchange effect above.
-      // For dismiss/error we reset loading here immediately.
       if (result.type !== 'success') {
         setIsLoading(false);
       }

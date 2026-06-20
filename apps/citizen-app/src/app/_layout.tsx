@@ -82,10 +82,11 @@ function InitialLayout() {
     const inTabsGroup = seg0 === '(tabs)';
     const isLoginPage = seg0 === 'login';
     const isSelectCityPage = seg0 === 'select-city';
+    const isAuthCallback = seg0 === 'redirect';
 
     const navigationTimeout = setTimeout(() => {
       if (!isAuthenticated) {
-        if (!isLoginPage) {
+        if (!isLoginPage && !isAuthCallback) {
           router.replace('/login');
         }
       } else if (profile === null) {
@@ -162,6 +163,7 @@ function InitialLayout() {
                 headerBlurEffect: isLiquidGlassAvailable() ? undefined : colorScheme === 'dark' ? 'dark' : 'light',
               }}
             /> */}
+      <Stack.Screen name="redirect" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

@@ -6,16 +6,18 @@ import { describe, expect, it, vi } from 'vitest';
 // Mocks
 // ---------------------------------------------------------------------------
 
-const mockUserService = { getMe: vi.fn() };
-vi.mock('@/providers/ServicesProvider', () => ({
-  useServices: () => ({ userService: mockUserService }),
+const mockGetMe = vi.fn();
+vi.mock('@/providers/ApiProvider', () => ({
+  useApi: () => ({}),
+}));
+vi.mock('@repo/frontend-services/user', () => ({
+  // biome-ignore lint/style/useNamingConvention: mock class name must match export
+  UserService: vi.fn().mockImplementation(() => ({ getMe: mockGetMe })),
 }));
 
 import { PermissionProvider, usePermissions } from './PermissionProvider';
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <PermissionProvider>{children}</PermissionProvider>
-);
+const wrapper = ({ children }: { children: ReactNode }) => <PermissionProvider>{children}</PermissionProvider>;
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -42,7 +44,7 @@ const ME_ADMIN = { ...ME_EMPLOYEE, role: 'ADMIN' as const, permissions: [] as co
 
 describe('PermissionProvider / usePermissions', () => {
   it('isLoaded est false au départ puis true après fetch', async () => {
-    mockUserService.getMe.mockResolvedValue(ME_EMPLOYEE);
+    mockGetMe.mockResolvedValue(ME_EMPLOYEE);
     const { result } = renderHook(() => usePermissions(), { wrapper });
 
     expect(result.current.isLoaded).toBe(false);
@@ -50,7 +52,7 @@ describe('PermissionProvider / usePermissions', () => {
   });
 
   it("expose les permissions de l'employe", async () => {
-    mockUserService.getMe.mockResolvedValue(ME_EMPLOYEE);
+    mockGetMe.mockResolvedValue(ME_EMPLOYEE);
     const { result } = renderHook(() => usePermissions(), { wrapper });
 
     await waitFor(() => expect(result.current.isLoaded).toBe(true));
@@ -61,7 +63,7 @@ describe('PermissionProvider / usePermissions', () => {
   });
 
   it('hasAnyPermission retourne true si au moins une clé est présente', async () => {
-    mockUserService.getMe.mockResolvedValue(ME_EMPLOYEE);
+    mockGetMe.mockResolvedValue(ME_EMPLOYEE);
     const { result } = renderHook(() => usePermissions(), { wrapper });
 
     await waitFor(() => expect(result.current.isLoaded).toBe(true));
@@ -71,7 +73,7 @@ describe('PermissionProvider / usePermissions', () => {
   });
 
   it('hasAllPermissions retourne true seulement si toutes les clés sont présentes', async () => {
-    mockUserService.getMe.mockResolvedValue(ME_EMPLOYEE);
+    mockGetMe.mockResolvedValue(ME_EMPLOYEE);
     const { result } = renderHook(() => usePermissions(), { wrapper });
 
     await waitFor(() => expect(result.current.isLoaded).toBe(true));
@@ -81,7 +83,7 @@ describe('PermissionProvider / usePermissions', () => {
   });
 
   it('ADMIN bypass — toutes les permissions retournent true', async () => {
-    mockUserService.getMe.mockResolvedValue(ME_ADMIN);
+    mockGetMe.mockResolvedValue(ME_ADMIN);
     const { result } = renderHook(() => usePermissions(), { wrapper });
 
     await waitFor(() => expect(result.current.isLoaded).toBe(true));

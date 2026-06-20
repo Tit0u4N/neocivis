@@ -1,3 +1,4 @@
+import type { ContainerClient } from '@azure/storage-blob';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { optionalEnv } from '@/infrastructure/env';
 
@@ -7,8 +8,19 @@ export function isBlobStorageConfigured(): boolean {
   return Boolean(optionalEnv('AZURE_STORAGE_CONNECTION_STRING'));
 }
 
+async function clearContainer(container: ContainerClient): Promise<void> {
+  let count = 0;
+  for await (const blob of container.listBlobsFlat()) {
+    await container.deleteBlob(blob.name);
+    count++;
+  }
+  // biome-ignore lint/suspicious/noConsole: script CLI
+  console.info(`[db:reset:blob] container cleared (container=${container.containerName}, count=${count})`);
+}
+
 /**
- * Deletes and recreates the media blob container (and legacy `articles` if present).
+ * Empties all blobs from the media blob container (and legacy `articles` if present).
+ * Containers themselves are kept intact.
  */
 export async function resetBlobStorage(): Promise<void> {
   const connectionString = optionalEnv('AZURE_STORAGE_CONNECTION_STRING');
@@ -26,20 +38,23 @@ export async function resetBlobStorage(): Promise<void> {
   }
 
   const client = BlobServiceClient.fromConnectionString(connectionString);
-  const containersToReset = [containerName, LEGACY_ARTICLES_CONTAINER];
-
-  for (const name of containersToReset) {
-    const container = client.getContainerClient(name);
-    const deleted = await container.deleteIfExists();
-    if (deleted.deleted) {
-      // biome-ignore lint/suspicious/noConsole: script CLI
-      console.info(`[db:reset:blob] container deleted (container=${name})`);
-    }
-  }
 
   const mediaContainer = client.getContainerClient(containerName);
-  await mediaContainer.createIfNotExists({ access: 'blob' });
-  await mediaContainer.setAccessPolicy('blob');
-  // biome-ignore lint/suspicious/noConsole: script CLI
-  console.info(`[db:reset:blob] container ensured (container=${containerName})`);
+  if (await mediaContainer.exists()) {
+    await clearContainer(mediaContainer);
+  } else {
+    await mediaContainer.createIfNotExists({ access: 'blob' });
+    try {
+      await mediaContainer.setAccessPolicy('blob');
+    } catch {
+      // Azurite emulator does not support container ACLs
+    }
+    // biome-ignore lint/suspicious/noConsole: script CLI
+    console.info(`[db:reset:blob] container created (container=${containerName})`);
+  }
+
+  const legacyContainer = client.getContainerClient(LEGACY_ARTICLES_CONTAINER);
+  if (await legacyContainer.exists()) {
+    await clearContainer(legacyContainer);
+  }
 }

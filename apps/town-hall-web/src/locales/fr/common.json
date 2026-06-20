@@ -592,7 +592,9 @@
       "actionEdit": "Modifier",
       "actionDelete": "Supprimer",
       "empty": "Aucun rôle trouvé.",
-      "error": "Impossible de charger les rôles."
+      "error": "Impossible de charger les rôles.",
+      "permissionCount_one": "{{count}} permission",
+      "permissionCount_other": "{{count}} permissions"
     },
     "form": {
       "createTitle": "Créer un rôle",
@@ -659,6 +661,40 @@
         "MEDIA_UPLOAD_PERMISSION": "Téléverser des images, vidéos et documents dans la bibliothèque.",
         "MEDIA_DELETE_PERMISSION": "Supprimer des médias de la bibliothèque."
       }
+    }
+  },
+  "employees": {
+    "list": {
+      "title": "Gestion des employés",
+      "count_one": "{{count}} employé",
+      "count_other": "{{count}} employés",
+      "add": "Ajouter un employé",
+      "searchPlaceholder": "Rechercher un utilisateur…",
+      "columnUser": "Utilisateur",
+      "columnRoles": "Rôles",
+      "actionEditRoles": "Modifier les rôles",
+      "actionRemove": "Retirer de la mairie",
+      "empty": "Aucun utilisateur trouvé.",
+      "noRolesConfigured": "Aucun rôle configuré — créez des rôles dans la section Rôles."
+    },
+    "form": {
+      "newEmployeeFallback": "Nouvel employé",
+      "usernameFallback": "nom.utilisateur",
+      "firstNameLabel": "Prénom",
+      "firstNamePlaceholder": "Jean",
+      "lastNameLabel": "Nom",
+      "lastNamePlaceholder": "Dupont",
+      "usernameLabel": "Nom d'utilisateur",
+      "usernamePlaceholder": "jean.dupont",
+      "emailLabel": "Email",
+      "emailPlaceholder": "jean.dupont@mairie.fr",
+      "assignedRolesLabel": "Rôles assignés",
+      "createAction": "Créer"
+    },
+    "remove": {
+      "title": "Retirer cet employé ?",
+      "description": "Cet employé sera retiré de la mairie. Son compte restera actif mais il n'aura plus accès à l'administration.",
+      "confirm": "Retirer"
     }
   }
 }

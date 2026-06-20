@@ -25,14 +25,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/ui/page-layout';
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { PERMISSION_GROUPS } from './permission-groups';
@@ -262,7 +255,9 @@ export function RoleListPage(props: Props) {
                     <p className="truncate">{role.description || '—'}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant="secondary">{role.permissions.length} permission(s)</Badge>
+                    <Badge variant="secondary">
+                      {t('roles.list.permissionCount', { count: role.permissions.length })}
+                    </Badge>
                   </td>
                   <td className="w-px px-4 py-3 text-right">
                     <DropdownMenu>

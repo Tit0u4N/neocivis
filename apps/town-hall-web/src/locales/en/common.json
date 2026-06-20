@@ -592,7 +592,9 @@
       "actionEdit": "Edit",
       "actionDelete": "Delete",
       "empty": "No roles found.",
-      "error": "Unable to load roles."
+      "error": "Unable to load roles.",
+      "permissionCount_one": "{{count}} permission",
+      "permissionCount_other": "{{count}} permissions"
     },
     "form": {
       "createTitle": "Create a role",
@@ -659,6 +661,40 @@
         "MEDIA_UPLOAD_PERMISSION": "Upload images, videos and documents to the library.",
         "MEDIA_DELETE_PERMISSION": "Delete media from the library."
       }
+    }
+  },
+  "employees": {
+    "list": {
+      "title": "Employee management",
+      "count_one": "{{count}} employee",
+      "count_other": "{{count}} employees",
+      "add": "Add an employee",
+      "searchPlaceholder": "Search a user…",
+      "columnUser": "User",
+      "columnRoles": "Roles",
+      "actionEditRoles": "Edit roles",
+      "actionRemove": "Remove from town hall",
+      "empty": "No users found.",
+      "noRolesConfigured": "No roles configured — create roles in the Roles section."
+    },
+    "form": {
+      "newEmployeeFallback": "New employee",
+      "usernameFallback": "username",
+      "firstNameLabel": "First name",
+      "firstNamePlaceholder": "John",
+      "lastNameLabel": "Last name",
+      "lastNamePlaceholder": "Smith",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "john.smith",
+      "emailLabel": "Email",
+      "emailPlaceholder": "john.smith@townhall.fr",
+      "assignedRolesLabel": "Assigned roles",
+      "createAction": "Create"
+    },
+    "remove": {
+      "title": "Remove this employee?",
+      "description": "This employee will be removed from the town hall. Their account will remain active but they will no longer have access to the administration.",
+      "confirm": "Remove"
     }
   }
 }

@@ -46,6 +46,7 @@ function RolePicker({
   onToggle: (roleId: string) => void;
   isLoading: boolean;
 }>) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -58,7 +59,7 @@ function RolePicker({
   if (roles.length === 0) {
     return (
       <p className="rounded-md border px-4 py-3 text-muted-foreground text-sm">
-        Aucun rôle configuré — créez des rôles dans la section Rôles.
+        {t('employees.list.noRolesConfigured')}
       </p>
     );
   }
@@ -101,7 +102,9 @@ function UserRow({
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <Avatar>
-            {user.profilePictureUrl && <AvatarImage src={user.profilePictureUrl} alt={`${user.firstName} ${user.lastName}`} />}
+            {user.profilePictureUrl && (
+              <AvatarImage src={user.profilePictureUrl} alt={`${user.firstName} ${user.lastName}`} />
+            )}
             <AvatarFallback className="bg-primary/10 font-semibold text-primary text-xs">
               {getInitials(user)}
             </AvatarFallback>
@@ -138,10 +141,10 @@ function UserRow({
             )}
           />
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onEdit}>Modifier les rôles</DropdownMenuItem>
+            <DropdownMenuItem onClick={onEdit}>{t('employees.list.actionEditRoles')}</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDeleteRequest} className="text-destructive">
-              Retirer de la mairie
+              {t('employees.list.actionRemove')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -182,18 +185,18 @@ export function UserListPage(props: Props) {
   } = props;
 
   return (
-    <PageLayout title="Gestion des employés">
+    <PageLayout title={t('employees.list.title')}>
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{users.length} employé(s)</p>
+        <p className="text-muted-foreground text-sm">{t('employees.list.count', { count: users.length })}</p>
         <Button onClick={openCreateDialog}>
           <Plus className="mr-2 size-4" />
-          Ajouter un employé
+          {t('employees.list.add')}
         </Button>
       </div>
 
       <div className="flex items-center gap-3">
         <Input
-          placeholder="Rechercher un utilisateur..."
+          placeholder={t('employees.list.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-xs"
@@ -210,8 +213,12 @@ export function UserListPage(props: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Utilisateur</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Rôles</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                {t('employees.list.columnUser')}
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                {t('employees.list.columnRoles')}
+              </th>
               <th className="w-px px-4 py-3" />
             </tr>
           </thead>
@@ -228,7 +235,7 @@ export function UserListPage(props: Props) {
             {!isLoading && users.length === 0 && (
               <tr>
                 <td className="px-4 py-10 text-center text-muted-foreground" colSpan={3}>
-                  <p className="font-medium">Aucun utilisateur trouvé.</p>
+                  <p className="font-medium">{t('employees.list.empty')}</p>
                 </td>
               </tr>
             )}
@@ -261,51 +268,53 @@ export function UserListPage(props: Props) {
               <AlertDialogTitle className="font-semibold text-base">
                 {createForm.firstName || createForm.lastName
                   ? `${createForm.firstName} ${createForm.lastName}`.trim()
-                  : 'Nouvel employé'}
+                  : t('employees.form.newEmployeeFallback')}
               </AlertDialogTitle>
-              <p className="mt-0.5 text-muted-foreground text-sm">{createForm.username || 'nom.utilisateur'}</p>
+              <p className="mt-0.5 text-muted-foreground text-sm">
+                {createForm.username || t('employees.form.usernameFallback')}
+              </p>
             </div>
           </div>
 
           <div className="space-y-5 px-6 py-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="font-medium text-sm">Prénom *</Label>
+                <Label className="font-medium text-sm">{t('employees.form.firstNameLabel')} *</Label>
                 <Input
                   value={createForm.firstName}
                   onChange={(e) => setCreateField('firstName', e.target.value)}
-                  placeholder="Jean"
+                  placeholder={t('employees.form.firstNamePlaceholder')}
                 />
                 {createErrors.firstName && <p className="text-destructive text-xs">{createErrors.firstName}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label className="font-medium text-sm">Nom *</Label>
+                <Label className="font-medium text-sm">{t('employees.form.lastNameLabel')} *</Label>
                 <Input
                   value={createForm.lastName}
                   onChange={(e) => setCreateField('lastName', e.target.value)}
-                  placeholder="Dupont"
+                  placeholder={t('employees.form.lastNamePlaceholder')}
                 />
                 {createErrors.lastName && <p className="text-destructive text-xs">{createErrors.lastName}</p>}
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="font-medium text-sm">{"Nom d'utilisateur *"}</Label>
+              <Label className="font-medium text-sm">{t('employees.form.usernameLabel')} *</Label>
               <Input
                 value={createForm.username}
                 onChange={(e) => setCreateField('username', e.target.value)}
-                placeholder="jean.dupont"
+                placeholder={t('employees.form.usernamePlaceholder')}
               />
               {createErrors.username && <p className="text-destructive text-xs">{createErrors.username}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <Label className="font-medium text-sm">Email *</Label>
+              <Label className="font-medium text-sm">{t('employees.form.emailLabel')} *</Label>
               <Input
                 type="email"
                 value={createForm.email}
                 onChange={(e) => setCreateField('email', e.target.value)}
-                placeholder="jean.dupont@mairie.fr"
+                placeholder={t('employees.form.emailPlaceholder')}
               />
               {createErrors.email && <p className="text-destructive text-xs">{createErrors.email}</p>}
             </div>
@@ -314,7 +323,7 @@ export function UserListPage(props: Props) {
           <AlertDialogFooter className="border-t bg-muted/20 px-6 py-4">
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={() => void handleCreate()} disabled={isSubmittingCreate}>
-              Créer
+              {t('employees.form.createAction')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -345,7 +354,7 @@ export function UserListPage(props: Props) {
 
           <div className="space-y-4 px-6 py-5">
             <div className="space-y-2">
-              <Label className="font-medium text-sm">Rôles assignés</Label>
+              <Label className="font-medium text-sm">{t('employees.form.assignedRolesLabel')}</Label>
               <RolePicker roles={roles} selected={editRoleIds} onToggle={toggleEditRole} isLoading={isEditLoading} />
             </div>
           </div>
@@ -363,10 +372,9 @@ export function UserListPage(props: Props) {
       <AlertDialog open={confirmDeleteId !== null} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>
         <AlertDialogContent className="max-w-xl overflow-hidden p-0">
           <AlertDialogHeader className="px-8 pt-8 pb-6">
-            <AlertDialogTitle className="text-xl">Retirer cet employé ?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">{t('employees.remove.title')}</AlertDialogTitle>
             <AlertDialogDescription className="mt-2 text-base">
-              Cet employé sera retiré de la mairie. Son compte restera actif mais il n'aura plus accès à
-              l'administration.
+              {t('employees.remove.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="border-t bg-muted/20 px-8 py-5">
@@ -375,7 +383,7 @@ export function UserListPage(props: Props) {
               onClick={() => confirmDeleteId !== null && void handleDelete(confirmDeleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Retirer
+              {t('employees.remove.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

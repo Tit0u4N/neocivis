@@ -1,8 +1,9 @@
 'use client';
 
 import type { BaseUserRole, PermissionKey } from '@repo/contracts';
+import { UserService } from '@repo/frontend-services/user';
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
-import { useServices } from '@/providers/ServicesProvider';
+import { useApi } from '@/providers/ApiProvider';
 
 type PermissionContextValue = {
   permissions: PermissionKey[];
@@ -17,18 +18,19 @@ type PermissionContextValue = {
 const PermissionContext = createContext<PermissionContextValue | undefined>(undefined);
 
 export function PermissionProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const { userService } = useServices();
+  const api = useApi();
   const [permissions, setPermissions] = useState<PermissionKey[]>([]);
   const [role, setRole] = useState<BaseUserRole | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    const userService = new UserService(api);
     userService.getMe().then((me) => {
       setPermissions(me.permissions);
       setRole(me.role);
       setIsLoaded(true);
     });
-  }, [userService]);
+  }, [api]);
 
   const value: PermissionContextValue = {
     permissions,

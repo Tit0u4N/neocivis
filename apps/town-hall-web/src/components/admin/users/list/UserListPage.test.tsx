@@ -87,7 +87,7 @@ describe('UserListPage', () => {
 
   it('shows empty state when there are no users', () => {
     render(<UserListPage {...makeProps({ isLoading: false, users: [] })} />);
-    expect(screen.getByText('Aucun utilisateur trouvé.')).toBeTruthy();
+    expect(screen.getByText('employees.list.empty')).toBeTruthy();
   });
 
   it('renders a row for each user', () => {
@@ -105,20 +105,20 @@ describe('UserListPage', () => {
   it('calls setSearchQuery when the search input changes', () => {
     const setSearchQuery = vi.fn();
     render(<UserListPage {...makeProps({ setSearchQuery })} />);
-    const input = screen.getByPlaceholderText('Rechercher un utilisateur...');
+    const input = screen.getByPlaceholderText('employees.list.searchPlaceholder');
     fireEvent.change(input, { target: { value: 'alice' } });
     expect(setSearchQuery).toHaveBeenCalledWith('alice');
   });
 
   it('shows the delete confirmation dialog when confirmDeleteId is set', () => {
     render(<UserListPage {...makeProps({ confirmDeleteId: 1 })} />);
-    expect(screen.getByText('Retirer cet employé ?')).toBeTruthy();
+    expect(screen.getByText('employees.remove.title')).toBeTruthy();
   });
 
   it('calls handleDelete when the delete confirmation is confirmed', () => {
     const handleDelete = vi.fn();
     render(<UserListPage {...makeProps({ confirmDeleteId: 1, handleDelete })} />);
-    fireEvent.click(screen.getByText('Retirer'));
+    fireEvent.click(screen.getByText('employees.remove.confirm'));
     expect(handleDelete).toHaveBeenCalledWith(1);
   });
 

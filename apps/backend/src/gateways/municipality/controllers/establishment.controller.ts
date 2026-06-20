@@ -1,9 +1,13 @@
 import { CreateEstablishmentInput, UpdateEstablishmentInput } from '@repo/contracts/establishment';
 import { type Context, Hono } from 'hono';
+import type { PermissionGuard } from '@/middlewares/permission.guard';
 import type { EstablishmentService } from '@/modules/establishment/service/establishment.service';
 
 export class EstablishmentController {
-  constructor(private service: EstablishmentService) {}
+  constructor(
+    private service: EstablishmentService,
+    private guard: PermissionGuard,
+  ) {}
 
   public getRoutes() {
     const app = new Hono();
@@ -22,7 +26,7 @@ export class EstablishmentController {
       return c.json(establishment);
     });
 
-    app.post('/', async (c: Context) => {
+    app.post('/', this.guard.require('ESTABLISHMENT_CREATE_PERMISSION'), async (c: Context) => {
       const cityId = c.req.param('cityId') ?? '';
       const body = await c.req.json();
       const parsed = CreateEstablishmentInput.safeParse(body);
@@ -33,7 +37,7 @@ export class EstablishmentController {
       return c.json(establishment, 201);
     });
 
-    app.put('/:id', async (c: Context) => {
+    app.put('/:id', this.guard.require('ESTABLISHMENT_MODIFY_PERMISSION'), async (c: Context) => {
       const cityId = c.req.param('cityId') ?? '';
       const body = await c.req.json();
       const parsed = UpdateEstablishmentInput.safeParse(body);
@@ -47,7 +51,7 @@ export class EstablishmentController {
       return c.json(establishment);
     });
 
-    app.delete('/:id', async (c: Context) => {
+    app.delete('/:id', this.guard.require('ESTABLISHMENT_DELETE_PERMISSION'), async (c: Context) => {
       const cityId = c.req.param('cityId') ?? '';
       const deleted = await this.service.delete(cityId, c.req.param('id'));
       if (!deleted) {

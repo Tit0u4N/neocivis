@@ -72,10 +72,6 @@
         "description": "Voir les signalements"
       },
       {
-        "name": "SIGNAL_CREATE_PERMISSION",
-        "description": "Créer des signalements"
-      },
-      {
         "name": "SIGNAL_MODIFY_PERMISSION",
         "description": "Modifier des signalements"
       },
@@ -108,16 +104,12 @@
         "description": "Modifier des éléments de la page mairie"
       },
       {
-        "name": "PAGE_CITY_HALL_ANNOUNCE_PERMISSION",
-        "description": "Créer des annonces sur la page mairie"
+        "name": "MEDIA_UPLOAD_PERMISSION",
+        "description": "Uploader des médias"
       },
       {
-        "name": "NOTIFICATION_SEND_PERMISSION",
-        "description": "Envoyer des notifications aux utilisateurs"
-      },
-      {
-        "name": "WEBHOOK_PERMISSION",
-        "description": "Gestion des webhook"
+        "name": "MEDIA_DELETE_PERMISSION",
+        "description": "Supprimer des médias"
       }
     ]
   },

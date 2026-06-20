@@ -218,12 +218,12 @@ describe('AccessService', () => {
   describe('userHasPermission', () => {
     it('returns true for ADMIN of the city (bypass)', async () => {
       const admin = usersById.get(10) as User;
-      await expect(service.userHasPermission(admin, NICE, 'NOTIFICATION_SEND_PERMISSION')).resolves.toBe(true);
+      await expect(service.userHasPermission(admin, NICE, 'ARTICLE_PUBLISH_PERMISSION')).resolves.toBe(true);
     });
 
     it('returns false for ADMIN of another city', async () => {
       const admin = usersById.get(10) as User;
-      await expect(service.userHasPermission(admin, BIOT, 'NOTIFICATION_SEND_PERMISSION')).resolves.toBe(false);
+      await expect(service.userHasPermission(admin, BIOT, 'ARTICLE_PUBLISH_PERMISSION')).resolves.toBe(false);
     });
 
     it('returns true for an EMPLOYEE whose role grants the permission in this city', async () => {

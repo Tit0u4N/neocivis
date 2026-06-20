@@ -1,0 +1,52 @@
+meta {
+  name: access-roles-admin - 03 - Denied - Create role (employee)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/roles
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "name": "should-never-be-created",
+    "description": "Blocked by admin guard",
+    "permissions": []
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/roles`);
+}
+
+tests {
+  test("Status is 403 — employee cannot create roles", function() {
+    expect(res.getStatus()).to.equal(403);
+  });
+  test("Error mentions ADMIN role required", function() {
+    expect(res.getBody()).to.have.property('error').that.includes('ADMIN');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

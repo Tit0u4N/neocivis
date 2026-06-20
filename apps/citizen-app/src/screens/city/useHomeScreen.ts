@@ -1,5 +1,5 @@
 import type { ArticleWithResolvedTranslation } from '@repo/contracts/article';
-import type { CarouselItemResolved } from '@repo/contracts/config';
+import type { CarouselItemResolved, CategoryLink } from '@repo/contracts/config';
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useAuth } from '@/providers/AuthProvider';
@@ -10,7 +10,7 @@ const HOME_PREVIEW_LIMIT = 3;
 
 export type Category = {
   id: string;
-  attachedPageId?: string;
+  link?: CategoryLink;
   name: string;
   icon: string; // PascalCase Lucide icon name, e.g. 'Star', 'TriangleAlert'
   color: string;

@@ -19,7 +19,6 @@ export type CategoryTranslation = z.infer<typeof CategoryTranslation>;
 
 export const Category = z.object({
   id: z.string(),
-  attachedPageId: z.string().optional(),
   link: CategoryLink.optional(),
   icon: z.string().min(1),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),

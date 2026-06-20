@@ -69,6 +69,10 @@
         "drafts": "Brouillons",
         "searchPlaceholder": "Rechercher…"
       },
+      "viewMode": {
+        "list": "Vue liste",
+        "grid": "Vue mosaïque"
+      },
       "table": {
         "title": "Titre",
         "status": "Statut",
@@ -529,5 +533,51 @@
       "deleteConfirm": "Supprimer cette catégorie ?",
       "error": "Impossible de charger les catégories."
     }
+  },
+  "forumUsers": {
+    "title": "Gestion des utilisateurs",
+    "tabs": {
+      "active": "Comptes actifs",
+      "banned": "Comptes bannis"
+    },
+    "search": "Saisir un nom d'utilisateur",
+    "table": {
+      "username": "Nom d'utilisateur",
+      "contributions": "Contributions au forum",
+      "status": "Statut du compte",
+      "dateBan": "Date du ban"
+    },
+    "status": {
+      "active": "Actif",
+      "banned": "Banni"
+    },
+    "actions": {
+      "ban": "Bannir",
+      "unban": "Débannir",
+      "more": "Plus"
+    },
+    "banModal": {
+      "title": "Bannir l'utilisateur",
+      "description": "Voulez-vous vraiment bannir {{name}} ? Cette action peut être annulée.",
+      "cancel": "Annuler",
+      "confirm": "Bannir"
+    },
+    "unbanModal": {
+      "title": "Débannir l'utilisateur",
+      "description": "Voulez-vous vraiment débannir {{name}} ?",
+      "cancel": "Annuler",
+      "confirm": "Débannir"
+    },
+    "infoModal": {
+      "title": "Informations utilisateur",
+      "profilePicture": "Photo de profil",
+      "username": "Nom d'utilisateur",
+      "lastConnection": "Dernière connexion",
+      "banSince": "Banni depuis",
+      "memberSince": "Membre depuis",
+      "close": "Fermer"
+    },
+    "empty": "Aucun utilisateur",
+    "error": "Impossible de charger les utilisateurs"
   }
 }

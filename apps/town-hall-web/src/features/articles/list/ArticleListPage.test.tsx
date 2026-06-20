@@ -56,6 +56,8 @@ function makeProps(overrides: Partial<Parameters<typeof ArticleListPage>[0]> = {
     navigateToCreate: vi.fn(),
     navigateToEdit: vi.fn(),
     navigateToTranslations: vi.fn(),
+    viewMode: 'list' as const,
+    setViewMode: vi.fn(),
     ...overrides,
   };
 }
@@ -120,5 +122,23 @@ describe('ArticleListPage', () => {
     render(<ArticleListPage {...makeProps({ confirmDeleteId: 'a1', setConfirmDeleteId })} />);
     fireEvent.click(screen.getByText('common.cancel'));
     expect(setConfirmDeleteId).toHaveBeenCalledWith(null);
+  });
+
+  it('renders article cards in grid view', () => {
+    const articles = [makeArticle('a1', 'published', 'Article Un'), makeArticle('a2', 'draft', 'Article Deux')];
+    render(<ArticleListPage {...makeProps({ articles, viewMode: 'grid' })} />);
+    expect(screen.getByText('Article Un')).toBeTruthy();
+    expect(screen.getByText('Article Deux')).toBeTruthy();
+  });
+
+  it('shows empty state in grid view when there are no articles', () => {
+    render(<ArticleListPage {...makeProps({ isLoading: false, articles: [], viewMode: 'grid' })} />);
+    expect(screen.getByText('articles.list.empty.title')).toBeTruthy();
+  });
+
+  it('renders grid skeletons while loading in grid view', () => {
+    const { container } = render(<ArticleListPage {...makeProps({ isLoading: true, viewMode: 'grid' })} />);
+    const skeletons = container.querySelectorAll('[class*="animate-pulse"], [class*="skeleton"]');
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 });

@@ -202,4 +202,29 @@ describe('useArticleListPage', () => {
     act(() => result.current.navigateToTranslations('a1'));
     expect(mockPush).toHaveBeenCalledWith('/dashboard/articles/a1/translations');
   });
+
+  it('viewMode defaults to list', async () => {
+    mockArticleService.getAll.mockResolvedValue([]);
+    const { result } = renderHook(() => useArticleListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.viewMode).toBe('list');
+  });
+
+  it('setViewMode switches to grid', async () => {
+    mockArticleService.getAll.mockResolvedValue([]);
+    const { result } = renderHook(() => useArticleListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    act(() => result.current.setViewMode('grid'));
+    expect(result.current.viewMode).toBe('grid');
+  });
+
+  it('setViewMode switches back to list from grid', async () => {
+    mockArticleService.getAll.mockResolvedValue([]);
+    const { result } = renderHook(() => useArticleListPage());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    act(() => result.current.setViewMode('grid'));
+    expect(result.current.viewMode).toBe('grid');
+    act(() => result.current.setViewMode('list'));
+    expect(result.current.viewMode).toBe('list');
+  });
 });

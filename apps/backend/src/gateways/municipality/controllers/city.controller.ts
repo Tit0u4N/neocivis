@@ -2,6 +2,7 @@ import type { ApiErrorDto, CityPublicDto, OperationSuccessDto, UserPublicDto } f
 import { UpdateCityInput as UpdateCityInputSchema } from '@repo/contracts/city';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { PermissionGuard } from '@/middlewares/permission.guard';
 import type { CityService } from '@/modules/city/city.service';
 import type { UserService } from '@/modules/users/service/user.service';
 
@@ -9,15 +10,16 @@ export class CityController {
   constructor(
     private cityService: CityService,
     private userService: UserService,
+    private guard: PermissionGuard,
   ) {}
 
   public getRoutes(): Hono {
     const app = new Hono();
-    app.patch('/:cityId', (c) => this.patchCity(c));
+    app.patch('/:cityId', this.guard.require('PAGE_CITY_HALL_MODIFY_PERMISSION'), (c) => this.patchCity(c));
     app.get('/:cityId/citizens', (c) => this.listCitizens(c));
     app.get('/:cityId/employees', (c) => this.listEmployees(c));
-    app.post('/:cityId/employees', (c) => this.createAndAssignEmployee(c));
-    app.delete('/:cityId/employees/:userId', (c) => this.unassignEmployee(c));
+    app.post('/:cityId/employees', this.guard.requireAdmin(), (c) => this.createAndAssignEmployee(c));
+    app.delete('/:cityId/employees/:userId', this.guard.requireAdmin(), (c) => this.unassignEmployee(c));
     return app;
   }
 

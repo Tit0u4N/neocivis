@@ -1,0 +1,44 @@
+meta {
+  name: forum-thread-delete - 04 - Allowed - Delete thread
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/{{permThreadId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  const threadId = bru.getVar('permThreadId');
+  if (!threadId) throw new Error('permThreadId not set — run step 02 first');
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/${threadId}`);
+}
+
+script:post-response {
+  bru.setVar('permThreadId', null);
+}
+
+tests {
+  test("Status is 200 — employee has FORUM_THREAD_DELETE_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

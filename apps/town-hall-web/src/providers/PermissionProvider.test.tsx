@@ -12,7 +12,9 @@ vi.mock('@/providers/ApiProvider', () => ({
 }));
 vi.mock('@repo/frontend-services/user', () => ({
   // biome-ignore lint/style/useNamingConvention: mock class name must match export
-  UserService: vi.fn().mockImplementation(() => ({ getMe: mockGetMe })),
+  UserService: class {
+    getMe = mockGetMe;
+  },
 }));
 
 import { PermissionProvider, usePermissions } from './PermissionProvider';

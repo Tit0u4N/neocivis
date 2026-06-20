@@ -8,6 +8,17 @@ export default mergeConfig(reactConfig, {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      react: path.resolve(__dirname, '../../node_modules/react'),
+      'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
+    },
+    dedupe: ['react', 'react-dom'],
+  },
+  test: {
+    server: {
+      deps: {
+        // Force locally-installed packages through Vite so the react alias applies
+        inline: [/@base-ui\/react/],
+      },
     },
   },
 });

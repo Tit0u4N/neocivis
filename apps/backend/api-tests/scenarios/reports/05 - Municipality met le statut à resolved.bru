@@ -1,0 +1,46 @@
+meta {
+  name: 05 - Municipality met le statut à resolved
+  type: http
+  seq: 987
+}
+
+patch {
+  url: {{url}}/api/municipality/cities/{{reportTestCityId}}/reports/{{e2eReportId}}/status
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "resolved"
+  }
+}
+
+script:pre-request {
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  const cityId = bru.getVar('reportTestCityId');
+  const reportId = bru.getVar('e2eReportId');
+  if (!token || !cityId || !reportId) {
+    throw new Error('Missing tokenAdmin, reportTestCityId, or e2eReportId — run steps 01-04 first.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/reports/${reportId}/status`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Report is now resolved with resolvedAt", function() {
+    const body = res.getBody();
+    expect(body.status).to.equal('resolved');
+    expect(body.resolvedAt).to.be.a('string');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

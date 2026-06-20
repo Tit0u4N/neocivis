@@ -36,7 +36,7 @@ export class CosmosReportRepository implements IReportRepository {
     // Get total count
     const { resources: countRes } = await container.items
       .query<{ count: number }>({
-        query: 'SELECT VALUE COUNT(1) FROM c WHERE c.authorId = @authorId',
+        query: 'SELECT COUNT(1) AS count FROM c WHERE c.authorId = @authorId',
         parameters: [{ name: '@authorId', value: authorId }],
       })
       .fetchAll();
@@ -82,7 +82,7 @@ export class CosmosReportRepository implements IReportRepository {
 
     const { resources: countRes } = await container.items
       .query<{ count: number }>({
-        query: 'SELECT VALUE COUNT(1) FROM c WHERE c.cityId = @cityId',
+        query: 'SELECT COUNT(1) AS count FROM c WHERE c.cityId = @cityId',
         parameters: [{ name: '@cityId', value: cityId }],
       })
       .fetchAll();
@@ -114,5 +114,15 @@ export class CosmosReportRepository implements IReportRepository {
     const updated = { ...existing, ...patch, id } as Report;
     await container.items.upsert(updated);
     return updated;
+  }
+
+  async deleteAll(): Promise<void> {
+    const container = await this.getContainer();
+    const { resources } = await container.items
+      .query<{ id: string; authorId: string }>({ query: 'SELECT c.id, c.authorId FROM c' })
+      .fetchAll();
+    for (const item of resources) {
+      await container.item(item.id, item.authorId).delete();
+    }
   }
 }

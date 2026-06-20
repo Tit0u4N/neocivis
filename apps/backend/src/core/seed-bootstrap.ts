@@ -6,6 +6,7 @@ import {
   createConfigRepository,
   createEstablishmentRepository,
   createMediaRepository,
+  createReportRepository,
   createThreadRepository,
   createUserRepository,
 } from '@/core/in-memory-repositories';
@@ -30,6 +31,7 @@ async function bootstrapAutoSeed(): Promise<void> {
   const mediaRepository = createMediaRepository();
   const establishmentRepository = createEstablishmentRepository();
   const threadRepository = createThreadRepository();
+  const reportRepository = createReportRepository();
 
   const iamService = new KeycloakIAMService();
   const userService = new UserService(userRepository, iamService, mediaBlobService);
@@ -44,6 +46,7 @@ async function bootstrapAutoSeed(): Promise<void> {
     accessService,
     establishmentRepository,
     threadRepository,
+    reportRepository,
     mediaRepository,
     mediaBlobService,
     configRepository,

@@ -1,21 +1,10 @@
 import type { Report } from '@repo/contracts/report';
-import { getMockReports } from '../seed/report.seed';
 import type { IReportRepository } from './report.repository.interface';
 
 export class InMemoryReportRepository implements IReportRepository {
-  private seeded = false;
   private reports: Report[] = [];
 
-  private ensureSeeded(): void {
-    if (this.seeded) {
-      return;
-    }
-    this.reports = getMockReports();
-    this.seeded = true;
-  }
-
   findByAuthor(authorId: string, page: number, limit: number): Promise<{ items: Report[]; total: number }> {
-    this.ensureSeeded();
     const own = this.reports.filter((r) => r.authorId === authorId);
     const sorted = [...own].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = (page - 1) * limit;
@@ -23,7 +12,6 @@ export class InMemoryReportRepository implements IReportRepository {
   }
 
   findByCityId(cityId: string, page: number, limit: number): Promise<{ items: Report[]; total: number }> {
-    this.ensureSeeded();
     const own = this.reports.filter((r) => r.cityId === cityId);
     const sorted = [...own].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = (page - 1) * limit;
@@ -31,23 +19,25 @@ export class InMemoryReportRepository implements IReportRepository {
   }
 
   findById(id: string): Promise<Report | null> {
-    this.ensureSeeded();
     return Promise.resolve(this.reports.find((r) => r.id === id) ?? null);
   }
 
   create(report: Report): Promise<Report> {
-    this.ensureSeeded();
     this.reports.push(report);
     return Promise.resolve(report);
   }
 
   update(id: string, patch: Partial<Report>): Promise<Report> {
-    this.ensureSeeded();
     const idx = this.reports.findIndex((r) => r.id === id);
     if (idx === -1) {
       throw new Error(`Report not found: ${id}`);
     }
     this.reports[idx] = { ...this.reports[idx], ...patch };
     return Promise.resolve(this.reports[idx]);
+  }
+
+  // biome-ignore lint/suspicious/useAwait: mock file
+  async deleteAll(): Promise<void> {
+    this.reports = [];
   }
 }

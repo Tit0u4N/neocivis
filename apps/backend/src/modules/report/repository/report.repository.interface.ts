@@ -6,4 +6,5 @@ export interface IReportRepository {
   findById(id: string): Promise<Report | null>;
   create(report: Report): Promise<Report>;
   update(id: string, patch: Partial<Report>): Promise<Report>;
+  deleteAll(): Promise<void>;
 }

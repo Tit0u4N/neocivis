@@ -1,0 +1,51 @@
+meta {
+  name: 02 - Citizen liste ses signalements
+  type: http
+  seq: 984
+}
+
+get {
+  url: {{url}}/api/citizen/cities/{{reportTestCityId}}/reports/me
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenCitizen');
+  const cityId = bru.getVar('reportTestCityId');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — run step 01 first.');
+  }
+  if (!cityId) {
+    throw new Error('Missing reportTestCityId — run step 01 first.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/reports/me`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response is paginated", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('data').that.is.an('array');
+    expect(body).to.have.property('total').that.is.a('number');
+    expect(body).to.have.property('page');
+    expect(body).to.have.property('limit');
+    expect(body).to.have.property('totalPages');
+  });
+
+  test("Created report is in the list", function() {
+    const reportId = bru.getVar('e2eReportId');
+    const found = res.getBody().data.find(function(r) { return r.id === reportId; });
+    expect(found).to.not.be.undefined;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

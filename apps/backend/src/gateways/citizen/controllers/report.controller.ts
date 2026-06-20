@@ -35,7 +35,7 @@ export class ReportController {
   private async createReport(c: Context): Promise<ControllerJson<Report, 201>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
     const user = (c as any).var.user;
-    if (!user) {
+    if (!user?.id) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
 
@@ -46,8 +46,8 @@ export class ReportController {
       longitude: formData.get('longitude') ?? undefined,
     });
     if (!fields.success) {
-      const body: ApiErrorWithDetailsDto = { error: 'Invalid fields', details: fields.error.flatten() };
-      return c.json(body, 400);
+      const errBody: ApiErrorWithDetailsDto = { error: 'Invalid fields', details: fields.error.flatten() };
+      return c.json(errBody, 400);
     }
 
     const photo = formData.get('photo');
@@ -60,8 +60,10 @@ export class ReportController {
     if (photo.size > MAX_SIZE_BYTES) {
       return c.json({ error: 'Fichier trop volumineux. Maximum 5 Mo.' } satisfies ApiErrorDto, 400);
     }
+
+    const cityId = c.req.param('cityId') ?? '';
     const buf = await photo.arrayBuffer();
-    const photoUrl = await this.uploads.uploadImage(buf, photo.name, photo.type);
+    const photoUrl = await this.uploads.uploadImage(buf, photo.name, photo.type, cityId);
 
     // Analyse IA de la photo pour détecter le type automatiquement (best-effort)
     const type = await this.qwen.analyzeReportImage(photoUrl).catch(() => undefined);
@@ -69,10 +71,9 @@ export class ReportController {
     const { latitude, longitude } = fields.data;
     const location = latitude !== undefined && longitude !== undefined ? { latitude, longitude } : undefined;
 
-    const cityId = c.req.param('cityId') ?? '';
     const report = await this.reports.createReport({
       desc: fields.data.desc,
-      authorId: String(user.id),
+      authorId: user.id.toString(),
       cityId,
       location,
       photoUrl,

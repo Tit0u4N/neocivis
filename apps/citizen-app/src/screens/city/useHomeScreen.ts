@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useAuth } from '@/providers/AuthProvider';
 import { useServices } from '@/providers/ServicesProvider';
+import { useCityStore } from '@/stores/city.store';
 
 const HOME_PREVIEW_LIMIT = 3;
 
@@ -23,6 +24,7 @@ export function useHomeScreen() {
   const { articleService, configService } = useServices();
   const { language } = useLanguage();
   const { user } = useAuth();
+  const { cityId } = useCityStore();
 
   const [articles, setArticles] = useState<ArticleWithResolvedTranslation[]>([]);
   const [carouselItems, setCarouselItems] = useState<CarouselItemResolved[]>([]);
@@ -32,6 +34,7 @@ export function useHomeScreen() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!cityId) return;
     setArticlesLoading(true);
     setError(null);
     void articleService
@@ -45,9 +48,10 @@ export function useHomeScreen() {
       .finally(() => {
         setArticlesLoading(false);
       });
-  }, [language, articleService]);
+  }, [language, articleService, cityId]);
 
   useEffect(() => {
+    if (!cityId) return;
     setCarouselLoading(true);
     void configService
       .getConfig(language)
@@ -55,10 +59,13 @@ export function useHomeScreen() {
         setCarouselItems(config.carousel);
         setCategories(config.categories);
       })
+      .catch(() => {
+        setCarouselLoading(false);
+      })
       .finally(() => {
         setCarouselLoading(false);
       });
-  }, [language, configService]);
+  }, [language, configService, cityId]);
 
   const previewArticles = useMemo(() => articles.slice(0, HOME_PREVIEW_LIMIT), [articles]);
 

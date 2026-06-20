@@ -1,0 +1,42 @@
+meta {
+  name: 06 - Citizen ne peut pas annuler (déjà résolu)
+  type: http
+  seq: 988
+}
+
+patch {
+  url: {{url}}/api/citizen/cities/{{reportTestCityId}}/reports/{{e2eReportId}}/cancel
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenCitizen');
+  const cityId = bru.getVar('reportTestCityId');
+  const reportId = bru.getVar('e2eReportId');
+  if (!token || !cityId || !reportId) {
+    throw new Error('Missing tokenCitizen, reportTestCityId, or e2eReportId — run steps 01-05 first.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/reports/${reportId}/cancel`);
+}
+
+tests {
+  test("Status is 400 (already resolved)", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("Error message mentions resolved or cancelled", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('error').that.is.a('string');
+    expect(body.error.toLowerCase()).to.satisfy(function(msg) {
+      return msg.includes('resolved') || msg.includes('cancel');
+    });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

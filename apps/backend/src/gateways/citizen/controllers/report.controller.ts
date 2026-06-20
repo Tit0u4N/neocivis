@@ -7,6 +7,7 @@ import {
 } from '@repo/contracts/report';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { GroqService } from '@/modules/report/groq.service';
 import type { ReportService } from '@/modules/report/service/report.service';
 import type { IUploadService } from '@/modules/upload/upload.service';
 
@@ -17,6 +18,7 @@ export class ReportController {
   constructor(
     private reports: ReportService,
     private uploads: IUploadService,
+    private qwen: GroqService,
   ) {}
 
   public getRoutes(): Hono {
@@ -32,8 +34,8 @@ export class ReportController {
 
   private async createReport(c: Context): Promise<ControllerJson<Report, 201>> {
     // biome-ignore lint/suspicious/noExplicitAny: user set by auth middleware on context
-    const user = (c as any).user;
-    if (!user) {
+    const user = (c as any).var.user;
+    if (!user?.id) {
       return c.json({ error: 'Unauthorized' } satisfies ApiErrorDto, 401);
     }
 
@@ -44,8 +46,8 @@ export class ReportController {
       longitude: formData.get('longitude') ?? undefined,
     });
     if (!fields.success) {
-      const body: ApiErrorWithDetailsDto = { error: 'Invalid fields', details: fields.error.flatten() };
-      return c.json(body, 400);
+      const errBody: ApiErrorWithDetailsDto = { error: 'Invalid fields', details: fields.error.flatten() };
+      return c.json(errBody, 400);
     }
 
     const photo = formData.get('photo');
@@ -58,17 +60,24 @@ export class ReportController {
     if (photo.size > MAX_SIZE_BYTES) {
       return c.json({ error: 'Fichier trop volumineux. Maximum 5 Mo.' } satisfies ApiErrorDto, 400);
     }
+
+    const cityId = c.req.param('cityId') ?? '';
     const buf = await photo.arrayBuffer();
-    const photoUrl = await this.uploads.uploadImage(buf, photo.name, photo.type);
+    const photoUrl = await this.uploads.uploadImage(buf, photo.name, photo.type, cityId);
+
+    // Analyse IA de la photo pour détecter le type automatiquement (best-effort)
+    const type = await this.qwen.analyzeReportImage(photoUrl).catch(() => undefined);
 
     const { latitude, longitude } = fields.data;
     const location = latitude !== undefined && longitude !== undefined ? { latitude, longitude } : undefined;
 
     const report = await this.reports.createReport({
       desc: fields.data.desc,
-      authorId: user.id,
+      authorId: user.id.toString(),
+      cityId,
       location,
       photoUrl,
+      type,
     });
     const body: Report = report;
     return c.json(body, 201);
@@ -90,7 +99,7 @@ export class ReportController {
     }
 
     const { page, limit } = result.data;
-    const body: PaginatedReportsResponse = await this.reports.getMyReports(user.id, page, limit);
+    const body: PaginatedReportsResponse = await this.reports.getMyReports(String(user.id), page, limit);
     return c.json(body, 200);
   }
 
@@ -102,7 +111,7 @@ export class ReportController {
     }
 
     try {
-      const report = await this.reports.getReportByIdForUser(c.req.param('id'), user.id);
+      const report = await this.reports.getReportByIdForUser(c.req.param('id'), String(user.id));
       const body: Report = report;
       return c.json(body, 200);
     } catch {
@@ -118,7 +127,7 @@ export class ReportController {
     }
 
     try {
-      const report = await this.reports.cancelReport(c.req.param('id'), user.id);
+      const report = await this.reports.cancelReport(c.req.param('id'), String(user.id));
       const body: Report = report;
       return c.json(body, 200);
     } catch (err) {

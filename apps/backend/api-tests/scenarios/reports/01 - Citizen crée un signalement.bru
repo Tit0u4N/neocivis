@@ -1,0 +1,65 @@
+meta {
+  name: 01 - Citizen crée un signalement
+  type: http
+  seq: 983
+}
+
+post {
+  url: {{url}}/api/citizen/cities/{{reportTestCityId}}/reports
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  desc: Trottoir effondre devant le 12 rue de la Paix
+  latitude: 43.7102
+  longitude: 7.2620
+  photo: @file(fixtures/report-groq.jpg) @contentType(image/jpeg)
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+  const cityId = bru.getEnvVar('reportTestCityId');
+  if (!cityId) {
+    throw new Error('Missing reportTestCityId — folder pre-request did not resolve the city.');
+  }
+  bru.setVar('reportTestCityId', cityId);
+}
+
+
+tests {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Report has required fields", function() {
+    const body = res.getBody();
+    expect(body.id).to.be.a('string');
+    expect(body.authorId).to.be.a('string');
+    expect(body.cityId).to.be.a('string');
+    expect(body.desc).to.be.a('string');
+    expect(body.photoUrl).to.be.a('string');
+    expect(body.status).to.equal('pending');
+    bru.setVar('e2eReportId', body.id);
+  });
+  
+  test("Type is a valid ReportType", function() {
+    expect(res.getBody().type).to.be.a('string');
+  });
+  
+  const expectedType = bru.getEnvVar('groq_expected_type');
+  if (expectedType) {
+    test("Groq a classifie correctement l'image", function() {
+      expect(res.getBody().type).to.equal(expectedType);
+    });
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}

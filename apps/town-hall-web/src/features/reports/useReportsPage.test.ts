@@ -28,6 +28,7 @@ function makeReport(id: string, status: ReportStatus, overrides: Partial<Report>
   return {
     id,
     authorId: 'usr-test',
+    cityId: 'city-test',
     title: `Signalement ${id}`,
     type: 'Voirie',
     status,

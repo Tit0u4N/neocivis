@@ -8,8 +8,9 @@ const CITY_ID = 'city-1';
 const mockReport: Report = {
   id: 'report-1',
   authorId: 'user-1',
+  cityId: CITY_ID,
   title: 'Broken street lamp',
-  type: 'Public lighting',
+  type: 'Éclairage public',
   status: 'pending',
   desc: 'The street lamp on the corner flickers.',
   photoUrl: 'https://example.com/photo.jpg',
@@ -54,7 +55,7 @@ describe('ReportService', () => {
 
       const result = await service.getMine();
 
-      expect(ky.get).toHaveBeenCalledWith('me', expect.objectContaining({ searchParams: {} }));
+      expect(ky.get).toHaveBeenCalledWith('reports/me', expect.objectContaining({ searchParams: {} }));
       expect(result).toEqual(mockPaginated);
     });
 
@@ -64,7 +65,7 @@ describe('ReportService', () => {
 
       await service.getMine({ page: 2, limit: 5 });
 
-      expect(ky.get).toHaveBeenCalledWith('me', expect.objectContaining({ searchParams: { page: 2, limit: 5 } }));
+      expect(ky.get).toHaveBeenCalledWith('reports/me', expect.objectContaining({ searchParams: { page: 2, limit: 5 } }));
     });
   });
 
@@ -75,7 +76,7 @@ describe('ReportService', () => {
 
       const result = await service.getById('report-1');
 
-      expect(ky.get).toHaveBeenCalledWith('report-1');
+      expect(ky.get).toHaveBeenCalledWith('reports/report-1');
       expect(result).toEqual(mockReport);
     });
   });
@@ -88,7 +89,7 @@ describe('ReportService', () => {
 
       const result = await service.cancel('report-1');
 
-      expect(ky.patch).toHaveBeenCalledWith('report-1/cancel');
+      expect(ky.patch).toHaveBeenCalledWith('reports/report-1/cancel');
       expect(result.status).toBe('cancelled');
     });
   });
@@ -106,7 +107,7 @@ describe('ReportService', () => {
       });
 
       expect(ky.extend).toHaveBeenCalledWith({ headers: { 'Content-Type': undefined } });
-      expect(postMock).toHaveBeenCalledWith('', expect.objectContaining({ body: expect.any(FormData) }));
+      expect(postMock).toHaveBeenCalledWith('reports', expect.objectContaining({ body: expect.any(FormData) }));
       expect(result).toEqual(mockReport);
     });
 
@@ -150,7 +151,7 @@ describe('ReportService', () => {
 
       const result = await service.getAll();
 
-      expect(ky.get).toHaveBeenCalledWith('');
+      expect(ky.get).toHaveBeenCalledWith('reports');
       expect(result).toEqual(mockPaginated);
     });
   });
@@ -163,7 +164,7 @@ describe('ReportService', () => {
 
       const result = await service.updateStatus('report-1', 'progress');
 
-      expect(ky.patch).toHaveBeenCalledWith('report-1/status', { json: { status: 'progress' } });
+      expect(ky.patch).toHaveBeenCalledWith('reports/report-1/status', { json: { status: 'progress' } });
       expect(result.status).toBe('progress');
     });
   });

@@ -15,6 +15,7 @@ describe('ReportService', () => {
       const report = await service.createReport({
         desc: 'Trottoir dégradé',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       expect(report.id).toBeDefined();
@@ -30,6 +31,7 @@ describe('ReportService', () => {
       const report = await service.createReport({
         desc: 'Nid de poule',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       expect(report.title).toBe('Nid de poule');
@@ -41,6 +43,7 @@ describe('ReportService', () => {
       const report = await service.createReport({
         desc,
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       expect(report.title.length).toBeLessThanOrEqual(61); // 60 + ellipsis char
@@ -52,6 +55,7 @@ describe('ReportService', () => {
       const report = await service.createReport({
         desc: 'Lampadaire cassé',
         authorId: 'user-1',
+        cityId: 'test-city',
         location: { latitude: 43.2965, longitude: 5.3698 },
         photoUrl: 'https://example.com/photo.jpg',
       });
@@ -66,11 +70,13 @@ describe('ReportService', () => {
       await service.createReport({
         desc: 'Problème voirie',
         authorId: 'user-A',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       await service.createReport({
         desc: 'Éclairage défaillant',
         authorId: 'user-B',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
 
@@ -84,6 +90,7 @@ describe('ReportService', () => {
         await service.createReport({
           desc: `Signalement ${i} suffisamment long`,
           authorId: 'user-paginate',
+          cityId: 'test-city',
           photoUrl: 'https://example.com/photo.jpg',
         });
       }
@@ -108,6 +115,7 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Mobilier cassé',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       const found = await service.getReportByIdForUser(created.id, 'user-1');
@@ -124,6 +132,7 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Dégradation',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       await expect(service.getReportByIdForUser(created.id, 'user-autre')).rejects.toThrow('Report not found');
@@ -133,8 +142,8 @@ describe('ReportService', () => {
   describe('getCityReports', () => {
     it('retourne tous les signalements de la ville, tous auteurs confondus', async () => {
       const { service } = makeService();
-      await service.createReport({ desc: 'Voirie auteur A', authorId: 'user-A', photoUrl: 'https://x/a.jpg' });
-      await service.createReport({ desc: 'Voirie auteur B', authorId: 'user-B', photoUrl: 'https://x/b.jpg' });
+      await service.createReport({ desc: 'Voirie auteur A', authorId: 'user-A', cityId: 'city-1', photoUrl: 'https://x/a.jpg' });
+      await service.createReport({ desc: 'Voirie auteur B', authorId: 'user-B', cityId: 'city-1', photoUrl: 'https://x/b.jpg' });
 
       const result = await service.getCityReports('city-1', 1, 10);
       const authors = new Set(result.data.map((r) => r.authorId));
@@ -142,11 +151,20 @@ describe('ReportService', () => {
       expect(authors.has('user-B')).toBe(true);
     });
 
+    it('ne retourne pas les signalements des autres villes', async () => {
+      const { service } = makeService();
+      await service.createReport({ desc: 'Signalement ville 1', authorId: 'user-A', cityId: 'city-1', photoUrl: 'https://x/a.jpg' });
+      await service.createReport({ desc: 'Signalement ville 2', authorId: 'user-B', cityId: 'city-2', photoUrl: 'https://x/b.jpg' });
+
+      const result = await service.getCityReports('city-1', 1, 10);
+      expect(result.data.every((r) => r.cityId === 'city-1')).toBe(true);
+    });
+
     it('calcule correctement totalPages sur le total de la ville', async () => {
       const { service } = makeService();
       const baseline = (await service.getCityReports('city-1', 1, 1)).total;
       for (let i = 0; i < 5; i++) {
-        await service.createReport({ desc: `Signalement ${i} long`, authorId: 'user-X', photoUrl: 'https://x/x.jpg' });
+        await service.createReport({ desc: `Signalement ${i} long`, authorId: 'user-X', cityId: 'city-1', photoUrl: 'https://x/x.jpg' });
       }
       const limit = 2;
       const result = await service.getCityReports('city-1', 1, limit);
@@ -162,10 +180,11 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Trottoir abîmé',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://x/a.jpg',
       });
       await repo.update(created.id, { updatedAt: '2020-01-01T00:00:00.000Z' });
-      const updated = await service.updateStatus('city-1', created.id, 'progress');
+      const updated = await service.updateStatus('test-city', created.id, 'progress');
       expect(updated.status).toBe('progress');
       expect(updated.updatedAt).not.toBe('2020-01-01T00:00:00.000Z');
     });
@@ -175,9 +194,10 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Lampadaire cassé',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://x/a.jpg',
       });
-      const updated = await service.updateStatus('city-1', created.id, 'resolved');
+      const updated = await service.updateStatus('test-city', created.id, 'resolved');
       expect(updated.status).toBe('resolved');
       expect(updated.resolvedAt).toBeDefined();
     });
@@ -194,6 +214,7 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Bruit excessif nocturne',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       const cancelled = await service.cancelReport(created.id, 'user-1');
@@ -205,6 +226,7 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Stationnement gênant',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       // Force une date passée pour garantir un updatedAt différent après cancel
@@ -218,6 +240,7 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Problème résolu',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       await repo.update(created.id, { status: 'resolved' });
@@ -231,6 +254,7 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: 'Déjà annulé',
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       await service.cancelReport(created.id, 'user-1');
@@ -244,6 +268,7 @@ describe('ReportService', () => {
       const created = await service.createReport({
         desc: "Signalement d'un autre",
         authorId: 'user-1',
+        cityId: 'test-city',
         photoUrl: 'https://example.com/photo.jpg',
       });
       await expect(service.cancelReport(created.id, 'user-autre')).rejects.toThrow('Report not found');

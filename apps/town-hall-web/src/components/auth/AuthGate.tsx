@@ -7,6 +7,7 @@ import { useAuth } from 'react-oidc-context';
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { Button } from '@/components/ui/button';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { PermissionProvider } from '@/providers/PermissionProvider';
 
 export function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
   const auth = useAuth();
@@ -44,9 +45,11 @@ export function AuthGate({ children }: Readonly<{ children: ReactNode }>) {
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>{children}</SidebarInset>
-    </SidebarProvider>
+    <PermissionProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>{children}</SidebarInset>
+      </SidebarProvider>
+    </PermissionProvider>
   );
 }

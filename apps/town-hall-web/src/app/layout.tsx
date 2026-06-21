@@ -23,9 +23,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <I18nProvider>
           <AppProvider>
             <AuthProvider>
-              <AuthGate>
-                <ApiProvider>{children}</ApiProvider>
-              </AuthGate>
+              <ApiProvider>
+                <AuthGate>{children}</AuthGate>
+              </ApiProvider>
             </AuthProvider>
           </AppProvider>
         </I18nProvider>

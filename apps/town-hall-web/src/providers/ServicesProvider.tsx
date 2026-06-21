@@ -1,5 +1,6 @@
 'use client';
 
+import { AccessService } from '@repo/frontend-services/access';
 import { ArticleService } from '@repo/frontend-services/article';
 import { CityService } from '@repo/frontend-services/city';
 import { ConfigService } from '@repo/frontend-services/config';
@@ -18,6 +19,7 @@ import { useCityStore } from '@/stores/city.store';
  * (auth, permission, upload) are created where they are used.
  */
 type ServicesContextValue = {
+  accessService: AccessService;
   articleService: ArticleService;
   cityService: CityService;
   configService: ConfigService;
@@ -44,6 +46,7 @@ export function ServicesProvider({ children }: Readonly<{ children: ReactNode }>
 
   const services = useMemo<ServicesContextValue>(
     () => ({
+      accessService: new AccessService(api, cityId),
       articleService: new ArticleService(api, cityId),
       cityService: new CityService(api),
       configService: new ConfigService(api, cityId),

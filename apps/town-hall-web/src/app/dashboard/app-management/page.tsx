@@ -6,7 +6,7 @@ import { PageLayout } from '@/components/ui/page-layout';
 import { cn } from '@/lib/utils';
 
 type AppTab = 'layout' | 'carousel';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { CarouselTab } from '../../../features/app-management/carousel/CarouselTab';
 import { CategoryLayoutTab } from '../../../features/app-management/category/CategoryLayoutTab';
 

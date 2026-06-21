@@ -579,5 +579,122 @@
     },
     "empty": "No users",
     "error": "Unable to load users"
+  },
+  "roles": {
+    "list": {
+      "title": "Role management",
+      "count": "role(s)",
+      "create": "Create role",
+      "searchPlaceholder": "Search a role…",
+      "columnName": "Name",
+      "columnDescription": "Description",
+      "columnPermissions": "Permissions",
+      "actionEdit": "Edit",
+      "actionDelete": "Delete",
+      "empty": "No roles found.",
+      "error": "Unable to load roles.",
+      "permissionCount_one": "{{count}} permission",
+      "permissionCount_other": "{{count}} permissions"
+    },
+    "form": {
+      "createTitle": "Create a role",
+      "createSubtitle": "Define a role and its associated permissions.",
+      "editTitle": "Edit role",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Forum moderator",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the responsibilities of this role…",
+      "permissionsLabel": "Permissions",
+      "createAction": "Create",
+      "editAction": "Save"
+    },
+    "delete": {
+      "title": "Delete this role?",
+      "description": "This action is irreversible. The role will be removed from all employees who have it.",
+      "confirm": "Delete"
+    },
+    "errors": {
+      "duplicateName": "This name is already used by another role."
+    },
+    "permissions": {
+      "SIGNAL_VIEW_PERMISSION": "View reports",
+      "SIGNAL_MODIFY_PERMISSION": "Modify reports",
+      "FORUM_THREAD_CREATE_PERMISSION": "Create threads",
+      "FORUM_THREAD_DELETE_PERMISSION": "Delete threads",
+      "FORUM_THREAD_MODIFY_PERMISSION": "Modify threads",
+      "FORUM_THREAD_DELETE_MESSAGE_PERMISSION": "Delete forum messages",
+      "FORUM_THREAD_BAN_USER_PERMISSION": "Ban forum users",
+      "FORUM_THREAD_UNBAN_USER_PERMISSION": "Unban forum users",
+      "PAGE_CITY_HALL_MODIFY_PERMISSION": "Modify city hall page",
+      "ARTICLE_PUBLISH_PERMISSION": "Publish articles",
+      "ARTICLE_MODIFY_PERMISSION": "Modify articles",
+      "ARTICLE_DELETE_PERMISSION": "Delete articles",
+      "ESTABLISHMENT_CREATE_PERMISSION": "Create establishments",
+      "ESTABLISHMENT_MODIFY_PERMISSION": "Modify establishments",
+      "ESTABLISHMENT_DELETE_PERMISSION": "Delete establishments",
+      "MEDIA_UPLOAD_PERMISSION": "Upload media",
+      "MEDIA_DELETE_PERMISSION": "Delete media",
+      "groups": {
+        "SIGNAL": "Reports",
+        "FORUM_THREAD": "Forum",
+        "PAGE_CITY_HALL": "City hall page",
+        "ARTICLE": "Articles",
+        "ESTABLISHMENT": "Establishments",
+        "MEDIA": "Media"
+      },
+      "descriptions": {
+        "SIGNAL_VIEW_PERMISSION": "View the list and details of citizen reports.",
+        "SIGNAL_MODIFY_PERMISSION": "Update the status and information of a report.",
+        "FORUM_THREAD_CREATE_PERMISSION": "Create new discussion threads on the forum.",
+        "FORUM_THREAD_DELETE_PERMISSION": "Permanently delete a discussion thread.",
+        "FORUM_THREAD_MODIFY_PERMISSION": "Modify the title or content of a discussion thread.",
+        "FORUM_THREAD_DELETE_MESSAGE_PERMISSION": "Delete individual messages within a thread.",
+        "FORUM_THREAD_BAN_USER_PERMISSION": "Prevent a user from posting on the forum.",
+        "FORUM_THREAD_UNBAN_USER_PERMISSION": "Lift a user's ban from the forum.",
+        "PAGE_CITY_HALL_MODIFY_PERMISSION": "Modify the content of the city hall presentation page.",
+        "ARTICLE_PUBLISH_PERMISSION": "Publish new articles on the municipal portal.",
+        "ARTICLE_MODIFY_PERMISSION": "Modify the content of existing articles.",
+        "ARTICLE_DELETE_PERMISSION": "Delete published articles.",
+        "ESTABLISHMENT_CREATE_PERMISSION": "Register a new municipal establishment.",
+        "ESTABLISHMENT_MODIFY_PERMISSION": "Update an establishment's information.",
+        "ESTABLISHMENT_DELETE_PERMISSION": "Remove an establishment from the catalog.",
+        "MEDIA_UPLOAD_PERMISSION": "Upload images, videos and documents to the library.",
+        "MEDIA_DELETE_PERMISSION": "Delete media from the library."
+      }
+    }
+  },
+  "employees": {
+    "list": {
+      "title": "Employee management",
+      "count_one": "{{count}} employee",
+      "count_other": "{{count}} employees",
+      "add": "Add an employee",
+      "searchPlaceholder": "Search a user…",
+      "columnUser": "User",
+      "columnRoles": "Roles",
+      "actionEditRoles": "Edit roles",
+      "actionRemove": "Remove from town hall",
+      "empty": "No users found.",
+      "noRolesConfigured": "No roles configured — create roles in the Roles section."
+    },
+    "form": {
+      "newEmployeeFallback": "New employee",
+      "usernameFallback": "username",
+      "firstNameLabel": "First name",
+      "firstNamePlaceholder": "John",
+      "lastNameLabel": "Last name",
+      "lastNamePlaceholder": "Smith",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "john.smith",
+      "emailLabel": "Email",
+      "emailPlaceholder": "john.smith@townhall.fr",
+      "assignedRolesLabel": "Assigned roles",
+      "createAction": "Create"
+    },
+    "remove": {
+      "title": "Remove this employee?",
+      "description": "This employee will be removed from the town hall. Their account will remain active but they will no longer have access to the administration.",
+      "confirm": "Remove"
+    }
   }
 }

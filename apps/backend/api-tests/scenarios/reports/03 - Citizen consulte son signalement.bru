@@ -1,0 +1,41 @@
+meta {
+  name: 03 - Citizen consulte son signalement
+  type: http
+  seq: 985
+}
+
+get {
+  url: {{url}}/api/citizen/cities/{{reportTestCityId}}/reports/{{e2eReportId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenCitizen');
+  const cityId = bru.getVar('reportTestCityId');
+  const reportId = bru.getVar('e2eReportId');
+  if (!token || !cityId || !reportId) {
+    throw new Error('Missing tokenCitizen, reportTestCityId, or e2eReportId — run steps 01-02 first.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/reports/${reportId}`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Report matches created one", function() {
+    const body = res.getBody();
+    expect(body.id).to.equal(bru.getVar('e2eReportId'));
+    expect(body.status).to.equal('pending');
+    expect(body.desc).to.contain('Trottoir');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,6 +1,6 @@
 import '@/i18n';
 import * as NavigationBar from 'expo-navigation-bar';
-import type { ErrorBoundaryProps } from 'expo-router';
+import type { ErrorBoundaryProps, Href } from 'expo-router';
 import { Stack, useRootNavigationState, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -14,10 +14,16 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ApiProvider } from '@/providers/ApiProvider';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
-import { CityProvider } from '@/stores/city.store';
+import { ServicesProvider } from '@/providers/ServicesProvider';
+import { ArticlesProvider } from '@/stores/articles.store';
+import { CityProvider, useCityStore } from '@/stores/city.store';
+import { ForumProvider } from '@/stores/forum.store';
+import { ProfileProvider, useProfile } from '@/stores/profile.store';
+import { UserProvider } from '@/stores/user.store';
 import { Colors } from '@/theme/colors';
 import { ThemeProvider } from '@/theme/theme-provider';
 import 'react-native-reanimated';
+import { ToastProvider } from '@/components/ui/toast';
 
 type GlobalErrorHandler = (error: unknown, isFatal?: boolean) => void;
 
@@ -54,7 +60,9 @@ export function ErrorBoundary({ error }: ErrorBoundaryProps) {
 
 function InitialLayout() {
   useColorScheme() || 'light';
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { profile, isLoading: profileLoading } = useProfile();
+  const { cityId, setCityId, setCity } = useCityStore();
   const segments = useSegments();
   const router = useRouter();
 
@@ -65,29 +73,56 @@ function InitialLayout() {
       return;
     }
 
+    const isLoading = authLoading || (isAuthenticated && profileLoading);
     if (isLoading) {
       return;
     }
 
-    // `segments[0]` helps us determine the current "root" route.
-    const InTabsGroup = segments[0] === '(tabs)';
-    const isLoginPage = segments[0] === 'login';
+    const seg0 = segments[0] as string;
+    const inTabsGroup = seg0 === '(tabs)';
+    const isLoginPage = seg0 === 'login';
+    const isSelectCityPage = seg0 === 'select-city';
+    const isAuthCallback = seg0 === 'redirect';
+
     const navigationTimeout = setTimeout(() => {
-      if (!(isAuthenticated || isLoginPage)) {
-        // Si non connecté et qu'on n'est pas sur la page login -> On force le login
-        router.replace('/login');
-      } else if (isAuthenticated && !InTabsGroup) {
-        // Si déjà connecté et qu'on n'est pas dans les tabs -> On redirige vers l'appli
-        router.replace('/(tabs)/(city)');
+      if (!isAuthenticated) {
+        if (!isLoginPage && !isAuthCallback) {
+          router.replace('/login');
+        }
+      } else if (profile === null) {
+        // Profil non chargé (erreur réseau) → retour au login
+        if (!isLoginPage) {
+          router.replace('/login');
+        }
+      } else if (profile.memberships.length === 0) {
+        // Citoyen sans ville → écran de sélection
+        if (!isSelectCityPage) {
+          router.replace('/select-city' as Href);
+        }
+      } else {
+        // Citoyen avec au moins une ville → auto-sélectionner la 1ère
+        const firstCity = profile.memberships[0];
+        if (cityId !== firstCity.id) {
+          setCityId(firstCity.id);
+          setCity(firstCity);
+        }
+        if (!inTabsGroup) {
+          router.replace('/(tabs)/(city)');
+        }
       }
     }, 0);
 
     return () => clearTimeout(navigationTimeout);
   }, [
     isAuthenticated,
-    isLoading,
+    authLoading,
+    profileLoading,
+    profile,
+    cityId,
+    setCityId,
+    setCity,
     segments,
-    rootNavigationState?.key, // Si déjà connecté et qu'on est sur la page login -> On redirige vers l'appli
+    rootNavigationState?.key,
     router.replace,
   ]);
 
@@ -96,6 +131,7 @@ function InitialLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
       <Stack.Screen name="login/index" options={{ headerShown: false }} />
+      <Stack.Screen name="select-city/index" options={{ headerShown: false }} />
 
       {/* <Stack.Screen
               name="sheet"
@@ -127,6 +163,7 @@ function InitialLayout() {
                 headerBlurEffect: isLiquidGlassAvailable() ? undefined : colorScheme === 'dark' ? 'dark' : 'light',
               }}
             /> */}
+      <Stack.Screen name="redirect" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
@@ -207,14 +244,26 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: bgColor }}>
       <LanguageProvider>
         <ThemeProvider>
-          <AuthProvider>
-            <ApiProvider>
-              <CityProvider>
-                <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-                <InitialLayout />
-              </CityProvider>
-            </ApiProvider>
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <ApiProvider>
+                <CityProvider>
+                  <ServicesProvider>
+                    <UserProvider>
+                      <ArticlesProvider>
+                        <ForumProvider>
+                          <ProfileProvider>
+                            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
+                            <InitialLayout />
+                          </ProfileProvider>
+                        </ForumProvider>
+                      </ArticlesProvider>
+                    </UserProvider>
+                  </ServicesProvider>
+                </CityProvider>
+              </ApiProvider>
+            </AuthProvider>
+          </ToastProvider>
         </ThemeProvider>
       </LanguageProvider>
     </GestureHandlerRootView>

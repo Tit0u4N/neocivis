@@ -1,30 +1,45 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CarouselTab } from '@/components/app-management/carousel/CarouselTab';
-import { CategoryLayoutTab } from '@/components/app-management/category/CategoryLayoutTab';
 import { PageLayout } from '@/components/ui/page-layout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+
+type AppTab = 'layout' | 'carousel';
+
+import { CarouselTab } from '../../../features/app-management/carousel/CarouselTab';
+import { CategoryLayoutTab } from '../../../features/app-management/category/CategoryLayoutTab';
 
 export default function AppManagementRoute() {
   const { t } = useTranslation();
+  const [tab, setTab] = useState<AppTab>('layout');
+
+  const TABS: { id: AppTab; label: string }[] = [
+    { id: 'layout', label: t('appManagement.tabs.layout') },
+    { id: 'carousel', label: t('appManagement.tabs.carousel') },
+  ];
 
   return (
     <PageLayout title={t('appManagement.title')} className={'flex-col'}>
-      <Tabs className="flex-col gap-3 pt-3">
-        <TabsList className="h-8 w-full text-xl">
-          <TabsTrigger value="layout">{t('appManagement.tabs.layout')}</TabsTrigger>
-          <TabsTrigger value="carousel">{t('appManagement.tabs.carousel')}</TabsTrigger>
-        </TabsList>
+      <div className="flex border-border border-b">
+        {TABS.map((t_) => (
+          <button
+            key={t_.id}
+            type="button"
+            onClick={() => setTab(t_.id)}
+            className={cn(
+              '-mb-px border-b-2 px-5 py-2 font-medium text-sm transition-colors',
+              tab === t_.id
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {t_.label}
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="layout">
-          <CategoryLayoutTab />
-        </TabsContent>
-
-        <TabsContent value="carousel">
-          <CarouselTab />
-        </TabsContent>
-      </Tabs>
+      {tab === 'layout' ? <CategoryLayoutTab /> : <CarouselTab />}
     </PageLayout>
   );
 }

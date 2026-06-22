@@ -1,0 +1,98 @@
+<policies>
+    <!-- Throttle, authorize, validate, cache, or transform the requests -->
+    <inbound>
+        <base />
+        
+        <cors allow-credentials="true">
+            <allowed-origins>
+                <origin>https://citizen-app-dev.neocivis.cloud</origin>
+                <origin>https://townhall-dev.neocivis.cloud</origin>
+            </allowed-origins>
+            <allowed-methods>
+                <method>GET</method>
+                <method>POST</method>
+                <method>PUT</method>
+                <method>DELETE</method>
+                <method>OPTIONS</method>
+                <method>PATCH</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
+        </cors>
+
+        <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized - Token missing or exipred" require-scheme="Bearer" output-token-variable-name="jwtToken">
+            <openid-config url="https://auth.neocivis.cloud/realms/neocivis-dev/.well-known/openid-configuration" />
+            <audiences>
+                <audience>neocivis-api</audience>
+            </audiences>
+            <issuers>
+                <issuer>https://auth.neocivis.cloud/realms/neocivis-dev</issuer>
+            </issuers>
+        </validate-jwt>
+
+        <!-- X-User-Id -->
+        <set-header name="X-User-Id" exists-action="override">
+            <value>@(((Jwt)context.Variables["jwtToken"]).Claims.GetValueOrDefault("sub", new[] { "" })[0])</value>
+        </set-header>
+
+        <!-- X-User-Username -->
+        <set-header name="X-User-Username" exists-action="override">
+            <value>@(((Jwt)context.Variables["jwtToken"]).Claims.GetValueOrDefault("preferred_username", new[] { "" })[0])</value>
+        </set-header>
+
+        <!-- X-User-Email -->
+        <set-header name="X-User-Email" exists-action="override">
+            <value>@(((Jwt)context.Variables["jwtToken"]).Claims.GetValueOrDefault("email", new[] { "" })[0])</value>
+        </set-header>
+
+        <!-- X-User-First-Name -->
+        <set-header name="X-User-First-Name" exists-action="override">
+            <value>@(((Jwt)context.Variables["jwtToken"]).Claims.GetValueOrDefault("given_name", new[] { "" })[0])</value>
+        </set-header>
+
+        <!-- X-User-Last-Name -->
+        <set-header name="X-User-Last-Name" exists-action="override">
+            <value>@(((Jwt)context.Variables["jwtToken"]).Claims.GetValueOrDefault("family_name", new[] { "" })[0])</value>
+        </set-header>
+
+        <!-- 3. Injection du champ complexe imbriqué (realm_access.roles) -->
+        <set-header name="X-User-Roles" exists-action="override">
+            <value>@{
+                var jwt = (Jwt)context.Variables["jwtToken"];
+                // On récupère le bloc JSON "realm_access" sous forme de texte brut
+                var realmAccessStr = jwt.Claims.GetValueOrDefault("realm_access", new[] { "" })[0];
+                
+                if (!string.IsNullOrWhiteSpace(realmAccessStr)) {
+                    try {
+                        // On parse le texte en objet JSON utilisable
+                        var realmAccess = Newtonsoft.Json.Linq.JObject.Parse(realmAccessStr);
+                        var roles = realmAccess["roles"];
+                        
+                        if (roles != null) {
+                            // On transforme le tableau JSON ["CITIZEN", "ADMIN"] en chaîne de caractères "CITIZEN,ADMIN"
+                            return string.Join(",", roles.Select(r => r.ToString()));
+                        }
+                    } catch {
+                        // Tolérance aux pannes : si le JSON est invalide, on ne renvoie rien
+                        return "";
+                    }
+                }
+                return "";
+            }</value>
+        </set-header>
+        
+    </inbound>
+    <!-- Control if and how the requests are forwarded to services  -->
+    <backend>
+        <base />
+    </backend>
+    <!-- Customize the responses -->
+    <outbound>
+        <base />
+    </outbound>
+    <!-- Handle exceptions and customize error responses  -->
+    <on-error>
+        <base />
+    </on-error>
+</policies>

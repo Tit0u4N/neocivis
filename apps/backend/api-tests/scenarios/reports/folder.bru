@@ -1,0 +1,26 @@
+meta {
+  name: reports
+  seq: 982
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenCitizen');
+  if (!token) return;
+
+  let cityId = bru.getEnvVar('reportTestCityId');
+  if (!cityId) {
+    const resp = await axios.get(`${baseUrl}/api/citizen/cities`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const nice = resp.data.find(function(c) { return c.name === 'Nice'; });
+    if (nice && nice.id) {
+      bru.setEnvVar('reportTestCityId', nice.id);
+    }
+  }
+}

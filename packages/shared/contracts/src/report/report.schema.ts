@@ -26,6 +26,7 @@ export type GpsLocation = z.infer<typeof GpsLocation>;
 export const Report = z.object({
   id: z.string().uuid(),
   authorId: z.string(),
+  cityId: z.string(),
   title: z.string().min(1).max(120),
   type: ReportType,
   status: ReportStatus,
@@ -42,8 +43,17 @@ export const CreateReportFormFields = z.object({
   desc: z.string().min(6),
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
+  // Note: 'photo' is sent as multipart File and validated separately in the controller
 });
 export type CreateReportFormFields = z.infer<typeof CreateReportFormFields>;
+
+export const CreateReportPayload = z.object({
+  desc: z.string().min(6),
+  photo: z.instanceof(File),
+  latitude: z.coerce.number().min(-90).max(90).optional(),
+  longitude: z.coerce.number().min(-180).max(180).optional(),
+});
+export type CreateReportPayload = z.infer<typeof CreateReportPayload>;
 
 export const ReportsListQuery = z.object({
   page: z.coerce.number().int().positive().optional().default(1),

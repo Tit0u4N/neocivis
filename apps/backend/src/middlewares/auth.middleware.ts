@@ -59,15 +59,7 @@ export function applyUserMiddleware(app: Hono, userService: UserService) {
           resolvedLastName ??= profile?.lastName;
         }
 
-        c.set('user', {
-          keycloakId,
-          roles,
-          baseRole,
-          username: resolvedUsername,
-          email: resolvedEmail,
-          firstName: resolvedFirstName,
-          lastName: resolvedLastName,
-        });
+        let numericId: number | undefined;
 
         // Sync si DB branchée, ou si on est en mode in-memory (repository in-memory).
         if (c.var.db || isInMemoryMode()) {
@@ -79,7 +71,20 @@ export function applyUserMiddleware(app: Hono, userService: UserService) {
             firstName: resolvedFirstName,
             lastName: resolvedLastName,
           });
+          const userRecord = await userService.getByKeycloakId(keycloakId);
+          numericId = userRecord?.id;
         }
+
+        c.set('user', {
+          id: numericId,
+          keycloakId,
+          roles,
+          baseRole,
+          username: resolvedUsername,
+          email: resolvedEmail,
+          firstName: resolvedFirstName,
+          lastName: resolvedLastName,
+        });
       }
 
       await next();

@@ -1,3 +1,4 @@
+import type { PermissionKey } from '@repo/contracts';
 import type { LucideIcon } from 'lucide-react';
 import {
   FileText,
@@ -18,7 +19,7 @@ export type SidebarItemConfig = {
   labelKey: string;
   icon: LucideIcon;
   href: string;
-  permissions?: string[];
+  permissions?: PermissionKey[];
   adminOnly?: boolean;
 };
 

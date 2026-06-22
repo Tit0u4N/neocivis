@@ -19,5 +19,6 @@ export const authConfig = {
   scopes: ['openid', 'profile', 'email', Platform.OS !== 'web' ? 'offline_access' : ''],
   redirectUri: makeRedirectUri({
     scheme: 'neocivis-citizen-app',
+    path: 'redirect',
   }),
 };

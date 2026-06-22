@@ -6,12 +6,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ── Hoisted mocks (evaluated before vi.mock factories) ─────────────────────
 
-const { mockGetMine, mockGetById, mockCancel, mockCreate, mockRouter, mockLocationModule, mockImagePickerModule } =
-  vi.hoisted(() => ({
-    mockGetMine: vi.fn<[], Promise<PaginatedReportsResponse>>(),
-    mockGetById: vi.fn<[string], Promise<Report>>(),
-    mockCancel: vi.fn<[string], Promise<Report>>(),
-    mockCreate: vi.fn<[], Promise<Report>>(),
+const {
+  mockGetMine,
+  mockGetById,
+  mockCancel,
+  mockCreate,
+  mockRouter,
+  mockLocationModule,
+  mockImagePickerModule,
+  mockReportService,
+} = vi.hoisted(() => {
+  const mockGetMine = vi.fn<[], Promise<PaginatedReportsResponse>>();
+  const mockGetById = vi.fn<[string], Promise<Report>>();
+  const mockCancel = vi.fn<[string], Promise<Report>>();
+  const mockCreate = vi.fn<[], Promise<Report>>();
+  return {
+    mockGetMine,
+    mockGetById,
+    mockCancel,
+    mockCreate,
+    mockReportService: { getMine: mockGetMine, getById: mockGetById, cancel: mockCancel, create: mockCreate },
     mockRouter: { back: vi.fn(), push: vi.fn() },
     mockLocationModule: {
       requestForegroundPermissionsAsync: vi.fn(),
@@ -24,7 +38,8 @@ const { mockGetMine, mockGetById, mockCancel, mockCreate, mockRouter, mockLocati
       requestCameraPermissionsAsync: vi.fn(),
       launchCameraAsync: vi.fn(),
     },
-  }));
+  };
+});
 
 // ── Module mocks ────────────────────────────────────────────────────────────
 
@@ -42,22 +57,8 @@ vi.mock('expo-router', () => {
   };
 });
 
-vi.mock('@/providers/ApiProvider', () => {
-  const stableApi = {};
-  return { useApi: () => stableApi };
-});
-
-function createReportServiceMock() {
-  return {
-    getMine: mockGetMine,
-    getById: mockGetById,
-    cancel: mockCancel,
-    create: mockCreate,
-  };
-}
-
-vi.mock('@repo/frontend-services/report', () => ({
-  ReportService: vi.fn(createReportServiceMock),
+vi.mock('@/providers/ServicesProvider', () => ({
+  useServices: () => ({ reportService: mockReportService }),
 }));
 
 vi.mock('expo-location', () => mockLocationModule);

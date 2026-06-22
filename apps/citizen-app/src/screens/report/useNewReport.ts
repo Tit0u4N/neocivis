@@ -1,9 +1,8 @@
-import { ReportService } from '@repo/frontend-services/report';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import { useApi } from '@/providers/ApiProvider';
+import { useEffect, useState } from 'react';
+import { useServices } from '@/providers/ServicesProvider';
 
 export interface GpsCoords {
   latitude: number;
@@ -15,8 +14,7 @@ export type LocationState = { status: 'loading' } | { status: 'denied' } | { sta
 export type PhotoState = { status: 'none' } | { status: 'picked'; uri: string; fileName: string; mimeType?: string };
 
 export function useNewReport() {
-  const api = useApi();
-  const reportService = useMemo(() => new ReportService(api), [api]);
+  const { reportService } = useServices();
 
   const [desc, setDesc] = useState('');
   const [photo, setPhoto] = useState<PhotoState>({ status: 'none' });

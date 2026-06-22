@@ -1,0 +1,57 @@
+meta {
+  name: 04 - Municipality liste les signalements
+  type: http
+  seq: 986
+}
+
+get {
+  url: {{url}}/api/municipality/cities/{{reportTestCityId}}/reports
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const token = bru.getVar('tokenAdmin');
+  if (!token) {
+    throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  let cityId = bru.getVar('reportTestCityId');
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    cityId = me.data?.city?.id;
+    if (!cityId) {
+      throw new Error('Admin has no city in /user/me');
+    }
+    bru.setVar('reportTestCityId', cityId);
+  }
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/reports`);
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response is paginated and has reports", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('data').that.is.an('array');
+    expect(body.total).to.be.greaterThan(0);
+  });
+
+  test("Created report appears in city list", function() {
+    const reportId = bru.getVar('e2eReportId');
+    const found = res.getBody().data.find(function(r) { return r.id === reportId; });
+    expect(found).to.not.be.undefined;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

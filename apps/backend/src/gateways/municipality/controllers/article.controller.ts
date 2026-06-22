@@ -9,29 +9,38 @@ import {
 } from '@repo/contracts/article';
 import { type Context, Hono } from 'hono';
 import type { ControllerJson } from '@/gateways/controller-json-response';
+import type { PermissionGuard } from '@/middlewares/permission.guard';
 import type { ArticleService } from '@/modules/article/service/article.service';
 
 export class ArticleController {
-  constructor(private articleService: ArticleService) {}
+  constructor(
+    private articleService: ArticleService,
+    private guard: PermissionGuard,
+  ) {}
 
   public getRoutes(): Hono {
     const app = new Hono();
 
     app.get('/', (c) => this.listAll(c));
     app.get('/:id', (c) => this.getById(c));
-    app.post('/', (c) => this.create(c));
-    app.put('/:id', (c) => this.update(c));
-    app.delete('/:id', (c) => this.remove(c));
-    app.patch('/:id/status', (c) => this.patchStatus(c));
-    app.post('/:id/translations', (c) => this.addTranslation(c));
-    app.put('/:id/translations/:locale', (c) => this.updateTranslation(c));
-    app.delete('/:id/translations/:locale', (c) => this.deleteTranslation(c));
+    app.post('/', this.guard.require('ARTICLE_PUBLISH_PERMISSION'), (c) => this.create(c));
+    app.put('/:id', this.guard.require('ARTICLE_MODIFY_PERMISSION'), (c) => this.update(c));
+    app.delete('/:id', this.guard.require('ARTICLE_DELETE_PERMISSION'), (c) => this.remove(c));
+    app.patch('/:id/status', this.guard.require('ARTICLE_MODIFY_PERMISSION'), (c) => this.patchStatus(c));
+    app.post('/:id/translations', this.guard.require('ARTICLE_PUBLISH_PERMISSION'), (c) => this.addTranslation(c));
+    app.put('/:id/translations/:locale', this.guard.require('ARTICLE_MODIFY_PERMISSION'), (c) => this.updateTranslation(c));
+    app.delete('/:id/translations/:locale', this.guard.require('ARTICLE_DELETE_PERMISSION'), (c) => this.deleteTranslation(c));
 
     return app;
   }
 
   private getCityId(c: Context): string {
     return c.req.param('cityId');
+  }
+
+  //todo verify il the userID is an INT
+  private getUserId(c: Context): number {
+    return c.var.user?.id ?? 0;
   }
 
   private async listAll(c: Context): Promise<ControllerJson<Article[], 200, readonly []>> {
@@ -58,8 +67,8 @@ export class ArticleController {
     if (!parsed.success) {
       return c.json({ error: parsed.error.message } satisfies ApiErrorDto, 400);
     }
-    const authorId = (c.get('userId') as string) ?? 'unknown';
-    const article = await this.articleService.createArticle(cityId, parsed.data, authorId);
+    const authorId = this.getUserId(c);
+    const article = await this.articleService.createArticle(cityId, parsed.data, authorId.toString());
     const body: Article = article;
     return c.json(body, 201);
   }

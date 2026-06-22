@@ -1,0 +1,56 @@
+meta {
+  name: 03 - Citizen lists threads
+  type: http
+  seq: 973
+}
+
+get {
+  url: {{url}}/api/citizen/cities/{{cityNiceId}}/threads
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const token = bru.getVar('tokenCitizen');
+  if (!token) {
+    throw new Error('Missing tokenCitizen — collection pre-request did not run.');
+  }
+  req.setHeader('Authorization', `Bearer ${token}`);
+
+  const baseUrl = bru.getEnvVar('url');
+  const cityId = bru.getVar('cityNiceId');
+  if (!cityId) {
+    throw new Error('Missing cityNiceId — run step 01 first.');
+  }
+  req.setUrl(`${baseUrl}/api/citizen/cities/${cityId}/threads`);
+}
+
+script:post-response {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response is paginated", function() {
+    const body = res.getBody();
+    expect(body.data).to.be.an('array');
+    expect(body.total).to.be.a('number');
+    expect(body.page).to.equal(1);
+  });
+
+  test("Seeded threads are present", function() {
+    const titles = res.getBody().data.map((t) => t.title);
+    expect(titles).to.include('Terrains de tennis — entretien');
+  });
+
+  test("Each thread has replyCount", function() {
+    const data = res.getBody().data;
+    if (data.length > 0 && data[0]) {
+      expect(data[0].replyCount).to.be.a('number');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

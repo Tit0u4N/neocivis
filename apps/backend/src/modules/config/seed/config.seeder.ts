@@ -3,16 +3,13 @@ import type { MediaImageLink } from '@repo/contracts/media';
 import type { ISeeder } from '@/core/seeder.interface';
 import type { CityService } from '@/modules/city/city.service';
 import type { IConfigRepository } from '@/modules/config/repository/config.repository.interface';
-import { getMockCarouselItems, getMockCategories } from '@/modules/config/seed/config.seed';
+import {
+  type CarouselSeedTemplate,
+  getCarouselSeedsForCity,
+  getMockCategories,
+} from '@/modules/config/seed/config.seed';
 import type { IMediaRepository } from '@/modules/media/repository/media.repository.interface';
 import { appendMediaLink } from '@/modules/media/repository/media.repository.interface';
-import { NICE_MEDIA_IDS } from '@/modules/media/seed/media.seed';
-
-const CAROUSEL_MEDIA_BY_ITEM_ID: Record<string, string> = {
-  'carousel-1': NICE_MEDIA_IDS.carousel1,
-  'carousel-2': NICE_MEDIA_IDS.carousel2,
-  'carousel-3': NICE_MEDIA_IDS.carousel3,
-};
 
 export class ConfigSeeder implements ISeeder {
   constructor(
@@ -22,41 +19,70 @@ export class ConfigSeeder implements ISeeder {
   ) {}
 
   async deleteAll(): Promise<void> {
-    await this.configRepository.setCarouselItems([]);
-    await this.configRepository.setCategories([]);
+    const cities = await this.cityService.listPublicCities();
+    for (const city of cities) {
+      const existingCarousel = await this.configRepository.getCarouselItems(city.id);
+      await this.configRepository.setCarouselItems(city.id, []);
+      await this.configRepository.setCategories(city.id, []);
+
+      if (existingCarousel.length > 0) {
+        const removedIds = new Set(existingCarousel.map((i) => i.id));
+        const mediaList = await this.mediaRepository.findByCityId(city.id);
+        for (const media of mediaList) {
+          const filtered = media.links.filter((l) => !(l.type === 'carousel' && removedIds.has(l.idLink)));
+          if (filtered.length !== media.links.length) {
+            await this.mediaRepository.update(media.id, { links: filtered });
+          }
+        }
+      }
+    }
   }
 
   async seed(): Promise<void> {
-    const nice = (await this.cityService.listPublicCities()).find((c) => c.name === 'Nice');
-    if (!nice) {
-      return;
+    const cities = await this.cityService.listPublicCities();
+    for (const city of cities) {
+      const templates = getCarouselSeedsForCity(city.name);
+      if (templates.length === 0) {
+        continue;
+      }
+
+      await this.configRepository.setCategories(city.id, getMockCategories());
+      const resolvedCarousel = await this.resolveCarouselWithMedia(templates);
+      await this.configRepository.setCarouselItems(city.id, resolvedCarousel);
     }
+  }
 
-    await this.configRepository.setCategories(getMockCategories());
+  private async resolveCarouselWithMedia(templates: CarouselSeedTemplate[]): Promise<CarouselItem[]> {
+    const resolved: CarouselItem[] = [];
 
-    const resolvedCarousel: CarouselItem[] = [];
-    for (const item of getMockCarouselItems()) {
-      const mediaId = CAROUSEL_MEDIA_BY_ITEM_ID[item.id];
-      if (!mediaId) {
-        resolvedCarousel.push(item);
-        continue;
-      }
-      const media = await this.mediaRepository.findById(mediaId);
+    for (const template of templates) {
+      const media = await this.mediaRepository.findById(template.mediaId);
       if (!media) {
-        resolvedCarousel.push(item);
+        resolved.push({
+          id: template.id,
+          order: template.order,
+          translations: template.translations,
+        });
         continue;
       }
+
       const link: MediaImageLink = {
-        idLink: item.id,
+        idLink: template.id,
         type: 'carousel',
-        title: item.translations.find((t) => t.locale === 'fr')?.title ?? item.id,
+        title: template.translations.find((t) => t.locale === 'fr')?.title ?? template.id,
       };
       await this.mediaRepository.update(media.id, {
         links: appendMediaLink(media.links, link),
       });
-      resolvedCarousel.push({ ...item, imageUrl: media.url });
+
+      resolved.push({
+        id: template.id,
+        imageUrl: media.url,
+        order: template.order,
+        translations: template.translations,
+      });
     }
 
-    await this.configRepository.setCarouselItems(resolvedCarousel);
+    return resolved;
   }
 }

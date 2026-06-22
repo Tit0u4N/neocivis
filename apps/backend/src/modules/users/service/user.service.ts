@@ -1,15 +1,22 @@
+import { randomUUID } from 'node:crypto';
+import type { UpdateAccountInput, UserMeDto, UserPublicDto } from '@repo/contracts';
 import type { IAMService, IamUser, IamUserProfile } from '@/modules/iam/iam.service';
+import type { IMediaBlobService } from '@/modules/media/media-blob.service';
 import type {
   InsertSeededUserInput,
   IUserRepository,
   UpsertUserFromHeadersInput,
 } from '../repository/user.repository.interface';
-import type { User } from '../user.types';
+import { toUserMeDto, toUserPublicDto, toUserPublicDtoForCitizen, type User } from '../user.types';
+
+const MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 export class UserService {
   constructor(
     private repository: IUserRepository,
     private iamService: IAMService,
+    private mediaBlobService?: IMediaBlobService,
   ) {}
 
   async getIamUserByUsername(username: string): Promise<IamUser | null> {
@@ -77,6 +84,101 @@ export class UserService {
       return;
     }
     await this.repository.updateFromHeaders(input);
+    if (input.profilePictureUrl) {
+      await this.repository.updateProfilePictureUrl(input.keycloakId, input.profilePictureUrl);
+    }
+  }
+
+  /**
+   * Met à jour le profil de l'utilisateur courant dans Keycloak, puis en DB.
+   * La DB est mise à jour directement sans attendre le webhook access.UPDATE.
+   */
+  async updateMyProfile(keycloakId: string, input: UpdateAccountInput): Promise<void> {
+    await this.iamService.updateUserProfile(keycloakId, {
+      username: input.username,
+      email: input.email,
+      firstName: input.firstName,
+      lastName: input.lastName,
+    });
+
+    const existing = await this.repository.getByKeycloakId(keycloakId);
+    if (existing) {
+      await this.repository.updateProfile({
+        keycloakId,
+        username: input.username ?? existing.username,
+        email: input.email ?? existing.email,
+        firstName: input.firstName ?? existing.firstName,
+        lastName: input.lastName ?? existing.lastName,
+      });
+    }
+  }
+
+  /**
+   * Déclenche l'envoi d'un e-mail UPDATE_PASSWORD via Keycloak.
+   * `clientId` est passé à Keycloak pour que le template FTL puisse brancher sur le bon style.
+   */
+  async sendPasswordResetEmail(keycloakId: string, clientId: string): Promise<void> {
+    await this.iamService.sendPasswordResetEmail(keycloakId, clientId);
+  }
+
+  toPublicDto(user: User): UserPublicDto {
+    return toUserPublicDto(user, this.placeholderUrl());
+  }
+
+  toPublicDtoForCitizen(user: User): UserPublicDto {
+    return toUserPublicDtoForCitizen(user, this.placeholderUrl());
+  }
+
+  toMeDto(user: User): UserMeDto {
+    return toUserMeDto(user, this.placeholderUrl());
+  }
+
+  private placeholderUrl(): string {
+    return this.mediaBlobService?.getProfilePicturePlaceholderUrl() ?? '';
+  }
+
+  async updateProfilePicture(
+    keycloakId: string,
+    buffer: ArrayBuffer | Buffer,
+    filename: string,
+    mimeType: string,
+  ): Promise<void> {
+    if (!this.mediaBlobService) {
+      throw new Error('Blob service not configured');
+    }
+    if (!ALLOWED_MIME_TYPES.has(mimeType)) {
+      throw new Error(`Unsupported image type: ${mimeType}`);
+    }
+    if (buffer.byteLength > MAX_PROFILE_PICTURE_BYTES) {
+      throw new Error('Image exceeds maximum size of 5 MB');
+    }
+
+    const ext = filename.includes('.') ? filename.slice(filename.lastIndexOf('.')) : '';
+    const storagePath = `profile-pictures/${keycloakId}/${randomUUID()}${ext}`;
+
+    const existing = await this.repository.getByKeycloakId(keycloakId);
+    if (existing?.profilePictureUrl) {
+      const oldStoragePath = existing.profilePictureUrl.split('/').slice(-3).join('/');
+      await this.mediaBlobService.deleteByStoragePath(oldStoragePath).catch(() => {});
+    }
+
+    const uploaded = await this.mediaBlobService.uploadToStoragePath(buffer, mimeType, storagePath);
+    await this.repository.updateProfilePictureUrl(keycloakId, uploaded.url);
+  }
+
+  async removeProfilePicture(keycloakId: string): Promise<void> {
+    if (!this.mediaBlobService) {
+      throw new Error('Blob service not configured');
+    }
+    const existing = await this.repository.getByKeycloakId(keycloakId);
+    if (!existing) {
+      return;
+    }
+    if (existing.profilePictureUrl) {
+      const oldStoragePath = existing.profilePictureUrl.split('/').slice(-3).join('/');
+      await this.mediaBlobService.deleteByStoragePath(oldStoragePath).catch(() => {});
+    }
+    await this.repository.updateProfilePictureUrl(keycloakId, null);
   }
 
   async deleteAll(): Promise<void> {

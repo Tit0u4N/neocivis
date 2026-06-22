@@ -1,0 +1,53 @@
+meta {
+  name: city-employees-admin - 05 - Cleanup
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  const adminAuth = `Bearer ${adminToken}`;
+  req.setHeader('Authorization', adminAuth);
+
+  let cityId = bru.getVar('cityNiceId');
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+
+  // Remove perm-test-emp if still present (e.g. step 03 was skipped).
+  const list = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/employees`, { headers: { Authorization: adminAuth } });
+  const emp = (list.data || []).find((u) => u.username === 'perm-test-emp');
+  if (emp) {
+    try { await axios.delete(`${baseUrl}/api/municipality/cities/${cityId}/employees/${emp.id}`, { headers: { Authorization: adminAuth } }); } catch (_) {}
+  }
+
+  bru.setVar('permNewEmployeeId', null);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees`);
+}
+
+tests {
+  test("Status is 200 — cleanup complete", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("perm-test-emp no longer in employees list", function() {
+    const employees = res.getBody();
+    const found = (employees || []).find((u) => u.username === 'perm-test-emp');
+    expect(found).to.be.undefined;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

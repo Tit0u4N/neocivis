@@ -1,18 +1,16 @@
 import type { ArticleWithResolvedTranslation } from '@repo/contracts/article';
-import type { CarouselItemResolved } from '@repo/contracts/config';
-import { ArticleService } from '@repo/frontend-services/article';
-import { ConfigService } from '@repo/frontend-services/config';
+import type { CarouselItemResolved, CategoryLink } from '@repo/contracts/config';
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useApi } from '@/providers/ApiProvider';
 import { useAuth } from '@/providers/AuthProvider';
+import { useServices } from '@/providers/ServicesProvider';
 import { useCityStore } from '@/stores/city.store';
 
 const HOME_PREVIEW_LIMIT = 3;
 
 export type Category = {
   id: string;
-  attachedPageId?: string;
+  link?: CategoryLink;
   name: string;
   icon: string; // PascalCase Lucide icon name, e.g. 'Star', 'TriangleAlert'
   color: string;
@@ -23,7 +21,7 @@ export type Category = {
 };
 
 export function useHomeScreen() {
-  const api = useApi();
+  const { articleService, configService } = useServices();
   const { language } = useLanguage();
   const { user } = useAuth();
   const { cityId } = useCityStore();
@@ -35,10 +33,8 @@ export function useHomeScreen() {
   const [carouselLoading, setCarouselLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const articleService = useMemo(() => new ArticleService(api), [api]);
-  const configService = useMemo(() => new ConfigService(api, cityId), [api, cityId]);
-
   useEffect(() => {
+    if (!cityId) return;
     setArticlesLoading(true);
     setError(null);
     void articleService
@@ -52,9 +48,10 @@ export function useHomeScreen() {
       .finally(() => {
         setArticlesLoading(false);
       });
-  }, [language, articleService]);
+  }, [language, articleService, cityId]);
 
   useEffect(() => {
+    if (!cityId) return;
     setCarouselLoading(true);
     void configService
       .getConfig(language)
@@ -62,10 +59,13 @@ export function useHomeScreen() {
         setCarouselItems(config.carousel);
         setCategories(config.categories);
       })
+      .catch(() => {
+        setCarouselLoading(false);
+      })
       .finally(() => {
         setCarouselLoading(false);
       });
-  }, [language, configService]);
+  }, [language, configService, cityId]);
 
   const previewArticles = useMemo(() => articles.slice(0, HOME_PREVIEW_LIMIT), [articles]);
 

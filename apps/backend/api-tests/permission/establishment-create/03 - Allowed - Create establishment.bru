@@ -1,0 +1,58 @@
+meta {
+  name: establishment-create - 03 - Allowed - Create establishment
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/establishment
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "name": "Établissement perm-test",
+    "type": "culture",
+    "address": "1 rue du Test",
+    "hours": "9h-17h",
+    "phone": "0400000000"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/establishment`);
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.id) bru.setVar('permEstablishmentId', body.id);
+}
+
+tests {
+  test("Status is 201 — employee has ESTABLISHMENT_CREATE_PERMISSION", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  test("Establishment created with id", function() {
+    expect(res.getBody()).to.have.property('id');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

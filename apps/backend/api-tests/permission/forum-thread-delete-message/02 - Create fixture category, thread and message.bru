@@ -1,0 +1,72 @@
+meta {
+  name: forum-thread-delete-message - 02 - Create fixture category, thread and message
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/threads/{{permThreadId}}/messages
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "body": "Message de test pour FORUM_THREAD_DELETE_MESSAGE_PERMISSION"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const adminToken = bru.getVar('tokenAdmin');
+  if (!adminToken) throw new Error('Missing tokenAdmin — collection pre-request did not run.');
+  const adminAuth = `Bearer ${adminToken}`;
+  req.setHeader('Authorization', adminAuth);
+
+  let cityId = bru.getVar('cityNiceId');
+  if (!cityId) {
+    const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: adminAuth } });
+    cityId = me.data?.city?.id;
+    bru.setVar('cityNiceId', cityId);
+  }
+
+  // Category.
+  const cats = await axios.get(`${baseUrl}/api/municipality/cities/${cityId}/threads/categories`, { headers: { Authorization: adminAuth } });
+  let cat = (cats.data || []).find((c) => c.label === 'perm-delmsg-category');
+  if (!cat) {
+    const created = await axios.post(`${baseUrl}/api/municipality/cities/${cityId}/threads/categories`, { emoji: '🧪', label: 'perm-delmsg-category' }, { headers: { Authorization: adminAuth, 'content-type': 'application/json' } });
+    cat = created.data;
+  }
+  bru.setVar('permCategoryId', cat.id);
+
+  // Thread.
+  const threadRes = await axios.post(`${baseUrl}/api/municipality/cities/${cityId}/threads`, { title: 'Thread perm-delmsg-test', categoryId: cat.id, body: 'Thread pour FORUM_THREAD_DELETE_MESSAGE_PERMISSION' }, { headers: { Authorization: adminAuth, 'content-type': 'application/json' } });
+  const thread = threadRes.data;
+  bru.setVar('permThreadId', thread.id);
+
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/threads/${thread.id}/messages`);
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.id) bru.setVar('permMessageId', body.id);
+}
+
+tests {
+  test("Status is 201 — fixture message created", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  test("Message id saved", function() {
+    expect(res.getBody()).to.have.property('id');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

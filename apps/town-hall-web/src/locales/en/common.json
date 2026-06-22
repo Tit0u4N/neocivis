@@ -69,6 +69,10 @@
         "drafts": "Drafts",
         "searchPlaceholder": "Search…"
       },
+      "viewMode": {
+        "list": "List view",
+        "grid": "Mosaic view"
+      },
       "table": {
         "title": "Title",
         "status": "Status",
@@ -137,6 +141,69 @@
         "description": "Description (optional)",
         "content": "Content"
       }
+    }
+  },
+  "establishment": {
+    "list": {
+      "title": "Establishments",
+      "add": "Add",
+      "count_one": "{{count}} establishment",
+      "count_other": "{{count}} establishments",
+      "searchPlaceholder": "Search an establishment…",
+      "noImage": "No image",
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "empty": {
+        "title": "No establishments",
+        "createFirst": "Add the first one"
+      },
+      "deleteDialog": {
+        "title": "Delete this establishment?",
+        "description": "This action is irreversible. The establishment will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "viewMode": {
+        "list": "List view",
+        "grid": "Grid view"
+      }
+    },
+    "form": {
+      "titleCreate": "New establishment",
+      "titleEdit": "Edit establishment",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "E.g. Main Town Hall",
+        "type": "Type",
+        "address": "Address",
+        "addressPlaceholder": "E.g. 1 Place du Général de Gaulle",
+        "hours": "Opening hours",
+        "hoursPlaceholder": "E.g. Mon-Fri 8am-5pm",
+        "phone": "Phone",
+        "phonePlaceholder": "E.g. 04 93 32 80 00",
+        "image": "Image",
+        "imageAlt": "Establishment image",
+        "imageChoose": "Choose an image",
+        "imageChange": "Change image"
+      },
+      "discardDialog": {
+        "title": "Discard changes?",
+        "description": "Unsaved changes will be lost.",
+        "cancel": "Continue editing",
+        "confirm": "Discard"
+      },
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back"
+    },
+    "types": {
+      "all": "All types",
+      "town_hall": "Town Hall",
+      "education": "Education",
+      "culture": "Culture",
+      "sport": "Sport"
     }
   },
   "sidebar": {
@@ -310,5 +377,324 @@
       "Violet": "Purple"
     },
     "newTileTitle": "New"
+  },
+  "reports": {
+    "title": "Reports",
+    "export": "Export",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "resolved": "Resolved"
+    },
+    "tabs": {
+      "pending": "Pending reports",
+      "history": "History"
+    },
+    "view": {
+      "table": "Table view",
+      "map": "Map view"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Title",
+      "category": "Category",
+      "location": "Location",
+      "date": "Date",
+      "status": "Status",
+      "author": "Author",
+      "resolvedBy": "Resolved by",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "progress": "In progress",
+      "resolved": "Resolved",
+      "cancelled": "Cancelled"
+    },
+    "map": {
+      "placeholder": "Interactive map view — {{count}} report(s)"
+    },
+    "actions": {
+      "detail": "Detail"
+    },
+    "detail": {
+      "description": "Description",
+      "resolvedAt": "Resolved on"
+    },
+    "empty": "No reports",
+    "error": "Unable to load reports"
+  },
+  "account": {
+    "profile": {
+      "title": "Personal information",
+      "fields": {
+        "firstName": "First name",
+        "firstNamePlaceholder": "Your first name",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Your last name",
+        "username": "Username",
+        "usernamePlaceholder": "e.g. jean.dupont",
+        "email": "Email address",
+        "emailPlaceholder": "e.g. jean.dupont@townhall.fr"
+      },
+      "editAria": "Edit {{field}}",
+      "fieldHints": {
+        "firstName": "Your first name as it appears in the application. Between 1 and 100 characters.",
+        "lastName": "Your last name as it appears in the application. Between 1 and 100 characters.",
+        "username": "Unique identifier used to recognize you in the system. Between 3 and 50 characters, no spaces.",
+        "email": "Email address linked to your account. Used for notifications and password reset."
+      }
+    },
+    "password": {
+      "title": "Password",
+      "description": "To change your password, we will send you a reset email.",
+      "button": "Change password"
+    },
+    "passwordDialog": {
+      "title": "Change password?",
+      "description": "A password reset email will be sent to {{email}}. Do you want to continue?",
+      "cancel": "Cancel",
+      "confirm": "Send email"
+    },
+    "session": {
+      "title": "Session"
+    }
+  },
+  "threads": {
+    "list": {
+      "title": "Forum",
+      "subtitle": "City threads",
+      "newThread": "New thread",
+      "filterAll": "All",
+      "lastComments": "Last comments",
+      "empty": "No threads in this category.",
+      "error": "Unable to load threads.",
+      "mutedCount_one": "{{count}} muted",
+      "mutedCount_other": "{{count}} muted",
+      "bannedCount_one": "{{count}} banned",
+      "bannedCount_other": "{{count}} banned",
+      "loadMore": "Load more"
+    },
+    "card": {
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "likes": "{{count}} likes"
+    },
+    "detail": {
+      "backToThreads": "Back to threads",
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "noVisibleReplies": "No visible replies.",
+      "replyPlaceholder": "Write a reply…",
+      "replyButton": "Reply",
+      "deletedMessages": "Deleted messages ({{count}})",
+      "deletedSubject": "Subject deleted by moderation",
+      "archivedSubject": "Thread archived — not visible to citizens",
+      "restore": "Restore",
+      "unarchive": "Unarchive",
+      "addReaction": "Add a reaction",
+      "error": "Unable to load thread."
+    },
+    "newThreadModal": {
+      "title": "New thread",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Thread title…",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "messageLabel": "Message",
+      "cancel": "Cancel",
+      "submit": "Post"
+    },
+    "moderation": {
+      "menuLabel": "Moderation",
+      "deleteMessage": "Delete message",
+      "deleteThread": "Delete subject",
+      "archive": "Archive thread",
+      "unarchive": "Unarchive thread",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "ban": "Ban from forum",
+      "unban": "Unban",
+      "statusMuted": "Muted",
+      "statusBanned": "Banned",
+      "deletedAt": "deleted · {{date}}"
+    },
+    "emojiPicker": {
+      "searchPlaceholder": "Search…",
+      "loading": "Loading…",
+      "empty": "No results"
+    },
+    "categories": {
+      "manageTitle": "Manage categories",
+      "addCategory": "Add category",
+      "emojiLabel": "Emoji",
+      "labelLabel": "Label",
+      "deleteConfirm": "Delete this category?",
+      "error": "Unable to load categories."
+    }
+  },
+  "forumUsers": {
+    "title": "User management",
+    "tabs": {
+      "active": "Active accounts",
+      "banned": "Banned accounts"
+    },
+    "search": "Enter username",
+    "table": {
+      "username": "Username",
+      "contributions": "Contributions thread",
+      "status": "Account status",
+      "dateBan": "Date Ban"
+    },
+    "status": {
+      "active": "Active",
+      "banned": "Banned"
+    },
+    "actions": {
+      "ban": "Ban",
+      "unban": "Unban",
+      "more": "More"
+    },
+    "banModal": {
+      "title": "Ban user",
+      "description": "Are you sure you want to ban {{name}}? This action can be reversed.",
+      "cancel": "Cancel",
+      "confirm": "Ban"
+    },
+    "unbanModal": {
+      "title": "Unban user",
+      "description": "Are you sure you want to unban {{name}}?",
+      "cancel": "Cancel",
+      "confirm": "Unban"
+    },
+    "infoModal": {
+      "title": "User information",
+      "profilePicture": "Profil picture",
+      "username": "Username",
+      "lastConnection": "Last connexion",
+      "banSince": "Ban since",
+      "memberSince": "Member since",
+      "close": "Close"
+    },
+    "empty": "No users",
+    "error": "Unable to load users"
+  },
+  "roles": {
+    "list": {
+      "title": "Role management",
+      "count": "role(s)",
+      "create": "Create role",
+      "searchPlaceholder": "Search a role…",
+      "columnName": "Name",
+      "columnDescription": "Description",
+      "columnPermissions": "Permissions",
+      "actionEdit": "Edit",
+      "actionDelete": "Delete",
+      "empty": "No roles found.",
+      "error": "Unable to load roles.",
+      "permissionCount_one": "{{count}} permission",
+      "permissionCount_other": "{{count}} permissions"
+    },
+    "form": {
+      "createTitle": "Create a role",
+      "createSubtitle": "Define a role and its associated permissions.",
+      "editTitle": "Edit role",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Forum moderator",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the responsibilities of this role…",
+      "permissionsLabel": "Permissions",
+      "createAction": "Create",
+      "editAction": "Save"
+    },
+    "delete": {
+      "title": "Delete this role?",
+      "description": "This action is irreversible. The role will be removed from all employees who have it.",
+      "confirm": "Delete"
+    },
+    "errors": {
+      "duplicateName": "This name is already used by another role."
+    },
+    "permissions": {
+      "SIGNAL_VIEW_PERMISSION": "View reports",
+      "SIGNAL_MODIFY_PERMISSION": "Modify reports",
+      "FORUM_THREAD_CREATE_PERMISSION": "Create threads",
+      "FORUM_THREAD_DELETE_PERMISSION": "Delete threads",
+      "FORUM_THREAD_MODIFY_PERMISSION": "Modify threads",
+      "FORUM_THREAD_DELETE_MESSAGE_PERMISSION": "Delete forum messages",
+      "FORUM_THREAD_BAN_USER_PERMISSION": "Ban forum users",
+      "FORUM_THREAD_UNBAN_USER_PERMISSION": "Unban forum users",
+      "PAGE_CITY_HALL_MODIFY_PERMISSION": "Modify city hall page",
+      "ARTICLE_PUBLISH_PERMISSION": "Publish articles",
+      "ARTICLE_MODIFY_PERMISSION": "Modify articles",
+      "ARTICLE_DELETE_PERMISSION": "Delete articles",
+      "ESTABLISHMENT_CREATE_PERMISSION": "Create establishments",
+      "ESTABLISHMENT_MODIFY_PERMISSION": "Modify establishments",
+      "ESTABLISHMENT_DELETE_PERMISSION": "Delete establishments",
+      "MEDIA_UPLOAD_PERMISSION": "Upload media",
+      "MEDIA_DELETE_PERMISSION": "Delete media",
+      "groups": {
+        "SIGNAL": "Reports",
+        "FORUM_THREAD": "Forum",
+        "PAGE_CITY_HALL": "City hall page",
+        "ARTICLE": "Articles",
+        "ESTABLISHMENT": "Establishments",
+        "MEDIA": "Media"
+      },
+      "descriptions": {
+        "SIGNAL_VIEW_PERMISSION": "View the list and details of citizen reports.",
+        "SIGNAL_MODIFY_PERMISSION": "Update the status and information of a report.",
+        "FORUM_THREAD_CREATE_PERMISSION": "Create new discussion threads on the forum.",
+        "FORUM_THREAD_DELETE_PERMISSION": "Permanently delete a discussion thread.",
+        "FORUM_THREAD_MODIFY_PERMISSION": "Modify the title or content of a discussion thread.",
+        "FORUM_THREAD_DELETE_MESSAGE_PERMISSION": "Delete individual messages within a thread.",
+        "FORUM_THREAD_BAN_USER_PERMISSION": "Prevent a user from posting on the forum.",
+        "FORUM_THREAD_UNBAN_USER_PERMISSION": "Lift a user's ban from the forum.",
+        "PAGE_CITY_HALL_MODIFY_PERMISSION": "Modify the content of the city hall presentation page.",
+        "ARTICLE_PUBLISH_PERMISSION": "Publish new articles on the municipal portal.",
+        "ARTICLE_MODIFY_PERMISSION": "Modify the content of existing articles.",
+        "ARTICLE_DELETE_PERMISSION": "Delete published articles.",
+        "ESTABLISHMENT_CREATE_PERMISSION": "Register a new municipal establishment.",
+        "ESTABLISHMENT_MODIFY_PERMISSION": "Update an establishment's information.",
+        "ESTABLISHMENT_DELETE_PERMISSION": "Remove an establishment from the catalog.",
+        "MEDIA_UPLOAD_PERMISSION": "Upload images, videos and documents to the library.",
+        "MEDIA_DELETE_PERMISSION": "Delete media from the library."
+      }
+    }
+  },
+  "employees": {
+    "list": {
+      "title": "Employee management",
+      "count_one": "{{count}} employee",
+      "count_other": "{{count}} employees",
+      "add": "Add an employee",
+      "searchPlaceholder": "Search a user…",
+      "columnUser": "User",
+      "columnRoles": "Roles",
+      "actionEditRoles": "Edit roles",
+      "actionRemove": "Remove from town hall",
+      "empty": "No users found.",
+      "noRolesConfigured": "No roles configured — create roles in the Roles section."
+    },
+    "form": {
+      "newEmployeeFallback": "New employee",
+      "usernameFallback": "username",
+      "firstNameLabel": "First name",
+      "firstNamePlaceholder": "John",
+      "lastNameLabel": "Last name",
+      "lastNamePlaceholder": "Smith",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "john.smith",
+      "emailLabel": "Email",
+      "emailPlaceholder": "john.smith@townhall.fr",
+      "assignedRolesLabel": "Assigned roles",
+      "createAction": "Create"
+    },
+    "remove": {
+      "title": "Remove this employee?",
+      "description": "This employee will be removed from the town hall. Their account will remain active but they will no longer have access to the administration.",
+      "confirm": "Remove"
+    }
   }
 }

@@ -3,10 +3,14 @@ import { defineConfig, type Options } from 'tsup';
 export default defineConfig((options: Options) => ({
   entry: {
     index: 'src/index.ts',
+    access: 'src/access/access.service.ts',
     article: 'src/article/article.service.ts',
     auth: 'src/auth/auth.service.ts',
+    city: 'src/city/city.service.ts',
     config: 'src/config/config.service.ts',
-    permission: 'src/permission/permission.service.ts',
+    establishment: 'src/establishment/establishment.service.ts',
+    thread: 'src/thread/thread.service.ts',
+    user: 'src/user/user.service.ts',
     report: 'src/report/report.service.ts',
     upload: 'src/upload/upload.service.ts',
     media: 'src/media/media.service.ts',

@@ -1,0 +1,41 @@
+meta {
+  name: city-employees-admin - 04 - Denied - Unassign employee (employee)
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{url}}/api/municipality/cities/{{cityNiceId}}/employees/99999
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios');
+  const baseUrl = bru.getEnvVar('url');
+  const employeeToken = bru.getVar('tokenEmployee');
+  if (!employeeToken) throw new Error('Missing tokenEmployee — collection pre-request did not run.');
+  req.setHeader('Authorization', `Bearer ${employeeToken}`);
+
+  const me = await axios.get(`${baseUrl}/api/municipality/user/me`, { headers: { Authorization: `Bearer ${employeeToken}` } });
+  const cityId = me.data?.city?.id;
+  if (!cityId) throw new Error('Employee has no city context');
+  bru.setVar('cityNiceId', cityId);
+
+  // userId 99999 is fake — the admin guard fires before the service, so 403 is returned regardless.
+  req.setUrl(`${baseUrl}/api/municipality/cities/${cityId}/employees/99999`);
+}
+
+tests {
+  test("Status is 403 — employee cannot unassign city employees", function() {
+    expect(res.getStatus()).to.equal(403);
+  });
+  test("Error mentions ADMIN role required", function() {
+    expect(res.getBody()).to.have.property('error').that.includes('ADMIN');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

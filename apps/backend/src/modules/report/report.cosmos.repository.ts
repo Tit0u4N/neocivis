@@ -1,6 +1,7 @@
 import type { Container } from '@azure/cosmos';
 import type { Report } from '@repo/contracts/report';
 import { getCosmosClient } from '@/infrastructure/azure/cosmos.client';
+import { ensureCosmosDatabaseAndContainers } from '@/infrastructure/azure/cosmos.setup';
 import { optionalEnv } from '@/infrastructure/env';
 import type { IReportRepository } from './repository/report.repository.interface';
 
@@ -17,12 +18,14 @@ export class CosmosReportRepository implements IReportRepository {
     }
 
     const client = getCosmosClient();
-    const databaseId = optionalEnv('COSMOS_DATABASE_ID') ?? 'neocivis';
-    const containerId = 'reports';
-
-    const { database } = await client.databases.createIfNotExists({ id: databaseId });
+    // Use ensureCosmosDatabaseAndContainers so the database is always created
+    // with shared throughput before adding the reports container.
+    // Creating the database without throughput here would result in a
+    // per-container database, causing every container to get 400 RU/s dedicated
+    // and exceeding the account's 1000 RU/s total limit.
+    const database = await ensureCosmosDatabaseAndContainers(client);
     const { container } = await database.containers.createIfNotExists({
-      id: containerId,
+      id: 'reports',
       partitionKey: { paths: ['/authorId'] },
     });
 

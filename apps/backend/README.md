@@ -1,194 +1,291 @@
-# Backend (Hono on Azure Functions)
+# Backend — Hono sur Azure Functions v4
 
-## Prerequisites
-- Node.js 20 or later
-- Azure Functions Core Tools
-- Azure CLI
-- An Azure account
-- Docker
-
-### Download and install Azure Functions Core Tools
-```bash
-npm install -g azure-functions-core-tools@4 --unsafe-perm true
-```
-or check the [official documentation](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript) for installation instructions.
-
-### Download and install Azure CLI
-Consult the [official documentation](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) for installation instructions.
-
-
-### Download and install Docker
-Consult the [official documentation](https://docs.docker.com/get-docker/) for installation instructions depending on your operating system.
+API REST de NeoCivis. Hono v4 exposé via Azure Functions Node.js model v4, TypeScript strict, build tsup.
 
 ---
 
-## Environment configuration
+## Stack
 
-Two mechanisms apply depending on how you run the backend.
+| Composant | Technologie |
+|-----------|-------------|
+| Runtime | Azure Functions v4 (Node.js model) |
+| Framework HTTP | Hono v4 + `@marplex/hono-azurefunc-adapter` |
+| Données relationnelles | PostgreSQL via Drizzle ORM |
+| Données documentaires | Azure Cosmos DB (NoSQL) |
+| Stockage fichiers | Azure Blob Storage |
+| Auth | Keycloak (JWT Bearer) |
+| Validation | Zod (schemas dans `@repo/contracts`) |
+| IA | Groq SDK (analyse signalements) |
+| Build | tsup (ESM → `dist/`) |
+| Tests unitaires | Vitest |
+| Tests API | Bruno |
 
-### `local.settings.json` (Azure Functions host locally)
+---
 
-Azure Functions Core Tools map the `Values` entries from `local.settings.json` into `process.env` when you run `func start` (or `bun run dev`).
+## Architecture
 
-1. Copy the example file to `local.settings.json` (that file is gitignored; see `.funcignore`):
+Le backend suit une architecture stricte en 4 couches :
+
+```
+src/
+├── index.ts                    # Point d'entrée : 3 Azure Function HTTP triggers
+├── gateways/                   # Couche 1 : routing + DI
+│   ├── citizen/                # /api/citizen/* (JWT requis)
+│   │   ├── citizen.gateway.ts
+│   │   └── controllers/        # article, city, config, establishment, report, thread, user
+│   ├── municipality/           # /api/municipality/* (JWT + rôle agent/admin requis)
+│   │   ├── municipality.gateway.ts
+│   │   └── controllers/        # access, article, city, config, establishment, media, report, thread, user
+│   └── webhook/                # /api/webhook/* (pas d'auth JWT — Keycloak uniquement)
+│       ├── webhook.gateway.ts
+│       └── controllers/
+├── modules/                    # Couche 2 & 3 : service + repository
+│   ├── access/                 # Gestion des permissions par ville
+│   ├── article/                # Articles (Cosmos DB)
+│   ├── city/                   # Villes (PostgreSQL)
+│   ├── config/                 # Configuration applicative (Cosmos DB)
+│   ├── establishment/          # Établissements (PostgreSQL)
+│   ├── iam/                    # Gestion des comptes Keycloak
+│   ├── media/                  # Médias liés aux articles (Cosmos DB + Blob)
+│   ├── report/                 # Signalements citoyens (Cosmos DB + Groq AI)
+│   ├── thread/                 # Fils de discussion sur signalements (PostgreSQL)
+│   ├── upload/                 # Upload de fichiers vers Azure Blob
+│   ├── users/                  # Utilisateurs (PostgreSQL)
+│   └── webhook/                # Traitement des événements Keycloak
+├── middlewares/                # Auth JWT, CORS, rôles, permissions, local-auth
+├── infrastructure/             # Clients Azure (Blob, Cosmos), Drizzle, env
+└── core/                       # Auto-seed, env-check, runtime-config, ISeeder
+```
+
+### Modules et stockage
+
+| Module | Stockage principal | Notes |
+|--------|--------------------|-------|
+| `users` | PostgreSQL (Drizzle) | Synchronisé via webhook Keycloak |
+| `access` | PostgreSQL (Drizzle) | Permissions par ville |
+| `city` | PostgreSQL (Drizzle) | |
+| `establishment` | PostgreSQL (Drizzle) | |
+| `thread` | PostgreSQL (Drizzle) | Fils sur signalements |
+| `article` | Azure Cosmos DB | |
+| `config` | Azure Cosmos DB | |
+| `media` | Azure Cosmos DB + Azure Blob | Métadonnées + fichiers |
+| `report` | Azure Cosmos DB | Analyse IA via Groq |
+| `iam` | Keycloak (API externe) | |
+| `upload` | Azure Blob Storage | Upload direct |
+| `webhook` | — | Stateless, traite les events Keycloak |
+
+---
+
+## Prérequis
+
+- **Node.js** ≥ 20.9.0
+- **Bun** (package manager — ne pas utiliser npm/pnpm/yarn)
+- **Azure Functions Core Tools v4**
+- **PostgreSQL** (local ou Docker)
+- **Azurite** (émulateur Azure Storage local) ou compte Azure Storage réel
+- **Azure Cosmos DB Emulator** ou compte Cosmos DB réel
+- **Bruno CLI** (pour les tests API)
+
+### Installer Azure Functions Core Tools
+
+```bash
+bun add -g azure-functions-core-tools@4
+```
+
+Ou via la [documentation officielle](https://learn.microsoft.com/fr-fr/azure/azure-functions/functions-run-local).
+
+### Installer Bruno CLI
+
+```bash
+bun add -g @usebruno/cli
+```
+
+---
+
+## Configuration de l'environnement
+
+### `local.settings.json` (Azure Functions en local)
+
+Azure Functions Core Tools injecte les entrées `Values` dans `process.env` au démarrage.
+
+1. Copier le fichier d'exemple :
 
    ```bash
    cp local-example.settings.json local.settings.json
    ```
 
-   On PowerShell:
+   Sous PowerShell :
 
    ```powershell
    Copy-Item local-example.settings.json local.settings.json
    ```
 
-2. Fill in secrets and URLs for your machine (Postgres, Cosmos or emulator, Keycloak, Azure Storage, and so on).
+2. Renseigner les secrets selon votre environnement.
 
-Useful keys (see `local-example.settings.json` and the source):
+#### Variables d'environnement
 
-| Variable | Purpose |
-|----------|---------|
-| `FUNCTIONS_WORKER_RUNTIME` | Must stay `node` for this project. |
-| `ENV_MODE` | e.g. `development`: enables certain local-only behavior (see `local-auth.middleware`). |
-| `IN_MEMORY` | `true` / `1` / `yes` / `on`: in-memory storage (no Postgres or Cosmos for main data); real environment checks are relaxed. |
-| `AUTO_SEED` (or `auto_seed`) | Runs a seed when gateways start; recognized values: `INSERT_ONLY`, `RESET_DATA` (see Seeding). |
-| `DATABASE_URL` | Postgres connection (Drizzle / users). |
-| `DATABASE_POOL_MAX` | Max pool size (default `5`). |
-| `COSMOS_ENDPOINT`, `COSMOS_KEY` | Cosmos DB (articles in persisted mode). |
-| `COSMOS_DATABASE_ID` | Optional, defaults to `neocivis`. |
-| `COSMOS_DATABASE_THROUGHPUT` | Shared database RU/s for all containers (default `400`, clamped `400`–`1000`). Use this on accounts capped at 1000 RU/s so `articles` + `media` do not each reserve 400 RU/s. After changing, run `bun run db:reset -- --confirm --cosmos` once to recreate the database with shared throughput. |
-| `KEYCLOAK_*` | Optional at startup but required for real IAM sync (`KEYCLOAK_BASE_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`). |
-| `AZURE_STORAGE_CONNECTION_STRING`, `AZURE_MEDIA_STORAGE_CONTAINER` | Required for media blobs and citizen report uploads. |
-| `AZURE_STORAGE_BASE_URL` | Optional (derived public URLs). |
+| Variable | Obligatoire | Description |
+|----------|-------------|-------------|
+| `FUNCTIONS_WORKER_RUNTIME` | Oui | Toujours `node` |
+| `ENV_MODE` | Non | `development` active le mode local-auth (pas de vrai JWT requis) |
+| `IN_MEMORY` | Non | `true` : tout en mémoire, aucune base de données requise |
+| `AUTO_SEED` | Non | `INSERT_ONLY` ou `RESET_DATA` — seed automatique au démarrage |
+| `DATABASE_URL` | Oui (hors IN_MEMORY) | URL de connexion PostgreSQL |
+| `DATABASE_POOL_MAX` | Non | Taille max du pool (défaut : `5`) |
+| `COSMOS_ENDPOINT` | Oui (hors IN_MEMORY) | Endpoint Cosmos DB |
+| `COSMOS_KEY` | Oui (hors IN_MEMORY) | Clé Cosmos DB |
+| `COSMOS_DATABASE_ID` | Non | Défaut : `neocivis` |
+| `COSMOS_DATABASE_THROUGHPUT` | Non | RU/s partagé (défaut : `400`, max : `1000`). Après modification, relancer `bun run db:reset -- --confirm --cosmos`. |
+| `KEYCLOAK_BASE_URL` | Oui | URL de base Keycloak |
+| `KEYCLOAK_REALM` | Oui | Realm Keycloak |
+| `KEYCLOAK_CLIENT_ID` | Oui | Client ID backend |
+| `KEYCLOAK_CLIENT_SECRET` | Oui | Secret client backend |
+| `KEYCLOAK_PASSWORD_SETUP_CLIENT_ID` | Non | Client pour le reset de mot de passe |
+| `KEYCLOAK_PASSWORD_SETUP_REDIRECT_URI` | Non | URI de redirection pour reset mot de passe |
+| `AZURE_STORAGE_CONNECTION_STRING` | Oui (médias/uploads) | Chaîne de connexion Azure Blob |
+| `AZURE_MEDIA_STORAGE_CONTAINER` | Non | Nom du container (défaut : `media`) |
+| `AZURE_STORAGE_BASE_URL` | Non | URL publique de base du Blob Storage |
 
-When **not** in `IN_MEMORY` mode, `assertBackendEnv()` at startup requires at least `DATABASE_URL`, `COSMOS_ENDPOINT`, and `COSMOS_KEY`.
+### `.env` / `.env.local` (scripts CLI)
 
-### `.env` / `.env.local` (CLI scripts)
-
-The `db:reset` and `db:seeding` scripts load the **first** file found, in order, among `.env.local` then `.env`, under `apps/backend` (the process current working directory).
-
-Drizzle commands `db:generate`, `db:migrate`, `db:push`, and `db:studio` read `DATABASE_URL` from the process environment **without** loading those files automatically. Export `DATABASE_URL` in your shell, or run with an env file supported by Bun, for example:
+Les scripts `db:reset` et `db:seeding` chargent `.env.local` puis `.env` depuis `apps/backend/`.
+Les commandes Drizzle (`db:generate`, `db:migrate`, `db:push`, `db:studio`) nécessitent `DATABASE_URL` dans l'environnement :
 
 ```bash
-bun --env-file=.env.local run db:migrate
+bun run db:migrate
 ```
 
 ---
 
-## Seeding (development data)
+## Mode IN_MEMORY
 
-Seeding fills **users** (via Keycloak when configured, otherwise fallback values) and **articles** (Cosmos or in-memory repository depending on mode).
+Définir `IN_MEMORY=true` dans `local.settings.json` permet de démarrer sans aucune base de données. Tous les repositories passent en mode mémoire. Idéal pour le développement rapide ou les tests d'intégration.
 
-### `INSERT_ONLY` and `RESET_DATA`
-
-- **`INSERT_ONLY`**: runs `seed()` only on each seeder (users, articles). Existing data is not cleared first.
-- **`RESET_DATA`**: for each seeder, calls `deleteAll()` first, then `seed()`. Useful to get a clean dataset without manual cleanup.
-
-### Where these modes apply
-
-1. **Gateway startup** (`citizen` / `municipality`): if `AUTO_SEED` (or `auto_seed`) is exactly `INSERT_ONLY` or `RESET_DATA`, the same pipeline runs once (except when in-memory already handled as in `auto-seed.ts`). A missing or unrecognized value disables auto-seed.
-
-2. **Manual script** `bun run db:seeding`: defaults to `INSERT_ONLY`. Pass `--reset` for `RESET_DATA`:
-
-   ```bash
-   bun run db:seeding -- --reset
-   ```
-
-### Limitations
-
-- With **`IN_MEMORY`** enabled, the `db:seeding` script **exits with an error** and refuses to run. Startup auto-seed can still run in memory for local development.
+> Les repositories in-memory ne sont **pas partagés** entre les gateways (`citizen`, `municipality`, `webhook`) — ils sont des Azure Functions distinctes.
 
 ---
 
-## Database commands (`package.json`)
+## Démarrage local
 
-Run these from `apps/backend`:
-
-| Script | Description |
-|--------|-------------|
-| `bun run db:generate` | Generates Drizzle SQL migration files from the schema (`drizzle-kit generate`). Requires `DATABASE_URL` in the environment. |
-| `bun run db:migrate` | Applies migrations from the `drizzle/` folder to Postgres (`migrate.ts`). Requires `DATABASE_URL`. |
-| `bun run db:push` | Pushes the schema to the database without migration files (`drizzle-kit push`). Handy for local iteration; use with care on real data. |
-| `bun run db:studio` | Opens Drizzle Studio (`drizzle-kit studio`). |
-| `bun run db:reset` | **Destructive**: orchestrated reset of Postgres, Cosmos, and/or Azure Blob. Requires **`--confirm`**. Targets: `--drizzle` / `--postgres` / `--postgress` (typo alias accepted in code), `--cosmos` (also clears the media blob container when `AZURE_STORAGE_CONNECTION_STRING` is set), `--blob` / `--storage` (blob only), or `--all` / `--both` (Postgres + Cosmos + blob). With an interactive TTY and no target, the script prompts; without a TTY, the default is all three. Skips Cosmos or blob steps with a log line when not configured. Loads `.env.local` / `.env`. Example: `bun run db:reset -- --confirm --all` |
-| `bun run db:seeding` | Runs seeders (see Seeding). `--reset` selects `RESET_DATA`. Loads `.env.local` / `.env`. Not compatible with `IN_MEMORY`. |
-
----
-
-## Running the backend locally
-To run the backend locally, follow these steps:
-1. Navigate to the `apps/backend` directory.
-2. Install the dependencies (if you haven't already during the setup of the global project):
 ```bash
-bun install
+# Depuis apps/backend/ (watch tsup + func start en parallèle)
+bun run start
 ```
-3. Start the Azure Functions host:
-```bash
-func start
-```
-This will start the backend server locally, and you can access the API endpoints at `http://localhost:7071/api`.
 
-### Webhook gateway (Keycloak)
+L'API est accessible sur `http://localhost:7071/api`.
 
-A third Azure Function serves Keycloak event webhooks (no JWT / APIM auth):
+### Aperçu des routes
+
+#### Gateway citizen (`/api/citizen/*`, JWT requis)
+
+| Préfixe | Controller |
+|---------|-----------|
+| `/api/citizen/articles` | Lecture des articles |
+| `/api/citizen/cities` | Villes disponibles |
+| `/api/citizen/config` | Configuration applicative |
+| `/api/citizen/establishments` | Établissements |
+| `/api/citizen/reports` | Signalements (création + suivi) |
+| `/api/citizen/threads` | Fils de discussion |
+| `/api/citizen/users` | Profil utilisateur |
+
+#### Gateway municipality (`/api/municipality/*`, JWT + rôle requis)
+
+| Préfixe | Controller |
+|---------|-----------|
+| `/api/municipality/access` | Gestion des permissions par ville |
+| `/api/municipality/articles` | CRUD articles |
+| `/api/municipality/cities` | CRUD villes |
+| `/api/municipality/config` | Configuration |
+| `/api/municipality/establishments` | CRUD établissements |
+| `/api/municipality/media` | Upload et gestion des médias |
+| `/api/municipality/reports` | Gestion des signalements |
+| `/api/municipality/threads` | Fils de discussion |
+| `/api/municipality/users` | Gestion des utilisateurs |
+
+#### Gateway webhook (`/api/webhook/*`, pas d'auth JWT)
 
 | Route | Description |
 |-------|-------------|
-| `POST /api/webhook/post` | Receives Keycloak events (`access.REGISTER`, `access.UPDATE`, `access.DELETE`). Any body is accepted; invalid payloads are ignored with HTTP 200. Syncs the Postgres `users` table (soft delete on `access.DELETE`). |
+| `POST /api/webhook/post` | Événements Keycloak (`access.REGISTER`, `access.UPDATE`, `access.DELETE`). Corps invalide → 200 ignoré. Sync la table `users` PostgreSQL. |
 
-Configure the webhook URL in Keycloak (see `scripts/setup-keycloak-webhook.ts` and `KEYCLOAK_WEBHOOK_URL`, e.g. `http://localhost:7071/api/webhook/post`).
+Configurer l'URL webhook dans Keycloak (`KEYCLOAK_WEBHOOK_URL`, ex. `http://localhost:7071/api/webhook/post`). Voir `scripts/setup-keycloak-webhook.ts`.
 
-**Local E2E (Bruno `scenarios/webhook`)** : set `IN_MEMORY` to `false` in `local.settings.json`. Each gateway is a separate Azure Function; in-memory repos are not shared across `citizen`, `municipality`, and `webhook`.
+---
 
-After schema changes, apply migrations: `bun --env-file=.env.local run db:migrate`.
+## Commandes de base de données
 
-### Running the backend in watch mode
-To run the backend in watch mode, which automatically restarts the server when file changes are detected, use the following command:
+Depuis `apps/backend/` :
+
+| Script | Description |
+|--------|-------------|
+| `bun run db:generate` | Génère les fichiers de migration Drizzle à partir du schéma |
+| `bun run db:migrate` | Applique les migrations depuis `drizzle/` vers PostgreSQL |
+| `bun run db:push` | Push le schéma sans fichier de migration (itération locale rapide) |
+| `bun run db:studio` | Ouvre Drizzle Studio |
+| `bun run db:reset` | **Destructif** : reset PostgreSQL, Cosmos DB et/ou Azure Blob. Requiert `--confirm`. Cibles : `--drizzle`, `--cosmos`, `--blob`, `--all`. Ex : `bun run db:reset -- --confirm --all` |
+| `bun run db:seeding` | Lance les seeders. `--reset` pour vider avant de re-seeder. Non compatible avec `IN_MEMORY`. |
+
+---
+
+## Seeding
+
+Le seeding remplit `users` (via Keycloak si configuré, sinon valeurs de fallback) et les autres modules (articles, villes, établissements, config, médias, etc.).
+
+### Modes
+
+- **`INSERT_ONLY`** : insère sans vider. Données existantes conservées.
+- **`RESET_DATA`** : vide (`deleteAll()`) puis insère. Dataset propre.
+
+### Déclenchement
+
+1. **Démarrage automatique** : `AUTO_SEED=INSERT_ONLY` ou `AUTO_SEED=RESET_DATA` dans `local.settings.json`
+2. **Script manuel** : `bun run db:seeding` (défaut : `INSERT_ONLY`, ajouter `--reset` pour `RESET_DATA`)
+
+> Avec `IN_MEMORY=true`, le script `db:seeding` refuse de s'exécuter (erreur). Le seed automatique au démarrage reste possible.
+
+---
+
+## Tests
+
+### Tests unitaires (Vitest)
+
+Les tests sont co-localisés avec les sources (`{name}.service.test.ts` à côté de `{name}.service.ts`) :
+
 ```bash
-bun run dev
+bun run test          # run once
+bun run test:watch    # mode watch
 ```
 
-### Note on prestart
-The `prestart` script is used to build the TypeScript code before starting the Azure Functions host. This ensures that the latest changes are compiled and ready to be served when you run `func start`. The `prestart` script is automatically executed before the `start` script, so you don't need to run it manually.
+### Tests API (Bruno)
 
-## Testing
+Les tests Bruno sont dans `api-tests/`, organisés par module. Environnements disponibles : `local`, `dev`, `prod`.
 
-### Tests with Vitest
-Vitest is a testing framework for JavaScript and TypeScript. It's used to run unit tests for the backend code.
-All the tests are specified with the `.spec.ts` extension and are located in the `src` directory. To run the tests, execute the following command in the terminal:
 ```bash
-bun run test
+# Depuis apps/backend/
+bru run --env local                          # tous les tests
+bru run --env local api-tests/article        # un module
+bru run --env local --export-junit           # export JUnit (CI)
+bru run --env dev                            # environnement dev
+bru run --env prod                           # environnement prod
 ```
 
-### Tests with Bruno
-Bruno is a tool for testing APIs. Here it's used to test the backend API endpoints. The test files are located in the `api-tests` directory. Each test file corresponds to a specific API endpoint and contains tests to verify the functionality of that endpoint.
+> Certains tests Bruno neccisetent des bdds fraichement seedées. Si vous avez des erreurs de type "not found" ou "permission denied", relancez `bun run db:reset -- --confirm --all` puis `bun run db:seeding`.
+---
 
-If you haven't already, make sure to install Bruno globally:
+## Build
+
 ```bash
-npm install -g @usebruno/cli
+bun run build    # compile TypeScript → dist/ (ESM via tsup)
 ```
 
-To run the tests, navigate to the `api-tests` directory and execute the following command:
-```bash
-bru run --env local
-```
+La configuration tsup est dans `tsup.config.ts`. Le build est déclenché automatiquement avant `func start` via le script `prestart`.
 
-You can also open the Bruno UI to run and manage your tests.
+---
 
-If you need to run a specific test file, you can use the following command:
-```bash
-bru run --env local <path-to-test-file-or-directory>
-```
+## Commandes depuis la racine du monorepo
 
-You can also export the test results in JUnit format for integration with CI/CD pipelines:
 ```bash
-bru run --env local --export-junit
-```
-
-You can also run the prod and dev environments tests by replacing `local` with `prod` or `dev` in the command:
-```bash
-bru run --env prod
-```
-```bash
-bru run --env dev
+bun turbo dev --filter=backend
+bun turbo build --filter=backend
+bun turbo test --filter=backend
 ```

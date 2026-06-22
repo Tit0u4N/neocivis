@@ -67,7 +67,6 @@ jobs:
         bun install --production
 
     - name: 'Run Azure Functions Action (DEV)'
-      if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment != 'main'
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_DEV_NAME }}
@@ -75,7 +74,7 @@ jobs:
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_DEV_PUBLISH_PROFILE }}
 
     - name: 'Run Azure Functions Action (PROD)'
-      if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'main'
+      if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'main')
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}

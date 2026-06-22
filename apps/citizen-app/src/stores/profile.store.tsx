@@ -26,6 +26,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       const me = await authService.getMe();
       setProfile(me);
     } catch (err) {
+      console.log('[Profile] getMe failed:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement du profil');
       setProfile(null);
     } finally {

@@ -161,7 +161,7 @@ export function useThreadListPage() {
 
   const navigateToThread = useCallback(
     (id: string) => {
-      router.push(`/dashboard/threads/${id}`);
+      router.push(`/dashboard/threads/detail?id=${id}`);
     },
     [router],
   );

@@ -89,14 +89,14 @@ export function useArticleListPage() {
 
   const navigateToEdit = useCallback(
     (id: string) => {
-      router.push(`/dashboard/articles/${id}`);
+      router.push(`/dashboard/articles/edit?id=${id}`);
     },
     [router],
   );
 
   const navigateToTranslations = useCallback(
     (id: string) => {
-      router.push(`/dashboard/articles/${id}/translations`);
+      router.push(`/dashboard/articles/translations?id=${id}`);
     },
     [router],
   );

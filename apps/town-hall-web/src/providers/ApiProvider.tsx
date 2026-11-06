@@ -5,6 +5,8 @@ import type { KyInstance } from 'ky';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { createTownHallDemoFetch } from '@/demo/demo-fetch';
+import { DEMO_API_BASE_URL, IS_DEMO_MODE } from '@/demo/demo-mode';
 
 type ApiContextValue = {
   api: KyInstance;
@@ -25,7 +27,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const api = useMemo(
     () =>
       createApiClient({
-        baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? '',
+        baseUrl: IS_DEMO_MODE ? DEMO_API_BASE_URL : (process.env.NEXT_PUBLIC_API_BASE_URL ?? ''),
+        fetch: IS_DEMO_MODE ? createTownHallDemoFetch() : undefined,
         tokenProvider: async () => authRef.current.user?.access_token ?? null,
         onUnauthorized: () => {
           void authRef.current.signinRedirect();

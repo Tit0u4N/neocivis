@@ -2,6 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { AuthProvider as OidcAuthProvider } from 'react-oidc-context';
+import { DemoAuthProvider } from '@/demo/DemoAuthProvider';
+import { IS_DEMO_MODE } from '@/demo/demo-mode';
 
 /**
  * OIDC authority URL, e.g. https://auth.neocivis.cloud/realms/neocivis
@@ -18,5 +20,8 @@ const oidcConfig = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  if (IS_DEMO_MODE) {
+    return <DemoAuthProvider>{children}</DemoAuthProvider>;
+  }
   return <OidcAuthProvider {...oidcConfig}>{children}</OidcAuthProvider>;
 }

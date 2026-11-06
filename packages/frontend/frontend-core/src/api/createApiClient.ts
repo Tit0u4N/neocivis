@@ -1,5 +1,5 @@
-import ky from 'ky';
 import type { KyInstance, NormalizedOptions } from 'ky';
+import ky from 'ky';
 
 export type TokenProvider = () => Promise<string | null>;
 
@@ -7,6 +7,11 @@ export type ApiClientOptions = {
   baseUrl: string;
   tokenProvider: TokenProvider;
   onUnauthorized?: () => void;
+  /**
+   * Custom `fetch` implementation (defaults to the global one).
+   * Used by the static demo mode to serve requests from an in-browser backend.
+   */
+  fetch?: typeof fetch;
 };
 
 /**
@@ -23,9 +28,16 @@ export type ApiClientOptions = {
  * Note: retry re-issues the request without a body — safe for 401 auth checks since
  * servers validate the Authorization header before reading the body.
  */
-export function createApiClient({ baseUrl, tokenProvider, onUnauthorized }: ApiClientOptions): KyInstance {
+export function createApiClient({
+  baseUrl,
+  tokenProvider,
+  onUnauthorized,
+  fetch: customFetch,
+}: ApiClientOptions): KyInstance {
+  const fetchImpl = customFetch ?? globalThis.fetch.bind(globalThis);
   return ky.create({
     prefixUrl: baseUrl,
+    fetch: fetchImpl,
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -57,7 +69,7 @@ export function createApiClient({ baseUrl, tokenProvider, onUnauthorized }: ApiC
           const retryHeaders = new Headers(request.headers);
           retryHeaders.set('Authorization', `Bearer ${freshToken}`);
 
-          const retryResponse = await fetch(request.url, {
+          const retryResponse = await fetchImpl(request.url, {
             method: request.method,
             headers: retryHeaders,
           });

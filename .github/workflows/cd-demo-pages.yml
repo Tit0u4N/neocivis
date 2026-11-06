@@ -1,0 +1,72 @@
+name: "CD Démo statique (GitHub Pages)"
+
+# Démo sans backend ni Keycloak : le backend Hono tourne en mémoire dans le navigateur
+# avec les données de seed. Prérequis : Settings → Pages → Source = "GitHub Actions".
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: demo-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Installation des dépendances
+        run: bun install
+
+      - name: Build des packages partagés
+        run: bunx turbo run build --filter=town-hall-web^...
+
+      - name: Build démo town-hall-web
+        working-directory: apps/town-hall-web
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/mairie
+        run: bun run build:demo
+
+      - name: Assemblage du site
+        run: |
+          mkdir -p site/mairie
+          cp -r apps/town-hall-web/out/. site/mairie/
+          # Page racine : redirige vers l'espace mairie.
+          cat > site/index.html <<HTML
+          <!doctype html>
+          <meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=./mairie/">
+          <title>NeoCivis — Démo</title>
+          <a href="./mairie/">Accéder à la démo NeoCivis (mairie)</a>
+          HTML
+          touch site/.nojekyll
+
+      - name: Upload artefact Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Déploiement GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

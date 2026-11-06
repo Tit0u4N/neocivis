@@ -150,7 +150,7 @@ export function useArticleTranslationsPage(id: string) {
   );
 
   const navigateToEdit = useCallback(() => {
-    router.push(`/dashboard/articles/${id}`);
+    router.push(`/dashboard/articles/edit?id=${id}`);
   }, [id, router]);
 
   return {

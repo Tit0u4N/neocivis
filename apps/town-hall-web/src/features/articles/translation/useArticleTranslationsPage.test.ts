@@ -231,6 +231,6 @@ describe('useArticleTranslationsPage', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => result.current.navigateToEdit());
-    expect(mockPush).toHaveBeenCalledWith('/dashboard/articles/art-1');
+    expect(mockPush).toHaveBeenCalledWith('/dashboard/articles/edit?id=art-1');
   });
 });

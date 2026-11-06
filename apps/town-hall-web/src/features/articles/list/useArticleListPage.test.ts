@@ -191,7 +191,7 @@ describe('useArticleListPage', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => result.current.navigateToEdit('a1'));
-    expect(mockPush).toHaveBeenCalledWith('/dashboard/articles/a1');
+    expect(mockPush).toHaveBeenCalledWith('/dashboard/articles/edit?id=a1');
   });
 
   it('navigateToTranslations pushes the translations URL', async () => {
@@ -200,7 +200,7 @@ describe('useArticleListPage', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => result.current.navigateToTranslations('a1'));
-    expect(mockPush).toHaveBeenCalledWith('/dashboard/articles/a1/translations');
+    expect(mockPush).toHaveBeenCalledWith('/dashboard/articles/translations?id=a1');
   });
 
   it('viewMode defaults to list', async () => {

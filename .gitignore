@@ -108,3 +108,5 @@ local.settings.json
 
 # --- Local data ---
 local-data/
+# Static demo bundle (apps/backend build:demo)
+dist-demo

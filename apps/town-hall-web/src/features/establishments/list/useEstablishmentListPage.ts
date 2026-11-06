@@ -68,7 +68,7 @@ export function useEstablishmentListPage() {
 
   const navigateToEdit = useCallback(
     (id: string) => {
-      router.push(`/dashboard/establishment/${id}`);
+      router.push(`/dashboard/establishment/edit?id=${id}`);
     },
     [router],
   );

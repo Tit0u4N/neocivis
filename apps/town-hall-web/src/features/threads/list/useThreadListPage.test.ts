@@ -259,7 +259,7 @@ describe('useThreadListPage', () => {
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       act(() => result.current.navigateToThread('thread-1'));
-      expect(mockPush).toHaveBeenCalledWith('/dashboard/threads/thread-1');
+      expect(mockPush).toHaveBeenCalledWith('/dashboard/threads/detail?id=thread-1');
     });
   });
 

@@ -137,7 +137,7 @@ describe('useEstablishmentListPage', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => result.current.navigateToEdit('est-1'));
-    expect(mockPush).toHaveBeenCalledWith('/dashboard/establishment/est-1');
+    expect(mockPush).toHaveBeenCalledWith('/dashboard/establishment/edit?id=est-1');
   });
 
   it('setConfirmDeleteId sets and clears the dialog state', async () => {

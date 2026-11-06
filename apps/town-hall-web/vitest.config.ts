@@ -7,6 +7,7 @@ export default mergeConfig(reactConfig, {
   plugins: [react()],
   resolve: {
     alias: {
+      '@demo-api': path.resolve(__dirname, './src/demo/demo-api.stub.ts'),
       '@': path.resolve(__dirname, './src'),
       react: path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),

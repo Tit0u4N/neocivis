@@ -73,6 +73,11 @@ jobs:
           </main>
           </html>
           HTML
+          # GitHub Pages n'utilise que le 404.html racine : on y sert l'app citoyen (SPA) pour
+          # les URLs profondes /citoyen/*, sinon on renvoie vers la page 404 de la mairie.
+          REPO_PATH="/${{ github.event.repository.name }}"
+          GUARD="<script>if(!location.pathname.startsWith('${REPO_PATH}/citoyen/'))location.replace('${REPO_PATH}/mairie/404.html')</script>"
+          sed "s#<head>#<head>${GUARD}#" site/citoyen/index.html > site/404.html
           touch site/.nojekyll
 
       - name: Upload artefact Pages

@@ -10,6 +10,8 @@ import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
+import { DemoBanner } from '@/demo/DemoBanner';
+import { IS_DEMO_MODE } from '@/demo/demo-mode';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { LanguageProvider } from '@/i18n/LanguageContext';
 import { ApiProvider } from '@/providers/ApiProvider';
@@ -86,7 +88,7 @@ function InitialLayout() {
 
     const navigationTimeout = setTimeout(() => {
       if (!isAuthenticated) {
-        if (!isLoginPage && !isAuthCallback) {
+        if (!(isLoginPage || isAuthCallback)) {
           router.replace('/login');
         }
       } else if (profile === null) {
@@ -254,7 +256,14 @@ export default function RootLayout() {
                         <ForumProvider>
                           <ProfileProvider>
                             <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} animated={true} />
-                            <InitialLayout />
+                            {IS_DEMO_MODE ? (
+                              <View style={{ flex: 1 }}>
+                                <DemoBanner />
+                                <InitialLayout />
+                              </View>
+                            ) : (
+                              <InitialLayout />
+                            )}
                           </ProfileProvider>
                         </ForumProvider>
                       </ArticlesProvider>

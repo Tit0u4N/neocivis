@@ -1,12 +1,8 @@
 name: "CD Citizen App (Android Debug APK)"
 
+# Désactivé (projet terminé) : seuls les builds web (CI + démo Pages) tournent automatiquement.
+# Lancement manuel toujours possible via workflow_dispatch.
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - "apps/citizen-app/**"
-      - "packages/**"
-      - ".github/workflows/cd-citizen-android.yml"
   workflow_dispatch:
 
 permissions:

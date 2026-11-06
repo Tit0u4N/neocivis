@@ -1,13 +1,8 @@
 name: CD Backend to Azure Function
 
+# Désactivé (projet terminé) : seuls les builds web (CI + démo Pages) tournent automatiquement.
+# Lancement manuel toujours possible via workflow_dispatch.
 on:
-  workflow_run:
-    workflows: ["CI (Build & Test)"] 
-    types:
-      - completed
-    branches: 
-      - main
-      - dev
   workflow_dispatch:
     inputs:
       environment:

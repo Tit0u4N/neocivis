@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { authConfig, KEYCLOAK_AUTHORITY } from '@/config/authConfig';
+import { DemoAuthProvider } from '@/demo/DemoAuthProvider';
+import { IS_DEMO_MODE } from '@/demo/demo-mode';
 import { refreshAccessToken } from '@/services/tokenRefresh';
 import { clearTokens, getAccessToken, isTokenExpired, saveTokens } from '@/services/tokenStorage';
 
@@ -33,7 +35,7 @@ type AuthContextValue = {
   logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export type AuthProviderProps = {
   children: ReactNode;
@@ -66,7 +68,14 @@ function parseJwtPayload(token: string): AuthUser | null {
   }
 }
 
-export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthProviderProps) {
+export function AuthProvider(props: AuthProviderProps) {
+  if (IS_DEMO_MODE) {
+    return <DemoAuthProvider>{props.children}</DemoAuthProvider>;
+  }
+  return <KeycloakAuthProvider {...props} />;
+}
+
+function KeycloakAuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthProviderProps) {
   // Stable ref so the mount effect always uses the initial authority without re-running.
   const authorityRef = useRef(authority);
 
@@ -120,7 +129,9 @@ export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthP
   const pendingExchangeRef = useRef<{ code: string; codeVerifier: string } | null>(null);
 
   useEffect(() => {
-    if (response?.type !== 'success') return;
+    if (response?.type !== 'success') {
+      return;
+    }
     const code = response.params.code;
     const codeVerifier = request?.codeVerifier;
     if (code && codeVerifier) {
@@ -130,11 +141,17 @@ export function AuthProvider({ children, authority = KEYCLOAK_AUTHORITY }: AuthP
 
   // Handle auth code exchange after the browser redirects back to the app.
   useEffect(() => {
-    if (response?.type !== 'success') return;
-    if (!discovery) return;
+    if (response?.type !== 'success') {
+      return;
+    }
+    if (!discovery) {
+      return;
+    }
 
     const pending = pendingExchangeRef.current;
-    if (!pending) return;
+    if (!pending) {
+      return;
+    }
     pendingExchangeRef.current = null;
 
     setIsLoading(true);

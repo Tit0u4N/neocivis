@@ -1,8 +1,10 @@
 import { createApiClient } from '@repo/frontend-core/api';
 import type { KyInstance } from 'ky';
-import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { KEYCLOAK_AUTHORITY } from '@/config/authConfig';
+import { createCitizenDemoFetch } from '@/demo/demo-fetch';
+import { DEMO_API_BASE_URL, IS_DEMO_MODE } from '@/demo/demo-mode';
 import { useAuth } from '@/providers/AuthProvider';
 import { refreshAccessToken } from '@/services/tokenRefresh';
 import { getAccessToken, isTokenExpired } from '@/services/tokenStorage';
@@ -25,7 +27,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const api = useMemo(
     () =>
       createApiClient({
-        baseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',
+        baseUrl: IS_DEMO_MODE ? DEMO_API_BASE_URL : (process.env.EXPO_PUBLIC_API_BASE_URL ?? ''),
+        fetch: IS_DEMO_MODE ? createCitizenDemoFetch() : undefined,
         tokenProvider: async () => {
           const expired = await isTokenExpired();
           if (!expired) {

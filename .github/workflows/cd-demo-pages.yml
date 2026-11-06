@@ -33,7 +33,7 @@ jobs:
         run: bun install
 
       - name: Build des packages partagés
-        run: bunx turbo run build --filter=town-hall-web^...
+        run: bunx turbo run build --filter=town-hall-web^... --filter=citizen-app^...
 
       - name: Build démo town-hall-web
         working-directory: apps/town-hall-web
@@ -41,17 +41,37 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/mairie
         run: bun run build:demo
 
+      - name: Build démo citizen-app (web)
+        working-directory: apps/citizen-app
+        env:
+          EXPO_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/citoyen
+        run: bun run build:demo
+
       - name: Assemblage du site
         run: |
-          mkdir -p site/mairie
+          mkdir -p site/mairie site/citoyen
           cp -r apps/town-hall-web/out/. site/mairie/
-          # Page racine : redirige vers l'espace mairie.
+          cp -r apps/citizen-app/dist/. site/citoyen/
+          # Page racine : choix de l'application.
           cat > site/index.html <<HTML
           <!doctype html>
+          <html lang="fr">
           <meta charset="utf-8">
-          <meta http-equiv="refresh" content="0; url=./mairie/">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>NeoCivis — Démo</title>
-          <a href="./mairie/">Accéder à la démo NeoCivis (mairie)</a>
+          <style>
+            body { font-family: system-ui, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; background: #f5f7fa; color: #1a2233; }
+            main { text-align: center; padding: 16px; }
+            a { display: block; margin: 12px auto; padding: 14px 24px; max-width: 280px; border-radius: 12px; background: #1f6f78; color: #fff; text-decoration: none; font-weight: 600; }
+            p { color: #5b6476; }
+          </style>
+          <main>
+            <h1>NeoCivis — Démo</h1>
+            <p>Données fictives, réinitialisées à chaque rechargement.</p>
+            <a href="./mairie/">Espace mairie</a>
+            <a href="./citoyen/">Application citoyen</a>
+          </main>
+          </html>
           HTML
           touch site/.nojekyll
 

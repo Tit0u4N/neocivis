@@ -15,6 +15,7 @@ export default mergeConfig(
     ],
     resolve: {
       alias: {
+        '@demo-api': path.resolve(__dirname, './src/demo/demo-api.stub.ts'),
         '@': path.resolve(__dirname, './src'),
         'react-native': path.resolve(__dirname, './src/__tests__/react-native-mock.ts'),
       },
